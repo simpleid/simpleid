@@ -1,0 +1,178 @@
+<!-- BEGIN: main -->
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xml:lang="en-AU" lang="en-AU" xmlns="http://www.w3.org/1999/xhtml">
+    <!-- :mode=html: -->
+    <head>
+        <title>{title} - SimpleID</title>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+                
+        <style type="text/css" media="screen">
+            @import url(html/simpleid.css);
+        </style>
+    </head>
+    <body>
+        <div id="header">
+            <h1><a href="http://simpleid.sourceforge.net/">SimpleID</a> {version}</h1>
+        </div>
+        <div id="content">
+            <h1>{title}</h1>
+            
+            <!-- BEGIN: message -->
+            <div class="message">
+                <p>{message}</p>
+            </div>
+            <!-- END: message -->
+            
+            <!-- BEGIN: user -->
+            <div class="user">
+                <p class="logged-in-as">You are logged in as <strong>{uid}</strong> (<strong>{identity}</strong>).</p>
+                <p class="logout">{logout}</p>
+                <div style="clear: both"></div>
+            </div>
+            <!-- END: user -->
+            
+            <!-- BEGIN: frontpage -->            
+            <h2>Trusted Sites</h2>
+            <form action="index.php" method="post">
+            <input name="q" type="hidden" value="autorelease" />
+            <input name="update-all" type="hidden" value="1"/>
+            <table>
+                <tr>
+                    <th>Realm</th>
+                    <th>Last access</th>
+                    <th>Automatic</th>
+                </tr>
+                <!-- BEGIN:realm -->
+                <tr>
+                    <td><span class="realm">{realm}</span></td>
+                    <td>{last_time}</td>
+                    <td><input type="checkbox" value="1" name="autorelease[{realm}]" {auto_release}/></td>
+                </tr>
+                <!-- END: realm -->
+            </table>
+            <input type="submit" name="op" id="edit-submit" value="Submit" class="form-submit" />
+            </form>
+            
+            <h2>Simple Registration Extension</h2>
+            <p>SimpleID will send the following information to sites which supports
+            the Simple Registration Extension.</p>
+            
+            <p>To change these, or your password,
+            <a href="http://koinic.net/software/simpleid/identity-file">edit your identity file</a>.</p>
+            
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Value</th>
+                </tr>
+                <!-- BEGIN: sreg -->
+                <tr>
+                    <td>{name}</td>
+                    <td>{value}</td>
+                </tr>
+                <!-- END: sreg -->
+            </table>
+            <!-- END: frontpage -->
+            
+            <!-- BEGIN: rp -->
+            <form action="index.php" method="post">
+                <input name="q" type="hidden" value="send" />
+                <!-- BEGIN: parameter --><input type="hidden" name="{name}" value="{value}" /><!-- END: parameter -->
+                
+                <!-- BEGIN: setup -->
+                <p>You are being logged into <strong class="realm">{realm}</strong>.</p>
+                
+                <div class="form-item">
+                    <label class="option">
+                        <input type="checkbox" name="autorelease" {auto_release} value="1" />
+                        Automatically send my information to this site for any future requests.
+                    </label>
+                </div>
+                
+                <p>SimpleID will also be sending the following registration information.
+                You can view the site's <a href="{policy_url}">policy</a> in relation
+                to the use of this information.</p>
+            
+                <!-- BEGIN: sreg -->
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Value</th>
+                    </tr>
+                    <!-- BEGIN: sreg -->
+                    <tr>
+                        <td>{name}</td>
+                        <td>{value}</td>
+                    </tr>
+                    <!-- END: sreg -->
+                </table>
+                <!-- END: sreg -->
+                
+                <input type="submit" name="op" id="edit-submit" value="OK" class="form-submit" />
+                <input type="submit" name="op" id="edit-cancel" value="Cancel" class="form-submit" />
+                <!-- END: setup -->
+
+                <!-- BEGIN: cancel -->
+                <p>Unable to log into <strong class="realm">{realm}</strong>.</p>
+                
+                <p>Your current identity does not match the requested identity <strong>{identity}</strong>.</p>
+                
+                <p><a href="?q=logout">Log out of SimpleID</a> and try again.</p>
+                
+                <input type="submit" name="op" id="edit-cancel" value="Cancel" class="form-submit" />
+                <!-- END: cancel -->                
+            </form>
+            <!-- END: rp -->
+
+            <!-- BEGIN: autorelease -->
+            <form action="index.php" method="post">
+                <input name="q" type="hidden" value="autorelease" />
+
+                <div class="form-item">
+                    <label class="option">
+                        <input type="checkbox" name="autorelease[{realm}]" value="1" />
+                        Automatically send my information to <strong>{realm}</strong> for any future requests.
+                    </label>
+                </div>
+                <input type="submit" name="op" id="edit-submit" value="OK" class="form-submit" />
+            </form>
+            <!-- END: autorelease -->
+            
+            <!-- BEGIN: login -->
+            <form action="index.php" method="post">
+                <input name="q" type="hidden" value="login"/><input name="destination" type="hidden" value="{destination}"/>
+                <input name="captcha_hash" type="hidden" value="{captcha_hash}" />
+                <div class="form-item">
+                    <label for="edit-name">User name:</span></label>
+                    <input type="text" maxlength="60" name="name" id="edit-name"  size="60" value=""  class="form-text required" />
+                </div>
+                <div class="form-item">
+                    <label for="edit-pass">Password:</label>
+                    <input type="password" name="pass" id="edit-pass"  size="60"  class="form-text required" />
+                </div>
+                <div class="form-item">
+                    <label for="edit-captcha">What is {captcha}?</label>
+                    <input type="text" maxlength="60" name="captcha" id="edit-captcha"  size="60" value="" class="form-text required" />
+                </div>
+                <input type="submit" name="op" id="edit-submit" value="Log in" class="form-submit" />
+            </form>
+            <!-- END: login -->
+            
+            
+            <!-- BEGIN: redirect -->
+            <form action="{url}" method="get" id="simpleid_redirect">
+                <p>Redirecting...</p>
+                <!-- BEGIN: parameter --><input type="hidden" name="{name}" value="{value}" /><!-- END: parameter -->
+                <noscript><input type="submit" value="Send" /></noscript>
+                <script type="text/javascript">document.getElementById("simpleid_redirect").submit();</script>
+            </form>
+            <!-- END: redirect -->
+        </div>
+
+        <div id="footer">
+            <address>SimpleID &copy; Kelvin Mo 2007.</address>
+        </div>
+    </body>
+</html>
+<!-- END: main -->

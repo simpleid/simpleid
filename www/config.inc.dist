@@ -1,0 +1,67 @@
+<?php
+/**
+ * SimpleID configuration file.
+ */
+
+
+/**
+ * Base URL.
+ *
+ * This is the URL of the location you want to place your SimpleID
+ * distribution.  It becomes the URL of the SimpleID server.
+ *
+ * It is not allowed to have a trailing slash; SimpleID will add it
+ * for you.
+ *
+ * Examples:
+ *   define('SIMPLEID_BASE_URL', 'http://www.example.com');
+ *   define('SIMPLEID_BASE_URL', 'http://www.example.com:8888');
+ *   define('SIMPLEID_BASE_URL', 'http://www.example.com/simpleid');
+ *   define('SIMPLEID_BASE_URL', 'https://www.example.com:8888/simpleid');
+ *
+ */
+define('SIMPLEID_BASE_URL', 'http://www.example.com');
+
+/**
+ * Directory to store identity information.
+ *
+ * This directory must exist and be readable by the web server.
+ *
+ * For maximum security, it is highly recommended to place this
+ * directory outside your web browser's document root directory, so
+ * that it is not visible to user agents.
+ *
+ */
+define('SIMPLEID_IDENTITIES_DIR', '../identities');
+
+/**
+ * Directory to store cache data.
+ *
+ * This directory must exist and be readable and writable by the
+ * web server.
+ *
+ * For maximum security, it is highly recommended to place this
+ * directory outside your web browser's document root directory, so
+ * that it is not visible to user agents.
+ *
+ */
+define('SIMPLEID_CACHE_DIR', '../cache');
+
+
+/**
+ * Date and time format.
+ *
+ * The date and time format specified using the strftime() syntax.
+ *
+ * See http://www.php.net/strftime for details.
+ * 
+ */
+define('SIMPLEID_DATE_TIME_FORMAT', '%Y-%m-%d %H:%M:%S %Z');
+
+/**
+ * The number of seconds before associations expire.  This is an advanced
+ * option, for which the default setting should work fine.
+ */
+define('SIMPLEID_ASSOC_EXPIRES_IN', 3600);
+
+?>

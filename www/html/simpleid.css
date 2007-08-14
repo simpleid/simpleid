@@ -1,0 +1,135 @@
+body {
+	margin: 0;
+	padding: 0;
+	font: 12px normal Helvetica, Arial, sans-serif;
+	line-height: 1em;
+}
+
+#header {
+    background-color: #666666;
+    color: #CCCCCC;
+    padding: 5px 10px;    
+}
+
+#header h1 {
+    font-weight: bold;
+    font-size: 1.2em;
+    text-transform: uppercase;
+    margin: 0.5em 0;
+    color: #CCCCCC;
+    letter-spacing: 0;
+}
+
+#header h1 a {
+    color: #FFFFFF;
+    text-decoration: none;
+    border-bottom: none;
+}
+
+#footer {
+    margin: 2em 0;
+    padding: 0px 10px;
+    text-align: right;
+    color: #999999;
+}
+#footer address { font-style: normal }
+
+#content {
+    margin: 1em 10px;
+}
+
+h1 {
+    margin: 1em 0;
+    font-weight: normal;
+    font-size: 1.8em;
+    text-transform: uppercase;
+    color: #666666;
+    letter-spacing: 0.1em;
+}
+
+h2 {
+    margin: 2em 0;
+    padding-top: 1em;
+    font-weight: normal;
+    font-size: 1.5em;
+    text-transform: uppercase;
+    color: #666666;
+    letter-spacing: 0.1em;    
+    border-top: 2px dotted #BBBBBB;
+}
+
+p, li { line-height: 1.5; }
+
+a {
+    border-bottom: 1px solid #CCCCCC;
+    color: #1144AA;
+    text-decoration: none !important;
+    font-weight: bold;
+}
+
+a:visited {
+    border-color: #CCCCCC;
+    color: #114499;
+}
+a:focus, a:hover {
+    border-color: #4488EE;
+    color: #4488EE;
+}
+
+table {
+    border-collapse: collapse;
+    margin: 0 0 1em 0;
+    width: 100%;
+}
+
+td, th {
+    border-bottom: 1px solid #CCCCCC;
+    text-align: left;
+    vertical-align: center;
+    padding: 5px 5px;
+}
+th {
+    border-bottom: 0px;
+    background-color: #666666;
+    color: #FFFFFF;
+    white-space: nowrap;
+    font-weight: bold;
+}
+.realm {
+    padding-left: 20px;
+    background: transparent url(world.png) no-repeat top left;
+}
+
+.message {
+    border: 1px solid #666666;
+    padding: 0 10px;
+    background: #DDDDDD;
+    margin-bottom: 10px;
+}
+.message p { line-height: 1; }
+
+.user {
+    border: 1px solid #1144AA;
+    background-color: #DDEEFF;
+    padding: 0px 10px;
+    text-align: right;
+}
+.logged-in-as {
+    padding-left: 20px;
+    background: transparent url(user.png) no-repeat top left;
+    float: left;
+}
+
+/* Forms */
+.form-item {
+    margin: 1em 0;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    padding: 2px 0;
+}
+label.option { font-weight: normal; }
+
+

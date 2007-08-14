@@ -1,0 +1,51 @@
+; :mode=ini:
+; SimpleID identity file.
+;
+; This file contains all the data associated with an identity.  It should
+; always be named username.identity, where username is the user name to be used
+; when logging into SimpleID.
+;
+
+;
+; The OpenID Identifier associated with this identity.  This is typically a
+; URL, although the OpenID specifications allow the use of URIs and even XRIs.
+;
+; Relying parties must be able to resolve the identity to obtain the address
+; of this SimpleID installation.
+;
+; Examples:
+;    http://example.com/
+;    http://example.com:8888/
+;    http://example.com/myopenid
+;    https://example.com:8080/myopenid
+;
+identity=http://example.com/
+
+;
+; The password associated with this identity.  This password is hashed using
+; the MD5 algorithm.
+;
+; There are various tools available which will give you the MD5 hash of any
+; given string.  Wikipedia (http://en.wikipedia.org/wiki/MD5) is a good place
+; to start.
+;
+pass=c8e24ae844b7cb9381g722ae8209a19a
+
+;
+; Simple Registration Extension data.
+;
+; If you want to provide registration data for consumers which support the
+; Simple Registration Extension, uncomment the section below and fill
+; in your details
+;
+
+;[sreg]
+;nickname=Example
+;email=example@example.com
+;fullname=Example
+;dob=2000-00-00
+;gender=M
+;postcode=1234
+;country=xy
+;language=xy
+;timezone=Australia/Sydney
