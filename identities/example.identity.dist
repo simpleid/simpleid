@@ -1,4 +1,7 @@
 ; :mode=ini:
+; $Id$
+;
+;
 ; SimpleID identity file.
 ;
 ; This file contains all the data associated with an identity.  It should
@@ -36,9 +39,11 @@ pass=c8e24ae844b7cb9381g722ae8209a19a
 ;
 ; If you want to provide registration data for consumers which support the
 ; Simple Registration Extension, uncomment the section below and fill
-; in your details
+; in your details.
 ;
-
+; Further information on the Simple Registration Extension can be found at
+; http://www.openidenabled.com/openid/simple-registration-extension
+;
 ;[sreg]
 ;nickname=Example
 ;email=example@example.com
@@ -46,6 +51,6 @@ pass=c8e24ae844b7cb9381g722ae8209a19a
 ;dob=2000-00-00
 ;gender=M
 ;postcode=1234
-;country=xy
-;language=xy
+;country=en
+;language=au
 ;timezone=Australia/Sydney
