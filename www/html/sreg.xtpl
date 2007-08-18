@@ -22,21 +22,17 @@
 <!-- END: user_page -->
             
 <!-- BEGIN: form -->
-    <p>SimpleID will also be sending the following registration information.
+    <p>SimpleID will also be sending the following registration information to the site.
     {policy}</p>
-    
-    <p>If you don't want to send a particular piece of information, uncheck the box.</p>
     
     <table>
         <tr>
-            <th>Send?</th>
             <th>Name</th>
             <th>Value</th>
         </tr>
         <!-- BEGIN: sreg -->
         <tr>
-            <td><input type="checkbox" name="openid.{alias}.{name}" value="{value}" checked="checked" /></td>
-            <td>{name}</td>
+            <td><input type="hidden" name="openid.{alias}.{name}" value="{value}" /> {name}</td>
             <td>{value}</td>
         </tr>
         <!-- END: sreg -->
