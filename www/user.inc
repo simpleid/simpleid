@@ -128,13 +128,15 @@ function user_logout($destination = 'frontpage') {
     
     cache_delete('user', $user['uid']);
     unset($_SESSION['user']);
-    
     $user = NULL;
+    
+    set_message('You have been logged out.');
+    
     user_login_form($destination);
 }
 
 
-function user_login_form($destination) {
+function user_login_form($destination) {    
     global $xtpl;
 
     $a = rand(1, 10);
@@ -143,7 +145,7 @@ function user_login_form($destination) {
     $xtpl->assign('title', 'Log In');
     $xtpl->assign('destination', $destination);
     $xtpl->assign('captcha_hash', md5(SIMPLEID_BASE_URL . ($a + $b)));
-    $xtpl->assign('captcha', $a . " + " . $b);
+    $xtpl->assign('captcha', $a . " + " . $b);    
     
     $xtpl->parse('main.login');
     $xtpl->parse('main');
@@ -163,20 +165,17 @@ function user_page() {
     
     $rps = simpleid_rp_load_all($user['uid']);
     
-    foreach ($rps as $realm => $rp) {
-        $xtpl->assign('realm', htmlspecialchars($rp['realm']));
-        $xtpl->assign('last_time', htmlspecialchars(strftime(SIMPLEID_DATE_TIME_FORMAT, $rp['last_time'])));
-        $xtpl->assign('auto_release', ($rp['auto_release']) ? 'checked="checked"' : '');
-        $xtpl->parse('main.frontpage.realm');
-    }
-    
-    if (isset($user['sreg'])) {
-        foreach ($user['sreg'] as $name => $value) {
-            $xtpl->assign('name', htmlspecialchars($name));
-            $xtpl->assign('value', htmlspecialchars($value));
-            $xtpl->parse('main.frontpage.sreg');
+    if ($rps) {
+        foreach ($rps as $realm => $rp) {
+            $xtpl->assign('realm', htmlspecialchars($rp['realm']));
+            $xtpl->assign('last_time', htmlspecialchars(strftime(SIMPLEID_DATE_TIME_FORMAT, $rp['last_time'])));
+            $xtpl->assign('auto_release', ($rp['auto_release']) ? 'checked="checked"' : '');
+            $xtpl->parse('main.frontpage.realm');
         }
     }
+    
+    $extensions = extension_invoke_all('user_page');
+    $xtpl->assign('extensions', implode($extensions));
     
     $xtpl->parse('main.frontpage');
     

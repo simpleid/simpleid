@@ -1,5 +1,5 @@
 $HeadURL: https://xtpl.svn.sourceforge.net/svnroot/xtpl/branches/php4/license.txt $
-$Id: license.txt 16 2007-01-11 03:02:49Z cocomp $
+$Id$
 
 XTemplate is dual licensed using BSD and LGPL.
 

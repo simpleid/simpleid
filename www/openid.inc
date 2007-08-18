@@ -292,18 +292,36 @@ function _openid_btwoc($num) {
 
 // Fix PHP's braindead handling of POST data
 function _openid_fix_post(&$post) {
-  // TODO $extensions = module_invoke_all('openid', 'extension');
-  foreach ($post as $key => $value) {
-    if (strpos($key, 'openid_') === 0) {
-      $fixed_key = str_replace('openid_', 'openid.', $key);
-      $fixed_key = str_replace('openid.ns_', 'openid.ns.', $fixed_key);
-      /*foreach ($extensions as $ext) {
-        $fixed_key = str_replace('openid.'.$ext.'_', 'openid.'.$ext.'.', $fixed_key);
-      }*/
-      unset($post[$key]);
-      $post[$fixed_key] = $value;
+    global $ns_to_alias;    
+    
+    foreach ($post as $key => $value) {
+        if (strpos($key, 'openid_') === 0) {
+            $fixed_key = str_replace('openid_', 'openid.', $key);
+            $fixed_key = str_replace('openid.ns_', 'openid.ns.', $fixed_key);
+            
+            if (strpos($fixed_key, 'openid.ns.') === 0) {
+                $alias = substr($fixed_key, 10);
+                $ns_to_alias[$value] = $alias;
+            }
+            unset($post[$key]);
+            $post[$fixed_key] = $value;
+        }
     }
-  }
+    
+    $aliases = array_values($ns_to_alias);
+    
+    foreach ($post as $key => $value) {
+        $fixed_key = $key;
+        
+        foreach ($aliases as $alias) {
+            $fixed_key = str_replace('openid.'.$alias.'_', 'openid.'.$alias.'.', $key);
+        }
+        
+        if ($fixed_key != $key) {
+            unset($post[$key]);
+            $post[$fixed_key] = $value;
+        }
+    }
 }
 
 // Provide bcpowmod support for PHP4
@@ -321,3 +339,6 @@ if (!function_exists('bcpowmod')) {
     return $result;
   }
 }
+
+
+?>

@@ -34,7 +34,6 @@ include "lib/xtemplate.class.php";
 include "openid.inc";
 include "user.inc";
 include "cache.inc";
-include "sreg.inc";
 
 define('SIMPLEID_VERSION', '0.1');
 
@@ -48,31 +47,32 @@ function simpleid_start() {
     
     // Check if the configuration file has been defined
     if (!defined('SIMPLEID_BASE_URL')) {
-        set_message('No configuration file found.  See the <a href="http://simpleid.sourceforge.net/manual.html">manual</a> for instructions on how to set up a configuration file.');
+        set_message('No configuration file found.  See the <a href="http://simpleid.sourceforge.net/manual">manual</a> for instructions on how to set up a configuration file.');
         $xtpl->parse('main');
         $xtpl->out('main');
         exit;
     }
     
     if (!is_dir(SIMPLEID_IDENTITIES_DIR)) {
-        set_message('Identities directory not found.  See the <a href="http://simpleid.sourceforge.net/manual.html">manual</a> for instructions on how to set up SimpleID.');
+        set_message('Identities directory not found.  See the <a href="http://simpleid.sourceforge.net/manual">manual</a> for instructions on how to set up SimpleID.');
         $xtpl->parse('main');
         $xtpl->out('main');
         exit;
     }
     
     if (!is_dir(SIMPLEID_CACHE_DIR) || !is_writeable(SIMPLEID_CACHE_DIR)) {
-        set_message('Cache directory not found or not writeable.  See the <a href="http://simpleid.sourceforge.net/manual.html">manual</a> for instructions on how to set up SimpleID.');
+        set_message('Cache directory not found or not writeable.  See the <a href="http://simpleid.sourceforge.net/manual">manual</a> for instructions on how to set up SimpleID.');
         $xtpl->parse('main');
         $xtpl->out('main');
         exit;
     }
     
+    extension_init();
     user_init();
     
     _openid_fix_post($_REQUEST);
     
-    $q = (isset($_REQUEST['q'])) ? $_REQUEST['q'] : '';       
+    $q = (isset($_REQUEST['q'])) ? $_REQUEST['q'] : '';
     
     switch ($q) {
         case 'continue':
@@ -146,7 +146,7 @@ function simpleid_process_openid() {
             return;
         case 'checkid_immediate':
         case 'checkid_setup':
-            return simpleid_authentication_response($_REQUEST);
+            return simpleid_checkid($_REQUEST);
         case 'check_authentication':
             simpleid_authenticate($_REQUEST);
             break;
@@ -375,6 +375,8 @@ function simpleid_checkid_ok($request) {
         $message['nonce'] = $matches[1];
     }
     
+    $message = array_merge($message, extension_invoke_all('checkid_ok', $request));
+    
     return $message;
 }
 
@@ -494,16 +496,18 @@ function simpleid_rp_form($request, &$response) {
   
     $xtpl->assign('realm', htmlspecialchars($realm));
 
-#  $form = array_merge($form, module_invoke_all('openid', 'form', $request, $response));
-
     if ($form['openid.mode'] == 'cancel') {
         $xtpl->assign('identity', htmlspecialchars($form['openid.identity']));
         $xtpl->parse('main.rp.cancel');
-    } else {
+    } else {        
         // Check the user's auto-submit preference for this RP
         // (default to on)
         $auto_submit_checked = TRUE;
         $rp = simpleid_rp_load($user['uid'], $realm);
+        
+        $extensions = extension_invoke_all('form', $form, $rp);
+        $xtpl->assign('extensions', implode($extensions));
+
     
         if ($rp && $rp['auto_release'] == 0) {
             $auto_submit_checked = FALSE;
@@ -539,7 +543,7 @@ function simpleid_send($response = NULL) {
     if ($response['op'] == 'Cancel') {
         $response['openid.mode'] = 'cancel';
     } else {
-        simpleid_rp_save($uid, $_REQUEST['openid.realm'], $_REQUEST['autorelease']);
+        simpleid_rp_save($uid, $_REQUEST['openid.realm'], array('auto_release' => $_REQUEST['autorelease']));
     }
     
     unset($response['autosubmit']);
@@ -554,7 +558,7 @@ function simpleid_send($response = NULL) {
 
 function simpleid_sign($response) {
   $signed_keys = array('return_to', 'response_nonce', 'assoc_handle', 'identity');
-  #$signed_keys = array_merge($signed_keys, module_invoke_all('openid', 'signed', $response));
+  $signed_keys = array_merge($signed_keys, extension_invoke_all('signed_keys', $response));
   $response['openid.signed'] = implode(',', $signed_keys);
   
   // Use the request openid.assoc_handle to look up
@@ -571,7 +575,7 @@ function simpleid_sign($response) {
  * Wrapper for saving and loading Relying Parties
  * with which users have interacted.
  */
-function simpleid_rp_save($uid, $realm, $auto_release = FALSE) {
+function simpleid_rp_save($uid, $realm, $details = array()) {
     $now = time();
     
     $rps = simpleid_rp_load_all($uid);
@@ -579,21 +583,13 @@ function simpleid_rp_save($uid, $realm, $auto_release = FALSE) {
     if ($rps == NULL) $rps = array();
 
     if (!isset($rps[$realm])) {
-        if ($auto_release === FALSE) {
-            $auto_release = 0;
-        } else {
-            $auto_release = 1;
+        if ($details['auto_release'] != 0) {
+            $details['auto_release'] = 1;
         }
         
-        $rps[$realm] = array('uid' => $uid, 'realm' => $realm, 'first_time' => $now, 'last_time' => $now, 'auto_release' => $auto_release);
+        $rps[$realm] = array_merge($details, array('uid' => $uid, 'realm' => $realm, 'first_time' => $now, 'last_time' => $now));
     } else {
-        // If no auto-release value has been included
-        // in the call to this function, then don't
-        // update the value.        
-        
-        if ($auto_release !== FALSE) {
-            $rps[$realm]['auto_release'] = $auto_release;
-        }
+        $rps[$realm] = array_merge($details, $rps[$realm]);
         $rps[$realm]['last_time'] = $now;
     }
     cache_set('rp', $uid, $rps);

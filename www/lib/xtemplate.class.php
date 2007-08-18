@@ -14,7 +14,7 @@
  * @see license.txt LGPL / BSD license
  * @since PHP 4.?
  * @link $HeadURL: https://xtpl.svn.sourceforge.net/svnroot/xtpl/branches/php4/xtemplate.class.php $
- * @version $Id: xtemplate.class.php 21 2007-05-29 18:01:15Z cocomp $
+ * @version $Id$
  *
  *
  * XTemplate class - http://www.phpxtemplate.org/ (x)html / xml generation with templates - fast & easy

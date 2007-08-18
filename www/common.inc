@@ -26,7 +26,7 @@
  * 
  * $Id$
  */
-
+ 
 function set_message($msg) {
     global $xtpl;
     
@@ -89,4 +89,78 @@ function normalize_url($url) {
   return $normalized_url;
 }
 
+define('SIMPLEID_EXTENSIONS', 'sreg');
+
+// For sreg 1.0 compatibility
+$ns_to_alias = array("http://openid.net/extensions/sreg/1.1" => "sreg");
+$ns_to_extension = array();
+
+function extension_init() {
+    global $extensions;
+    global $ns_to_extension;
+    
+    $extensions = preg_split('/, */', SIMPLEID_EXTENSIONS);
+    
+    foreach ($extensions as $extension) {
+        include_once $extension . ".inc";
+        
+        $ns_to_extension[extension_invoke($extension, 'ns')] = $extension;
+    }
+}
+
+function extension_invoke_all() {
+    global $extensions;
+    
+    $args = func_get_args();
+    $function = array_shift($args);
+    $return = array();
+    
+    foreach ($extensions as $extension) {
+        if (function_exists($extension . '_' . $function)) {
+            $result = call_user_func_array($extension . '_' . $function, $args);
+            if (isset($result) && is_array($result)) {
+                $return = array_merge($return, $result);
+            } else if (isset($result)) {
+                $return[] = $result;
+            } 
+        }
+    }
+    
+    return $return;
+}
+
+function extension_invoke() {
+    $args = func_get_args();
+    $extension = array_shift($args);
+    $function = array_shift($args);
+    
+    if (function_exists($extension . '_' . $function)) {
+        return call_user_func_array($extension . '_' . $function, $args);
+    }
+}
+
+function extension_get_request($ns, $request) {
+    $alias = extension_get_alias($ns);
+    $return = array();
+    
+    foreach ($request as $key => $value) {
+        if (strpos($key, 'openid.' . $alias . '.') === 0) {
+            $return[substr($key, strlen('openid.' . $alias . '.'))] = $value;
+        }
+    }
+    
+    return $return;
+}
+
+function extension_get_alias($ns) {
+    global $ns_to_alias;
+    
+    return $ns_to_alias[$ns];
+}
+
+function get_extensions() {
+    global $extensions;
+    
+    return $extensions;
+}
 ?>

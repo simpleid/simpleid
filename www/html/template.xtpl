@@ -2,7 +2,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xml:lang="en-AU" lang="en-AU" xmlns="http://www.w3.org/1999/xhtml">
-    <!-- :mode=html: -->
+    <!-- :mode=html: $Id$ -->
     <head>
         <title>{title} - SimpleID</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
@@ -54,25 +54,8 @@
             <input type="submit" name="op" id="edit-submit" value="Submit" class="form-submit" />
             </form>
             
-            <h2>Simple Registration Extension</h2>
-            <p>SimpleID will send the following information to sites which supports
-            the Simple Registration Extension.</p>
+            {extensions}
             
-            <p>To change these, or your password,
-            <a href="http://koinic.net/software/simpleid/identity-file">edit your identity file</a>.</p>
-            
-            <table>
-                <tr>
-                    <th>Name</th>
-                    <th>Value</th>
-                </tr>
-                <!-- BEGIN: sreg -->
-                <tr>
-                    <td>{name}</td>
-                    <td>{value}</td>
-                </tr>
-                <!-- END: sreg -->
-            </table>
             <!-- END: frontpage -->
             
             <!-- BEGIN: rp -->
@@ -89,25 +72,8 @@
                         Automatically send my information to this site for any future requests.
                     </label>
                 </div>
-                
-                <p>SimpleID will also be sending the following registration information.
-                You can view the site's <a href="{policy_url}">policy</a> in relation
-                to the use of this information.</p>
-            
-                <!-- BEGIN: sreg -->
-                <table>
-                    <tr>
-                        <th>Name</th>
-                        <th>Value</th>
-                    </tr>
-                    <!-- BEGIN: sreg -->
-                    <tr>
-                        <td>{name}</td>
-                        <td>{value}</td>
-                    </tr>
-                    <!-- END: sreg -->
-                </table>
-                <!-- END: sreg -->
+
+                {extensions}
                 
                 <input type="submit" name="op" id="edit-submit" value="OK" class="form-submit" />
                 <input type="submit" name="op" id="edit-cancel" value="Cancel" class="form-submit" />
@@ -171,7 +137,7 @@
         </div>
 
         <div id="footer">
-            <address>SimpleID &copy; Kelvin Mo 2007.</address>
+            <address>SimpleID {version} &copy; Kelvin Mo 2007.</address>
         </div>
     </body>
 </html>
