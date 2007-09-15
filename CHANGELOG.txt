@@ -1,5 +1,12 @@
 // $Id$
 
+
+SimpleID 0.2
+------------
+
+- Fixed bug in Simple Registration Extension support
+
+
 SimpleID 0.1
 ------------
 
