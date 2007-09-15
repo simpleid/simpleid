@@ -96,10 +96,10 @@ function sreg_form($form, $rp) {
                 $xtpl2->parse('form.sreg');
             }
         }
+        
+        $xtpl2->parse('form');
+        return $xtpl2->text('form');
     }
-    
-    $xtpl2->parse('form');
-    return $xtpl2->text('form');
 }
 
 function sreg_send() {

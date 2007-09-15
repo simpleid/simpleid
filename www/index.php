@@ -35,7 +35,7 @@ include "openid.inc";
 include "user.inc";
 include "cache.inc";
 
-define('SIMPLEID_VERSION', '0.1');
+define('SIMPLEID_VERSION', '0.2');
 
 simpleid_start();
 

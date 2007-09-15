@@ -143,9 +143,11 @@ function extension_get_request($ns, $request) {
     $alias = extension_get_alias($ns);
     $return = array();
     
-    foreach ($request as $key => $value) {
-        if (strpos($key, 'openid.' . $alias . '.') === 0) {
-            $return[substr($key, strlen('openid.' . $alias . '.'))] = $value;
+    if ($request) {
+        foreach ($request as $key => $value) {
+            if (strpos($key, 'openid.' . $alias . '.') === 0) {
+                $return[substr($key, strlen('openid.' . $alias . '.'))] = $value;
+            }
         }
     }
     
