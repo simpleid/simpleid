@@ -35,7 +35,7 @@ include "openid.inc";
 include "user.inc";
 include "cache.inc";
 
-define('SIMPLEID_VERSION', '0.2');
+define('SIMPLEID_VERSION', '0.2.1');
 
 simpleid_start();
 
@@ -285,7 +285,7 @@ function simpleid_checkid($request) {
             }
             break;
         case CHECKID_OK:
-            $response = simpleid_checkid_ok();
+            $response = simpleid_checkid_ok($request);
             $response = simpleid_sign($response);
             $message = _openid_create_message($response);
             return redirect_form($request['openid.return_to'], $message);
@@ -370,9 +370,12 @@ function simpleid_checkid_ok($request) {
     );
     
     // Check for a 1.1 nonce
+    $query = array();
     $parts = parse_url($request['openid.return_to']);
-    if (preg_match('/nonce=([^&]+)/', $parts['query'], $matches)) {
-        $message['nonce'] = $matches[1];
+    parse_str($parts['query'], $query);
+    
+    if (isset($query['nonce'])) {
+        $message['nonce'] = $query['nonce'];
     }
     
     $message = array_merge($message, extension_invoke_all('checkid_ok', $request));
