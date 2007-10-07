@@ -73,8 +73,9 @@ function simpleid_start() {
     _openid_fix_post($_REQUEST);
     
     $q = (isset($_REQUEST['q'])) ? $_REQUEST['q'] : '';
+    $q = explode('/', $q);
     
-    switch ($q) {
+    switch ($q[0]) {
         case 'continue':
             simpleid_continue();
             break;
@@ -92,6 +93,16 @@ function simpleid_start() {
             break;
         case 'logout':
             user_logout();
+            break;
+        case 'user':
+            if (isset($q[1])) {
+                user_public_page($q[1]);
+            } else {
+                user_public_page();
+            }
+            break;
+        case 'xrds':
+            user_xrds($q[1]);
             break;
         default:
             if (isset($_REQUEST['openid.mode'])) {
@@ -524,7 +535,6 @@ function simpleid_rp_form($request, &$response) {
     $xtpl->parse('main');
     
     $xtpl->out('main');
-    
 }
 
 
@@ -611,4 +621,5 @@ function simpleid_rp_load_all($uid) {
 function simpleid_rp_save_all($uid, $rps) {
     cache_set('rp', $uid, $rps);
 }
+
 ?>

@@ -6,6 +6,16 @@
     <head>
         <title>{title} - SimpleID</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+        
+        <!-- BEGIN: provider -->
+            <link rel="openid.server" href="{provider}"/>
+            <link rel="openid2.provider" href="{provider}"/>
+            <meta content="{xrds}" http-equiv="X-XRDS-Location" />
+        <!-- END: provider -->
+        <!-- BEGIN: local_id -->
+            <link rel="openid.delegate" href="{local_id}"/>
+            <link rel="openid2.local_id" href="{local_id}"/>
+        <!-- END: local_id -->
                 
         <style type="text/css" media="screen">
             @import url(html/simpleid.css);
@@ -142,3 +152,25 @@
     </body>
 </html>
 <!-- END: main -->
+
+<!-- BEGIN: xrds -->
+<?xml version="1.0" encoding="UTF-8"?>
+<xrds:XRDS xmlns:xrds="xri://$xrds" xmlns="xri://$xrd*($v*2.0)">
+    <XRD>
+        <Service priority="10">
+            <Type>http://specs.openid.net/auth/2.0/signon</Type>
+            <URI>{simpleid_base_url}</URI>
+            <!-- BEGIN: local_id2 -->
+            <LocalID>{local_id}</LocalID>            
+            <!-- END: local_id2 -->
+        </Service>
+        <Service priority="20" xmlns:openid="http://openid.net/xmlns/1.0">
+            <Type>http://openid.net/signon/1.0</Type>
+            <URI>{simpleid_base_url}</URI>
+            <!-- BEGIN: local_id -->
+            <openid:Delegate>{local_id}</openid:Delegate>            
+            <!-- END: local_id -->
+        </Service>
+    </XRD>
+</xrds:XRDS>
+<!-- END: xrds -->

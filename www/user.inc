@@ -46,6 +46,14 @@ function user_load($uid) {
     if (file_exists($identity_file)) {
         $user = parse_ini_file($identity_file, TRUE);
         $user["uid"] = $uid;
+        
+        if (isset($user["identity"])) {
+            $user["local_identity"] = true;
+        } else {
+            $user["identity"] = SIMPLEID_BASE_URL . '/index.php?q=user/' . $uid;
+            $user["local_identity"] = false;
+        }
+        
         return $user;
     } else {
         return NULL;
@@ -182,6 +190,59 @@ function user_page() {
     $xtpl->assign('title', 'Home Page');
     $xtpl->parse('main');
     $xtpl->out('main');
+}
+
+function user_public_page($uid = NULL) {
+    global $xtpl;
+    
+    $xtpl->assign('title', 'User Page');
+    if ($uid == NULL) {
+        header('Status: 500');
+        set_message('No user specified.');
+    } else {
+        $user = user_load($uid);
+        
+        if ($user == NULL) {
+            header('Status: 500');
+            set_message('User <strong>' . htmlspecialchars($uid) . '</strong> not found.');
+        } else {
+            header('X-XRDS-Location', SIMPLEID_BASE_URL . '/index.php?q=xrds/' . $uid);
+            
+            set_message('This is the user <strong>' . htmlspecialchars($uid) . '</strong>\'s SimpleID page.  It contains hidden information for the use by OpenID consumers.');
+            
+            $xtpl->assign('title', htmlspecialchars($uid));
+            $xtpl->assign('provider', htmlspecialchars(SIMPLEID_BASE_URL));
+            $xtpl->assign('xrds', htmlspecialchars(SIMPLEID_BASE_URL . '/index.php?q=xrds/' . $uid));
+            if ($user["local_identity"]) {
+                $xtpl->assign('local_id', htmlspecialchars($user["identity"]));
+            }
+        }
+    }
+    
+    $xtpl->parse('main.provider');
+    if ($user["local_identity"]) $xtpl->parse('main.local_id');
+    $xtpl->parse('main');
+    $xtpl->out('main');
+}
+
+function user_xrds($uid = NULL) {
+    global $xtpl;
+    
+    header('Content-Type: application/xrds+xml');
+    header('Content-Disposition: inline; filename=yadis.xml');
+    
+    if ($uid != NULL) {
+        $user = user_load($uid);
+        if (($user != NULL) && ($user["local_identity"])) {
+            $xtpl->assign('local_id', htmlspecialchars($user["identity"]));
+            $xtpl->parse('xrds.local_id');
+            $xtpl->parse('xrds.local_id2');
+        }
+    }
+    
+    $xtpl->assign('simpleid_base_url', htmlspecialchars(SIMPLEID_BASE_URL));
+    $xtpl->parse('xrds');
+    $xtpl->out('xrds');
 }
 
 function user_block($allow_logout = TRUE) {
