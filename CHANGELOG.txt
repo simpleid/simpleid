@@ -1,5 +1,23 @@
 // $Id$
 
+SimpleID 0.5
+------------
+
+- Numerous bug fixes
+
+- The identifier variable is now optional in identity files.  SimpleID automatically
+  assigns an identifier to all identities where this is not specified.
+
+- Improved compliance against OpenID specifications.
+
+- Support for SHA256 where this is compiled into PHP.
+
+
+SimpleID 0.2.1
+--------------
+
+- Bug fixes
+
 
 SimpleID 0.2
 ------------

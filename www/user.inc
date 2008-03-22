@@ -94,41 +94,46 @@ function user_login() {
     global $user;
     
     // If the user is already logged in, return
-    if (isset($user["uid"])) redirect_http(SIMPLEID_BASE_URL, 'q=frontpage');
+    if (isset($user["uid"])) openid_indirect_response_redirect(SIMPLEID_BASE_URL, 'q=frontpage');
     
     $destination = $_POST['destination'];
+    $state = $_POST['s'];    
+    $query = 'q=' . $destination;
+    $query .= ($state) ? '&s=' . urlencode($state) : '';
     
     if (!$_POST['name'] || !$_POST['pass'] || !$_POST['captcha']) {
-        set_message('You need to supply the user name, the password and the answer to the maths question in order to log in.');
-        user_login_form($destination);
+        if (isset($_POST['destination'])) {
+            // User came from a log in form.
+            set_message('You need to supply the user name, the password and the answer to the maths question in order to log in.');
+        }
+        user_login_form($destination, $state);
         return;
     }
     
     if (md5(SIMPLEID_BASE_URL . trim($_POST['captcha'])) != $_POST['captcha_hash']) {
         set_message('Your answer to the maths question is not correct.');
-        user_login_form($destination);
+        user_login_form($destination, $state);
         return;
     }
     
     $test_user = user_load($_POST['name']);
     if ($test_user == NULL) {
         set_message('The user you have supplied does not exist.');
-        user_login_form($destination);
+        user_login_form($destination, $state);
         return;
     }
     
     if (md5($_POST['pass']) != $test_user['pass']) {
         set_message('The user name or password is not correct.');
-        user_login_form($destination);
+        user_login_form($destination, $state);
         return;
     }
     
     $user = $test_user;
     $_SESSION['user'] = $_POST['name'];
     cache_set('user', $_POST['name'], session_id());
-    //session_regenerate_id();
 
-    redirect_http(SIMPLEID_BASE_URL, 'q=' . $destination);
+    openid_indirect_response_redirect(SIMPLEID_BASE_URL, $query);
 }
 
 function user_logout($destination = 'frontpage') {
@@ -144,7 +149,7 @@ function user_logout($destination = 'frontpage') {
 }
 
 
-function user_login_form($destination) {    
+function user_login_form($destination = '', $state = NULL) {    
     global $xtpl;
 
     $a = rand(1, 10);
@@ -153,7 +158,8 @@ function user_login_form($destination) {
     $xtpl->assign('title', 'Log In');
     $xtpl->assign('destination', $destination);
     $xtpl->assign('captcha_hash', md5(SIMPLEID_BASE_URL . ($a + $b)));
-    $xtpl->assign('captcha', $a . " + " . $b);    
+    $xtpl->assign('captcha', $a . " + " . $b);
+    if ($state) $xtpl->assign('state', $state);
     
     $xtpl->parse('main.login');
     $xtpl->parse('main');

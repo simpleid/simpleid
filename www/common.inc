@@ -34,18 +34,9 @@ function set_message($msg) {
     $xtpl->parse('main.message');
 }
 
-// 6.2.1. HTTP Redirect
-function redirect_http($url, $encoded_message) {
-    header('Status: 302 Found');
-    header('Location: ' . $url . '?' . $encoded_message);
-    exit;
-}
-
-// 6.2.2. HTML FORM Redirection
 function redirect_form($url, $message) {
     global $xtpl;
     
-    $items = explode("\n", $message);
     // Preserve GET parameters in url
     $parts = parse_url($url);
     $query = $parts['query'];
@@ -58,8 +49,7 @@ function redirect_form($url, $message) {
             $xtpl->parse('main.redirect.parameter');
         }
     }
-    foreach ($items as $item) {
-        list($key, $value) = explode(':', $item, 2);
+    foreach ($message as $key => $value) {
         if ($key) {
             $xtpl->assign('name', htmlspecialchars($key));
             $xtpl->assign('value', htmlspecialchars($value));
@@ -77,6 +67,16 @@ function redirect_form($url, $message) {
     exit;
 }
 
+function indirect_fatal_error($error) {
+    global $xtpl;
+    
+    set_message($error);
+    
+    $xtpl->parse('main');
+    $xtpl->out('main');
+    exit;
+}
+
 function normalize_url($url) {
   $normalized_url = $url;
 
@@ -87,6 +87,14 @@ function normalize_url($url) {
   }
 
   return $normalized_url;
+}
+
+function pickle($data) {
+    return base64_encode(gzcompress(serialize($data)));
+}
+
+function unpickle($pickle) {
+    return unserialize(gzuncompress(base64_decode($pickle)));
 }
 
 define('SIMPLEID_EXTENSIONS', 'sreg');
