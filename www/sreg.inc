@@ -35,10 +35,10 @@ function sreg_default_alias() {
     return "sreg";
 }
 
-function sreg_checkid_ok() {
+function sreg_id_res($request) {
     global $user;
     
-    $request = extension_get_request(sreg_ns(), $response);
+    $request = extension_get_request(sreg_ns(), $request);
     $required = explode(',', $request['required']);
     $optional = explode(',', $request['optional']);
     $keys = array_merge($required, $optional);
@@ -47,7 +47,7 @@ function sreg_checkid_ok() {
     
     foreach ($keys as $key) {
         if (isset($user['sreg'][$key])) {
-            $return['openid.' . $alias . '.key'] = $user['sreg'][$key];
+            $return['openid.' . $alias . '.' .  $key] = $user['sreg'][$key];
         }
     }
     
@@ -55,27 +55,28 @@ function sreg_checkid_ok() {
 }
 
 /**
- * Returns an array of keys that need signing.
+ * Returns an array of fields that need signing.
  */
-function sreg_signed_keys($response) {
+function sreg_signed_field($response) {
     $request = extension_get_request(sreg_ns(), $response);
     $required = explode(',', $request['required']);
     $optional = explode(',', $request['optional']);
-    $keys = array_merge($required, $optional);
+    $fields = array_merge($required, $optional);
     $alias = extension_get_alias(sreg_ns());
     $return = array();
     
-    foreach ($keys as $key) {
-        if (isset($response['openid.' . $alias . '.key'])) $return[] = $alias . '.' . $key;
+    foreach ($fields as $field) {
+        if (isset($response['openid.' . $alias . '.' . $field])) $return[] = $alias . '.' . $field;
     }
     
     return $return;
 }
 
-function sreg_form($form, $rp) {
+function sreg_form($request, $rp) {
     global $user;
     
-    $request = extension_get_request(sreg_ns(), $form);
+    $request = extension_get_request(sreg_ns(), $request);
+    
     $required = explode(',', $request['required']);
     $optional = explode(',', $request['optional']);
     $keys = array_merge($required, $optional);

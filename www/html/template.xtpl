@@ -44,7 +44,7 @@
             
             <!-- BEGIN: frontpage -->            
             <h2>Trusted Sites</h2>
-            <form action="index.php" method="post">
+            <form action="index.php" method="post" enctype="application/x-www-form-urlencoded" >
             <input name="q" type="hidden" value="autorelease" />
             <input name="update-all" type="hidden" value="1"/>
             <table>
@@ -69,9 +69,9 @@
             <!-- END: frontpage -->
             
             <!-- BEGIN: rp -->
-            <form action="index.php" method="post">
-                <input name="q" type="hidden" value="send" />
-                <!-- BEGIN: parameter --><input type="hidden" name="{name}" value="{value}" /><!-- END: parameter -->
+            <form action="index.php" method="post" enctype="application/x-www-form-urlencoded" >
+                <input type="hidden" name="q" value="send" />
+                <input type="hidden" name="s" value="{state}" />
                 
                 <!-- BEGIN: setup -->
                 <p>You are being logged into <strong class="realm">{realm}</strong>.</p>
@@ -116,8 +116,9 @@
             <!-- END: autorelease -->
             
             <!-- BEGIN: login -->
-            <form action="index.php" method="post">
-                <input name="q" type="hidden" value="login"/><input name="destination" type="hidden" value="{destination}"/>
+            <form action="index.php" method="post" enctype="application/x-www-form-urlencoded">
+                <input type="hidden" name="q" value="login"/><input name="destination" type="hidden" value="{destination}"/>
+                <input type="hidden" name="s" value="{state}"/>
                 <input name="captcha_hash" type="hidden" value="{captcha_hash}" />
                 <div class="form-item">
                     <label for="edit-name">User name:</span></label>
@@ -137,10 +138,10 @@
             
             
             <!-- BEGIN: redirect -->
-            <form action="{url}" method="get" id="simpleid_redirect">
+            <form action="{url}" enctype="application/x-www-form-urlencoded" id="simpleid_redirect">
                 <p>Redirecting...</p>
                 <!-- BEGIN: parameter --><input type="hidden" name="{name}" value="{value}" /><!-- END: parameter -->
-                <noscript><input type="submit" value="Send" /></noscript>
+                <noscript><input type="submit" value="Continue" /></noscript>
                 <script type="text/javascript">document.getElementById("simpleid_redirect").submit();</script>
             </form>
             <!-- END: redirect -->

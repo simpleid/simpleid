@@ -133,7 +133,7 @@ function openid_indirect_response_form($url, $message) {
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xml:lang="en-AU" lang="en-AU" xmlns="http://www.w3.org/1999/xhtml"><body>';
 
-    $html .= '<form action="' . htmlspecialchars($url) . '" method="post" enctype="application/x-www-form-urlencoded" id="redirect"><p>Redirecting...</p>';
+    $html .= '<form action="' . htmlspecialchars($url) . '" enctype="application/x-www-form-urlencoded" id="redirect"><p>Redirecting...</p>';
 
     foreach ($message as $key -> $value) {
         if ($key) {
@@ -160,53 +160,6 @@ function openid_indirect_error($url, $error, $additional = array(), $version = O
     openid_indirect_response($url, $message, $response_func);
 }
 
-/**
- * Encodes a message using Key-Value Form Encoding [4.1.1]
- *
- */
-function _openid_create_message($data) {
-  $serialized = '';  
-
-  foreach ($data as $key => $value) {
-    if (strpos($key, ':') !== false) {
-      return null;
-    }
-    
-    if (strpos($key, "\n") !== false) {
-      return null;
-    }
-    
-    if (strpos($value, "\n") !== false) {
-      return null;
-    }
-    $serialized .= "$key:$value\n";
-  }
-  return $serialized;
-}
-
-/**
- * Converts a message encoded using Key-Value Form Encoding into HTTP Encoding
- * [4.1.2]
- */
-function _openid_encode_message($message) {
-  $encoded_message = '';
-
-  // Content-Type: application/x-www-form-urlencoded
-  $items = explode("\n", $message);
-  foreach ($items as $item) {
-    list($key, $value) = explode(':', $item, 2);
-
-    if ($key != '') {
-      if ($encoded_message != '') {
-        $encoded_message .= '&';
-      }
-      $encoded_message .= rawurlencode(trim($key)) . '=' . rawurlencode(trim($value));
-    }
-  }
-
-  return $encoded_message;
-}
-
 function openid_get_realm($request, $version) {
     if ($version == OPENID_VERSION_1_1) {
         $realm = $request['openid.trust_root'];
@@ -223,53 +176,12 @@ function openid_get_realm($request, $version) {
     return $realm;
 }
 
-/**
- * Signatures
- * Sign certain keys in a message
- * $association - object loaded from openid_association or openid_server_association table
- *              - important fields are ->assoc_type and ->mac_key
- * $message_array - array of entire message about to be sent
- * $keys_to_sign - keys in the message to include in signature (without
- * 'openid.' appended)
- */
-function _openid_signature($association, $message_array, $keys_to_sign) {
-    $hmac_funcs = array('HMAC-SHA1' => '_openid_hmac_sha1', 'HMAC-SHA256' => '_openid_hmac_sha256');
-    
-    $hmac_func = $hmac_funcs[$association['assoc_type']];
-    
-    $signature = '';
-    $sign_data = array();
-
-    foreach ($keys_to_sign as $key) {
-        if (isset($message_array['openid.' . $key])) {
-            $sign_data[$key] = $message_array['openid.' . $key];
-        }
-    }
-
-    // We set OPENID_VERSION_1_1 because we don't want to sign the namespace header
-    $message = openid_direct_message($sign_data, OPENID_VERSION_1_1);
-    $secret = base64_decode($association['mac_key']);
-    $signature = call_user_func($hmac_func, $secret, $message);
-
-    return base64_encode($signature);
-}
-
-
-
-
-/**
- * Encoded an integer as big-endian signed two's complement binary strings.
- * [4.2]
- */
-function _openid_btwoc($num) {
-    return pack('H*', $num);
-}
 
 /**
  * Fix PHP's braindead handling of POST data.  PHP changes dots in keys of
  * associative arrays to underscores.
  */
-function _openid_fix_post(&$post) {
+function openid_fix_post(&$post) {
     global $ns_to_alias;    
     
     foreach ($post as $key => $value) {
@@ -422,6 +334,14 @@ function _openid_dh_long_to_binary($long) {
     return $string;
 }
 
+/**
+ * Encoded an integer as big-endian signed two's complement binary strings.
+ * [4.2]
+ */
+function _openid_btwoc($num) {
+    return pack('H*', $num);
+}
+
 function _openid_dh_xorsecret($shared, $secret, $hash_func = '_openid_sha1') {
     $dh_shared_str = _openid_dh_long_to_binary($shared);
     $hashed_dh_shared = call_user_func($hash_func, $dh_shared_str);
@@ -434,43 +354,74 @@ function _openid_dh_xorsecret($shared, $secret, $hash_func = '_openid_sha1') {
 }
 
 function _openid_dh_rand($stop) {
-  static $duplicate_cache = array();
+    static $duplicate_cache = array();
   
-  // Used as the key for the duplicate cache
-  $rbytes = _openid_dh_long_to_binary($stop);
+    // Used as the key for the duplicate cache
+    $rbytes = _openid_dh_long_to_binary($stop);
   
-  if (array_key_exists($rbytes, $duplicate_cache)) {
-    list($duplicate, $nbytes) = $duplicate_cache[$rbytes];
-  } else {
-    if ($rbytes[0] == "\x00") {
-      $nbytes = strlen($rbytes) - 1;
+    if (array_key_exists($rbytes, $duplicate_cache)) {
+        list($duplicate, $nbytes) = $duplicate_cache[$rbytes];
     } else {
-      $nbytes = strlen($rbytes);
-    }
+        if ($rbytes[0] == "\x00") {
+            $nbytes = strlen($rbytes) - 1;
+        } else {
+            $nbytes = strlen($rbytes);
+        }
     
-    $mxrand = bcpow(256, $nbytes);
+        $mxrand = bcpow(256, $nbytes);
 
-    // If we get a number less than this, then it is in the
-    // duplicated range.
-    $duplicate = bcmod($mxrand, $stop);
+        // If we get a number less than this, then it is in the
+        // duplicated range.
+        $duplicate = bcmod($mxrand, $stop);
 
-    if (count($duplicate_cache) > 10) {
-      $duplicate_cache = array();
-    }
+        if (count($duplicate_cache) > 10) {
+            $duplicate_cache = array();
+        }
     
-    $duplicate_cache[$rbytes] = array($duplicate, $nbytes);
-  }
+        $duplicate_cache[$rbytes] = array($duplicate, $nbytes);
+    }
   
-  do {
-    $bytes = "\x00" . _openid_get_bytes($nbytes);
-    $n = _openid_dh_binary_to_long($bytes);
-    // Keep looping if this value is in the low duplicated range
-  } while (bccomp($n, $duplicate) < 0);
+    do {
+        $bytes = "\x00" . _openid_get_bytes($nbytes);
+        $n = _openid_dh_binary_to_long($bytes);
+        // Keep looping if this value is in the low duplicated range
+    } while (bccomp($n, $duplicate) < 0);
 
-  return bcmod($n, $stop);
+    return bcmod($n, $stop);
 }
 
 /* ------- Hash and HMAC functions ------------------------------------------- */
+
+/**
+ * Signatures
+ * Sign certain keys in a message
+ * $association - object loaded from openid_association or openid_server_association table
+ *              - important fields are ->assoc_type and ->mac_key
+ * $message_array - array of entire message about to be sent
+ * $keys_to_sign - keys in the message to include in signature (without
+ * 'openid.' appended)
+ */
+function _openid_signature($association, $message_array, $keys_to_sign) {
+    $hmac_funcs = array('HMAC-SHA1' => '_openid_hmac_sha1', 'HMAC-SHA256' => '_openid_hmac_sha256');
+    
+    $hmac_func = $hmac_funcs[$association['assoc_type']];
+    
+    $signature = '';
+    $sign_data = array();
+
+    foreach ($keys_to_sign as $key) {
+        if (isset($message_array['openid.' . $key])) {
+            $sign_data[$key] = $message_array['openid.' . $key];
+        }
+    }
+
+    // We set OPENID_VERSION_1_1 because we don't want to sign the namespace header
+    $message = openid_direct_message($sign_data, OPENID_VERSION_1_1);
+    $secret = base64_decode($association['mac_key']);
+    $signature = call_user_func($hmac_func, $secret, $message);
+
+    return base64_encode($signature);
+}
 
 function _openid_sha1($text) {
     if (function_exists('hash_hmac') && function_exists('hash_algos') && (in_array('sha256', hash_algos()))) {

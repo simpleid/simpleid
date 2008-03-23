@@ -35,7 +35,7 @@ include "openid.inc";
 include "user.inc";
 include "cache.inc";
 
-define('SIMPLEID_VERSION', '0.3');
+define('SIMPLEID_VERSION', '0.5');
 
 simpleid_start();
 
@@ -73,7 +73,7 @@ function simpleid_start() {
     // Clean stale assocations
     cache_gc(SIMPLEID_ASSOC_EXPIRES_IN, 'association');
     
-    _openid_fix_post($_REQUEST);
+    openid_fix_post($_REQUEST);
     
     $q = (isset($_REQUEST['q'])) ? $_REQUEST['q'] : '';
     $q = explode('/', $q);
@@ -118,39 +118,30 @@ function simpleid_start() {
 }
 
 function simpleid_autorelease() {
-    global $xtpl;
     global $user;
     
-    if (!isset($_POST['op'])) {
-        $xtpl->assign('realm', $_REQUEST['openid.realm']);
-        $xtpl->parse('main.autorelease');
+
+    $rps = simpleid_rp_load_all($user['uid']);
     
-        $xtpl->assign('title', 'OpenID Setup');
-        $xtpl->parse('main');
-    
-        $xtpl->out('main');
-    } else {
-        $rps = simpleid_rp_load_all($user['uid']);
-        
-        if (isset($_POST['autorelease'])) {
-            foreach ($_POST['autorelease'] as $realm => $autorelease) {
-                if (isset($rps[$realm])) {
-                    $rps[$realm]['auto_release'] = ($autorelease) ? 1 : 0;
-                }
+    if (isset($_POST['autorelease'])) {
+        foreach ($_POST['autorelease'] as $realm => $autorelease) {
+            if (isset($rps[$realm])) {
+                $rps[$realm]['auto_release'] = ($autorelease) ? 1 : 0;
             }
         }
-        
-        if (isset($_POST['update-all'])) {
-            foreach ($rps as $realm => $rp) {
-                $rps[$realm]['auto_release'] = (isset($_POST['autorelease'][$realm]) && $_POST['autorelease'][$realm]) ? 1 : 0;
-            }
-        }
-        
-        simpleid_rp_save_all($user['uid'], $rps);
-        
-        set_message('Your preferences have been saved.');
-        user_page();
     }
+    
+    if (isset($_POST['update-all'])) {
+        foreach ($rps as $realm => $rp) {
+            $rps[$realm]['auto_release'] = (isset($_POST['autorelease'][$realm]) && $_POST['autorelease'][$realm]) ? 1 : 0;
+        }
+    }
+    
+    simpleid_rp_save_all($user['uid'], $rps);
+    
+    set_message('Your preferences have been saved.');
+    user_page();
+    
 }
 
 /**
@@ -229,7 +220,7 @@ function simpleid_associate($request) {
         }
     }
 
-    $response = _simpleid_associate(CREATE_ASSOCIATION_DEFAULT, $assoc_type, $session_type, $dh_modulus, $dh_gen, $dh_consumer_public);
+    $response = _simpleid_create_association(CREATE_ASSOCIATION_DEFAULT, $assoc_type, $session_type, $dh_modulus, $dh_gen, $dh_consumer_public);
     
     openid_direct_response(openid_direct_message($response, $version));
 }
@@ -242,7 +233,7 @@ function _simpleid_create_association($mode = CREATE_ASSOCIATION_DEFAULT, $assoc
     $hmac_funcs = array('HMAC-SHA1' => '_openid_hmac_sha1', 'HMAC-SHA256' => '_openid_hmac_sha256');
     $hash_funcs = array('DH-SHA1' => '_openid_sha1', 'DH-SHA256' => '_openid_sha256');
     
-    $assoc_handle = bin2hex(time()) . bin2hex(_openid_get_bytes(4));
+    $assoc_handle = dechex(intval(time())) . bin2hex(_openid_get_bytes(4));
     $expires_in = SIMPLEID_ASSOC_EXPIRES_IN;
     
     $secret = _openid_get_bytes($secret_size[$assoc_type]);
@@ -320,7 +311,6 @@ function simpleid_checkid($request) {
             case CHECKID_APPROVAL_REQUIRED:
                 if ($immediate) {
                     $response = simpleid_checkid_approval_required($request);
-                    $response = simpleid_sign($response);
                     return redirect_form($request['openid.return_to'], $response);
                 } else {
                     $response = simpleid_checkid_ok($request);
@@ -329,13 +319,12 @@ function simpleid_checkid($request) {
                 break;
             case CHECKID_OK:
                 $response = simpleid_checkid_ok($request);
-                $response = simpleid_sign($response);
+                $response = simpleid_sign($response, $request['openid.assoc_handle']);
                 return redirect_form($request['openid.return_to'], $response);
                 break;
             case CHECKID_LOGIN_REQUIRED:
                 if ($immediate) {
                     $response = simpleid_checkid_login_required($request);
-                    $response = simpleid_sign($response);
                     return redirect_form($request['openid.return_to'], $response);
                 } else {
                     user_login_form('continue', pickle($request));
@@ -346,7 +335,6 @@ function simpleid_checkid($request) {
             case CHECKID_IDENTITY_NOT_EXIST:
                 $response = simpleid_checkid_error($immediate);
                 if ($immediate) {                
-                    $response = simpleid_sign($response);
                     return redirect_form($request['openid.return_to'], $response);
                 } else {                
                     return simpleid_rp_form($request, $response);                
@@ -409,6 +397,8 @@ function simpleid_checkid_ok($request) {
         'openid.response_nonce' => openid_nonce(),
     );
     
+    if (isset($request['openid.assoc_handle'])) $message['openid.assoc_handle'] = $request['openid.assoc_handle'];
+    
     if ($version == OPENID_VERSION_2) {
         $message['openid.claimed_id'] = $request['openid.claimed_id'];
     }
@@ -419,7 +409,7 @@ function simpleid_checkid_ok($request) {
         $message['nonce'] = $matches[1];
     }
     
-    $message = array_merge($message, extension_invoke_all('checkid_ok', $request));
+    $message = array_merge($message, extension_invoke_all('id_res', $request));
     
     return openid_indirect_message($message, $version);
 }
@@ -429,11 +419,11 @@ function simpleid_checkid_approval_required($request) {
     
     if ($version == OPENID_VERSION_2) {
         $message = array('openid.mode' => 'setup_needed');
-    } else {    
+    } else {
+        $request['openid.mode'] = 'checkid_setup';
         $message = array(
-            'openid.mode' => 'id_res',
-            // TODO
-            'openid.user_setup_url' => SIMPLEID_BASE_URL . '/index.php?q=autorelease&openid.realm=' . $request['openid.realm']
+            'openid.mode' => 'id_res',            
+            'openid.user_setup_url' => SIMPLEID_BASE_URL . '/index.php?q=continue&s=' . pickle($request)
         );
     }
     
@@ -448,7 +438,7 @@ function simpleid_checkid_login_required($request, $auth_release_realm = NULL) {
     } else {    
         $message = array(
             'openid.mode' => 'id_res',
-            'openid.user_setup_url' => SIMPLEID_BASE_URL . '/index.php?q=login'
+            'openid.user_setup_url' => SIMPLEID_BASE_URL . '/index.php?q=login&s=' . pickle($request)
         );
     }
     
@@ -474,8 +464,39 @@ function simpleid_checkid_error($immediate) {
     return openid_indirect_message($message, $version);
 }
 
+
+function simpleid_sign(&$response, $assoc_handle = NULL) {
+    if (!$assoc_handle) {
+        $assoc = _simpleid_create_association(CREATE_ASSOCIATION_STATELESS);
+    } else {
+        $assoc = cache_get('association', $assoc_handle);
+        
+        if ($assoc['created'] + SIMPLEID_ASSOC_EXPIRES_IN < time()) {
+            // Association has expired, need to create a new one
+            $response['openid.invalidate_handle'] = $assoc_handle;
+            $assoc = _simpleid_create_association(CREATE_ASSOCIATION_STATELESS);
+        }
+    }
+    
+    // Get all the signed fields [10.1]
+    $signed_fields = array('op_endpoint', 'return_to', 'response_nonce', 'assoc_handle', 'identity', 'claimed_id');
+    $signed_fields = array_merge($signed_fields, extension_invoke_all('signed_fields', $response));
+    
+    // Check if the signed keys are actually present
+    $to_sign = array();
+    foreach ($signed_fields as $field) {
+        if (isset($response['openid.' . $field])) $to_sign[] = $field;
+    }
+    
+    $response['openid.signed'] = implode(',', $signed_fields);
+  
+    // Generate signature for this message
+    $response['openid.sig'] = _openid_signature($assoc, $response, $to_sign);
+    return $response;
+}
+
 /**
- * Verify signatures [11.4.2]
+ * Verify signatures generated using stateless mode [11.4.2]
  */
 function simpleid_authenticate($request) {
     global $version;
@@ -493,18 +514,24 @@ function simpleid_authenticate($request) {
     }
 
     if ($is_valid) {
-        $response = array(
-            'is_valid' => 'true'
-        );
+        $response = array('is_valid' => 'true');
     } else {
-        $response = array(
-            'is_valid' => 'false',
-            'invalidate_handle' => $request['openid.assoc_handle'] // optional, An association handle sent in the request
-        );
+        $response = array('is_valid' => 'false');
+    }
+    
+    // RP wants to check whether a handle is invalid
+    if (isset($request['openid.invalidate_handle'])) {
+        $invalid_assoc = cache_get('association', $request['openid.invalidate_handle']);
+        
+        if (!$invalid_assoc || ($invalid_assoc['created'] + SIMPLEID_ASSOC_EXPIRES_IN < time())) {
+            // Yes, it's invalid
+            $response['invalidate_handle'] = $request['openid.invalidate_handle'];
+        }
     }
 
     openid_direct_response(openid_direct_message($response, $version));
 }
+
 
 
 /**
@@ -535,20 +562,10 @@ function simpleid_rp_form($request, $response) {
         $xtpl->assign('identity', htmlspecialchars($response['openid.identity']));
         $xtpl->parse('main.rp.cancel');
     } else {        
-        // Check the user's auto-submit preference for this RP
-        // (default to on)
-        $auto_submit_checked = TRUE;
         $rp = simpleid_rp_load($user['uid'], $realm);
         
-        $extensions = extension_invoke_all('form', $response, $rp);
+        $extensions = extension_invoke_all('form', $request, $rp);
         $xtpl->assign('extensions', implode($extensions));
-
-    
-        if ($rp && $rp['auto_release'] == 0) {
-            $auto_submit_checked = FALSE;
-        }
-    
-        if ($auto_submit_checked) $xtpl->assign('auto_release', 'checked="checked"');
         
         $xtpl->parse('main.rp.setup');
     }
@@ -579,41 +596,12 @@ function simpleid_send() {
         $response = simpleid_checkid_error(false);
     } else {
         simpleid_rp_save($uid, $response['openid.realm'], array('auto_release' => $_REQUEST['autorelease']));
-        $response = simpleid_sign($response);
+        $response = simpleid_sign($response, $response['openid.assoc_handle']);
     }
 
     redirect_form($return_to, $response);
 }
 
-function simpleid_sign(&$response, $assoc_handle = NULL) {
-    if ($assoc_handle == NULL) {
-        $assoc = _simpleid_create_association(CREATE_ASSOCIATION_STATELESS);
-    } else {
-        $assoc = cache_get('association', $assoc_handle);
-        
-        if ($assoc['created'] + SIMPLEID_ASSOC_EXPIRES_IN < time()) {
-            // Association has expired, need to create a new one
-            $response['openid.invalidate_handle'] = $assoc_handle;
-            $assoc = _simpleid_create_association(CREATE_ASSOCIATION_STATELESS);
-        }
-    }
-    
-    // Get all the signed fields [10.1]
-    $signed_fields = array('op_endpoint', 'return_to', 'response_nonce', 'assoc_handle', 'identity', 'claimed_id');
-    $signed_fields = array_merge($signed_fields, extension_invoke_all('signed_fields', $response));
-    
-    // Check if the signed keys are actually present
-    $to_sign = array();
-    foreach ($signed_fields as $field) {
-        if (isset($response['openid.' . $field])) $to_sign[] = $field;
-    }
-    
-    $response['openid.signed'] = implode(',', $signed_fields);
-  
-    // Generate signature for this message
-    $response['openid.sig'] = _openid_signature($assoc, $response, $to_sign);
-    return $response;
-}
 
 /**
  * Wrapper for saving and loading Relying Parties

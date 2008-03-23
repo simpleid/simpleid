@@ -96,8 +96,8 @@ function user_login() {
     // If the user is already logged in, return
     if (isset($user["uid"])) openid_indirect_response_redirect(SIMPLEID_BASE_URL, 'q=frontpage');
     
-    $destination = $_POST['destination'];
-    $state = $_POST['s'];    
+    $destination = $_REQUEST['destination'];
+    $state = $_REQUEST['s'];    
     $query = 'q=' . $destination;
     $query .= ($state) ? '&s=' . urlencode($state) : '';
     
