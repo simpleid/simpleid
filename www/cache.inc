@@ -33,11 +33,18 @@
  * @param $type the type of data in the cache
  * @param $key an identifier
  * @param $data the data to store
+ * @param $time if present, sets the modification time of the cache file to this
+ * time
  */ 
-function cache_set($type, $key, $data) {
-    $file = fopen(_cache_get_name($type, $key), 'w');
+function cache_set($type, $key, $data, $time = NULL) {
+    $filename = _cache_get_name($type, $key);
+    $file = fopen($filename, 'w');
     fwrite($file, serialize($data));
     fclose($file);
+    
+    if ($time != NULL) {
+        touch($filename, $time);
+    }
 }
 
 /**
