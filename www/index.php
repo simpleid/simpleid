@@ -162,6 +162,9 @@ function simpleid_process_openid($request) {
         case 'check_authentication':
             simpleid_authenticate($request);
             break;
+        default:
+            set_message('Invalid OpenID message.');
+            user_page();
     }
 }
 
@@ -356,11 +359,13 @@ function _simpleid_checkid(&$request) {
     // Check 1: Is the user logged into SimpleID as any user?
     if ($user == NULL) {        
         return CHECKID_LOGIN_REQUIRED;
+    } else {
+        $uid = $user['uid'];
     }
     
     // Check 2: Is the user logged in as the same identity as the identity requested?
     // Choose the identity URL for the user automatically
-    if ($request['openid.identity'] == 'http://specs.openid.net/auth/2.0/identifier_select') {
+    if ($request['openid.identity'] == 'http://specs.openid.net/auth/2.0/identifier_select') {        
         $test_user = user_load($uid);
         $identity = $test_user['identity'];
         $request['openid.identity'] = $identity;
@@ -374,8 +379,7 @@ function _simpleid_checkid(&$request) {
     }
     
     // Check 3: For checkid_immediate, the user must already have given
-    // permission to log in automatically.
-    $uid = $user['uid'];
+    // permission to log in automatically.    
     $rp = simpleid_rp_load($uid, $realm);
     simpleid_rp_save($uid, $realm);
     
@@ -403,10 +407,12 @@ function simpleid_checkid_ok($request) {
         $message['openid.claimed_id'] = $request['openid.claimed_id'];
     }
     
-    // Check for a 1.1 nonce
-    $parts = parse_url($request['openid.return_to']);
-    if (preg_match('/nonce=([^&]+)/', $parts['query'], $matches)) {
-        $message['nonce'] = $matches[1];
+    if ($version == OPENID_VERSION_1_1) {
+        // Check for a 1.1 nonce
+        $parts = parse_url($request['openid.return_to']);
+        if (preg_match('/nonce=([^&]+)/', $parts['query'], $matches)) {
+            $message['nonce'] = $matches[1];
+        }
     }
     
     $message = array_merge($message, extension_invoke_all('id_res', $request));
@@ -559,7 +565,8 @@ function simpleid_rp_form($request, $response) {
     $xtpl->assign('realm', htmlspecialchars($realm));
 
     if ($response['openid.mode'] == 'cancel') {
-        $xtpl->assign('identity', htmlspecialchars($response['openid.identity']));
+        $xtpl->assign('return_to', htmlspecialchars($request['openid.return_to']));
+        $xtpl->assign('identity', htmlspecialchars($request['openid.identity']));
         $xtpl->parse('main.rp.cancel');
     } else {        
         $rp = simpleid_rp_load($user['uid'], $realm);
@@ -591,15 +598,22 @@ function simpleid_send() {
     
     $response = unpickle($_REQUEST['s']);
     $return_to = $response['openid.return_to'];
+    if (!$return_to) $return_to = $_REQUEST['openid.return_to'];
     
     if ($_REQUEST['op'] == 'Cancel') {
         $response = simpleid_checkid_error(false);
+        set_message('Log in cancelled.');
     } else {
         simpleid_rp_save($uid, $response['openid.realm'], array('auto_release' => $_REQUEST['autorelease']));
         $response = simpleid_sign($response, $response['openid.assoc_handle']);
+        set_message('You were logged in successfully.');
     }
 
-    redirect_form($return_to, $response);
+    if ($return_to) {
+        redirect_form($return_to, $response);
+    } else {
+        user_page();
+    }
 }
 
 

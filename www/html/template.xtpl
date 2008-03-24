@@ -90,6 +90,8 @@
                 <!-- END: setup -->
 
                 <!-- BEGIN: cancel -->
+                <input type="hidden" name="openid.return_to" value="{return_to}" />
+                
                 <p>Unable to log into <strong class="realm">{realm}</strong>.</p>
                 
                 <p>Your current identity does not match the requested identity <strong>{identity}</strong>.</p>
