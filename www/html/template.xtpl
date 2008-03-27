@@ -121,7 +121,7 @@
             <form action="index.php" method="post" enctype="application/x-www-form-urlencoded">
                 <input type="hidden" name="q" value="login"/><input name="destination" type="hidden" value="{destination}"/>
                 <input type="hidden" name="s" value="{state}"/>
-                <input name="captcha_hash" type="hidden" value="{captcha_hash}" />
+                <input type="hidden" name="nonce" value="{nonce}" />
                 <div class="form-item">
                     <label for="edit-name">User name:</span></label>
                     <input type="text" maxlength="60" name="name" id="edit-name"  size="60" value=""  class="form-text required" />
@@ -129,10 +129,6 @@
                 <div class="form-item">
                     <label for="edit-pass">Password:</label>
                     <input type="password" name="pass" id="edit-pass"  size="60"  class="form-text required" />
-                </div>
-                <div class="form-item">
-                    <label for="edit-captcha">What is {captcha}?</label>
-                    <input type="text" maxlength="60" name="captcha" id="edit-captcha"  size="60" value="" class="form-text required" />
                 </div>
                 <input type="submit" name="op" id="edit-submit" value="Log in" class="form-submit" />
             </form>

@@ -26,6 +26,8 @@
  * 
  * $Id$
  */
+ 
+define('SIMPLEID_LOGIN_NONCE_EXPIRES_IN', 3600);
 
 function user_init() {
     global $user;
@@ -101,19 +103,36 @@ function user_login() {
     $query = 'q=' . $destination;
     $query .= ($state) ? '&s=' . urlencode($state) : '';
     
-    if (!$_POST['name'] || !$_POST['pass'] || !$_POST['captcha']) {
+    if (!$_POST['name'] || !$_POST['pass']) {
         if (isset($_POST['destination'])) {
             // User came from a log in form.
-            set_message('You need to supply the user name, the password and the answer to the maths question in order to log in.');
+            set_message('You need to supply the user name and the password in order to log in.');
         }
         user_login_form($destination, $state);
         return;
     }
     
-    if (md5(SIMPLEID_BASE_URL . trim($_POST['captcha'])) != $_POST['captcha_hash']) {
-        set_message('Your answer to the maths question is not correct.');
+    if (!$_POST['nonce']) {
+        if (isset($_POST['destination'])) {
+            // User came from a log in form.
+            set_message('You seem to be attempting to log in from another web page.  You must use this page to log in.');
+        }
         user_login_form($destination, $state);
         return;
+    }
+    
+    $time = strtotime(substr($_POST['nonce'], 0, 20));
+    
+    if (!cache_get('user-nonce', $_POST['nonce'])) {
+        set_message('SimpleID detected a potential security attack on your log in.  Please log in again.');
+        user_login_form($destination, $state);
+        return;
+    } elseif ($time < time() - SIMPLEID_LOGIN_NONCE_EXPIRES_IN) {
+        set_message('The log in page has expired.  Please log in again.');
+        user_login_form($destination, $state);
+        return;
+    } else {
+        cache_delete('user-nonce', $_POST['nonce']);
     }
     
     $test_user = user_load($_POST['name']);
@@ -152,13 +171,14 @@ function user_logout($destination = 'frontpage') {
 function user_login_form($destination = '', $state = NULL) {    
     global $xtpl;
 
-    $a = rand(1, 10);
-    $b = rand(1, 10);
+    cache_gc(SIMPLEID_LOGIN_NONCE_EXPIRES_IN, 'user-nonce');
+    $nonce = openid_nonce();
+    cache_set('user-nonce', $nonce, 1);
     
     $xtpl->assign('title', 'Log In');
-    $xtpl->assign('destination', $destination);
+    $xtpl->assign('destination', htmlspecialchars($destination));
     $xtpl->assign('captcha_hash', md5(SIMPLEID_BASE_URL . ($a + $b)));
-    $xtpl->assign('captcha', $a . " + " . $b);
+    $xtpl->assign('nonce', htmlspecialchars($nonce));
     if ($state) $xtpl->assign('state', $state);
     
     $xtpl->parse('main.login');
