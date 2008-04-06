@@ -99,7 +99,7 @@ function user_login() {
     if (isset($user["uid"])) openid_indirect_response_redirect(SIMPLEID_BASE_URL, 'q=frontpage');
     
     $destination = $_REQUEST['destination'];
-    $state = $_REQUEST['s'];    
+    $state = $_REQUEST['s'];
     $query = 'q=' . $destination;
     $query .= ($state) ? '&s=' . urlencode($state) : '';
     
@@ -155,8 +155,17 @@ function user_login() {
     openid_indirect_response_redirect(SIMPLEID_BASE_URL, $query);
 }
 
-function user_logout($destination = 'frontpage') {
+function user_logout($destination = NULL) {
     global $user;
+    
+    $state = $_REQUEST['s'];
+    if ($destination == NULL) {
+        if ($_REQUEST['destination']) {
+            $destination = $_REQUEST['destination'];
+        } else {
+            $destination = '';
+        }
+    }
     
     cache_delete('user', $user['uid']);
     unset($_SESSION['user']);
@@ -164,7 +173,7 @@ function user_logout($destination = 'frontpage') {
     
     set_message('You have been logged out.');
     
-    user_login_form($destination);
+    user_login_form($destination, $state);
 }
 
 
