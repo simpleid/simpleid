@@ -42,12 +42,15 @@ define('OPENID_SHA1_BLOCKSIZE', 64);
 
 define('OPENID_RAND_SOURCE', '/dev/urandom');
 
-
 define('OPENID_VERSION_2', 2);
 define('OPENID_VERSION_1_1', 1);
 
-function openid_get_version($request) {
-    if ($request["openid.ns"] != 'http://specs.openid.net/auth/2.0/signon') return OPENID_VERSION_1_1;
+define('OPENID_NS_2_0', 'http://specs.openid.net/auth/2.0');
+define('OPENID_NS_1_1', 'http://openid.net/signon/1.1');
+define('OPENID_NS_1_0', 'http://openid.net/signon/1.0');
+
+function openid_get_version($request, $key = 'openid.ns') {
+    if ($request[$key] != OPENID_NS_2_0) return OPENID_VERSION_1_1;
     return OPENID_VERSION_2;
 }
 
@@ -61,7 +64,7 @@ function openid_get_version($request) {
  */
 function openid_direct_message($data, $version = OPENID_VERSION_2) {
     if ($version == OPENID_VERSION_2) {
-        $data['ns'] = 'http://specs.openid.net/auth/2.0';
+        $data['ns'] = OPENID_NS_2_0;
     }
     foreach ($data as $key => $value) {
         if (strpos($key, ':') !== false) {
@@ -101,7 +104,7 @@ function openid_direct_response($message, $status = '200 OK') {
  */
 function openid_indirect_message($data, $version = OPENID_VERSION_2) {
     if ($version == OPENID_VERSION_2) {
-        return array_merge($data, array('openid.ns' => 'http://specs.openid.net/auth/2.0'));
+        return array_merge($data, array('openid.ns' => OPENID_NS_2_0));
     }
     return $data;
 }
@@ -111,6 +114,12 @@ function openid_indirect_response($url, $message, $response_func = 'openid_indir
 }
 
 function openid_indirect_response_redirect($url, $message) {    
+    header('Status: 303 See Other');
+    header('Location: ' . openid_indirect_response_url($url, $message));
+    exit;
+}
+
+function openid_indirect_response_url($url, $message) {    
     if (is_array($message)) {
         $pairs = array();
         
@@ -123,9 +132,7 @@ function openid_indirect_response_redirect($url, $message) {
         $encoded_message = $message;
     }    
     
-    header('Status: 303 See Other');
-    header('Location: ' . $url . '?' . $encoded_message);
-    exit;
+    return $url . '?' . $encoded_message;
 }
 
 function openid_indirect_response_form($url, $message) {

@@ -36,6 +36,7 @@ include "user.inc";
 include "cache.inc";
 
 define('SIMPLEID_VERSION', '0.5');
+define('CACHE_DIR', SIMPLEID_CACHE_DIR);
 
 simpleid_start();
 
@@ -259,6 +260,7 @@ function _simpleid_create_association($mode = CREATE_ASSOCIATION_DEFAULT, $assoc
     }
 
     $association = array('assoc_handle' => $assoc_handle, 'assoc_type' => $assoc_type, 'mac_key' => $mac_key, 'created' => time());
+    if ($mode == CREATE_ASSOCIATION_STATELESS) $association['stateless'] = 1;
     cache_set('association', $assoc_handle, $association);
 
     if ($mode == CREATE_ASSOCIATION_DEFAULT) {
@@ -368,6 +370,7 @@ function _simpleid_checkid(&$request) {
     if ($request['openid.identity'] == 'http://specs.openid.net/auth/2.0/identifier_select') {        
         $test_user = user_load($uid);
         $identity = $test_user['identity'];
+        $request['openid.claimed_id'] = $identity;
         $request['openid.identity'] = $identity;
     } else {
         $identity = $request['openid.identity'];
@@ -474,6 +477,7 @@ function simpleid_checkid_error($immediate) {
 function simpleid_sign(&$response, $assoc_handle = NULL) {
     if (!$assoc_handle) {
         $assoc = _simpleid_create_association(CREATE_ASSOCIATION_STATELESS);
+        $response['openid.assoc_handle'] = $assoc['assoc_handle'];
     } else {
         $assoc = cache_get('association', $assoc_handle);
         
@@ -481,6 +485,7 @@ function simpleid_sign(&$response, $assoc_handle = NULL) {
             // Association has expired, need to create a new one
             $response['openid.invalidate_handle'] = $assoc_handle;
             $assoc = _simpleid_create_association(CREATE_ASSOCIATION_STATELESS);
+            $response['openid.assoc_handle'] = $assoc['assoc_handle'];
         }
     }
     
@@ -521,6 +526,10 @@ function simpleid_authenticate($request) {
 
     if ($is_valid) {
         $response = array('is_valid' => 'true');
+        if ($assoc['stateless']) {
+            // Stateless association handles should be used once, thus we should invalidate this one.
+            $response['invalidate_handle'] = $request['openid.assoc_handle'];
+        }
     } else {
         $response = array('is_valid' => 'false');
     }
@@ -565,6 +574,7 @@ function simpleid_rp_form($request, $response) {
     $xtpl->assign('realm', htmlspecialchars($realm));
 
     if ($response['openid.mode'] == 'cancel') {
+        $xtpl->assign('request_state', pickle($request));
         $xtpl->assign('return_to', htmlspecialchars($request['openid.return_to']));
         $xtpl->assign('identity', htmlspecialchars($request['openid.identity']));
         $xtpl->parse('main.rp.cancel');
@@ -593,10 +603,11 @@ function simpleid_rp_form($request, $response) {
  * to the original RP that had requested them.
  */
 function simpleid_send() {
-    global $user;
+    global $user, $version;
     $uid = $user['uid'];
     
     $response = unpickle($_REQUEST['s']);
+    $version = openid_get_version($response);
     $return_to = $response['openid.return_to'];
     if (!$return_to) $return_to = $_REQUEST['openid.return_to'];
     
