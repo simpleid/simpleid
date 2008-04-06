@@ -73,10 +73,10 @@ function cache_get($type, $key) {
 function cache_get_all($type) {
     $r = array();
     
-    $dir = opendir(SIMPLEID_CACHE_DIR);
+    $dir = opendir(CACHE_DIR);
     
     while (($file = readdir($dir)) !== false) {
-        $filename = SIMPLEID_CACHE_DIR . '/' . $file;
+        $filename = CACHE_DIR . '/' . $file;
         
         if ((filetype($filename) != "file") || (strpos($file, $type . '-') !== 0)) continue;
         
@@ -95,7 +95,8 @@ function cache_get_all($type) {
  * @param $key an identifier
  */
 function cache_delete($type, $key) {
-    unlink(_cache_get_name($type, $key));
+    $filename = _cache_get_name($type, $key);
+    if (file_exists($filename)) unlink($filename);
 }
 
 /**
@@ -106,10 +107,10 @@ function cache_delete($type, $key) {
  * @param $type the type of data in the cache
  */
 function cache_gc($expiry, $type = NULL) {
-    $dir = opendir(SIMPLEID_CACHE_DIR);
+    $dir = opendir(CACHE_DIR);
     
     while (($file = readdir($dir)) !== false) {
-        $filename = SIMPLEID_CACHE_DIR . '/' . $file;
+        $filename = CACHE_DIR . '/' . $file;
         
         if (($type != NULL) && (strpos($file, $type . '-') !== 0)) continue;
         
@@ -122,7 +123,7 @@ function cache_gc($expiry, $type = NULL) {
 }
 
 function _cache_get_name($type, $key) {
-    return SIMPLEID_CACHE_DIR . '/' . $type . '-' . md5($key) . '.cache';
+    return CACHE_DIR . '/' . $type . '-' . md5($key) . '.cache';
 }
 
 ?>
