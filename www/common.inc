@@ -78,24 +78,24 @@ function indirect_fatal_error($error) {
     exit;
 }
 
-function normalize_url($url) {
-  $normalized_url = $url;
-
-  $normalized_url = preg_replace('!^(xri://|xri://\$ip\*|xri://\$dns\*)!', '', $normalized_url);
-  
-  if (stristr($url, '://') === FALSE) {
-    $normalized_url = 'http://' . $url;
-  }
-
-  return $normalized_url;
-}
-
 function pickle($data) {
     return base64_encode(gzcompress(serialize($data)));
 }
 
 function unpickle($pickle) {
     return unserialize(gzuncompress(base64_decode($pickle)));
+}
+
+function get_request_uri($base) {
+    $i = strpos($base, '//');
+    $i = strpos($base, '/', $i + 2);
+    
+    if ($i === false) {
+        return $base . $_SERVER['REQUEST_URI'];
+    } else {
+        return substr($base, 0, $i) . $_SERVER['REQUEST_URI'];
+    }
+    
 }
 
 define('SIMPLEID_EXTENSIONS', 'sreg');
