@@ -2,7 +2,7 @@
 /*
  * SimpleID
  *
- * Copyright (C) Kelvin Mo 2007
+ * Copyright (C) Kelvin Mo 2007-8
  *
  * Includes code Drupal OpenID module (http://drupal.org/project/openid)
  * Rowan Kerr <rowan@standardinteractive.com>
