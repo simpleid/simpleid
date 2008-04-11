@@ -74,6 +74,8 @@
                 <input type="hidden" name="s" value="{state}" />
                 
                 <!-- BEGIN: setup -->
+                <input type="hidden" name="openid.realm" value="{realm}" />
+                
                 <p>You are being logged into <strong class="realm">{realm}</strong>.</p>
                 
                 <div class="form-item">

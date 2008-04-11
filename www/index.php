@@ -180,7 +180,7 @@ function simpleid_associate($request) {
     if (OPENID_SHA256_SUPPORTED) $supported_assoc_types[] = 'HMAC-SHA256';
     
     $supported_session_types = array('no-encryption', 'DH-SHA1');
-    if (OPENID_SHA256_SUPPORTED) $supported_assoc_types[] = 'DH-SHA256';
+    if (OPENID_SHA256_SUPPORTED) $supported_session_types[] = 'DH-SHA256';
 
     // Common Request Parameters [8.1.1]
     $assoc_type = $request['openid.assoc_type'];
@@ -615,7 +615,7 @@ function simpleid_send() {
         $response = simpleid_checkid_error(false);
         set_message('Log in cancelled.');
     } else {
-        simpleid_rp_save($uid, $response['openid.realm'], array('auto_release' => $_REQUEST['autorelease']));
+        simpleid_rp_save($uid, $_REQUEST['openid.realm'], array('auto_release' => $_REQUEST['autorelease']));
         $response = simpleid_sign($response, $response['openid.assoc_handle']);
         set_message('You were logged in successfully.');
     }
