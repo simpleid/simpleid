@@ -63,13 +63,13 @@ function sreg_signed_fields($response) {
     $optional = explode(',', $request['optional']);
     $fields = array_merge($required, $optional);
     $alias = extension_get_alias(sreg_ns());
-    $return = array();
+    $signed_fields = array();
     
     foreach ($fields as $field) {
-        if (isset($response['openid.' . $alias . '.' . $field])) $response[] = $alias . '.' . $field;
+        if (isset($response['openid.' . $alias . '.' . $field])) $signed_fields[] = $alias . '.' . $field;
     }
     
-    return $response;
+    return $signed_fields;
 }
 
 function sreg_form($request, $rp) {
