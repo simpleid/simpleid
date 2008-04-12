@@ -129,7 +129,7 @@ function extension_invoke_all() {
             $result = call_user_func_array($extension . '_' . $function, $args);
             if (isset($result) && is_array($result)) {
                 $return = array_merge($return, $result);
-            } else if (isset($result)) {
+            } elseif (isset($result)) {
                 $return[] = $result;
             } 
         }
