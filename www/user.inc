@@ -101,7 +101,7 @@ function user_login() {
     $destination = $_REQUEST['destination'];
     $state = $_REQUEST['s'];
     $query = 'q=' . $destination;
-    $query .= ($state) ? '&s=' . urlencode($state) : '';
+    $query .= ($state) ? '&s=' . rawurlencode($state) : '';
     
     if (!$_POST['name'] || !$_POST['pass']) {
         if (isset($_POST['destination'])) {

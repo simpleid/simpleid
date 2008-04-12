@@ -432,7 +432,7 @@ function simpleid_checkid_approval_required($request) {
         $request['openid.mode'] = 'checkid_setup';
         $message = array(
             'openid.mode' => 'id_res',            
-            'openid.user_setup_url' => SIMPLEID_BASE_URL . '/index.php?q=continue&s=' . pickle($request)
+            'openid.user_setup_url' => SIMPLEID_BASE_URL . '/index.php?q=continue&s=' . rawurlencode(pickle($request))
         );
     }
     
@@ -447,7 +447,7 @@ function simpleid_checkid_login_required($request, $auth_release_realm = NULL) {
     } else {    
         $message = array(
             'openid.mode' => 'id_res',
-            'openid.user_setup_url' => SIMPLEID_BASE_URL . '/index.php?q=login&s=' . pickle($request)
+            'openid.user_setup_url' => SIMPLEID_BASE_URL . '/index.php?q=login&destination=continue&s=' . rawurlencode(pickle($request))
         );
     }
     
