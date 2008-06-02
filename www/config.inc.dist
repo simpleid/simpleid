@@ -67,4 +67,12 @@ define('SIMPLEID_DATE_TIME_FORMAT', '%Y-%m-%d %H:%M:%S %Z');
  */
 define('SIMPLEID_ASSOC_EXPIRES_IN', 3600);
 
+/**
+ * SimpleID extensions.
+ *
+ * The SimpleID extensions you wish to load.  You should separate the
+ * extensions you wish to load with a comma.
+ *
+ */
+define('SIMPLEID_EXTENSIONS', 'sreg');
 ?>

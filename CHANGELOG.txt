@@ -1,5 +1,11 @@
 // $Id$
 
+SimpleID 0.5.1
+--------------
+
+- Fixed bug in user.inc
+
+
 SimpleID 0.5
 ------------
 

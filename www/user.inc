@@ -186,7 +186,6 @@ function user_login_form($destination = '', $state = NULL) {
     
     $xtpl->assign('title', 'Log In');
     $xtpl->assign('destination', htmlspecialchars($destination));
-    $xtpl->assign('captcha_hash', md5(SIMPLEID_BASE_URL . ($a + $b)));
     $xtpl->assign('nonce', htmlspecialchars($nonce));
     if ($state) $xtpl->assign('state', $state);
     
