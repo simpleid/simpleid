@@ -43,6 +43,7 @@ function sreg_default_alias() {
 
 function sreg_id_res($request) {
     global $user;
+    global $version;
     
     $request = extension_get_request(sreg_ns(), $request);
     $required = explode(',', $request['required']);
@@ -50,6 +51,8 @@ function sreg_id_res($request) {
     $fields = array_merge($required, $optional);
     $alias = extension_get_alias(sreg_ns());
     $response = array();
+    
+    if ($version == OPENID_VERSION_2) $response['openid.ns.' . $alias] = sreg_ns();
     
     foreach ($fields as $field) {
         if (isset($user['sreg'][$field])) {
@@ -64,13 +67,10 @@ function sreg_id_res($request) {
  * Returns an array of fields that need signing.
  */
 function sreg_signed_fields($response) {
-    $request = extension_get_request(sreg_ns(), $response);
-    $required = explode(',', $request['required']);
-    $optional = explode(',', $request['optional']);
-    $fields = array_merge($required, $optional);
+    $fields = array_keys(extension_get_request(sreg_ns(), $response));
     $alias = extension_get_alias(sreg_ns());
     $signed_fields = array();
-    
+
     foreach ($fields as $field) {
         if (isset($response['openid.' . $alias . '.' . $field])) $signed_fields[] = $alias . '.' . $field;
     }
@@ -92,8 +92,8 @@ function sreg_form($request, $rp) {
         
         $xtpl2->assign('alias', extension_get_alias(sreg_ns()));
         
-        if (isset($request['policy_url'])) {
-            $xtpl2->assign('policy', 'You can view the site\'s <a href="' & htmlspecialchars($request['policy_url']) & '">policy</a> in relation to the use of this information.');
+        if (isset($request['policy_url'])) {            
+            $xtpl2->assign('policy', 'You can view the site\'s policy in relation to the use of this information at this URL: <a href="' . htmlspecialchars($request['policy_url']) . '">' . htmlspecialchars($request['policy_url']) . '</a>.');            
         }
         
         foreach ($keys as $key) {

@@ -42,7 +42,7 @@ include "openid.inc";
 include "user.inc";
 include "cache.inc";
 
-define('SIMPLEID_VERSION', '0.5.1');
+define('SIMPLEID_VERSION', '0.6');
 define('CACHE_DIR', SIMPLEID_CACHE_DIR);
 
 simpleid_start();
@@ -722,6 +722,8 @@ function simpleid_send() {
     $version = openid_get_version($response);
     $return_to = $response['openid.return_to'];
     if (!$return_to) $return_to = $_REQUEST['openid.return_to'];
+    
+    extension_invoke_all('send', $response);
     
     if ($_REQUEST['op'] == 'Cancel') {
         $response = simpleid_checkid_error(false);
