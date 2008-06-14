@@ -27,7 +27,14 @@
  * $Id$
  */
 
-
+/**
+ * Main SimpleID file.
+ *
+ * @package simpleid
+ * @filesource
+ */
+ 
+ 
 include "config.inc";
 include "common.inc";
 include "lib/xtemplate.class.php";
@@ -40,6 +47,11 @@ define('CACHE_DIR', SIMPLEID_CACHE_DIR);
 
 simpleid_start();
 
+/**
+ * Entry point for SimpleID.
+ *
+ * @see user_init()
+ */
 function simpleid_start() {
     global $xtpl;
         
@@ -118,6 +130,10 @@ function simpleid_start() {
     }
 }
 
+/**
+ * Processes a user's preferences in relation to automatic verification of a
+ * relying party.
+ */
 function simpleid_autorelease() {
     global $user;
     
@@ -146,7 +162,13 @@ function simpleid_autorelease() {
 }
 
 /**
- * Entry point for OpenID messages
+ * Process an OpenID request.
+ *
+ * <p>This function determines the version of the OpenID specification that is
+ * relevant to this request, checks openid.mode and passes the
+ * request on to the function required to process the request.</p>
+ *
+ * @param mixed $request the OpenID request
  */
 function simpleid_process_openid($request) {
     global $version;
@@ -171,6 +193,14 @@ function simpleid_process_openid($request) {
 
 /**
  * Processes an association request from a relying party.  [8]
+ *
+ * <p>An association request has an openid.mode value of
+ * associate.  This function checks whether the association request
+ * is valid, and if so, creates an association and sends the response to
+ * the relying party.</p>
+ *
+ * @see _simpleid_create_association()
+ * @param mixed $request the OpenID request
  *
  */
 function simpleid_associate($request) {
@@ -232,6 +262,19 @@ function simpleid_associate($request) {
 define('CREATE_ASSOCIATION_STATELESS', 2);
 define('CREATE_ASSOCIATION_DEFAULT', 1);
 
+/**
+ * Creates an association.
+ *
+ * @param int $mode either CREATE_ASSOCIATION_DEFAULT or CREATE_ASSOCIATION_STATELESS
+ * @param string $assoc_type a valid OpenID association type
+ * @param string $session_type a valid OpenID session type
+ * @param string $dh_modulus for Diffie-Hellman key exchange, the modulus encoded in Base64
+ * @param string $dh_gen for Diffie-Hellman key exchange, g encoded in Base64
+ * @param string $dh_consumer_public for Diffie-Hellman key exchange, the public key of the relying party encoded in Base64
+ * @return mixed if $mode is CREATE_ASSOCIATION_DEFAULT, an OpenID response
+ * to the association request, if $mode is CREATE_ASSOCIATION_STATELESS, the
+ * association data for storage.
+ */
 function _simpleid_create_association($mode = CREATE_ASSOCIATION_DEFAULT, $assoc_type = 'HMAC-SHA1', $session_type = 'no-encryption', $dh_modulus = NULL, $dh_gen = NULL, $dh_consumer_public = NULL) {
     $secret_size = array('HMAC-SHA1' => 20, 'HMAC-SHA256' => 32);
     $hmac_funcs = array('HMAC-SHA1' => '_openid_hmac_sha1', 'HMAC-SHA256' => '_openid_hmac_sha256');
@@ -277,6 +320,20 @@ define('CHECKID_LOGIN_REQUIRED', -1);
 define('CHECKID_IDENTITIES_NOT_MATCHING', -2);
 define('CHECKID_IDENTITY_NOT_EXIST', -3);
 
+/**
+ * Processes an autentication request from a relying party.
+ *
+ * <p>An association request has an openid.mode value of
+ * checkid_setup or checkid_immediate.  This function calls
+ * {@link _simpleid_checkid()} to see whether the user logged on into SimpleID
+ * matches the identity supplied in the OpenID request.</p>
+ *
+ * <p>Depending on the OpenID version, this function will supply an appropriate
+ * assertion.</p>
+ *
+ * @param mixed $request the OpenID request
+ *
+ */
 function simpleid_checkid($request) {
     $immediate = ($request['openid.mode'] == 'checkid_immediate');
 
@@ -353,6 +410,15 @@ function simpleid_checkid($request) {
     }
 }
 
+/**
+ * Checks whether the current user logged into SimpleID matches the identity
+ * supplied in an OpenID request.
+ *
+ * @param mixed &$request the OpenID request
+ * @return int one of CHECKID_OK, CHECKID_APPROVAL_REQUIRED, CHECKID_IDENTITY_NOT_EXIST,
+ * CHECKID_IDENTITIES_NOT_MATCHING or CHECKID_LOGIN_REQUIRED
+ * @global array the current logged in user
+ */
 function _simpleid_checkid(&$request) {
     global $user, $version;
     
@@ -393,6 +459,12 @@ function _simpleid_checkid(&$request) {
     }
 }
 
+/**
+ * Returns an OpenID response indicating a positive assertion.
+ *
+ * @param mixed $request the OpenID request
+ * @return mixed an OpenID response with a positive assertion
+ */
 function simpleid_checkid_ok($request) {
     global $version;
     
@@ -423,6 +495,14 @@ function simpleid_checkid_ok($request) {
     return openid_indirect_message($message, $version);
 }
 
+/**
+ * Returns an OpenID response indicating a negative assertion to a
+ * checkid_immediate request, where an approval of the relying party by the
+ * user is required  [10.2]
+ *
+ * @param mixed $request the OpenID request
+ * @return mixed an OpenID response with a negative assertion
+ */
 function simpleid_checkid_approval_required($request) {
     global $version;
     
@@ -439,7 +519,14 @@ function simpleid_checkid_approval_required($request) {
     return openid_indirect_message($message, $version);
 }
 
-function simpleid_checkid_login_required($request, $auth_release_realm = NULL) {
+/**
+ * Returns an OpenID response indicating a negative assertion to a
+ * checkid_immediate request, where a login is required  [10.2]
+ *
+ * @param mixed $request the OpenID request
+ * @return mixed an OpenID response with a negative assertion
+ */
+function simpleid_checkid_login_required($request) {
     global $version;
     
     if ($version == OPENID_VERSION_2) {
@@ -455,7 +542,10 @@ function simpleid_checkid_login_required($request, $auth_release_realm = NULL) {
 }
 
 /**
- * Provides a message indicating a negative assertion  [10.2]
+ * Returns an OpenID response indicating a negative assertion  [10.2]
+ *
+ * @param bool $immediate whether checkid_immediate was used
+ * @return mixed an OpenID response with a negative assertion
  */
 function simpleid_checkid_error($immediate) {
     global $version;
@@ -473,7 +563,17 @@ function simpleid_checkid_error($immediate) {
     return openid_indirect_message($message, $version);
 }
 
-
+/**
+ * Signs an OpenID response, using signature information from an association
+ * handle.
+ *
+ * @param array &$response the OpenID response
+ * @param array $assoc_handle the association handle containing key information
+ * for the signature.  If $assoc_handle is not specified, a stateless association
+ * is created
+ * @return array the signed OpenID response
+ *
+ */
 function simpleid_sign(&$response, $assoc_handle = NULL) {
     if (!$assoc_handle) {
         $assoc = _simpleid_create_association(CREATE_ASSOCIATION_STATELESS);
@@ -499,7 +599,7 @@ function simpleid_sign(&$response, $assoc_handle = NULL) {
         if (isset($response['openid.' . $field])) $to_sign[] = $field;
     }
     
-    $response['openid.signed'] = implode(',', $signed_fields);
+    $response['openid.signed'] = implode(',', $to_sign);
   
     // Generate signature for this message
     $response['openid.sig'] = _openid_signature($assoc, $response, $to_sign);
@@ -508,6 +608,9 @@ function simpleid_sign(&$response, $assoc_handle = NULL) {
 
 /**
  * Verify signatures generated using stateless mode [11.4.2]
+ *
+ *
+ * @param mixed $request the OpenID request 
  */
 function simpleid_authenticate($request) {
     global $version;
@@ -551,15 +654,23 @@ function simpleid_authenticate($request) {
 
 /**
  * Continues an OpenID authentication request.
+ *
+ * <p>This function decodes an OpenID authentication request specified in the
+ * s request parameter and feeds it to the
+ * {@link simpleid_process_openid} function.  This allows SimpleID to preserve
+ * the state of an OpenID request.</p>
  */
 function simpleid_continue() {
     simpleid_process_openid(unpickle($_REQUEST['s']));
 }
 
 /**
- * Indirect communication .. give the user
- * a chance to make changes to any data
- * being requested by an RP.
+ * Provides a form for user verification of a relying party, where the 
+ * {@link _simpleid_checkid()} function returns a CHECKID_APPROVAL_REQUIRED
+ *
+ * @param mixed $request the original OpenID request
+ * @param mixed $response the proposed OpenID response, subject to user
+ * verification
  */
 function simpleid_rp_form($request, $response) {
     global $user;
@@ -597,10 +708,11 @@ function simpleid_rp_form($request, $response) {
 
 
 /**
- * 2nd part of 2-step user interaction
- * take the values they have updated
- * in the previous form and return them
- * to the original RP that had requested them.
+ * Processes a user response from the {@link simpleid_rp_form()} function.
+ *
+ * <p>If the user verifies the relying party, an OpenID response will be sent to
+ * the relying party.</p>
+ *
  */
 function simpleid_send() {
     global $user, $version;
@@ -629,8 +741,12 @@ function simpleid_send() {
 
 
 /**
- * Wrapper for saving and loading Relying Parties
- * with which users have interacted.
+ * Saves the user's preferences and other data in relation to a relying party.
+ *
+ * @param string $uid the user name
+ * @param string $realm the openid.realm of the relying party
+ * @param array $details an associative array of the data to save
+ * @see cache_set()
  */
 function simpleid_rp_save($uid, $realm, $details = array()) {
     $now = time();
@@ -652,6 +768,14 @@ function simpleid_rp_save($uid, $realm, $details = array()) {
     cache_set('rp', $uid, $rps);
 }
 
+/**
+ * Loads the user's preferences and other data in relation to a relying party.
+ *
+ * @param string $uid the user name
+ * @param string $realm the openid.realm of the relying party
+ * @return array an associative array of the data
+ * @see cache_get()
+ */
 function simpleid_rp_load($uid, $realm) {
     $rps = cache_get('rp', $uid);
     if (isset($rps[$realm])) {
@@ -661,10 +785,24 @@ function simpleid_rp_load($uid, $realm) {
     }
 }
 
+/**
+ * Loads the user's preferences and other data in relation to all relying parties.
+ *
+ * @param string $uid the user name
+ * @return array an associative array of the data, with the openid.realm URIs as
+ * key
+ */
 function simpleid_rp_load_all($uid) {
     return cache_get('rp', $uid);
 }
 
+/**
+ * Saves the user's preferences and other data in relation to all relying parties.
+ *
+ * @param string $uid the user name
+ * @param array $rps an associative array of the data as obtained from the
+ * {@link simpleid_rp_load_all()} function
+ */
 function simpleid_rp_save_all($uid, $rps) {
     cache_set('rp', $uid, $rps);
 }

@@ -28,12 +28,19 @@
  */
 
 /**
+ * Functions for caching and persistence.
+ *
+ * @package simpleid
+ * @filesource
+ */
+ 
+/**
  *  Stores data into the cache.
  *
- * @param $type the type of data in the cache
- * @param $key an identifier
- * @param $data the data to store
- * @param $time if present, sets the modification time of the cache file to this
+ * @param string $type the type of data in the cache
+ * @param string $key an identifier
+ * @param mixed $data the data to store
+ * @param int $time if present, sets the modification time of the cache file to this
  * time
  */ 
 function cache_set($type, $key, $data, $time = NULL) {
@@ -50,9 +57,9 @@ function cache_set($type, $key, $data, $time = NULL) {
 /**
  * Obtains data from the cache.
  *
- * @param $type the type of data in the cache
- * @param $key an identifier
- * @return the data associated with the type and key, or NULL if the cache
+ * @param string $type the type of data in the cache
+ * @param string $key an identifier
+ * @return mixed the data associated with the type and key, or NULL if the cache
  * does not contain the requested data.
  */
 function cache_get($type, $key) {
@@ -66,8 +73,8 @@ function cache_get($type, $key) {
 /**
  * Obtains all data of a particular type from the cache.
  *
- * @param $type the type of data in the cache
- * @return an array of data associated with the type, or NULL if the cache
+ * @param string $type the type of data in the cache
+ * @return mixed an array of data associated with the type, or NULL if the cache
  * does not contain the requested data.
  */
 function cache_get_all($type) {
@@ -91,8 +98,8 @@ function cache_get_all($type) {
 /**
  * Deletes data from the cache.
  *
- * @param $type the type of data in the cache
- * @param $key an identifier
+ * @param string $type the type of data in the cache
+ * @param string $key an identifier
  */
 function cache_delete($type, $key) {
     $filename = _cache_get_name($type, $key);
@@ -103,8 +110,8 @@ function cache_delete($type, $key) {
  * Garbage collects data stored the cache.  Data is deleted if it was stored
  * for longer than the specified expiry
  *
- * @param $expiry the expiry time, in seconds, after which data will be deleted
- * @param $type the type of data in the cache
+ * @param int $expiry the expiry time, in seconds, after which data will be deleted
+ * @param string $type the type of data in the cache
  */
 function cache_gc($expiry, $type = NULL) {
     $dir = opendir(CACHE_DIR);
@@ -122,6 +129,13 @@ function cache_gc($expiry, $type = NULL) {
     closedir($dir);
 }
 
+/**
+ * Returns the name of the cache data file, given a type and an identifier.
+ *
+ * @param string $type the type of data in the cache
+ * @param string $key an identifier
+ * @return string a file name
+ */
 function _cache_get_name($type, $key) {
     return CACHE_DIR . '/' . $type . '-' . md5($key) . '.cache';
 }

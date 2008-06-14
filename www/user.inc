@@ -26,9 +26,29 @@
  * 
  * $Id$
  */
+
+/**
+ * User functions.
+ *
+ * @package simpleid
+ * @filesource
+ */
+ 
  
 define('SIMPLEID_LOGIN_NONCE_EXPIRES_IN', 3600);
 
+/**
+ * This variable holds data on the currently logged-in user.  If the user is
+ * not logged in, this variable is NULL.
+ *
+ * @global array $user
+ */
+$user = NULL;
+
+/**
+ * Initialises the user system.  Loads data for the currently logged-in user,
+ * if any.
+ */
 function user_init() {
     global $user;
     global $xtpl;
@@ -42,6 +62,14 @@ function user_init() {
     }
 }
 
+/**
+ * Loads user data for a specified user name.
+ *
+ * @param string $uid the name of the user to load
+ * @return mixed data for the specified user, or NULL if the user name does not
+ * exist
+ * @see user_load_from_identity()
+ */
 function user_load($uid) {
     $identity_file = SIMPLEID_IDENTITIES_DIR . "/$uid.identity";    
     
@@ -62,6 +90,14 @@ function user_load($uid) {
     }
 }
 
+/**
+ * Loads user data for a specified OpenID Identity URI.
+ *
+ * @param string $identity the Identity URI of the user to load
+ * @return mixed data for the specified user, or NULL if the user name does not
+ * exist
+ * @see user_load()
+ */
 function user_load_from_identity($identity) {
     $uid = cache_get('identity', $identity);
     $r = NULL;
@@ -92,6 +128,10 @@ function user_load_from_identity($identity) {
     return $r;
 }
 
+/**
+ * Attempts to log in a user, using the user name and password specified in the
+ * HTTP request.
+ */
 function user_login() {
     global $user;
     
@@ -155,6 +195,12 @@ function user_login() {
     openid_indirect_response_redirect(SIMPLEID_BASE_URL, $query);
 }
 
+/**
+ * Attempts to log out a user and returns to the login form.
+ *
+ * @param string $destination the destination value to be included in the
+ * login form
+ */
 function user_logout($destination = NULL) {
     global $user;
     
@@ -176,7 +222,13 @@ function user_logout($destination = NULL) {
     user_login_form($destination, $state);
 }
 
-
+/**
+ * Provides a user login form.
+ *
+ * @param string $destination the SimpleID location to which the user is directed
+ * if login is successful
+ * @param string $state the current SimpleID state, if required by the location
+ */
 function user_login_form($destination = '', $state = NULL) {    
     global $xtpl;
 
@@ -194,6 +246,9 @@ function user_login_form($destination = '', $state = NULL) {
     $xtpl->out('main');
 }
 
+/**
+ * Returns the user's home page.
+ */
 function user_page() {
     global $user;
     global $xtpl;
@@ -226,6 +281,11 @@ function user_page() {
     $xtpl->out('main');
 }
 
+/**
+ * Returns the user's public page.
+ * 
+ * @param string $uid the user ID
+ */
 function user_public_page($uid = NULL) {
     global $xtpl;
     
@@ -259,6 +319,11 @@ function user_public_page($uid = NULL) {
     $xtpl->out('main');
 }
 
+/**
+ * Returns the user's public XDRS page.
+ * 
+ * @param string $uid the user ID
+ */
 function user_xrds($uid = NULL) {
     global $xtpl;
     
@@ -279,6 +344,11 @@ function user_xrds($uid = NULL) {
     $xtpl->out('xrds');
 }
 
+/**
+ * Set up the user block, showing the currently logged in user.
+ *
+ * @param bool $allow_logout whether to include a logout link
+ */
 function user_block($allow_logout = TRUE) {
     global $user;
     global $xtpl;

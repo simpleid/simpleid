@@ -28,7 +28,14 @@
  */
 
 /**
- * From Appendix B: Diffie-Hellman Key Exchange Default Value
+ * OpenID related functions.
+ *
+ * @package simpleid
+ * @filesource
+ */
+ 
+/**
+ * Diffie-Hellman Key Exchange Default Value
  */
 define('OPENID_DH_DEFAULT_MOD', '155172898181473697471232257763715539915724801'.
        '966915404479707795314057629378541917580651227423698188993727816152646631'.
@@ -49,6 +56,15 @@ define('OPENID_NS_2_0', 'http://specs.openid.net/auth/2.0');
 define('OPENID_NS_1_1', 'http://openid.net/signon/1.1');
 define('OPENID_NS_1_0', 'http://openid.net/signon/1.0');
 
+/**
+ * Detects the OpenID version of the current request
+ *
+ * @param mixed $request the OpenID request
+ * @param string $key the key to look for to determine the OpenID
+ * version
+ * @return int either OPENID_NS_2_0 or OPENID_VERSION_1_1
+ *
+ */
 function openid_get_version($request, $key = 'openid.ns') {
     if ($request[$key] != OPENID_NS_2_0) return OPENID_VERSION_1_1;
     return OPENID_VERSION_2;
@@ -59,8 +75,9 @@ function openid_get_version($request, $key = 'openid.ns') {
  *
  * The response will be encoded using Key-Value Form Encoding. [4.1.1]
  *
- * @param $data the data in the response
- * @param $version the message version
+ * @param mixed $data the data in the response
+ * @param int $version the message version
+ * @return string the message in key-value form encoding
  */
 function openid_direct_message($data, $version = OPENID_VERSION_2) {
     if ($version == OPENID_VERSION_2) {
@@ -86,7 +103,8 @@ function openid_direct_message($data, $version = OPENID_VERSION_2) {
 /**
  * Sends a direct response.
  *
- * @param $message an OpenID message encoded using Key-Value Form
+ * @param string $message an OpenID message encoded using Key-Value Form
+ * @param string $status the HTTP status to send
  */
 function openid_direct_response($message, $status = '200 OK') {
     header("HTTP/1.1 $status");
@@ -99,8 +117,9 @@ function openid_direct_response($message, $status = '200 OK') {
  *
  * The response will be encoded using HTTP Encoding. [4.1.2]
  *
- * @param $data the data in the response
- * @param $version the message version
+ * @param mixed $data the data in the response
+ * @param int $version the message version
+ * @return mixed the message
  */
 function openid_indirect_message($data, $version = OPENID_VERSION_2) {
     if ($version == OPENID_VERSION_2) {
@@ -109,17 +128,38 @@ function openid_indirect_message($data, $version = OPENID_VERSION_2) {
     return $data;
 }
 
+/**
+ * Sends an indirect response to a URL.
+ *
+ * @param string $url the URL to which the response is to be sent
+ * @param mixed $message an OpenID message
+ * @param string $response_func the method by which the indirect response is to
+ * be sent, either openid_indirect_response_form or openid_indirect_response_redirect
+ */
 function openid_indirect_response($url, $message, $response_func = 'openid_indirect_response_form') {
     call_user_func($response_func, $url, $message);
 }
 
+/**
+ * Sends an indirect message via an HTTP redirect
+ *
+ * @param string $url the URL to which the response is to be sent
+ * @param mixed $message an OpenID message
+ */ 
 function openid_indirect_response_redirect($url, $message) {    
     header('Status: 303 See Other');
     header('Location: ' . openid_indirect_response_url($url, $message));
     exit;
 }
 
-function openid_indirect_response_url($url, $message) {    
+/**
+ * Encodes an indirect message into a URL
+ * @param string $url the URL to which the response is to be sent
+ * @param mixed $message an OpenID message
+ * @return string the URL to which the response is to be sent, with the
+ * encoded message
+ */
+function openid_indirect_response_url($url, $message) {
     if (is_array($message)) {
         $pairs = array();
         
@@ -135,6 +175,12 @@ function openid_indirect_response_url($url, $message) {
     return $url . '?' . $encoded_message;
 }
 
+/**
+ * Sends an indirect message via an HTML form
+ *
+ * @param string $url the URL to which the response is to be sent
+ * @param mixed $message an OpenID message
+ */
 function openid_indirect_response_form($url, $message) {
     $html = '<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -157,16 +203,44 @@ function openid_indirect_response_form($url, $message) {
     exit;
 }
 
+/**
+ * Sends a direct message indicating an error.  This is a convenience function
+ * for {@link openid_direct_response()}.
+ *
+ * @param string $error the error message
+ * @param array $additional any additional data to be sent with the error
+ * message
+ * @param int $version the message version
+ */
 function openid_direct_error($error, $additional = array(), $version = OPENID_VERSION_2) {
     $message = openid_direct_message(array_merge(array('error' => $error), $additional), $version);
     openid_direct_response($message, '400 Bad Request');
 }
 
+/**
+ * Sends an indirect message indicating an error.  This is a convenience function
+ * for {@link openid_indirect_response()}.
+ *
+ * @param string $error the error message
+ * @param array $additional any additional data to be sent with the error
+ * message
+ * @param int $version the message version
+ * @param string $response_func the method by which the indirect response is to
+ * be sent, either openid_indirect_response_form or openid_indirect_response_redirect
+ */
 function openid_indirect_error($url, $error, $additional = array(), $version = OPENID_VERSION_2, $response_func = 'openid_indirect_response_form') {
     $message = openid_indirect_message(array_merge(array('error' => $error), $additional), $version);
     openid_indirect_response($url, $message, $response_func);
 }
 
+/**
+ * Gets the realm from the OpenID request.  This is specified differently
+ * depending on the OpenID version.
+ *
+ * @param mixed $request the OpenID request
+ * @param int $version the OpenID version for the message
+ * @return string the realm URI
+ */
 function openid_get_realm($request, $version) {
     if ($version == OPENID_VERSION_1_1) {
         $realm = $request['openid.trust_root'];
@@ -185,8 +259,10 @@ function openid_get_realm($request, $version) {
 
 
 /**
- * Fix PHP's braindead handling of POST data.  PHP changes dots in keys of
+ * Fix PHP's handling of POST data.  PHP changes dots in keys of
  * associative arrays to underscores.
+ *
+ * @param array &$post the HTTP post data as returned by PHP
  */
 function openid_fix_post(&$post) {
     global $ns_to_alias;    
@@ -223,7 +299,11 @@ function openid_fix_post(&$post) {
 
 /* ------- Random byte and nonce functions ----------------------------------- */
 /**
- * Obtains a number of random bytes.  This function uses an entropy source.
+ * Obtains a number of random bytes.  This function uses an entropy source specified
+ * in OPENID_RAND_SOURCE.
+ *
+ * @param int $num_bytes the number of bytes to generate
+ * @return string a string containing random bytes
  */
 function _openid_get_bytes($num_bytes) {
     static $f = null;
@@ -249,6 +329,8 @@ function _openid_get_bytes($num_bytes) {
 
 /**
  * Obtains a nonce [10.1]
+ *
+ * @return string an OpenID nonce
  */
 function openid_nonce() {
     return gmstrftime('%Y-%m-%dT%H:%M:%SZ') . bin2hex(_openid_get_bytes(4));
@@ -259,8 +341,13 @@ function openid_nonce() {
 /**
  * Associate using Diffie-Hellman key exchange [8.4.2]
  *
- * @param $dh_modulus a prime number
- * @param $dh_gen a primitive root modulo $dh_modulus
+ * @param string $secret proposed shared secret, in binary representation
+ * @param string $dh_consumer_public the client's exponential (public key), in Base64 representation
+ * @param string $dh_modulus a prime number
+ * @param string $dh_gen a primitive root modulo
+ * @param string $hash_func the hash function
+ * @return array an array containing the server's exponential (public key), and shared secret
+ * encrypted using the shared key
  */
 function openid_dh_server_assoc($secret, $dh_consumer_public, $dh_modulus = NULL, $dh_gen = NULL, $hash_func = '_openid_sha1') {
     $cpub = _openid_dh_base64_to_long($dh_consumer_public);
@@ -291,14 +378,32 @@ function openid_dh_server_assoc($secret, $dh_consumer_public, $dh_modulus = NULL
     );
 }
 
+/**
+ * Converts a Base64 encoded string to a BCMath integer
+ *
+ * @param string $str the Base64 encoded string
+ * @return string the BCMath integer
+ */
 function _openid_dh_base64_to_long($str) {
     return _openid_dh_binary_to_long(base64_decode($str));
 }
 
+/**
+ * Converts a BCMath integer to a Base64 encoded string
+ *
+ * @param string $str the BCMath integer
+ * @return string the Base64 encoded string
+ */
 function _openid_dh_long_to_base64($str) {
     return base64_encode(_openid_dh_long_to_binary($str));
 }
 
+/**
+ * Converts an integer in binary to a BCMath integer.
+ *
+ * @param string $str the integer in binary
+ * @param string the BCMath integer
+ */
 function _openid_dh_binary_to_long($str) {
     $bytes = array_merge(unpack('C*', $str));
 
@@ -312,6 +417,12 @@ function _openid_dh_binary_to_long($str) {
     return $n;
 }
 
+/**
+ * Converts an BCMath integer to its binary representation.
+ *
+ * @param string $long the BCMath integer
+ * @param string the binary representation
+ */
 function _openid_dh_long_to_binary($long) {
     $cmp = bccomp($long, 0);
     if ($cmp < 0) {
@@ -342,13 +453,24 @@ function _openid_dh_long_to_binary($long) {
 }
 
 /**
- * Encoded an integer as big-endian signed two's complement binary strings.
+ * Encode an integer as big-endian signed two's complement binary strings.
  * [4.2]
+ *
+ * @param string $num the binary integer
+ * @return string the signed two's complement binary string
  */
 function _openid_btwoc($num) {
     return pack('H*', $num);
 }
 
+/**
+ * Encrypts/decrypts the secret using a shared key
+ *
+ * @param string $shared the shared key, in binary representation
+ * @param string $secret the secret, in binart representation
+ * @param string $hash_func the hash function
+ * @return string the encrypted/decrypted secret, in binary representation
+ */
 function _openid_dh_xorsecret($shared, $secret, $hash_func = '_openid_sha1') {
     $dh_shared_str = _openid_dh_long_to_binary($shared);
     $hashed_dh_shared = call_user_func($hash_func, $dh_shared_str);
@@ -360,6 +482,13 @@ function _openid_dh_xorsecret($shared, $secret, $hash_func = '_openid_sha1') {
     return $xsecret;
 }
 
+/**
+ * Generates a random integer, which will be used to derive a private key
+ * for Diffie-Hellman key exchange.  The integer must be less than $stop
+ *
+ * @param string $stop a prime number, in binary representation
+ * @param string the random integer, in BCMath representation
+ */
 function _openid_dh_rand($stop) {
     static $duplicate_cache = array();
   
@@ -400,13 +529,13 @@ function _openid_dh_rand($stop) {
 /* ------- Hash and HMAC functions ------------------------------------------- */
 
 /**
- * Signatures
  * Sign certain keys in a message
- * $association - object loaded from openid_association or openid_server_association table
- *              - important fields are ->assoc_type and ->mac_key
- * $message_array - array of entire message about to be sent
- * $keys_to_sign - keys in the message to include in signature (without
+ *
+ * @param mixed $association the association containing the signature information
+ * @param array $message_array array of entire message about to be sent
+ * @param array $keys_to_sign keys in the message to include in signature (without
  * 'openid.' appended)
+ * @return string the signature encoded in Base64
  */
 function _openid_signature($association, $message_array, $keys_to_sign) {
     $hmac_funcs = array('HMAC-SHA1' => '_openid_hmac_sha1', 'HMAC-SHA256' => '_openid_hmac_sha256');
@@ -430,6 +559,12 @@ function _openid_signature($association, $message_array, $keys_to_sign) {
     return base64_encode($signature);
 }
 
+/**
+ * Obtains the SHA1 hash of a string in binary representation.
+ *
+ * @param string $text the text to be hashed
+ * @return string the hash in binary representation
+ */
 function _openid_sha1($text) {
     if (function_exists('hash_hmac') && function_exists('hash_algos') && (in_array('sha256', hash_algos()))) {
         return hash('sha1', $text, true);
@@ -445,6 +580,13 @@ function _openid_sha1($text) {
     }
 }
 
+/**
+ * Obtains the keyed hash value using the HMAC method and the SHA1 algorithm
+ *
+ * @param string $key the key in binary representation
+ * @param string $text the text to be hashed
+ * @return string the hash in binary representation
+ */
 function _openid_hmac_sha1($key, $text) {
     if (strlen($key) > OPENID_SHA1_BLOCKSIZE) {
         $key = _openid_sha1($key);
@@ -460,16 +602,35 @@ function _openid_hmac_sha1($key, $text) {
 
 // Check if SHA-256 support is available
 if (function_exists('hash_hmac') && function_exists('hash_algos') && (in_array('sha256', hash_algos()))) {
+    
+    /**
+     * Whether the current installation of PHP supports SHA256.  SHA256 is supported
+     * if the hash module is properly compiled and loaded into PHP.
+     */
     define('OPENID_SHA256_SUPPORTED', true);
     
+    /**
+     * Obtains the SHA256 hash of a string in binary representation.
+     *
+     * @param string $text the text to be hashed
+     * @return string $hash the hash in binary representation
+     */
     function _openid_sha256($text) {
         return hash('sha256', $text, true);
     }
     
+    /**
+     * Obtains the keyed hash value using the HMAC method and the SHA256 algorithm
+     *
+     * @param string $key the key in binary representation
+     * @param string $text the text to be hashed
+     * @return string the hash in binary representation
+     */
     function _openid_hmac_sha256($key, $text) {
         return hash_hmac('sha256', $text, true);
     }
 } else {
+    /** @ignore */
     define('OPENID_SHA256_SUPPORTED', false);
 }
 
@@ -477,6 +638,7 @@ if (function_exists('hash_hmac') && function_exists('hash_algos') && (in_array('
 
 // Provide bcpowmod support for PHP4
 if (!function_exists('bcpowmod')) {
+    /** @ignore */
     function bcpowmod($base, $exp, $mod) {
         $square = bcmod($base, $mod);
         $result = 1;

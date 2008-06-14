@@ -26,7 +26,19 @@
  * 
  * $Id$
  */
+
+/**
+ * Common functions used by SimpleID, and the implementation of extensions.
+ *
+ * @package simpleid
+ * @filesource
+ */
  
+/**
+ * Sets a message to display to the user on the rendered SimpleID page.
+ *
+ * @param string $msg the message to set
+ */
 function set_message($msg) {
     global $xtpl;
     
@@ -34,6 +46,13 @@ function set_message($msg) {
     $xtpl->parse('main.message');
 }
 
+/**
+ * Provides an HTML-based redirection form for OpenID messages.
+ *
+ * @param string $url the location to which the user agent is redirected
+ * @param mixed $message the OpenID message to include in the redirection
+ * request.
+ */
 function redirect_form($url, $message) {
     global $xtpl;
     
@@ -68,6 +87,11 @@ function redirect_form($url, $message) {
     exit;
 }
 
+/**
+ * Displays a fatal error message and exits.
+ *
+ * @param string $error the message to set
+ */
 function indirect_fatal_error($error) {
     global $xtpl;
     
@@ -78,14 +102,32 @@ function indirect_fatal_error($error) {
     exit;
 }
 
+/**
+ * Serialises a variable for inclusion as a URL parameter.
+ *
+ * @param mixed $data the data to serialise
+ * @return string serialised data
+ */
 function pickle($data) {
     return base64_encode(gzcompress(serialize($data)));
 }
 
+/**
+ * Deserialises data specified in a URL parameter as a variable.
+ *
+ * @param string $pickle the serialised data
+ * @return mixed the deserialised data
+ */
 function unpickle($pickle) {
     return unserialize(gzuncompress(base64_decode($pickle)));
 }
 
+/**
+ * Obtains the URI of the current request, given a base URI.
+ *
+ * @param string the base URI
+ * @return string the request URI
+ */
 function get_request_uri($base) {
     $i = strpos($base, '//');
     $i = strpos($base, '/', $i + 2);
@@ -109,6 +151,11 @@ if (!defined('SIMPLEID_EXTENSIONS')) {
 $ns_to_alias = array("http://openid.net/extensions/sreg/1.1" => "sreg");
 $ns_to_extension = array();
 
+/**
+ * Initialises the extension mechanism.  This function looks up the extensions
+ * to load in the {@link SIMPLEID_EXTENSIONS} constants, loads them, then
+ * calls the ns hook.
+ */
 function extension_init() {
     global $extensions;
     global $ns_to_extension;
@@ -118,10 +165,19 @@ function extension_init() {
     foreach ($extensions as $extension) {
         include_once $extension . ".inc";
         
-        $ns_to_extension[extension_invoke($extension, 'ns')] = $extension;
+        if (extension_invoke($extension)) {
+            $ns_to_extension[extension_invoke($extension, 'ns')] = $extension;
+        }
     }
 }
 
+/**
+ * Invokes a hook in all the loaded extensions.
+ *
+ * @param string $function the name of the hook to call
+ * @param mixed $args the arguments to the hook
+ * @return array the return values from the hook
+ */
 function extension_invoke_all() {
     global $extensions;
     
@@ -143,6 +199,14 @@ function extension_invoke_all() {
     return $return;
 }
 
+/**
+ * Invokes a hook in a specified extension.
+ *
+ * @param string $extension the extension to call
+ * @param string $function the name of the hook to call
+ * @param mixed $args the arguments to the hook
+ * @return mixed the return value from the hook
+ */
 function extension_invoke() {
     $args = func_get_args();
     $extension = array_shift($args);
@@ -153,12 +217,28 @@ function extension_invoke() {
     }
 }
 
+/**
+ * Filters an OpenID request to find keys specific to an extension, as specified
+ * by the Type URI.
+ *
+ * For exmaple, if the extension has the Type URI http://example.com/ and the
+ * alias example, this function will return an array of all the keys in the
+ * OpenID request which starts with openid.example
+ *
+ * @param string $ns the Type URI of the extension
+ * @param mixed $request the OpenID request
+ * @return array the filtered request, with the prefix (in the example above,
+ * <tt>openid.example.</tt>) stripped in the keys.
+ */
 function extension_get_request($ns, $request) {
     $alias = extension_get_alias($ns);
     $return = array();
     
     if ($request) {
         foreach ($request as $key => $value) {
+            if ($key == 'openid.' . $alias) {
+                $return['#default'] = $value;
+            }
             if (strpos($key, 'openid.' . $alias . '.') === 0) {
                 $return[substr($key, strlen('openid.' . $alias . '.'))] = $value;
             }
@@ -168,12 +248,24 @@ function extension_get_request($ns, $request) {
     return $return;
 }
 
+/**
+ * Returns the OpenID alias for an extension, given a Type URI, based on the
+ * alias definitions in the current OpenID request.
+ *
+ * @param string $ns the Type URI
+ * @return string the alias
+ */
 function extension_get_alias($ns) {
     global $ns_to_alias;
     
     return $ns_to_alias[$ns];
 }
 
+/**
+ * Returns an array of currently loaded extensions.
+ *
+ * @param array a list of the names of the currently loaded extensions.
+ */
 function get_extensions() {
     global $extensions;
     

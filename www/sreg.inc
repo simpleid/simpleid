@@ -27,6 +27,12 @@
  * $Id$
  */
 
+/**
+ * @package simpleid
+ * @subpackage extensions
+ */
+ 
+ 
 function sreg_ns() {
     return "http://openid.net/extensions/sreg/1.1";
 }
