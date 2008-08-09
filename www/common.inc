@@ -142,11 +142,6 @@ function get_request_uri($base) {
 
 /* ------- SimpleID extension support ---------------------------------------- */
 
-// For compatibility with earlier SimpleID versions.
-if (!defined('SIMPLEID_EXTENSIONS')) {
-    define('SIMPLEID_EXTENSIONS', 'sreg');
-}
-
 // For sreg 1.0 compatibility
 $ns_to_alias = array("http://openid.net/extensions/sreg/1.1" => "sreg");
 $ns_to_extension = array();
