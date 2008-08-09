@@ -2,6 +2,8 @@
 /**
  * SimpleID configuration file.
  *
+ * @package simpleid
+ *
  * $Id$
  *
  */
@@ -17,10 +19,12 @@
  * for you.
  *
  * Examples:
+ * <code>
  *   define('SIMPLEID_BASE_URL', 'http://www.example.com');
  *   define('SIMPLEID_BASE_URL', 'http://www.example.com:8888');
  *   define('SIMPLEID_BASE_URL', 'http://www.example.com/simpleid');
  *   define('SIMPLEID_BASE_URL', 'https://www.example.com:8888/simpleid');
+ * </code>
  *
  */
 define('SIMPLEID_BASE_URL', 'http://www.example.com');
