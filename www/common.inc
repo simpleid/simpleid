@@ -63,15 +63,15 @@ function redirect_form($url, $message) {
         $parts = explode('&', $query);
         foreach ($parts as $part) {
             list($key, $value) = explode('=', $part);
-            $xtpl->assign('name', htmlspecialchars($key));
-            $xtpl->assign('value', htmlspecialchars(urldecode($value)));
+            $xtpl->assign('name', htmlspecialchars($key, ENT_QUOTES, 'UTF-8'));
+            $xtpl->assign('value', htmlspecialchars(urldecode($value), ENT_QUOTES, 'UTF-8'));
             $xtpl->parse('main.redirect.parameter');
         }
     }
     foreach ($message as $key => $value) {
         if ($key) {
-            $xtpl->assign('name', htmlspecialchars($key));
-            $xtpl->assign('value', htmlspecialchars($value));
+            $xtpl->assign('name', htmlspecialchars($key, ENT_QUOTES, 'UTF-8'));
+            $xtpl->assign('value', htmlspecialchars($value, ENT_QUOTES, 'UTF-8'));
             $xtpl->parse('main.redirect.parameter');
         }
     }
@@ -125,7 +125,7 @@ function unpickle($pickle) {
 /**
  * Obtains the URI of the current request, given a base URI.
  *
- * @param string the base URI
+ * @param string $base the base URI
  * @return string the request URI
  */
 function get_request_uri($base) {
@@ -138,6 +138,50 @@ function get_request_uri($base) {
         return substr($base, 0, $i) . $_SERVER['REQUEST_URI'];
     }
     
+}
+
+/**
+ * Obtains a form token given a form ID.
+ *
+ * Form tokens are used in SimpleID forms to guard against cross-site forgary
+ * attacks.
+ *
+ * @param string $id the form ID
+ * @return string a form token
+ */
+function get_form_token($id) {
+    global $user;
+        $site_token = mt_rand();
+        cache_set('token', $base, $site_token);
+    if (cache_get('token', $base) == NULL) {
+    } else {
+        $site_token = cache_get('token', $base);
+    }
+    
+    if ($user == NULL) {
+        return md5($id . $site_token);
+    } else {
+        return md5(session_id() . $id . $site_token);
+    }
+}
+
+/**
+ * Checks whether a form token is valid
+ *
+ * @param string $token the token returned by the user agent
+ * @param string $id the form ID
+ * @return bool true if the form token is valid
+ */
+function validate_form_token($token, $id) {
+    global $user;
+    
+    $site_token = cache_get('token', $base);
+    
+    if ($user == NULL) {
+        return ($token == md5($id . $site_token));
+    } else {
+        return ($token == md5(session_id() . $id . $site_token));
+    }
 }
 
 /* ------- SimpleID extension support ---------------------------------------- */

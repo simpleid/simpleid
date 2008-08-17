@@ -93,13 +93,13 @@ function sreg_form($request, $rp) {
         $xtpl2->assign('alias', extension_get_alias(sreg_ns()));
         
         if (isset($request['policy_url'])) {            
-            $xtpl2->assign('policy', 'You can view the site\'s policy in relation to the use of this information at this URL: <a href="' . htmlspecialchars($request['policy_url']) . '">' . htmlspecialchars($request['policy_url']) . '</a>.');            
+            $xtpl2->assign('policy', 'You can view the site\'s policy in relation to the use of this information at this URL: <a href="' . htmlspecialchars($request['policy_url'], ENT_QUOTES, 'UTF-8') . '">' . htmlspecialchars($request['policy_url'], ENT_QUOTES, 'UTF-8') . '</a>.');            
         }
         
         foreach ($keys as $key) {
             if (isset($user['sreg'][$key])) {
-                $xtpl2->assign('name', htmlspecialchars($key));
-                $xtpl2->assign('value', htmlspecialchars($user['sreg'][$key]));
+                $xtpl2->assign('name', htmlspecialchars($key, ENT_QUOTES, 'UTF-8'));
+                $xtpl2->assign('value', htmlspecialchars($user['sreg'][$key], ENT_QUOTES, 'UTF-8'));
                 $xtpl2->parse('form.sreg');
             }
         }
@@ -118,8 +118,8 @@ function sreg_user_page() {
     
     if (isset($user['sreg'])) {
         foreach ($user['sreg'] as $name => $value) {
-            $xtpl2->assign('name', htmlspecialchars($name));
-            $xtpl2->assign('value', htmlspecialchars($value));
+            $xtpl2->assign('name', htmlspecialchars($name, ENT_QUOTES, 'UTF-8'));
+            $xtpl2->assign('value', htmlspecialchars($value, ENT_QUOTES, 'UTF-8'));
             $xtpl2->parse('user_page.sreg');
         }
     }

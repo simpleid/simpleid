@@ -186,11 +186,11 @@ function openid_indirect_response_form($url, $message) {
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xml:lang="en-AU" lang="en-AU" xmlns="http://www.w3.org/1999/xhtml"><body>';
 
-    $html .= '<form action="' . htmlspecialchars($url) . '" enctype="application/x-www-form-urlencoded" id="redirect"><p>Redirecting...</p>';
+    $html .= '<form action="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '" enctype="application/x-www-form-urlencoded" id="redirect"><p>Redirecting...</p>';
 
     foreach ($message as $key -> $value) {
         if ($key) {
-            $html .= '<input type="hidden" name="' . htmlspecialchars($key) . '" value="' . htmlspecialchars($value) . '" />';
+            $html .= '<input type="hidden" name="' . htmlspecialchars($key, ENT_QUOTES, 'UTF-8') . '" value="' . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . '" />';
         }
     }
 
