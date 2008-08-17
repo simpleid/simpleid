@@ -44,6 +44,10 @@ pass=c8e24ae844b7cb9381g722ae8209a19a
 ; Further information on the Simple Registration Extension can be found at
 ; http://www.openidenabled.com/openid/simple-registration-extension
 ;
+; Note, you must also enable the Simple Registration Extension in SimpleID.  To
+; do this, make sure the SIMPLEID_EXTENSIONS option in config.inc contains
+; sreg
+;
 ;[sreg]
 ;nickname=Example
 ;email=example@example.com
