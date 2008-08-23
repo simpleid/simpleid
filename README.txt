@@ -11,6 +11,14 @@ Latest Version
 The latest version of SimpleID can be found in the SimpleID web page at
 <http://simpleid.sourceforge.net/>
 
+Upgrading
+---------
+
+IMPORTANT: SimpleID version 0.6 introduced a new log in mechanism.  If you
+are upgrading from an earlier version of SimpleID, please read
+UPGRADE.txt for upgrade instructions.
+
+
 Installation
 ------------
 
@@ -42,3 +50,12 @@ SimpleID uses the famfamfam Silk icon set
 <http://www.famfamfam.com/lab/icons/silk/>, designed by Mark James.  The icon
 set is licensed is licensed under a Creative Commons Attribution 2.5 License
 <http://creativecommons.org/licenses/by/2.5/>.
+
+SimpleID uses the jQuery JavaScript library <http://jquery.com>, by John
+Resig and the jQuery team.
+
+SimpleID uses a JavaScript MD5 message digest library
+<http://pajhome.org.uk/crypt/md5>, written by Paul Johnston, Greg Holt, Andrew
+Kepert, Ydnar, Lostinet.  Licensing information for this library can be found
+in COPYING-md5.js.txt.
+

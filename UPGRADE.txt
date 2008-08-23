@@ -1,0 +1,31 @@
+// $Id$
+
+Upgrading SimpleID
+==================
+
+Upgrading to SimpleID 0.6
+-------------------------
+
+SimpleID version 0.6 introduced a new log in system.  The new system allows
+you to log in to SimpleID without sending your password in plain text.  Your
+password is used to create a cryptographic digest, which is then sent to
+the SimpleID server and verified.
+
+As a result, you need to be aware of two things:
+
+1.  You browser must have JavaScript switched on in order to use the new
+    log in system.  If JavaScript is not switched on, SimpleID reverts to the
+    "legacy" log in system used in previous versions, subject to the important
+    point below.
+    
+2.  By default, SimpleID version 0.6 will not accept logins under the legacy
+    system.  You can override this by putting the following line in your
+    config.inc:
+    
+    define('SIMPLEID_ALLOW_LEGACY_LOGIN', true);
+    
+    It is STRONGLY RECOMMENDED that you DO NOT switch the legacy login system
+    on, as it is substantially less secure than the new login system.  Use this
+    ONLY if your browser does not support JavaScript.
+    
+
