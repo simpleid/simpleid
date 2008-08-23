@@ -20,6 +20,8 @@
         <style type="text/css" media="screen">
             @import url(html/simpleid.css);
         </style>
+        
+        {javascript}
     </head>
     <body>
         <div id="header">
@@ -120,19 +122,26 @@
             <!-- END: autorelease -->
             
             <!-- BEGIN: login -->
-            <form action="index.php" method="post" enctype="application/x-www-form-urlencoded">
+            <div class="login-security {security_class}">
+                <p>{security_message}</p>
+            </div>
+            
+            <form action="index.php" method="post" enctype="application/x-www-form-urlencoded" id="login-form">
                 <input type="hidden" name="q" value="login"/><input name="destination" type="hidden" value="{destination}"/>
                 <input type="hidden" name="s" value="{state}"/>
-                <input type="hidden" name="nonce" value="{nonce}" />
+                <input type="hidden" name="nonce" id="edit-nonce" value="{nonce}" />
+                
+                <input type="hidden" name="digest" id="edit-digest" value="" />
+                
                 <div class="form-item">
                     <label for="edit-name">User name:</span></label>
-                    <input type="text" maxlength="60" name="name" id="edit-name"  size="60" value=""  class="form-text required" />
+                    <input type="text" maxlength="60" name="name" id="edit-name"  size="60" value=""  class="form-text required" {security_disabled} />
                 </div>
                 <div class="form-item">
                     <label for="edit-pass">Password:</label>
-                    <input type="password" name="pass" id="edit-pass"  size="60"  class="form-text required" />
+                    <input type="password" name="pass" id="edit-pass"  size="60"  class="form-text required" {security_disabled} />
                 </div>
-                <input type="submit" name="op" id="edit-submit" value="Log in" class="form-submit" />
+                <input type="submit" name="op" id="edit-submit" value="Log in" class="form-submit" {security_disabled} />
             </form>
             <!-- END: login -->
             

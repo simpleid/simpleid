@@ -100,13 +100,24 @@ th {
     background: transparent url(world.png) no-repeat top left;
 }
 
-.message {
+.message, .login-security {
     border: 1px solid #666666;
     padding: 0 10px;
     background: #DDDDDD;
     margin-bottom: 10px;
 }
 .message p { line-height: 1; }
+
+.unsecure {
+    border: 1px solid #AAAA11;
+    background: #FFFFDD;
+}
+.unsecure p { padding-left: 20px; background: transparent url(lock-open.png) no-repeat top left; }
+.secure {
+    border: 1px solid #44AA11;
+    background: #EEFFDD;
+}
+.secure p { padding-left: 20px; background: transparent url(lock.png) no-repeat top left; }
 
 .user {
     border: 1px solid #1144AA;

@@ -56,6 +56,24 @@ define('SIMPLEID_IDENTITIES_DIR', '../identities');
  */
 define('SIMPLEID_CACHE_DIR', '../cache');
 
+/**
+ * Allows legacy log-in system.
+ *
+ * Prior to SimpleID 0.6, the login system utilised by SimpleID requires users'
+ * passwords to be sent in plaintet to the web server for verification.  This is
+ * an inherent security risk.
+ *
+ * From version 0.6, SimpleID implemented a form of digest authentication, which
+ * means that passwords are not sent in plaintext.  For backwards compatibility,
+ * and to support browsers that do not have JavaScript installed, the legacy
+ * method is still supported if the following configuration parameter is set
+ * to true.  Otherwise, users must use a browser which supports JavaScript to
+ * log into SimpleID.
+ *
+ * The default is set to false for security reasons.  You should not change
+ * this value unless it is absolutely necessary.
+ */
+define('SIMPLEID_ALLOW_LEGACY_LOGIN', false);
 
 /**
  * Date and time format.

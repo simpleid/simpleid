@@ -45,6 +45,6 @@ function define_default($name, $value) {
     }
 }
 
-
+define_default('SIMPLEID_ALLOW_LEGACY_LOGIN', false);
 define_default('SIMPLEID_EXTENSIONS', 'sreg');
 ?>

@@ -143,11 +143,12 @@ function user_login() {
     $query = 'q=' . $destination;
     $query .= ($state) ? '&s=' . rawurlencode($state) : '';
     
-    if (!$_POST['name'] || !$_POST['pass']) {
+    if (!$_POST['name'] || ((SIMPLEID_ALLOW_LEGACY_LOGIN && (!$_POST['pass']) && (!$_POST['digest'])) || (!SIMPLEID_ALLOW_LEGACY_LOGIN && (!$_POST['digest'])))) {
         if (isset($_POST['destination'])) {
             // User came from a log in form.
             set_message('You need to supply the user name and the password in order to log in.');
         }
+        cache_delete('user-nonce', $_POST['nonce']);
         user_login_form($destination, $state);
         return;
     }
@@ -182,7 +183,11 @@ function user_login() {
         return;
     }
     
-    if (md5($_POST['pass']) != $test_user['pass']) {
+    if ($_POST['digest'] && !_user_verify_digest($_POST['digest'], $_POST['nonce'], $test_user)) {
+        set_message('The user name or password is not correct.');
+        user_login_form($destination, $state);
+        return;
+    } elseif (SIMPLEID_ALLOW_LEGACY_LOGIN && (md5($_POST['pass']) != $test_user['pass'])) {
         set_message('The user name or password is not correct.');
         user_login_form($destination, $state);
         return;
@@ -236,9 +241,25 @@ function user_login_form($destination = '', $state = NULL) {
     $nonce = openid_nonce();
     cache_set('user-nonce', $nonce, 1);
     
+    $xtpl->assign('javascript', '<script src="html/jquery.js" type="text/javascript"></script><script src="html/md5.js" type="text/javascript"></script><script src="html/user-login.js" type="text/javascript"></script>');
+    
+    if ($_SERVER['HTTPS']) {
+        $xtpl->assign('security_class', 'secure');
+        $xtpl->assign('security_message', 'Secure login using <strong>HTTPS</strong>.');
+    } else {
+        $xtpl->assign('security_class', 'unsecure');
+        
+        if (!SIMPLEID_ALLOW_LEGACY_LOGIN) {
+            $xtpl->assign('security_message', 'Your SimpleID configuration does not allow you to log in unsecurely.  Please enable JavaScript and try again, or see <a href="http://simpleid.sourceforge.net/manual/login-security.html">the SimpleID manual</a> for more details.');
+            $xtpl->assign('security_disabled', 'disabled="disabled"');
+        } else {
+            $xtpl->assign('security_message', '<strong>WARNING:</strong>  Your password will be sent to SimpleID as plain text.');
+        }
+    }
+    
     $xtpl->assign('title', 'Log In');
-    $xtpl->assign('destination', htmlspecialchars($destination));
-    $xtpl->assign('nonce', htmlspecialchars($nonce));
+    $xtpl->assign('destination', htmlspecialchars($destination, ENT_QUOTES, 'UTF-8'));
+    $xtpl->assign('nonce', htmlspecialchars($nonce, ENT_QUOTES, 'UTF-8'));
     if ($state) $xtpl->assign('state', $state);
     
     $xtpl->parse('main.login');
@@ -264,8 +285,8 @@ function user_page() {
     
     if ($rps) {
         foreach ($rps as $realm => $rp) {
-            $xtpl->assign('realm', htmlspecialchars($rp['realm']));
-            $xtpl->assign('last_time', htmlspecialchars(strftime(SIMPLEID_DATE_TIME_FORMAT, $rp['last_time'])));
+            $xtpl->assign('realm', htmlspecialchars($rp['realm'], ENT_QUOTES, 'UTF-8'));
+            $xtpl->assign('last_time', htmlspecialchars(strftime(SIMPLEID_DATE_TIME_FORMAT, $rp['last_time']), ENT_QUOTES, 'UTF-8'));
             $xtpl->assign('auto_release', ($rp['auto_release']) ? 'checked="checked"' : '');
             $xtpl->parse('main.frontpage.realm');
         }
@@ -298,17 +319,17 @@ function user_public_page($uid = NULL) {
         
         if ($user == NULL) {
             header('Status: 500');
-            set_message('User <strong>' . htmlspecialchars($uid) . '</strong> not found.');
+            set_message('User <strong>' . htmlspecialchars($uid, ENT_QUOTES, 'UTF-8') . '</strong> not found.');
         } else {
             header('X-XRDS-Location', SIMPLEID_BASE_URL . '/index.php?q=xrds/' . $uid);
             
-            set_message('This is the user <strong>' . htmlspecialchars($uid) . '</strong>\'s SimpleID page.  It contains hidden information for the use by OpenID consumers.');
+            set_message('This is the user <strong>' . htmlspecialchars($uid, ENT_QUOTES, 'UTF-8') . '</strong>\'s SimpleID page.  It contains hidden information for the use by OpenID consumers.');
             
-            $xtpl->assign('title', htmlspecialchars($uid));
-            $xtpl->assign('provider', htmlspecialchars(SIMPLEID_BASE_URL));
-            $xtpl->assign('xrds', htmlspecialchars(SIMPLEID_BASE_URL . '/index.php?q=xrds/' . $uid));
+            $xtpl->assign('title', htmlspecialchars($uid, ENT_QUOTES, 'UTF-8'));
+            $xtpl->assign('provider', htmlspecialchars(SIMPLEID_BASE_URL, ENT_QUOTES, 'UTF-8'));
+            $xtpl->assign('xrds', htmlspecialchars(SIMPLEID_BASE_URL . '/index.php?q=xrds/' . $uid, ENT_QUOTES, 'UTF-8'));
             if ($user["local_identity"]) {
-                $xtpl->assign('local_id', htmlspecialchars($user["identity"]));
+                $xtpl->assign('local_id', htmlspecialchars($user["identity"], ENT_QUOTES, 'UTF-8'));
             }
         }
     }
@@ -333,13 +354,13 @@ function user_xrds($uid = NULL) {
     if ($uid != NULL) {
         $user = user_load($uid);
         if (($user != NULL) && ($user["local_identity"])) {
-            $xtpl->assign('local_id', htmlspecialchars($user["identity"]));
+            $xtpl->assign('local_id', htmlspecialchars($user["identity"], ENT_QUOTES, 'UTF-8'));
             $xtpl->parse('xrds.local_id');
             $xtpl->parse('xrds.local_id2');
         }
     }
     
-    $xtpl->assign('simpleid_base_url', htmlspecialchars(SIMPLEID_BASE_URL));
+    $xtpl->assign('simpleid_base_url', htmlspecialchars(SIMPLEID_BASE_URL, ENT_QUOTES, 'UTF-8'));
     $xtpl->parse('xrds');
     $xtpl->out('xrds');
 }
@@ -354,11 +375,27 @@ function user_block($allow_logout = TRUE) {
     global $xtpl;
     
     if ($user != NULL) {
-        $xtpl->assign('uid', htmlspecialchars($user['uid']));
-        $xtpl->assign('identity', htmlspecialchars($user['identity']));
+        $xtpl->assign('uid', htmlspecialchars($user['uid'], ENT_QUOTES, 'UTF-8'));
+        $xtpl->assign('identity', htmlspecialchars($user['identity'], ENT_QUOTES, 'UTF-8'));
         if ($allow_logout) $xtpl->assign('logout', '<a href="?q=logout">Logout</a>');
         $xtpl->parse('main.user');
     }
+}
+
+/**
+ * Verfies a log in name and digest using digest authentication.
+ *
+ * @param string $digest the digest supplied by the user
+ * @param string $nonce the nonce supplied by SimpleID in the initial login
+ * form
+ * @param mixed $test_user the claimed user, against which to test the user's
+ * credentials
+ * @return bool true if the verification is successful
+ */
+function _user_verify_digest($digest, $nonce, $test_user) {
+    $test_digest1 = md5($test_user['uid'] . ':' . $test_user['pass']);
+    $test_digest = md5($nonce . ':' . $test_digest1);
+    return ($digest == $test_digest);
 }
 
 ?>
