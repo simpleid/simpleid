@@ -178,7 +178,7 @@ function user_login() {
     
     $test_user = user_load($_POST['name']);
     if ($test_user == NULL) {
-        set_message('The user you have supplied does not exist.');
+        set_message('The user name or password is not correct.');
         user_login_form($destination, $state);
         return;
     }
