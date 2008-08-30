@@ -241,7 +241,7 @@ function user_login_form($destination = '', $state = NULL) {
     $nonce = openid_nonce();
     cache_set('user-nonce', $nonce, 1);
     
-    $xtpl->assign('javascript', '<script src="html/jquery.js" type="text/javascript"></script><script src="html/md5.js" type="text/javascript"></script><script src="html/user-login.js" type="text/javascript"></script>');
+    $xtpl->assign('javascript', '<script src="html/md5.js" type="text/javascript"></script><script src="html/user-login.js" type="text/javascript"></script>');
     
     if ($_SERVER['HTTPS']) {
         $xtpl->assign('security_class', 'secure');
