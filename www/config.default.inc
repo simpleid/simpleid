@@ -30,6 +30,7 @@
  * Default configuration settings
  *
  * @package simpleid
+ * @filesource
  */
 
 /**
