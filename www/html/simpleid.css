@@ -5,10 +5,27 @@ body {
 	line-height: 1em;
 }
 
+#update {
+    background-color: #AA1144;
+    color: #FFFFFF;
+    padding: 5px 10px;
+    text-align: center;
+    display: none;
+}
+#update p {
+    margin: 0;
+    padding: 0;
+}
+#update a {
+    color: #FFFFFF;
+    text-decoration: none;
+    border-bottom-color: #FFFFFF;
+}
+
 #header {
     background-color: #666666;
     color: #CCCCCC;
-    padding: 5px 10px;    
+    padding: 5px 10px;
 }
 
 #header h1 {

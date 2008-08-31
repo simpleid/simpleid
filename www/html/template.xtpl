@@ -26,6 +26,8 @@
         {javascript}
     </head>
     <body>
+        <div id="update">        
+        </div>
         <div id="header">
             <h1><a href="http://simpleid.sourceforge.net/">SimpleID</a> {version}</h1>
         </div>
