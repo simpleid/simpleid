@@ -52,18 +52,21 @@
             <h2>Trusted Sites</h2>
             <form action="index.php" method="post" enctype="application/x-www-form-urlencoded" >
             <input name="q" type="hidden" value="autorelease" />
+            <input name="tk" type="hidden" value="{token}"/>
             <input name="update-all" type="hidden" value="1"/>
             <table>
                 <tr>
                     <th>Realm</th>
                     <th>Last access</th>
                     <th>Automatic</th>
+                    <th>Remove</th>
                 </tr>
                 <!-- BEGIN:realm -->
                 <tr>
                     <td><span class="realm">{realm}</span></td>
                     <td>{last_time}</td>
                     <td><input type="checkbox" value="1" name="autorelease[{realm}]" {auto_release}/></td>
+                    <td><input type="checkbox" value="1" name="remove[{realm}]"/></td>
                 </tr>
                 <!-- END: realm -->
             </table>
@@ -78,6 +81,7 @@
             <form action="index.php" method="post" enctype="application/x-www-form-urlencoded" >
                 <input type="hidden" name="q" value="send" />
                 <input type="hidden" name="s" value="{state}" />
+                <input name="tk" type="hidden" value="{token}"/>
                 
                 <!-- BEGIN: setup -->
                 <input type="hidden" name="openid.realm" value="{realm}" />
@@ -110,20 +114,6 @@
                 <!-- END: cancel -->                
             </form>
             <!-- END: rp -->
-
-            <!-- BEGIN: autorelease -->
-            <form action="index.php" method="post">
-                <input name="q" type="hidden" value="autorelease" />
-
-                <div class="form-item">
-                    <label class="option">
-                        <input type="checkbox" name="autorelease[{realm}]" value="1" />
-                        Automatically send my information to <strong>{realm}</strong> for any future requests.
-                    </label>
-                </div>
-                <input type="submit" name="op" id="edit-submit" value="OK" class="form-submit" />
-            </form>
-            <!-- END: autorelease -->
             
             <!-- BEGIN: login -->
             <div class="login-security {security_class}">

@@ -292,6 +292,8 @@ function user_page() {
         }
     }
     
+    $xtpl->assign('token', get_form_token('autorelease'));
+    
     $extensions = extension_invoke_all('user_page');
     $xtpl->assign('extensions', implode($extensions));
     

@@ -138,6 +138,16 @@ function simpleid_start() {
 function simpleid_autorelease() {
     global $user;
     
+    if ($user == NULL) {
+        user_login_form('');
+        return;
+    }
+    
+    if (!validate_form_token($_POST['tk'], 'autorelease')) {
+        set_message('SimpleID detected a potential security attack.  Please try again.');
+        user_page();
+        return;
+    }
 
     $rps = simpleid_rp_load_all($user['uid']);
     
@@ -145,6 +155,14 @@ function simpleid_autorelease() {
         foreach ($_POST['autorelease'] as $realm => $autorelease) {
             if (isset($rps[$realm])) {
                 $rps[$realm]['auto_release'] = ($autorelease) ? 1 : 0;
+            }
+        }
+    }
+    
+    if (isset($_POST['remove'])) {
+        foreach ($_POST['remove'] as $realm => $autorelease) {
+            if (isset($rps[$realm])) {
+                unset($rps[$realm]);
             }
         }
     }
@@ -682,6 +700,7 @@ function simpleid_rp_form($request, $response) {
 
     $realm = openid_get_realm($request, $version);
     
+    $xtpl->assign('token', get_form_token('rp'));
     $xtpl->assign('state', pickle($response));
     $xtpl->assign('realm', htmlspecialchars($realm, ENT_QUOTES, 'UTF-8'));
 
@@ -717,6 +736,20 @@ function simpleid_rp_form($request, $response) {
  */
 function simpleid_send() {
     global $user, $version;
+    
+    if ($user == NULL) {
+        user_login_form('');
+        return;
+    }
+    
+    if (!validate_form_token($_REQUEST['tk'], 'rp')) {
+        set_message('SimpleID detected a potential security attack.  Please try again.');
+        $xtpl->assign('title', 'OpenID Login');
+        $xtpl->parse('main');
+        $xtpl->out('main');
+        return;
+    }
+    
     $uid = $user['uid'];
     
     $response = unpickle($_REQUEST['s']);

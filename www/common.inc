@@ -151,11 +151,12 @@ function get_request_uri($base) {
  */
 function get_form_token($id) {
     global $user;
+
+    if (cache_get('token', SIMPLEID_BASE_URL) == NULL) {
         $site_token = mt_rand();
-        cache_set('token', $base, $site_token);
-    if (cache_get('token', $base) == NULL) {
+        cache_set('token', SIMPLEID_BASE_URL, $site_token);
     } else {
-        $site_token = cache_get('token', $base);
+        $site_token = cache_get('token', SIMPLEID_BASE_URL);
     }
     
     if ($user == NULL) {
@@ -175,7 +176,7 @@ function get_form_token($id) {
 function validate_form_token($token, $id) {
     global $user;
     
-    $site_token = cache_get('token', $base);
+    $site_token = cache_get('token', SIMPLEID_BASE_URL);
     
     if ($user == NULL) {
         return ($token == md5($id . $site_token));
