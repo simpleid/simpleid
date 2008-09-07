@@ -55,20 +55,24 @@
             <input name="tk" type="hidden" value="{token}"/>
             <input name="update-all" type="hidden" value="1"/>
             <table>
-                <tr>
-                    <th>Realm</th>
-                    <th>Last access</th>
-                    <th>Automatic</th>
-                    <th>Remove</th>
-                </tr>
-                <!-- BEGIN:realm -->
-                <tr>
-                    <td><span class="realm">{realm}</span></td>
-                    <td>{last_time}</td>
-                    <td><input type="checkbox" value="1" name="autorelease[{realm}]" {auto_release}/></td>
-                    <td><input type="checkbox" value="1" name="remove[{realm}]"/></td>
-                </tr>
-                <!-- END: realm -->
+                <thead>
+                    <tr>
+                        <th>Realm</th>
+                        <th>Last access</th>
+                        <th>Automatic</th>
+                        <th>Remove</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- BEGIN:realm -->
+                    <tr>
+                        <td><span class="realm">{realm}</span></td>
+                        <td>{last_time}</td>
+                        <td><input type="checkbox" value="1" name="autorelease[{realm}]" {auto_release}/></td>
+                        <td><input type="checkbox" value="1" name="remove[{realm}]"/></td>
+                    </tr>
+                    <!-- END: realm -->
+                </tbody>
             </table>
             <input type="submit" name="op" id="edit-submit" value="Submit" class="form-submit" />
             </form>
