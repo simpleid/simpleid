@@ -46,6 +46,22 @@ include "cache.inc";
 define('SIMPLEID_VERSION', '0.6');
 define('CACHE_DIR', SIMPLEID_CACHE_DIR);
 
+/**
+ * This variable holds the version of the OpenID specification associated with
+ * the current OpenID request.  This can be either {@link OPENID_VERSION_1_1}
+ * or {@link OPENID_VERSION_2}.
+ *
+ * @global int $version
+ */
+$version = OPENID_VERSION_1_1;
+
+/**
+ * This variable holds an instance of the XTemplate engine.
+ *
+ * @global object $xtpl
+ */
+$xtpl = NULL;
+
 simpleid_start();
 
 /**
@@ -338,6 +354,7 @@ define('CHECKID_OK', 1);
 define('CHECKID_LOGIN_REQUIRED', -1);
 define('CHECKID_IDENTITIES_NOT_MATCHING', -2);
 define('CHECKID_IDENTITY_NOT_EXIST', -3);
+define('CHECKID_PROTOCOL_ERROR', -127);
 
 /**
  * Processes an autentication request from a relying party.
@@ -354,6 +371,8 @@ define('CHECKID_IDENTITY_NOT_EXIST', -3);
  *
  */
 function simpleid_checkid($request) {
+    global $version;
+    
     $immediate = ($request['openid.mode'] == 'checkid_immediate');
 
     // Check for protocol correctness    
@@ -376,6 +395,16 @@ function simpleid_checkid($request) {
         
         if (!isset($request['openid.realm']) && !isset($request['openid.return_to'])) {
             indirect_fatal_error('Protocol Error: openid.return_to not set when openid.realm is not set.');
+            return;
+        }
+    }
+    
+    if (isset($request['openid.return_to'])) {
+        $realm = openid_get_realm($request, $version);
+        
+        if (!openid_url_matches_realm($request['openid.return_to'], $realm)) {
+            indirect_fatal_error('Protocol Error: openid.return_to does not match realm.');
+            //openid_indirect_error($request['openid.return_to'], 'Protocol Error: openid.return_to does not match realm.');
             return;
         }
     }
@@ -435,7 +464,7 @@ function simpleid_checkid($request) {
  *
  * @param mixed &$request the OpenID request
  * @return int one of CHECKID_OK, CHECKID_APPROVAL_REQUIRED, CHECKID_IDENTITY_NOT_EXIST,
- * CHECKID_IDENTITIES_NOT_MATCHING or CHECKID_LOGIN_REQUIRED
+ * CHECKID_IDENTITIES_NOT_MATCHING, CHECKID_LOGIN_REQUIRED or CHECKID_PROTOCOL_ERROR
  * @global array the current logged in user
  */
 function _simpleid_checkid(&$request) {

@@ -188,7 +188,7 @@ function openid_indirect_response_form($url, $message) {
 
     $html .= '<form action="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '" enctype="application/x-www-form-urlencoded" id="redirect"><p>Redirecting...</p>';
 
-    foreach ($message as $key -> $value) {
+    foreach ($message as $key => $value) {
         if ($key) {
             $html .= '<input type="hidden" name="' . htmlspecialchars($key, ENT_QUOTES, 'UTF-8') . '" value="' . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . '" />';
         }
@@ -221,6 +221,7 @@ function openid_direct_error($error, $additional = array(), $version = OPENID_VE
  * Sends an indirect message indicating an error.  This is a convenience function
  * for {@link openid_indirect_response()}.
  *
+ * @param string $url the URL to which the error message is to be sent
  * @param string $error the error message
  * @param array $additional any additional data to be sent with the error
  * message
@@ -229,7 +230,7 @@ function openid_direct_error($error, $additional = array(), $version = OPENID_VE
  * be sent, either openid_indirect_response_form or openid_indirect_response_redirect
  */
 function openid_indirect_error($url, $error, $additional = array(), $version = OPENID_VERSION_2, $response_func = 'openid_indirect_response_form') {
-    $message = openid_indirect_message(array_merge(array('error' => $error), $additional), $version);
+    $message = openid_indirect_message(array_merge(array('openid.mode'=> 'error', 'openid.error' => $error), $additional), $version);
     openid_indirect_response($url, $message, $response_func);
 }
 
@@ -295,6 +296,58 @@ function openid_fix_post(&$post) {
             $post[$fixed_key] = $value;
         }
     }
+}
+
+/**
+ * Determine whether a URL matches a realm.
+ *
+ * A URL matches a realm if:
+ *
+ * 1. The URL scheme and port of the URL are identical to those in the realm.
+ *    See RFC 3986, section 3.1 for rules about URI matching.
+ * 2. The URL's path is equal to or a sub-directory of the realm's path.
+ * 3. Either:
+ *    (a) The realm's domain contains the wild-card characters "*.", and the
+ *        trailing part of the URL's domain is identical to the part of the
+ *        realm following the "*." wildcard, or
+ *    (b) The URL's domain is identical to the realm's domain
+ *
+ * @param string $url to URL to test
+ * @param string $realm the realm
+ * @return bool true if the URL matches the realm
+ */
+function openid_url_matches_realm($url, $realm) {
+    $url = parse_url($url);
+    $realm = parse_url($realm);
+    
+    if (array_key_exists('user', $url) || array_key_exists('pass', $url) || array_key_exists('fragment', $url)) return false;
+    if (array_key_exists('user', $realm) || array_key_exists('pass', $realm) || array_key_exists('fragment', $realm)) return false;    
+    
+    if ($url['scheme'] != $realm['scheme']) return false;
+    
+    if ((!array_key_exists('port', $url)) && (!array_key_exists('port', $realm))) {
+        $url['port'] = '';
+        $realm['port'] = '';
+    }
+    if (($url['port'] != $realm['port']))
+            return false;
+    
+    if (substr($realm['host'], 0, 2) == '*.') {
+        $realm_re = '/^.*' . preg_quote(substr($realm['host'], 2)) . '$/i';
+    } else {
+        $realm_re = '/^' . preg_quote($realm['host']) . '$/i';
+    }
+    
+    if (!preg_match($realm_re, $url['host'])) return false;
+    
+    if ((!array_key_exists('path', $url)) && (!array_key_exists('path', $realm))) {
+        $url['path'] = '';
+        $realm['path'] = '';
+    }
+    if (substr($realm['path'], -1) == '/') $realm['path'] = substr($realm['path'], 0, -1);
+    if (($url['path'] != $realm['path']) && !preg_match('#^' . preg_quote($realm['path']) . '/.*$#', $url['path'])) return false;
+    
+    return true;
 }
 
 /* ------- Random byte and nonce functions ----------------------------------- */
