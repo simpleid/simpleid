@@ -403,8 +403,7 @@ function simpleid_checkid($request) {
         $realm = openid_get_realm($request, $version);
         
         if (!openid_url_matches_realm($request['openid.return_to'], $realm)) {
-            indirect_fatal_error('Protocol Error: openid.return_to does not match realm.');
-            //openid_indirect_error($request['openid.return_to'], 'Protocol Error: openid.return_to does not match realm.');
+            openid_indirect_error($request['openid.return_to'], 'Protocol Error: openid.return_to does not match realm.');
             return;
         }
     }
