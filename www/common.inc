@@ -203,7 +203,7 @@ function extension_init() {
     $extensions = preg_split('/, */', SIMPLEID_EXTENSIONS);
     
     foreach ($extensions as $extension) {
-        include_once $extension . ".inc";
+        include_once $extension . ".extension.inc";
         
         if (extension_invoke($extension)) {
             $ns_to_extension[extension_invoke($extension, 'ns')] = $extension;
