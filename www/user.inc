@@ -55,7 +55,8 @@ function user_init() {
     
     $user = NULL;
     
-    session_start();    
+    session_set_cookie_params(0);
+    session_start();
     
     if (isset($_SESSION['user']) && (cache_get('user', $_SESSION['user']) == session_id())) {
         $user = user_load($_SESSION['user']);
