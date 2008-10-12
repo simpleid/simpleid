@@ -30,17 +30,26 @@
 /**
  * @package simpleid
  * @subpackage extensions
+ * @filesource
  */
  
- 
+/**
+ * @see hook_ns()
+ */
 function sreg_ns() {
     return "http://openid.net/extensions/sreg/1.1";
 }
 
+/**
+ * @see hook_default_alias()
+ */
 function sreg_default_alias() {
     return "sreg";
 }
 
+/**
+ * @see hook_id_res()
+ */
 function sreg_id_res($request) {
     global $user;
     global $version;
@@ -65,6 +74,8 @@ function sreg_id_res($request) {
 
 /**
  * Returns an array of fields that need signing.
+ *
+ * @see hook_signed_fields()
  */
 function sreg_signed_fields($response) {
     $fields = array_keys(extension_get_request(sreg_ns(), $response));
@@ -78,6 +89,9 @@ function sreg_signed_fields($response) {
     return $signed_fields;
 }
 
+/**
+ * @see hook_form()
+ */
 function sreg_form($request, $rp) {
     global $user;
     
@@ -109,9 +123,15 @@ function sreg_form($request, $rp) {
     }
 }
 
+/**
+ * @see hook_send()
+ */
 function sreg_send() {
 }
 
+/**
+ * @see hook_user_page()
+ */
 function sreg_user_page() {
     global $user;
     $xtpl2 = new XTemplate('html/sreg.xtpl');

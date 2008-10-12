@@ -315,6 +315,7 @@ function openid_fix_post(&$post) {
  * @param string $url to URL to test
  * @param string $realm the realm
  * @return bool true if the URL matches the realm
+ * @since 0.6
  */
 function openid_url_matches_realm($url, $realm) {
     $url = parse_url($url);
