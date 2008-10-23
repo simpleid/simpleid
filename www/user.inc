@@ -34,8 +34,15 @@
  * @filesource
  */
  
- 
+/**
+ * The time the nonce used in the login process will last.
+ */
 define('SIMPLEID_LOGIN_NONCE_EXPIRES_IN', 3600);
+
+/**
+ * The time the persistent login cookie will last.
+ */
+define('SIMPLEID_USER_PERSISTENCE_EXPIRES_IN', 50400);
 
 /**
  * This variable holds data on the currently logged-in user.  If the user is
@@ -48,8 +55,10 @@ $user = NULL;
 /**
  * Initialises the user system.  Loads data for the currently logged-in user,
  * if any.
+ *
+ * @param string $q the SimpleID command, if any
  */
-function user_init() {
+function user_init($q = NULL) {
     global $user;
     global $xtpl;
     
@@ -60,6 +69,9 @@ function user_init() {
     
     if (isset($_SESSION['user']) && (cache_get('user', $_SESSION['user']) == session_id())) {
         $user = user_load($_SESSION['user']);
+    } elseif (isset($_COOKIE[_user_persistence_cookie()])) {
+        if (($q == 'login') || ($q == 'logout')) return;
+        user_persistence_verify();
     }
 }
 
@@ -197,6 +209,8 @@ function user_login() {
     $user = $test_user;
     $_SESSION['user'] = $_POST['name'];
     cache_set('user', $_POST['name'], session_id());
+    
+    if ($_POST['persistent'] == 1) user_persistence_create();
 
     openid_indirect_response_redirect(SIMPLEID_BASE_URL, $query);
 }
@@ -218,6 +232,8 @@ function user_logout($destination = NULL) {
             $destination = '';
         }
     }
+    
+    user_persistence_invalidate();
     
     cache_delete('user', $user['uid']);
     unset($_SESSION['user']);
@@ -399,6 +415,87 @@ function _user_verify_digest($digest, $nonce, $test_user) {
     $test_digest1 = md5($test_user['uid'] . ':' . $test_user['pass']);
     $test_digest = md5($nonce . ':' . $test_digest1);
     return ($digest == $test_digest);
+}
+
+/**
+ * Creates a persistent login cookie.  The login cookie will be based on the
+ * current log in user.
+ *
+ * @param string $id the ID of the series of persistent login cookies,  Cookies
+ * belonging to the same user and computer have the same ID.  If none is specified,
+ * one will be generated
+ * @param int $expires the time at which the cookie will expire.  If none is specified
+ * the time specified in {@link SIMPLEID_USER_PERSISTENCE_EXPIRES_IN} will be
+ * used
+ *
+ */
+function user_persistence_create($id = NULL, $expires = NULL) {
+    global $user;
+    
+    if ($id == NULL) $id = get_form_token(mt_rand());
+    if ($expires == NULL) $expires = time() + SIMPLEID_USER_PERSISTENCE_EXPIRES_IN;
+    $token = get_form_token(mt_rand());
+    
+    cache_set('persistence-'. $user['uid'], $id, array('token' => $token, 'expires' => $expires));
+    
+    setcookie(_user_persistence_cookie(), $user['uid'] . ':' . $id . ':' . $token, $expires);
+}
+
+/**
+ * Verifies a persistent login cookie.  If valid, log in the user automatically.
+ */
+function user_persistence_verify() {
+    global $user;
+    
+    $cookie = $_COOKIE[_user_persistence_cookie()];
+    
+    list($uid, $id, $token) = explode(':', $cookie);
+    
+    cache_gc(SIMPLEID_USER_PERSISTENCE_EXPIRES_IN, 'persistence-' . $uid);
+    $cache = cache_get('persistence-' . $uid, $id);
+    
+    if (!$cache) return;  // Cookie doesn't exist
+    
+    if ($cache['expires'] < time()) return;  // Cookie expired
+    
+    if ($cache['token'] != $token) {
+        // Token not the same - panic
+        cache_gc(0, 'persistence-' . $uid);
+        user_persistence_invalidate();
+        return;
+    }
+    
+    // Load the user, tag it as a persistent log in
+    $user = user_load($uid);
+    $user['persistent'] = TRUE;
+    
+    // Renew the token
+    user_persistence_create($id, $cache['expires']);
+}
+
+/**
+ * Removes the persistent login cookie from the user agent and the SimpleID
+ * cache.
+ */
+function user_persistence_invalidate() {
+    if (isset($_COOKIE[_user_persistence_cookie()])) {
+        $cookie = $_COOKIE[_user_persistence_cookie()];
+        
+        list($uid, $id, $token) = explode(':', $cookie);
+        
+        cache_delete('persistence-' . $uid, $id);
+        
+        setcookie(_user_persistence_cookie(), "", time() - 3600);
+    }
+}
+
+/**
+ * Get the name of the persistent login cookie.
+ *
+ * @return string the name of the persistent login cookie.
+ */
+function _user_persistence_cookie() {
+    return "persistence-" . md5(SIMPLEID_BASE_URL);
 }
 
 ?>

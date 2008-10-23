@@ -97,16 +97,16 @@ function simpleid_start() {
         exit;
     }
     
-    extension_init();
-    user_init();
-    
-    // Clean stale assocations
-    cache_gc(SIMPLEID_ASSOC_EXPIRES_IN, 'association');
-    
     openid_fix_post($_REQUEST);
     
     $q = (isset($_REQUEST['q'])) ? $_REQUEST['q'] : '';
     $q = explode('/', $q);
+    
+    extension_init();
+    user_init($q[0]);
+    
+    // Clean stale assocations
+    cache_gc(SIMPLEID_ASSOC_EXPIRES_IN, 'association');
     
     switch ($q[0]) {
         case 'continue':

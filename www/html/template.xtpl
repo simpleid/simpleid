@@ -138,7 +138,13 @@
                 <div class="form-item">
                     <label for="edit-pass">Password:</label>
                     <input type="password" name="pass" id="edit-pass"  size="60"  class="form-text required" {security_disabled} />
-                </div>
+                </div>                
+                <div class="form-item">
+                    <label class="option">
+                        <input type="checkbox" name="persistent" value="1" />
+                        Remember me on this computer for two weeks.
+                    </label>
+                </div>                
                 <input type="submit" name="op" id="edit-submit" value="Log in" class="form-submit" {security_disabled} />
             </form>
             <!-- END: login -->
