@@ -5,6 +5,14 @@ SimpleID 0.6
 
 - Fixed bugs in Simple Registration Extension
 
+- Implemented digest authentication (security enhancements)
+
+- Implemented persistent login
+
+- Enhanced form security
+
+- Changed extension of extensions from .inc to .extension.inc
+
 
 SimpleID 0.5.1
 --------------
