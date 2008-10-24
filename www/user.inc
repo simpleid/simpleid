@@ -205,14 +205,26 @@ function user_login() {
         user_login_form($destination, $state);
         return;
     }
-    
-    $user = $test_user;
-    $_SESSION['user'] = $_POST['name'];
-    cache_set('user', $_POST['name'], session_id());
+
+    _user_login($test_user);
     
     if ($_POST['persistent'] == 1) user_persistence_create();
 
     openid_indirect_response_redirect(SIMPLEID_BASE_URL, $query);
+}
+
+/**
+ * Sets the user specified by the parameter as the active user.
+ *
+ * @param array $login_user the user to log in
+ *
+ */
+function _user_login($login_user) {
+    global $user;
+
+    $user = $login_user;
+    $_SESSION['user'] = $_POST['name'];
+    cache_set('user', $_POST['name'], session_id());
 }
 
 /**
@@ -436,7 +448,7 @@ function user_persistence_create($id = NULL, $expires = NULL) {
     if ($expires == NULL) $expires = time() + SIMPLEID_USER_PERSISTENCE_EXPIRES_IN;
     $token = get_form_token(mt_rand());
     
-    cache_set('persistence-'. $user['uid'], $id, array('token' => $token, 'expires' => $expires));
+    cache_set('persistence-'. $user['uid'], $id, array('token' => $token, 'expires' => $expires, 'ip' => $_SERVER['REMOTE_ADDR']));
     
     setcookie(_user_persistence_cookie(), $user['uid'] . ':' . $id . ':' . $token, $expires);
 }
@@ -445,8 +457,6 @@ function user_persistence_create($id = NULL, $expires = NULL) {
  * Verifies a persistent login cookie.  If valid, log in the user automatically.
  */
 function user_persistence_verify() {
-    global $user;
-    
     $cookie = $_COOKIE[_user_persistence_cookie()];
     
     list($uid, $id, $token) = explode(':', $cookie);
@@ -468,6 +478,7 @@ function user_persistence_verify() {
     // Load the user, tag it as a persistent log in
     $user = user_load($uid);
     $user['persistent'] = TRUE;
+    _user_login($user);
     
     // Renew the token
     user_persistence_create($id, $cache['expires']);
