@@ -93,7 +93,7 @@ function user_load($uid) {
         if (isset($user["identity"])) {
             $user["local_identity"] = true;
         } else {
-            $user["identity"] = SIMPLEID_BASE_URL . '/index.php?q=user/' . $uid;
+            $user["identity"] = simpleid_url('q=user/' . rawurlencode($uid));
             $user["local_identity"] = false;
         }
         
@@ -149,7 +149,7 @@ function user_login() {
     global $user;
     
     // If the user is already logged in, return
-    if (isset($user["uid"])) openid_indirect_response_redirect(SIMPLEID_BASE_URL, 'q=frontpage');
+    if (isset($user["uid"])) openid_indirect_response_redirect(simpleid_url(), 'q=frontpage');
     
     $destination = $_REQUEST['destination'];
     $state = $_REQUEST['s'];
@@ -210,7 +210,7 @@ function user_login() {
     
     if ($_POST['persistent'] == 1) user_persistence_create();
 
-    openid_indirect_response_redirect(SIMPLEID_BASE_URL, $query);
+    openid_indirect_response_redirect(simpleid_url(), $query);
 }
 
 /**
@@ -272,7 +272,7 @@ function user_login_form($destination = '', $state = NULL) {
     
     $xtpl->assign('javascript', '<script src="html/md5.js" type="text/javascript"></script><script src="html/user-login.js" type="text/javascript"></script>');
     
-    if ($_SERVER['HTTPS']) {
+    if (isset($_SERVER['HTTPS'])) {
         $xtpl->assign('security_class', 'secure');
         $xtpl->assign('security_message', 'Secure login using <strong>HTTPS</strong>.');
     } else {
@@ -352,13 +352,13 @@ function user_public_page($uid = NULL) {
             header('Status: 500');
             set_message('User <strong>' . htmlspecialchars($uid, ENT_QUOTES, 'UTF-8') . '</strong> not found.');
         } else {
-            header('X-XRDS-Location', SIMPLEID_BASE_URL . '/index.php?q=xrds/' . $uid);
+            header('X-XRDS-Location', simpleid_url('q=xrds/' . rawurlencode($uid)));
             
             set_message('This is the user <strong>' . htmlspecialchars($uid, ENT_QUOTES, 'UTF-8') . '</strong>\'s SimpleID page.  It contains hidden information for the use by OpenID consumers.');
             
             $xtpl->assign('title', htmlspecialchars($uid, ENT_QUOTES, 'UTF-8'));
-            $xtpl->assign('provider', htmlspecialchars(SIMPLEID_BASE_URL, ENT_QUOTES, 'UTF-8'));
-            $xtpl->assign('xrds', htmlspecialchars(SIMPLEID_BASE_URL . '/index.php?q=xrds/' . $uid, ENT_QUOTES, 'UTF-8'));
+            $xtpl->assign('provider', htmlspecialchars(simpleid_url(), ENT_QUOTES, 'UTF-8'));
+            $xtpl->assign('xrds', htmlspecialchars(simpleid_url('q=xrds/' . rawurlencode($uid)), ENT_QUOTES, 'UTF-8'));
             if ($user["local_identity"]) {
                 $xtpl->assign('local_id', htmlspecialchars($user["identity"], ENT_QUOTES, 'UTF-8'));
             }
@@ -391,7 +391,7 @@ function user_xrds($uid = NULL) {
         }
     }
     
-    $xtpl->assign('simpleid_base_url', htmlspecialchars(SIMPLEID_BASE_URL, ENT_QUOTES, 'UTF-8'));
+    $xtpl->assign('simpleid_base_url', htmlspecialchars(simpleid_url(), ENT_QUOTES, 'UTF-8'));
     $xtpl->parse('xrds');
     $xtpl->out('xrds');
 }

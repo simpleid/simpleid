@@ -43,8 +43,20 @@ include "openid.inc";
 include "user.inc";
 include "cache.inc";
 
-define('SIMPLEID_VERSION', '0.6');
+define('SIMPLEID_VERSION', '0.7');
 define('CACHE_DIR', SIMPLEID_CACHE_DIR);
+
+
+define('CHECKID_APPROVAL_REQUIRED', 2);
+define('CHECKID_OK', 1);
+define('CHECKID_LOGIN_REQUIRED', -1);
+define('CHECKID_IDENTITIES_NOT_MATCHING', -2);
+define('CHECKID_IDENTITY_NOT_EXIST', -3);
+define('CHECKID_PROTOCOL_ERROR', -127);
+
+define('CREATE_ASSOCIATION_STATELESS', 2);
+define('CREATE_ASSOCIATION_DEFAULT', 1);
+
 
 /**
  * This variable holds the version of the OpenID specification associated with
@@ -294,8 +306,6 @@ function simpleid_associate($request) {
     openid_direct_response(openid_direct_message($response, $version));
 }
 
-define('CREATE_ASSOCIATION_STATELESS', 2);
-define('CREATE_ASSOCIATION_DEFAULT', 1);
 
 /**
  * Creates an association.
@@ -349,12 +359,7 @@ function _simpleid_create_association($mode = CREATE_ASSOCIATION_DEFAULT, $assoc
 }
 
 
-define('CHECKID_APPROVAL_REQUIRED', 2);
-define('CHECKID_OK', 1);
-define('CHECKID_LOGIN_REQUIRED', -1);
-define('CHECKID_IDENTITIES_NOT_MATCHING', -2);
-define('CHECKID_IDENTITY_NOT_EXIST', -3);
-define('CHECKID_PROTOCOL_ERROR', -127);
+
 
 /**
  * Processes an autentication request from a relying party.
@@ -472,7 +477,7 @@ function _simpleid_checkid(&$request) {
     $realm = openid_get_realm($request, $version);
     
     // Check 1: Is the user logged into SimpleID as any user?
-    if ($user == NULL) {        
+    if ($user == NULL) {
         return CHECKID_LOGIN_REQUIRED;
     } else {
         $uid = $user['uid'];
@@ -517,7 +522,7 @@ function simpleid_checkid_ok($request) {
     
     $message = array(
         'openid.mode' => 'id_res',
-        'openid.op_endpoint' => SIMPLEID_BASE_URL,
+        'openid.op_endpoint' => simpleid_url(),
         'openid.identity' => $request['openid.identity'],
         'openid.return_to' => $request['openid.return_to'],
         'openid.response_nonce' => openid_nonce(),
@@ -559,7 +564,7 @@ function simpleid_checkid_approval_required($request) {
         $request['openid.mode'] = 'checkid_setup';
         $message = array(
             'openid.mode' => 'id_res',            
-            'openid.user_setup_url' => SIMPLEID_BASE_URL . '/index.php?q=continue&s=' . rawurlencode(pickle($request))
+            'openid.user_setup_url' => simpleid_url('q=continue&s=' . rawurlencode(pickle($request)))
         );
     }
     
@@ -581,7 +586,7 @@ function simpleid_checkid_login_required($request) {
     } else {    
         $message = array(
             'openid.mode' => 'id_res',
-            'openid.user_setup_url' => SIMPLEID_BASE_URL . '/index.php?q=login&destination=continue&s=' . rawurlencode(pickle($request))
+            'openid.user_setup_url' => simpleid_url('q=login&destination=continue&s=' . rawurlencode(pickle($request)))
         );
     }
     

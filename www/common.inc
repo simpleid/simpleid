@@ -141,6 +141,26 @@ function get_request_uri($base) {
 }
 
 /**
+ * Obtains a SimpleID URL.  URLs produced by SimpleID should use this function.
+ *
+ * @param string $query a properly encoded query string
+ * @return string the url
+ *
+ * @since 0.7
+ */
+function simpleid_url($query = '') {
+    // Make sure that the base has a trailing slash
+    if ((substr(SIMPLEID_BASE_URL, -1) == '/') || (substr(SIMPLEID_BASE_URL, -9) == 'index.php')) {
+        $url = SIMPLEID_BASE_URL;
+    } else {
+        $url = SIMPLEID_BASE_URL . '/';
+    }
+    if ($query == '') return $url;
+    $url .= 'index.php?' . $query;
+    return $url;
+}
+
+/**
  * Obtains a form token given a form ID.
  *
  * Form tokens are used in SimpleID forms to guard against cross-site forgary
