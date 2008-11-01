@@ -146,6 +146,9 @@ function simpleid_start() {
                 user_public_page();
             }
             break;
+        case 'discovery':
+            user_discovery();
+            break;
         case 'xrds':
             user_xrds($q[1]);
             break;
