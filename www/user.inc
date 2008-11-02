@@ -409,12 +409,13 @@ function user_xrds($uid = NULL) {
         $user = user_load($uid);
         if (($user != NULL) && ($user["local_identity"])) {
             $xtpl->assign('local_id', htmlspecialchars($user["identity"], ENT_QUOTES, 'UTF-8'));
-            $xtpl->parse('xrds.local_id');
-            $xtpl->parse('xrds.local_id2');
+            $xtpl->parse('xrds.user_xrds.local_id');
+            $xtpl->parse('xrds.user_xrds.local_id2');
         }
     }
     
     $xtpl->assign('simpleid_base_url', htmlspecialchars(simpleid_url(), ENT_QUOTES, 'UTF-8'));
+    $xtpl->parse('xrds.user_xrds');
     $xtpl->parse('xrds');
     $xtpl->out('xrds');
 }

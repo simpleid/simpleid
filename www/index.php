@@ -150,13 +150,21 @@ function simpleid_start() {
             user_discovery();
             break;
         case 'xrds':
-            user_xrds($q[1]);
+            if (isset($q[1])) {
+                // A user's XRDS document
+                user_xrds($q[1]);
+            } else {
+                // SimpleID's XRDS document
+                simpleid_xrds();
+            }
             break;
         default:
             if (isset($_REQUEST['openid.mode'])) {
                 simpleid_process_openid($_REQUEST);
                 return;
             } else {
+                // Point to SimpleID's XRDS document
+                header('X-XRDS-Location: ' . simpleid_url('q=xrds'));
                 user_page();
             }
     }
@@ -809,6 +817,22 @@ function simpleid_send() {
     } else {
         user_page();
     }
+}
+
+/**
+ * Returns XDRS document for this SimpleID installation.
+ * 
+ */
+function simpleid_xrds() {
+    global $xtpl;
+    
+    header('Content-Type: application/xrds+xml');
+    header('Content-Disposition: inline; filename=yadis.xml');
+    
+    $xtpl->assign('simpleid_base_url', htmlspecialchars(simpleid_url(), ENT_QUOTES, 'UTF-8'));
+    $xtpl->parse('xrds.op_xrds');
+    $xtpl->parse('xrds');
+    $xtpl->out('xrds');
 }
 
 

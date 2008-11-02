@@ -232,6 +232,7 @@
 <!-- BEGIN: xrds --><?xml version="1.0" encoding="UTF-8"?>
 <xrds:XRDS xmlns:xrds="xri://$xrds" xmlns="xri://$xrd*($v*2.0)">
     <XRD>
+        <!-- BEGIN: user_xrds -->
         <Service priority="10">
             <Type>http://specs.openid.net/auth/2.0/signon</Type>
             <URI>{simpleid_base_url}</URI>
@@ -246,6 +247,14 @@
             <openid:Delegate>{local_id}</openid:Delegate>            
             <!-- END: local_id -->
         </Service>
+        <!-- END: user_xrds -->
+        <!-- BEGIN: op_xrds -->
+        <Service xmlns:simpleid="http://simpleid.sourceforge.net/ns/">
+            <Type>http://specs.openid.net/auth/2.0/server</Type>
+            <URI>{simpleid_base_url}</URI>
+            <simpleid:Version>{version}</simpleid:Version>
+        </Service>
+        <!-- END: op_xrds -->
     </XRD>
 </xrds:XRDS>
 <!-- END: xrds -->
