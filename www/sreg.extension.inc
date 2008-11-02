@@ -55,8 +55,8 @@ function sreg_id_res($request) {
     global $version;
     
     $request = extension_get_request(sreg_ns(), $request);
-    $required = explode(',', $request['required']);
-    $optional = explode(',', $request['optional']);
+    $required = (isset($request['required'])) ? explode(',', $request['required']) : array();
+    $optional = (isset($request['optional'])) ? explode(',', $request['optional']) : array();
     $fields = array_merge($required, $optional);
     $alias = extension_get_alias(sreg_ns());
     $response = array();
@@ -96,9 +96,8 @@ function sreg_form($request, $rp) {
     global $user;
     
     $request = extension_get_request(sreg_ns(), $request);
-    
-    $required = explode(',', $request['required']);
-    $optional = explode(',', $request['optional']);
+    $required = (isset($request['required'])) ? explode(',', $request['required']) : array();
+    $optional = (isset($request['optional'])) ? explode(',', $request['optional']) : array();
     $keys = array_merge($required, $optional);
     
     if ((count($request)) && isset($user['sreg'])) {

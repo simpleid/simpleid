@@ -80,6 +80,7 @@ function openid_get_version($request, $key = 'openid.ns') {
  * @return string the message in key-value form encoding
  */
 function openid_direct_message($data, $version = OPENID_VERSION_2) {
+    $encoded = '';
     if ($version == OPENID_VERSION_2) {
         $data['ns'] = OPENID_NS_2_0;
     }
