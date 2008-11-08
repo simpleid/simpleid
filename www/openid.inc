@@ -66,6 +66,7 @@ define('OPENID_NS_1_0', 'http://openid.net/signon/1.0');
  *
  */
 function openid_get_version($request, $key = 'openid.ns') {
+    if (!isset($request[$key])) return OPENID_VERSION_1_1;
     if ($request[$key] != OPENID_NS_2_0) return OPENID_VERSION_1_1;
     return OPENID_VERSION_2;
 }
