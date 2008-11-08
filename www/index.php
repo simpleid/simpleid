@@ -545,14 +545,6 @@ function simpleid_checkid_ok($request) {
         $message['openid.claimed_id'] = $request['openid.claimed_id'];
     }
     
-    if ($version == OPENID_VERSION_1_1) {
-        // Check for a 1.1 nonce
-        $parts = parse_url($request['openid.return_to']);
-        if (preg_match('/nonce=([^&]+)/', $parts['query'], $matches)) {
-            $message['nonce'] = $matches[1];
-        }
-    }
-    
     $message = array_merge($message, extension_invoke_all('id_res', $request));
     
     return openid_indirect_message($message, $version);
