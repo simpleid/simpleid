@@ -236,9 +236,9 @@ function _user_login($login_user) {
 function user_logout($destination = NULL) {
     global $user;
     
-    $state = $_REQUEST['s'];
+    $state = (isset($_REQUEST['s'])) ? $_REQUEST['s'] : '';
     if ($destination == NULL) {
-        if ($_REQUEST['destination']) {
+        if (isset($_REQUEST['destination'])) {
             $destination = $_REQUEST['destination'];
         } else {
             $destination = '';
@@ -272,7 +272,7 @@ function user_login_form($destination = '', $state = NULL) {
     
     $xtpl->assign('javascript', '<script src="html/md5.js" type="text/javascript"></script><script src="html/user-login.js" type="text/javascript"></script>');
     
-    if (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on')) {
+    if ((isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on')) || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && ($_SERVER['HTTP_X_FORWARDED_PROTO'] == "https"))) {
         $xtpl->assign('security_class', 'secure');
         $xtpl->assign('security_message', 'Secure login using <strong>HTTPS</strong>.');
     } else {
