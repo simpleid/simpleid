@@ -1,5 +1,19 @@
 // $Id$
 
+SimpleID 0.7
+------------
+
+- Implemented discovery information page to provide help for users to claim
+  their sites
+  
+- Implemented XRDS document for SimpleID
+
+
+SimpleID 0.6.1
+--------------
+  
+- Fixed return_to verification issue when using OpenID 1.1
+
 SimpleID 0.6
 ------------
 
