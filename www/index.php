@@ -797,11 +797,11 @@ function simpleid_send() {
     
     if ($_REQUEST['op'] == 'Cancel') {
         $response = simpleid_checkid_error(false);
-        set_message('Log in cancelled.');
+        if (!$return_to) set_message('Log in cancelled.');
     } else {
         simpleid_rp_save($uid, $_REQUEST['openid.realm'], array('auto_release' => $_REQUEST['autorelease']));
         $response = simpleid_sign($response, $response['openid.assoc_handle']);
-        set_message('You were logged in successfully.');
+        if (!$return_to) set_message('You were logged in successfully.');
     }
 
     if ($return_to) {
