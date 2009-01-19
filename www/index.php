@@ -38,10 +38,18 @@
 include "config.inc";
 include "config.default.inc";
 include "common.inc";
-include "lib/xtemplate.class.php";
 include "openid.inc";
 include "user.inc";
 include "cache.inc";
+
+
+// Allow for PHP5 version of xtemplate
+if (version_compare(PHP_VERSION, '5.0.0') === 1) {
+    include "lib/xtemplate.class.php";
+} else {
+    include "lib/xtemplate-php4.class.php";
+}
+
 
 define('SIMPLEID_VERSION', '0.7');
 define('CACHE_DIR', SIMPLEID_CACHE_DIR);
