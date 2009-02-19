@@ -1,5 +1,10 @@
 // $Id$
 
+SimpleID 0.6.2
+--------------
+
+- Fixed session_type verification issue when using OpenID 1.1
+
 
 SimpleID 0.6.1
 --------------
