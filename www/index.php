@@ -42,6 +42,7 @@ include "openid.inc";
 include "user.inc";
 include "cache.inc";
 
+define('SIMPLEID_VERSION', '0.6.2');
 
 // Allow for PHP5 version of xtemplate
 if (version_compare(PHP_VERSION, '5.0.0') === 1) {
@@ -277,8 +278,10 @@ function simpleid_associate($request) {
     
     $supported_session_types = array('no-encryption', 'DH-SHA1');
     if (OPENID_SHA256_SUPPORTED) $supported_session_types[] = 'DH-SHA256';
+    if ($version == OPENID_VERSION_1_1) $supported_session_types[] = '';
 
     // Common Request Parameters [8.1.1]
+    if (($version == OPENID_VERSION_1_1) && !isset($request['openid.session_type'])) $request['openid.session_type'] = '';
     $assoc_type = $request['openid.assoc_type'];
     $session_type = $request['openid.session_type'];
     
@@ -287,7 +290,7 @@ function simpleid_associate($request) {
     $dh_gen = $request['openid.dh_gen'];
     $dh_consumer_public = $request['openid.dh_consumer_public'];
     
-    if ((!$session_type) || (!$assoc_type)) {
+    if (!isset($request['openid.session_type']) || !isset($request['openid.assoc_type'])) {
         openid_direct_error('openid.session_type or openid.assoc_type not set');
         return;
     }
@@ -356,7 +359,7 @@ function _simpleid_create_association($mode = CREATE_ASSOCIATION_DEFAULT, $assoc
         'expires_in' => $expires_in
     );
     
-    if ($session_type == 'no-encryption') {
+    if (($session_type == 'no-encryption') || ($session_type == '')) {
         $mac_key = base64_encode(call_user_func($hmac_funcs[$assoc_type], $secret, $response['assoc_handle']));
         $response['mac_key'] = $mac_key;
     } elseif ($session_type == 'DH-SHA1' || $session_type == 'DH-SHA256') {
