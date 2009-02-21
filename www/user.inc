@@ -65,6 +65,7 @@ function user_init($q = NULL) {
     $user = NULL;
     
     session_set_cookie_params(0);
+    session_name('SESS' . md5(SIMPLEID_BASE_URL));
     session_start();
     
     if (isset($_SESSION['user']) && (cache_get('user', $_SESSION['user']) == session_id())) {
