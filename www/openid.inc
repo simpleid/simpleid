@@ -56,6 +56,8 @@ define('OPENID_NS_2_0', 'http://specs.openid.net/auth/2.0');
 define('OPENID_NS_1_1', 'http://openid.net/signon/1.1');
 define('OPENID_NS_1_0', 'http://openid.net/signon/1.0');
 
+define('OPENID_IDENTIFIER_SELECT', 'http://specs.openid.net/auth/2.0/identifier_select');
+
 /**
  * Detects the OpenID version of the current request
  *

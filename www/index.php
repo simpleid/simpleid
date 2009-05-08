@@ -42,8 +42,6 @@ include "openid.inc";
 include "user.inc";
 include "cache.inc";
 
-define('SIMPLEID_VERSION', '0.6.2');
-
 // Allow for PHP5 version of xtemplate
 if (version_compare(PHP_VERSION, '5.0.0') === 1) {
     include "lib/xtemplate.class.php";
@@ -353,11 +351,15 @@ function _simpleid_create_association($mode = CREATE_ASSOCIATION_DEFAULT, $assoc
     $secret = _openid_get_bytes($secret_size[$assoc_type]);
     
     $response = array(
-        'session_type' => $session_type,
         'assoc_handle' => $assoc_handle,
         'assoc_type' => $assoc_type,
         'expires_in' => $expires_in
     );
+    
+    // If $session_type is '', then it must be using OpenID 1.1 (blank parameter
+    // is not allowed for OpenID 2.0.  For OpenID 1.1 blank requests, we don't
+    // put a session_type in the response.
+    if ($session_type != '') $response['session_type'] = $session_type;
     
     if (($session_type == 'no-encryption') || ($session_type == '')) {
         $mac_key = base64_encode(call_user_func($hmac_funcs[$assoc_type], $secret, $response['assoc_handle']));
@@ -507,7 +509,7 @@ function _simpleid_checkid(&$request) {
     
     // Check 2: Is the user logged in as the same identity as the identity requested?
     // Choose the identity URL for the user automatically
-    if ($request['openid.identity'] == 'http://specs.openid.net/auth/2.0/identifier_select') {        
+    if ($request['openid.identity'] == OPENID_IDENTIFIER_SELECT) {        
         $test_user = user_load($uid);
         $identity = $test_user['identity'];
         $request['openid.claimed_id'] = $identity;
