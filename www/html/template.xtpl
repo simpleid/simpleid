@@ -74,7 +74,7 @@
                     <!-- END: realm -->
                 </tbody>
             </table>
-            <input type="submit" name="op" id="edit-submit" value="Submit" class="form-submit" />
+            <input type="submit" name="op" id="edit-submit" value="Submit" class="form-submit" {disabled} />
             </form>
             
             {extensions}
