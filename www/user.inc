@@ -321,6 +321,10 @@ function user_page() {
         }
     }
     
+    if (!$rps || (count($rps) == 0)) {
+        $xtpl->assign('disabled', 'disabled="disabled"');
+    }
+    
     $xtpl->assign('token', get_form_token('autorelease'));
     
     $extensions = extension_invoke_all('user_page');
