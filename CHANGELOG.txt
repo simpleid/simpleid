@@ -1,5 +1,11 @@
 // $Id$
 
+SimpleID 0.6.4
+--------------
+
+- Fixed user interface bug on trusted sites page
+
+
 SimpleID 0.6.3
 --------------
 
