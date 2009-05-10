@@ -18,7 +18,7 @@
  * License along with this program; if not, write to the Free
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  * 
- * $Id: common.inc 66 2008-09-13 04:54:52Z kmo $
+ * $Id$
  */
 
 function simpleweb_run($routes, $request_path = NULL, $not_found_route = NULL) {
