@@ -146,7 +146,7 @@
                 </div>                
                 <div class="form-item">
                     <label class="option">
-                        <input type="checkbox" name="persistent" value="1" />
+                        <input type="checkbox" name="autologin" value="1" />
                         Remember me on this computer for two weeks.
                     </label>
                 </div>                

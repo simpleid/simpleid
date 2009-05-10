@@ -40,9 +40,9 @@
 define('SIMPLEID_LOGIN_NONCE_EXPIRES_IN', 3600);
 
 /**
- * The time the persistent login cookie will last.
+ * The time the auto login cookie will last.
  */
-define('SIMPLEID_USER_PERSISTENCE_EXPIRES_IN', 50400);
+define('SIMPLEID_USER_AUTOLOGIN_EXPIRES_IN', 50400);
 
 /**
  * This variable holds data on the currently logged-in user.  If the user is
@@ -70,9 +70,9 @@ function user_init($q = NULL) {
     
     if (isset($_SESSION['user']) && (cache_get('user', $_SESSION['user']) == session_id())) {
         $user = user_load($_SESSION['user']);
-    } elseif (isset($_COOKIE[_user_persistence_cookie()])) {
+    } elseif (isset($_COOKIE[_user_autologin_cookie()])) {
         if (($q == 'login') || ($q == 'logout')) return;
-        user_persistence_verify();
+        user_autologin_verify();
     }
 }
 
@@ -187,7 +187,7 @@ function user_login() {
 
     _user_login($test_user);
     
-    if ($_POST['persistent'] == 1) user_persistence_create();
+    if ($_POST['autologin'] == 1) user_autologin_create();
 
     openid_indirect_response_redirect(simpleid_url(), $query);
 }
@@ -202,8 +202,8 @@ function _user_login($login_user) {
     global $user;
 
     $user = $login_user;
-    $_SESSION['user'] = $_POST['name'];
-    cache_set('user', $_POST['name'], session_id());
+    $_SESSION['user'] = $login_user['uid'];
+    cache_set('user', $login_user['uid'], session_id());
 }
 
 /**
@@ -224,7 +224,7 @@ function user_logout($destination = NULL) {
         }
     }
     
-    user_persistence_invalidate();
+    user_autologin_invalidate();
     
     cache_delete('user', $user['uid']);
     unset($_SESSION['user']);
@@ -438,39 +438,39 @@ function _user_verify_digest($digest, $nonce, $test_user) {
 }
 
 /**
- * Creates a persistent login cookie.  The login cookie will be based on the
+ * Creates a auto login cookie.  The login cookie will be based on the
  * current log in user.
  *
- * @param string $id the ID of the series of persistent login cookies,  Cookies
+ * @param string $id the ID of the series of auto login cookies,  Cookies
  * belonging to the same user and computer have the same ID.  If none is specified,
  * one will be generated
  * @param int $expires the time at which the cookie will expire.  If none is specified
- * the time specified in {@link SIMPLEID_USER_PERSISTENCE_EXPIRES_IN} will be
+ * the time specified in {@link SIMPLEID_USER_AUTOLOGIN_EXPIRES_IN} will be
  * used
  *
  */
-function user_persistence_create($id = NULL, $expires = NULL) {
+function user_autologin_create($id = NULL, $expires = NULL) {
     global $user;
     
     if ($id == NULL) $id = get_form_token(mt_rand());
-    if ($expires == NULL) $expires = time() + SIMPLEID_USER_PERSISTENCE_EXPIRES_IN;
+    if ($expires == NULL) $expires = time() + SIMPLEID_USER_AUTOLOGIN_EXPIRES_IN;
     $token = get_form_token(mt_rand());
     
-    cache_set('persistence-'. $user['uid'], $id, array('token' => $token, 'expires' => $expires, 'ip' => $_SERVER['REMOTE_ADDR']));
+    cache_set('autologin-'. $user['uid'], $id, array('token' => $token, 'expires' => $expires, 'ip' => $_SERVER['REMOTE_ADDR']));
     
-    setcookie(_user_persistence_cookie(), $user['uid'] . ':' . $id . ':' . $token, $expires);
+    setcookie(_user_autologin_cookie(), $user['uid'] . ':' . $id . ':' . $token, $expires);
 }
 
 /**
- * Verifies a persistent login cookie.  If valid, log in the user automatically.
+ * Verifies a auto login cookie.  If valid, log in the user automatically.
  */
-function user_persistence_verify() {
-    $cookie = $_COOKIE[_user_persistence_cookie()];
+function user_autologin_verify() {
+    $cookie = $_COOKIE[_user_autologin_cookie()];
     
     list($uid, $id, $token) = explode(':', $cookie);
     
-    cache_gc(SIMPLEID_USER_PERSISTENCE_EXPIRES_IN, 'persistence-' . $uid);
-    $cache = cache_get('persistence-' . $uid, $id);
+    cache_gc(SIMPLEID_USER_AUTOLOGIN_EXPIRES_IN, 'autologin-' . $uid);
+    $cache = cache_get('autologin-' . $uid, $id);
     
     if (!$cache) return;  // Cookie doesn't exist
     
@@ -478,43 +478,43 @@ function user_persistence_verify() {
     
     if ($cache['token'] != $token) {
         // Token not the same - panic
-        cache_gc(0, 'persistence-' . $uid);
-        user_persistence_invalidate();
+        cache_gc(0, 'autologin-' . $uid);
+        user_autologin_invalidate();
         return;
     }
     
-    // Load the user, tag it as a persistent log in
+    // Load the user, tag it as an auto log in
     $user = user_load($uid);
-    $user['persistent'] = TRUE;
+    $user['autologin'] = TRUE;
     _user_login($user);
     
     // Renew the token
-    user_persistence_create($id, $cache['expires']);
+    user_autologin_create($id, $cache['expires']);
 }
 
 /**
- * Removes the persistent login cookie from the user agent and the SimpleID
+ * Removes the auto login cookie from the user agent and the SimpleID
  * cache.
  */
-function user_persistence_invalidate() {
-    if (isset($_COOKIE[_user_persistence_cookie()])) {
-        $cookie = $_COOKIE[_user_persistence_cookie()];
+function user_autologin_invalidate() {
+    if (isset($_COOKIE[_user_autologin_cookie()])) {
+        $cookie = $_COOKIE[_user_autologin_cookie()];
         
         list($uid, $id, $token) = explode(':', $cookie);
         
-        cache_delete('persistence-' . $uid, $id);
+        cache_delete('autologin-' . $uid, $id);
         
-        setcookie(_user_persistence_cookie(), "", time() - 3600);
+        setcookie(_user_autologin_cookie(), "", time() - 3600);
     }
 }
 
 /**
- * Get the name of the persistent login cookie.
+ * Get the name of the auto login cookie.
  *
  * @return string the name of the persistent login cookie.
  */
-function _user_persistence_cookie() {
-    return "persistence-" . md5(SIMPLEID_BASE_URL);
+function _user_autologin_cookie() {
+    return "autologin-" . md5(SIMPLEID_BASE_URL);
 }
 
 ?>
