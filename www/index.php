@@ -38,6 +38,7 @@
 include "config.inc";
 include "config.default.inc";
 include "common.inc";
+include "simpleweb.inc";
 include "openid.inc";
 include "user.inc";
 include "cache.inc";
@@ -128,53 +129,33 @@ function simpleid_start() {
     // Clean stale assocations
     cache_gc(SIMPLEID_ASSOC_EXPIRES_IN, 'association');
     
-    switch ($q[0]) {
-        case 'continue':
-            simpleid_continue();
-            break;
-        case 'send':
-            simpleid_send();
-            break;
-        case 'autorelease':
-            simpleid_autorelease();
-            break;
-        case 'openid':
-            simpleid_process_openid();
-            break;
-        case 'login':
-            user_login();
-            break;
-        case 'logout':
-            user_logout();
-            break;
-        case 'user':
-            if (isset($q[1])) {
-                user_public_page($q[1]);
-            } else {
-                user_public_page();
-            }
-            break;
-        case 'discovery':
-            user_discovery();
-            break;
-        case 'xrds':
-            if (isset($q[1])) {
-                // A user's XRDS document
-                user_xrds($q[1]);
-            } else {
-                // SimpleID's XRDS document
-                simpleid_xrds();
-            }
-            break;
-        default:
-            if (isset($_REQUEST['openid.mode'])) {
-                simpleid_process_openid($_REQUEST);
-                return;
-            } else {
-                // Point to SimpleID's XRDS document
-                header('X-XRDS-Location: ' . simpleid_url('q=xrds'));
-                user_page();
-            }
+    $routes = array(
+        'continue' => 'simpleid_continue',
+        'send' => 'simpleid_send',
+        'autorelease' => 'simpleid_autorelease',
+        'openid' => 'simpleid_process_openid',
+        'login' => 'user_login',
+        'logout' => 'user_logout',
+        'user' => 'user_public_page',
+        'user/(.+)' => 'user_public_page',
+        'discovery' => 'user_discovery',
+        'xrds/(.*)' => 'user_xrds',
+        'xrds' => 'simpleid_xrds',
+        '.*' => 'simpleid_index'
+    );
+    $routes = array_merge($routes, extension_invoke_all('routes'));
+    
+    simpleweb_run($routes, implode('/', $q));
+}
+
+function simpleid_index() {
+    if (isset($_REQUEST['openid.mode'])) {
+        simpleid_process_openid($_REQUEST);
+        return;
+    } else {
+        // Point to SimpleID's XRDS document
+        header('X-XRDS-Location: ' . simpleid_url('q=xrds'));
+        user_page();
     }
 }
 
