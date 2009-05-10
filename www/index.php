@@ -41,6 +41,7 @@ include "common.inc";
 include "openid.inc";
 include "user.inc";
 include "cache.inc";
+include "filesystem.persistence.inc";
 
 // Allow for PHP5 version of xtemplate
 if (version_compare(PHP_VERSION, '5.0.0') === 1) {
@@ -685,7 +686,7 @@ function simpleid_authenticate($request) {
     
     $is_valid = TRUE;
   
-    $assoc = cache_get('association', $request['openid.assoc_handle']);
+    $assoc = (isset($request['openid.assoc_handle'])) ? cache_get('association', $request['openid.assoc_handle']) : NULL;
   
     if (!$assoc || !$assoc['assoc_type']) {
         $is_valid = FALSE;
@@ -770,6 +771,7 @@ function simpleid_rp_form($request, $response) {
     $xtpl->parse('main.rp');
     
     $xtpl->assign('title', 'OpenID Login');
+    $xtpl->assign('page_class', 'dialog-page');
     $xtpl->parse('main');
     
     $xtpl->out('main');
@@ -812,7 +814,7 @@ function simpleid_send() {
         $response = simpleid_checkid_error(false);
         if (!$return_to) set_message('Log in cancelled.');
     } else {
-        simpleid_rp_save($uid, $_REQUEST['openid.realm'], array('auto_release' => $_REQUEST['autorelease']));
+        simpleid_rp_save($uid, $_REQUEST['openid.realm'], array('auto_release' => (isset($_REQUEST['autorelease']) && $_REQUEST['autorelease']) ? 1 : 0));
         $response = simpleid_sign($response, $response['openid.assoc_handle']);
         if (!$return_to) set_message('You were logged in successfully.');
     }

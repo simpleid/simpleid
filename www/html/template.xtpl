@@ -25,7 +25,7 @@
         <script src="html/jquery.js" type="text/javascript"></script>
         {javascript}
     </head>
-    <body>
+    <body class="{page_class}">
         <div id="update">        
         </div>
         <div id="header">

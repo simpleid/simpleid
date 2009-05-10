@@ -85,10 +85,8 @@ function user_init($q = NULL) {
  * @see user_load_from_identity()
  */
 function user_load($uid) {
-    $identity_file = SIMPLEID_IDENTITIES_DIR . "/$uid.identity";    
-    
-    if (file_exists($identity_file)) {
-        $user = parse_ini_file($identity_file, TRUE);
+    if (persistence_user_exists($uid)) {
+        $user = persistence_user_load($uid);
         $user["uid"] = $uid;
         
         if (isset($user["identity"])) {
@@ -114,32 +112,12 @@ function user_load($uid) {
  */
 function user_load_from_identity($identity) {
     $uid = cache_get('identity', $identity);
-    $r = NULL;
+    if ($uid !== NULL) return user_load($uid);
     
-    if ($uid !== NULL) {
-        return user_load($uid);
-    } else {
-        $dir = opendir(SIMPLEID_IDENTITIES_DIR);
-        
-        while (($file = readdir($dir)) !== false) {
-            $filename = SIMPLEID_IDENTITIES_DIR . '/' . $file;                        
-            
-            if ((filetype($filename) != "file") || (!preg_match('/^(.+)\.identity$/', $file, $matches))) continue;            
-            
-            $uid = $matches[1];
-            $test_user = user_load($uid);
-            
-            cache_set('identity', $test_user['identity'], $uid);
-        
-            if ($test_user['identity'] == $identity) {
-                $r = $test_user;
-            }
-        }
-        
-        closedir($dir);
-    }
+    $uid = persistence_uid_from_identity($identity);
+    if ($uid !== NULL) return user_load($uid);
     
-    return $r;
+    return NULL;
 }
 
 /**
@@ -288,6 +266,7 @@ function user_login_form($destination = '', $state = NULL) {
     }
     
     $xtpl->assign('title', 'Log In');
+    $xtpl->assign('page_class', 'dialog-page');
     $xtpl->assign('destination', htmlspecialchars($destination, ENT_QUOTES, 'UTF-8'));
     $xtpl->assign('nonce', htmlspecialchars($nonce, ENT_QUOTES, 'UTF-8'));
     if ($state) $xtpl->assign('state', $state);
@@ -320,6 +299,10 @@ function user_page() {
             $xtpl->assign('auto_release', (isset($rp['auto_release']) && $rp['auto_release']) ? 'checked="checked"' : '');
             $xtpl->parse('main.frontpage.realm');
         }
+    }
+    
+    if (!$rps || (count($rps) == 0)) {
+        $xtpl->assign('disabled', 'disabled="disabled"');
     }
     
     $xtpl->assign('token', get_form_token('autorelease'));

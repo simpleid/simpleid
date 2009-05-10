@@ -78,6 +78,7 @@ function redirect_form($url, $message) {
 
     $xtpl->assign('url', $url);
     $xtpl->assign('title', 'Redirecting...');
+    $xtpl->assign('page_class', 'dialog-page');
     
     $xtpl->parse('main.redirect');
     $xtpl->parse('main');

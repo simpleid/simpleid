@@ -9,6 +9,12 @@ SimpleID 0.7
 - Implemented XRDS document for SimpleID
 
 
+SimpleID 0.6.3
+--------------
+
+- Fixed session_type verification issue when using OpenID 1.1
+
+
 SimpleID 0.6.2
 --------------
 
