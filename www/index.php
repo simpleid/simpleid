@@ -43,7 +43,7 @@ include "openid.inc";
 include "user.inc";
 include "cache.inc";
 
-define('SIMPLEID_VERSION', '0.6.4');
+define('SIMPLEID_VERSION', '0.6.5');
 define('CACHE_DIR', SIMPLEID_CACHE_DIR);
 
 /**

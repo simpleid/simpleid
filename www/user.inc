@@ -356,7 +356,7 @@ function user_public_page($uid = NULL) {
             header('Status: 500');
             set_message('User <strong>' . htmlspecialchars($uid, ENT_QUOTES, 'UTF-8') . '</strong> not found.');
         } else {
-            header('X-XRDS-Location', SIMPLEID_BASE_URL . '/index.php?q=xrds/' . $uid);
+            header('X-XRDS-Location: ', SIMPLEID_BASE_URL . '/index.php?q=xrds/' . $uid);
             
             set_message('This is the user <strong>' . htmlspecialchars($uid, ENT_QUOTES, 'UTF-8') . '</strong>\'s SimpleID page.  It contains hidden information for the use by OpenID consumers.');
             
