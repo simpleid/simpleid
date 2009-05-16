@@ -355,6 +355,36 @@ function openid_url_matches_realm($url, $realm) {
     return true;
 }
 
+/**
+ * Returns the URL of a relying party endpoint for a specified realm.  This URL
+ * is used to discover services associated with the realm.
+ *
+ * If the realm's domain contains the wild-card characters "*.", this is substituted
+ * with "www.".
+ *
+ * @param string $realm the realm
+ * @url string the URL
+ *
+ * @since 0.7
+ */
+function openid_realm_discovery_url($realm) {
+    $parts = parse_url($realm);
+    $host = strtr($path['host'], array('*.' => 'www.'));;
+    
+    $url = $parts['scheme'] . '://';
+    if (isset($parts['user'])) {
+        $url .= $parts['user'];
+        if (isset($parts['pass'])) $url .= ':' . $parts['pass'];
+        $url .= '@';
+    }
+    $url .= $host;
+    if (isset($parts['port'])) $url .= ':' . $parts['port'];
+    $url .= $path;
+    if (isset($parts['query'])) $url .= '?' . $parts['query'];
+    if (isset($parts['fragment'])) $url .= '#' . $parts['fragment'];
+    return $url;
+}
+
 /* ------- Random byte and nonce functions ----------------------------------- */
 /**
  * Obtains a number of random bytes.  This function uses an entropy source specified
