@@ -9,6 +9,12 @@ SimpleID 0.7
 - Implemented XRDS document for SimpleID
 
 
+SimpleID 0.6.4
+--------------
+
+- Fixed user interface bug on trusted sites page
+
+
 SimpleID 0.6.3
 --------------
 
