@@ -129,6 +129,7 @@ function _http_request_curl($url, $headers = array(), $method = 'GET', $retry = 
         $result['error'] = curl_error($curl);
     } else {
         $result['code'] = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $result['url'] = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
         $result['content-type'] = curl_getinfo($curl, CURLINFO_CONTENT_TYPE);
         $result['headers'] = array();
         
@@ -249,6 +250,7 @@ function _http_request_fsock($url, $headers = array(), $method = 'GET', $retry =
         }
     }
 
+    $result['url'] = $url;
     return $result;
 }
 

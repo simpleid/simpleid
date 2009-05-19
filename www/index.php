@@ -55,7 +55,7 @@ if (version_compare(PHP_VERSION, '5.0.0') === 1) {
 define('SIMPLEID_VERSION', '0.7');
 define('CACHE_DIR', SIMPLEID_CACHE_DIR);
 
-
+define('CHECKID_RETURN_TO_SUSPECT', 3);
 define('CHECKID_APPROVAL_REQUIRED', 2);
 define('CHECKID_OK', 1);
 define('CHECKID_LOGIN_REQUIRED', -1);
@@ -419,11 +419,6 @@ function simpleid_checkid($request) {
         }
     }
     
-    /*
-     * Here, we should verify whether $request['openid.return_to'] is in fact
-     * an OpenID endpoint.  [9.2.1]
-     */
-
     if (isset($request['openid.identity'])) {
         $result = _simpleid_checkid($request);
         
@@ -473,7 +468,7 @@ function simpleid_checkid($request) {
  * supplied in an OpenID request.
  *
  * @param mixed &$request the OpenID request
- * @return int one of CHECKID_OK, CHECKID_APPROVAL_REQUIRED, CHECKID_IDENTITY_NOT_EXIST,
+ * @return int one of CHECKID_OK, CHECKID_APPROVAL_REQUIRED, CHECKID_RETURN_TO_SUSPECT, CHECKID_IDENTITY_NOT_EXIST,
  * CHECKID_IDENTITIES_NOT_MATCHING, CHECKID_LOGIN_REQUIRED or CHECKID_PROTOCOL_ERROR
  * @global array the current logged in user
  */
@@ -505,12 +500,43 @@ function _simpleid_checkid(&$request) {
         return CHECKID_IDENTITIES_NOT_MATCHING;
     }
     
-    // Check 3: For checkid_immediate, the user must already have given
-    // permission to log in automatically.    
+    // Check 3: Discover the realm and match its return_to
     $rp = simpleid_rp_load($uid, $realm);
-    simpleid_rp_save($uid, $realm);
     
-    if ($rp['auto_release'] == 1) {
+    if (($version == OPENID_VERSION_2) && SIMPLEID_VERIFY_RETURN_URL_USING_REALM) {
+        $url = openid_realm_discovery_url($realm);
+        $verified = FALSE;
+        
+        cache_gc(3600, 'rp-services');
+        $services = cache_get('rp-services', $url);
+        if ($services == NULL) {
+            $services = discovery_get_services($url);
+            cache_set('rp-services', $url, $services);
+        }
+        $services = discovery_get_service_by_type($services, OPENID_RETURN_TO);
+        
+        if ($services) {
+            $return_to_uris = array();
+            
+            foreach ($services as $service) {
+                $return_to_uris = array_merge($return_to_uris, $service['uri']);
+            }
+            foreach ($return_to_uris as $return_to) {
+                if (openid_url_matches_realm($request['openid.return_to'], $return_to)) {
+                    $verified = TRUE;
+                    break;
+                }
+            }
+        }
+        
+        if (!$verified) {
+            return CHECKID_RETURN_TO_SUSPECT;
+        }
+    }
+    
+    // Check 4: For checkid_immediate, the user must already have given
+    // permission to log in automatically.
+    if (($rp != NULL) && ($rp['auto_release'] == 1)) {
         return CHECKID_OK;
     } else {
         return CHECKID_APPROVAL_REQUIRED;
@@ -721,8 +747,9 @@ function simpleid_continue() {
  * @param mixed $request the original OpenID request
  * @param mixed $response the proposed OpenID response, subject to user
  * verification
+ * @param int $reason either CHECKID_APPROVAL_REQUIRED or CHECKID_RETURN_TO_SUSPECT
  */
-function simpleid_rp_form($request, $response) {
+function simpleid_rp_form($request, $response, $reason = CHECKID_APPROVAL_REQUIRED) {
     global $user;
     global $xtpl;
     global $version;
@@ -746,6 +773,9 @@ function simpleid_rp_form($request, $response) {
         $extensions = extension_invoke_all('form', $request, $rp);
         $xtpl->assign('extensions', implode($extensions));
         
+        if ($reason == CHECKID_RETURN_TO_SUSPECT) {
+            $xtpl->parse('main.rp.setup.suspect');
+        }
         $xtpl->parse('main.rp.setup');
     }
     
