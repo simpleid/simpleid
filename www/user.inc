@@ -290,7 +290,7 @@ function user_page() {
     
     user_block();
     
-    $rps = simpleid_rp_load_all($user['uid']);
+    $rps = persistence_rp_load_all($user['uid']);
     
     if ($rps) {
         foreach ($rps as $realm => $rp) {

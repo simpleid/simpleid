@@ -4,12 +4,6 @@
  *
  * Copyright (C) Kelvin Mo 2007-9
  *
- * Includes code Drupal OpenID module (http://drupal.org/project/openid)
- * Rowan Kerr <rowan@standardinteractive.com>
- * James Walker <james@bryght.com>
- *
- * Copyright (C) Rowan Kerr and James Walker
- *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either
@@ -24,11 +18,11 @@
  * License along with this program; if not, write to the Free
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  * 
- * $Id: user.inc 87 2008-11-22 09:04:46Z kmo $
+ * $Id$
  */
 
 /**
- * Functions for storage of user data.
+ * Functions for persistent storage via the file system.
  *
  * @package simpleid
  * @filesource
@@ -90,6 +84,73 @@ function persistence_uid_from_identity($uid) {
     closedir($dir);
     
     return $r;
+}
+
+/**
+ * Saves the user's preferences and other data in relation to a relying party.
+ *
+ * @param string $uid the user name
+ * @param string $realm the openid.realm of the relying party
+ * @param array $details an associative array of the data to save
+ * @see cache_set()
+ */
+function persistence_rp_save($uid, $realm, $details = array()) {
+    $now = time();
+    
+    $rps = persistence_rp_load_all($uid);
+    
+    if ($rps == NULL) $rps = array();
+
+    if (!isset($rps[$realm])) {
+        if ($details['auto_release'] != 0) {
+            $details['auto_release'] = 1;
+        }
+        
+        $rps[$realm] = array_merge($details, array('uid' => $uid, 'realm' => $realm, 'first_time' => $now, 'last_time' => $now));
+    } else {
+        $rps[$realm] = array_merge($details, $rps[$realm]);
+        $rps[$realm]['last_time'] = $now;
+    }
+    cache_set('rp', $uid, $rps);
+}
+
+/**
+ * Loads the user's preferences and other data in relation to a relying party.
+ *
+ * @param string $uid the user name
+ * @param string $realm the openid.realm of the relying party
+ * @return array an associative array of the data
+ * @see cache_get()
+ */
+function persistence_rp_load($uid, $realm) {
+    $rps = cache_get('rp', $uid);
+    if (isset($rps[$realm])) {
+        return $rps[$realm];
+    } else {
+        return NULL;
+    }
+}
+
+/**
+ * Loads the user's preferences and other data in relation to all relying parties.
+ *
+ * @param string $uid the user name
+ * @return array an associative array of the data, with the openid.realm URIs as
+ * key
+ */
+function persistence_rp_load_all($uid) {
+    return cache_get('rp', $uid);
+}
+
+/**
+ * Saves the user's preferences and other data in relation to all relying parties.
+ *
+ * @param string $uid the user name
+ * @param array $rps an associative array of the data as obtained from the
+ * {@link persistence_rp_load_all()} function
+ */
+function persistence_rp_save_all($uid, $rps) {
+    cache_set('rp', $uid, $rps);
 }
 
 ?>

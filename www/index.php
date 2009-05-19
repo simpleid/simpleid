@@ -177,7 +177,7 @@ function simpleid_autorelease() {
         return;
     }
 
-    $rps = simpleid_rp_load_all($user['uid']);
+    $rps = persistence_rp_load_all($user['uid']);
     
     if (isset($_POST['autorelease'])) {
         foreach ($_POST['autorelease'] as $realm => $autorelease) {
@@ -201,7 +201,7 @@ function simpleid_autorelease() {
         }
     }
     
-    simpleid_rp_save_all($user['uid'], $rps);
+    persistence_rp_save_all($user['uid'], $rps);
     
     set_message('Your preferences have been saved.');
     user_page();
@@ -501,7 +501,7 @@ function _simpleid_checkid(&$request) {
     }
     
     // Check 3: Discover the realm and match its return_to
-    $rp = simpleid_rp_load($uid, $realm);
+    $rp = persistence_rp_load($uid, $realm);
     
     if (($version == OPENID_VERSION_2) && SIMPLEID_VERIFY_RETURN_URL_USING_REALM) {
         $url = openid_realm_discovery_url($realm);
@@ -768,7 +768,7 @@ function simpleid_rp_form($request, $response, $reason = CHECKID_APPROVAL_REQUIR
         $xtpl->assign('identity', htmlspecialchars($request['openid.identity'], ENT_QUOTES, 'UTF-8'));
         $xtpl->parse('main.rp.cancel');
     } else {        
-        $rp = simpleid_rp_load($user['uid'], $realm);
+        $rp = persistence_rp_load($user['uid'], $realm);
         
         $extensions = extension_invoke_all('form', $request, $rp);
         $xtpl->assign('extensions', implode($extensions));
@@ -825,7 +825,7 @@ function simpleid_send() {
         $response = simpleid_checkid_error(false);
         if (!$return_to) set_message('Log in cancelled.');
     } else {
-        simpleid_rp_save($uid, $_REQUEST['openid.realm'], array('auto_release' => (isset($_REQUEST['autorelease']) && $_REQUEST['autorelease']) ? 1 : 0));
+        persistence_rp_save($uid, $_REQUEST['openid.realm'], array('auto_release' => (isset($_REQUEST['autorelease']) && $_REQUEST['autorelease']) ? 1 : 0));
         $response = simpleid_sign($response, $response['openid.assoc_handle']);
         if (!$return_to) set_message('You were logged in successfully.');
     }
@@ -853,72 +853,5 @@ function simpleid_xrds() {
     $xtpl->out('xrds');
 }
 
-
-/**
- * Saves the user's preferences and other data in relation to a relying party.
- *
- * @param string $uid the user name
- * @param string $realm the openid.realm of the relying party
- * @param array $details an associative array of the data to save
- * @see cache_set()
- */
-function simpleid_rp_save($uid, $realm, $details = array()) {
-    $now = time();
-    
-    $rps = simpleid_rp_load_all($uid);
-    
-    if ($rps == NULL) $rps = array();
-
-    if (!isset($rps[$realm])) {
-        if ($details['auto_release'] != 0) {
-            $details['auto_release'] = 1;
-        }
-        
-        $rps[$realm] = array_merge($details, array('uid' => $uid, 'realm' => $realm, 'first_time' => $now, 'last_time' => $now));
-    } else {
-        $rps[$realm] = array_merge($details, $rps[$realm]);
-        $rps[$realm]['last_time'] = $now;
-    }
-    cache_set('rp', $uid, $rps);
-}
-
-/**
- * Loads the user's preferences and other data in relation to a relying party.
- *
- * @param string $uid the user name
- * @param string $realm the openid.realm of the relying party
- * @return array an associative array of the data
- * @see cache_get()
- */
-function simpleid_rp_load($uid, $realm) {
-    $rps = cache_get('rp', $uid);
-    if (isset($rps[$realm])) {
-        return $rps[$realm];
-    } else {
-        return NULL;
-    }
-}
-
-/**
- * Loads the user's preferences and other data in relation to all relying parties.
- *
- * @param string $uid the user name
- * @return array an associative array of the data, with the openid.realm URIs as
- * key
- */
-function simpleid_rp_load_all($uid) {
-    return cache_get('rp', $uid);
-}
-
-/**
- * Saves the user's preferences and other data in relation to all relying parties.
- *
- * @param string $uid the user name
- * @param array $rps an associative array of the data as obtained from the
- * {@link simpleid_rp_load_all()} function
- */
-function simpleid_rp_save_all($uid, $rps) {
-    cache_set('rp', $uid, $rps);
-}
 
 ?>
