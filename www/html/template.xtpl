@@ -97,6 +97,14 @@
                 
                 <p>You are being logged into <strong class="realm">{realm}</strong>.</p>
                 
+                <!-- BEGIN: suspect -->
+                <div class="message unsecure">
+                    <p>Warning: This web site has not confirmed its identity and might be
+                    fraudulent.  Do not share any personal information with this web
+                    site unless you are sure it is legitimate.  (OpenID version 2.0 return_to discovery failure)</p>
+                </div>
+                <!-- END: suspect -->
+                
                 <div class="form-item">
                     <label class="option">
                         <input type="checkbox" name="autorelease" {auto_release} value="1" />
