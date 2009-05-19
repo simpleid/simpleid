@@ -72,8 +72,26 @@ define('SIMPLEID_CACHE_DIR', '../cache');
  *
  * The default is set to false for security reasons.  You should not change
  * this value unless it is absolutely necessary.
+ *
+ * @since 0.6
  */
 define('SIMPLEID_ALLOW_LEGACY_LOGIN', false);
+
+/**
+ * Performs additional verification of relying party return URLs.
+ *
+ * When authenticating using OpenID version 2, SimpleID version 0.7 or later
+ * can perform additional verification of the relying party's return URLs under
+ * section 9.2.1 of the OpenID specification.
+ *
+ * The default is set to true for security reasons.  However, if your web server
+ * is blocked by your web hosting provider's firewall from accessing outside
+ * servers, then set this to false.
+ *
+ * @since 0.7
+ *
+ */
+define('SIMPLEID_VERIFY_RETURN_URL_USING_REALM', true);
 
 /**
  * Date and time format.
