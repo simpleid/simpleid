@@ -35,6 +35,20 @@ identity=http://example.com/
 pass=c8e24ae844b7cb9381g722ae8209a19a
 
 ;
+; Whether this user is given administrative privileges in SimpleID.
+;
+; This setting has no effect in the current version of SimpleID.  However,
+; more functionality may be added to SimpleID in future versions which will
+; be restricted to SimpleID administrators.
+;
+; You should grant administrative privileges to at least one user.
+;
+; If you wish this user to be given administrative privileges, uncomment the
+; line below.
+;
+;administrator=1
+
+;
 ; Simple Registration Extension data.
 ;
 ; If you want to provide registration data for consumers which support the
