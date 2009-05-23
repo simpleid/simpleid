@@ -428,147 +428,115 @@ function openid_nonce() {
 /* ------- Diffie-Hellman Key Exchange functions ----------------------------- */
 
 /**
- * Associate using Diffie-Hellman key exchange [8.4.2]
+ * Generates the cryptographic values required for responding to association
+ * requests [8.4.2]
  *
- * @param string $secret proposed shared secret, in binary representation
- * @param string $dh_consumer_public the client's exponential (public key), in Base64 representation
- * @param string $dh_modulus a prime number
- * @param string $dh_gen a primitive root modulo
+ * @param string $mac_key the MAC key, in binary representation
+ * @param string $dh_consumer_public the consumer's public key, in Base64 representation
+ * @param string $dh_modulus modulus - a large prime number
+ * @param string $dh_gen generator - a primitive root modulo
  * @param string $hash_func the hash function
- * @return array an array containing the server's exponential (public key), and shared secret
- * encrypted using the shared key
+ * @return array an array containing the server's public key (in Base64), and encrypted MAC key
+ * (in Base64), encrypted using the Diffie-Hellman shared secret
  */
-function openid_dh_server_assoc($secret, $dh_consumer_public, $dh_modulus = NULL, $dh_gen = NULL, $hash_func = '_openid_sha1') {
-    $cpub = _openid_dh_base64_to_long($dh_consumer_public);
-    
-    if ($dh_modulus) {
-        $mod = _openid_dh_base64_to_long($dh_modulus);
-    } else {
-        $mod = OPENID_DH_DEFAULT_MOD;
-    }
+function openid_dh_server_assoc($mac_key, $dh_consumer_public, $dh_modulus = NULL, $dh_gen = NULL, $hash_func = '_openid_sha1') {
+    $shared = openid_dh_generate_public_and_shared_secret($dh_consumer_public, $dh_modulus, $dh_gen);
 
-    if ($dh_gen) {
-        $gen = _openid_dh_base64_to_long($dh_gen);
-    } else {
-        $gen = OPENID_DH_DEFAULT_GEN;
-    }
-
-    $r = _openid_dh_rand($mod);
-    $private = bcadd($r, 1);
-    $public = bcpowmod($gen, $private, $mod);
-
-    $shared = bcpowmod($cpub, $private, $mod);
-    $mac_key = _openid_dh_xorsecret($shared, $secret, $hash_func);
-    $enc_mac_key = base64_encode($mac_key);
-    $spub64 = _openid_dh_long_to_base64($public);
     return array(
-        'dh_server_public' => $spub64,
-        'enc_mac_key' => $enc_mac_key
+        'dh_server_public' => $shared['dh_server_public'],
+        'enc_mac_key' => openid_encrypt_mac_key($shared['ZZ'], $mac_key, $hash_func)
     );
 }
 
 /**
- * Converts a Base64 encoded string to a BCMath integer
+ * Generates a public key and a shared secret for Diffie-Hellman key exchange.
  *
- * @param string $str the Base64 encoded string
- * @return string the BCMath integer
+ * This is the second step in the Diffle-Hellman key exchange process.  The other
+ * party (in OpenID 1.0 terms, the consumer) has already generated the public
+ * key ($dh_consumer_public) and sent it to this party (the server).  The Diffie-Hellman
+ * modulus ($dh_modulus) and generator ($dh_gen) have either been sent or previously agreed.
+ *
+ * @param string $dh_consumer_public the consumer's public key, in Base64 representation
+ * @param string $dh_modulus modulus, in Base64 representation
+ * @param string $dh_gen generator, in Base64 representation
+ * @return array an array containing: (a) dh_server_public - the server's public
+ * key (in Base64) and (b) ZZ - the shared secret (in BCMath)
+ *
+ * @link http://www.ietf.org/rfc/rfc2631.txt RFC 2631
  */
-function _openid_dh_base64_to_long($str) {
-    return _openid_dh_binary_to_long(base64_decode($str));
+function openid_dh_generate_public_and_shared_secret($dh_consumer_public, $dh_modulus = NULL, $dh_gen = NULL) {
+    // Decode the consumer's public key
+    $y_consumer = _openid_base64_to_string($dh_consumer_public);
+    
+    if ($dh_modulus) {
+        $p = _openid_base64_to_string($dh_modulus);
+    } else {
+        $p = OPENID_DH_DEFAULT_MOD;
+    }
+
+    if ($dh_gen) {
+        $g = _openid_base64_to_string($dh_gen);
+    } else {
+        $g = OPENID_DH_DEFAULT_GEN;
+    }
+
+    // Generate the server's private key - a random number which is less than p
+    $rand = _openid_dh_rand($p);
+    $x_server = bcadd($rand, 1);
+    
+    // Server's public key is g ^ private mod p
+    $y_server = bcpowmod($g, $x_server, $p);
+
+    // Encode the server's public key
+    $dh_server_public = _openid_string_to_base64($y_server);
+
+    // Generate the shared secret = consumer's public ^ server's private mod p = server's public ^ consumer's private mod p
+    $ZZ = bcpowmod($y_consumer, $x_server, $p);
+
+
+    return array(
+        'dh_server_public' => $dh_server_public,
+        'ZZ' => $ZZ
+    );
 }
 
 /**
- * Converts a BCMath integer to a Base64 encoded string
+ * Encrypts and encodes the MAC key.
  *
- * @param string $str the BCMath integer
- * @return string the Base64 encoded string
- */
-function _openid_dh_long_to_base64($str) {
-    return base64_encode(_openid_dh_long_to_binary($str));
-}
-
-/**
- * Converts an integer in binary to a BCMath integer.
- *
- * @param string $str the integer in binary
- * @param string the BCMath integer
- */
-function _openid_dh_binary_to_long($str) {
-    $bytes = array_merge(unpack('C*', $str));
-
-    $n = 0;
-  
-    foreach ($bytes as $byte) {
-        $n = bcmul($n, pow(2, 8));
-        $n = bcadd($n, $byte);
-    }
-
-    return $n;
-}
-
-/**
- * Converts an BCMath integer to its binary representation.
- *
- * @param string $long the BCMath integer
- * @param string the binary representation
- */
-function _openid_dh_long_to_binary($long) {
-    $cmp = bccomp($long, 0);
-    if ($cmp < 0) {
-        return FALSE;
-    }
-
-    if ($cmp == 0) {
-        return "\x00";
-    }
-
-    $bytes = array();
-  
-    while (bccomp($long, 0) > 0) {
-        array_unshift($bytes, bcmod($long, 256));
-        $long = bcdiv($long, pow(2, 8));
-    }
-  
-    if ($bytes && ($bytes[0] > 127)) {
-        array_unshift($bytes, 0);
-    }
-  
-    $string = '';
-    foreach ($bytes as $byte) {
-        $string .= pack('C', $byte);
-    }
-  
-    return $string;
-}
-
-/**
- * Encode an integer as big-endian signed two's complement binary strings.
- * [4.2]
- *
- * @param string $num the binary integer
- * @return string the signed two's complement binary string
- */
-function _openid_btwoc($num) {
-    return pack('H*', $num);
-}
-
-/**
- * Encrypts/decrypts the secret using a shared key
- *
- * @param string $shared the shared key, in binary representation
- * @param string $secret the secret, in binart representation
+ * @param string $ZZ the Diffie-Hellman key exchange shared secret, in binary representation
+ * @param string $secret the secret, in binary representation
  * @param string $hash_func the hash function
- * @return string the encrypted/decrypted secret, in binary representation
+ * @param string the encrypted MAC key in Base64 representation
  */
-function _openid_dh_xorsecret($shared, $secret, $hash_func = '_openid_sha1') {
-    $dh_shared_str = _openid_dh_long_to_binary($shared);
-    $hashed_dh_shared = call_user_func($hash_func, $dh_shared_str);
-    $xsecret = "";
-    for ($i = 0; $i < strlen($secret); $i++) {
-        $xsecret .= chr(ord($secret[$i]) ^ ord($hashed_dh_shared[$i]));
+function openid_encrypt_mac_key($ZZ, $mac_key, $hash_func = '_openid_sha1') {
+    // Encrypt the MAC key using the shared secret and the hash function
+    $encrypted_mac_key = _openid_xor($ZZ, $mac_key, $hash_func);
+    
+    // Encode the encrypted MAC key
+    $enc_mac_key = base64_encode($encrypted_mac_key);
+    
+    return $enc_mac_key;
+}
+
+/**
+ * Encrypts/decrypts using XOR.
+ *
+ * @param string $key the encryption key, in BCMath representation.  This is usually
+ * the shared secret (ZZ) calculated from the Diffie-Hellman key exchange
+ * @param string $plain_cipher the plaintext or ciphertext
+ * @param string $hash_func the hash function
+ * @return string the ciphertext or plaintext
+ */
+function _openid_xor($key, $plain_cipher, $hash_func = '_openid_sha1') {
+    $decoded_key = _openid_string_to_bytes($key);
+    $hashed_key = call_user_func($hash_func, $decoded_key);
+    
+    $cipher_plain = "";
+    for ($i = 0; $i < strlen($plain_cipher); $i++) {
+        $cipher_plain .= chr(ord($plain_cipher[$i]) ^ ord($hashed_key[$i]));
     }
   
-    return $xsecret;
+    return $cipher_plain;
 }
 
 /**
@@ -582,7 +550,7 @@ function _openid_dh_rand($stop) {
     static $duplicate_cache = array();
   
     // Used as the key for the duplicate cache
-    $rbytes = _openid_dh_long_to_binary($stop);
+    $rbytes = _openid_string_to_bytes($stop);
   
     if (array_key_exists($rbytes, $duplicate_cache)) {
         list($duplicate, $nbytes) = $duplicate_cache[$rbytes];
@@ -608,11 +576,100 @@ function _openid_dh_rand($stop) {
   
     do {
         $bytes = "\x00" . _openid_get_bytes($nbytes);
-        $n = _openid_dh_binary_to_long($bytes);
+        $n = _openid_bytes_to_string($bytes);
         // Keep looping if this value is in the low duplicated range
     } while (bccomp($n, $duplicate) < 0);
 
     return bcmod($n, $stop);
+}
+
+/* ------- Arbitary precision arithmetic and conversion functions ------------ */
+/**
+ * Converts an arbitary precision integer, encoded in Base64, to an ordinary
+ * string
+ *
+ * @param string $str arbitary precision integer, encoded in Base64
+ * @return string the string representation
+ */
+function _openid_base64_to_string($str) {
+    return _openid_bytes_to_string(base64_decode($str));
+}
+
+/**
+ * Converts a string representation of an integer to an arbitary precision
+ * integer, then converts it to Base64 encoding.
+ *
+ * @param string $str the string representation
+ * @return string the Base64 encoded arbitary precision integer
+ */
+function _openid_string_to_base64($str) {
+    return base64_encode(_openid_string_to_bytes($str));
+}
+
+/**
+ * Converts an arbitary precision integer to an ordinary string
+ *
+ * @param string $str the arbitary precision integer as a stream of bytes
+ * @param string the string representation
+ */
+function _openid_bytes_to_string($byte_stream) {
+    $bytes = array_merge(unpack('C*', $byte_stream));
+
+    $str = 0;
+  
+    foreach ($bytes as $byte) {
+        $str = bcmul($str, pow(2, 8));
+        $str = bcadd($str, $byte);
+    }
+
+    return $str;
+}
+
+/**
+ * Converts an a string representation of an integer to an arbitary precision
+ * integer, as a stream of bytes
+ *
+ * @param string $long the string representation
+ * @param string the arbitary precision integer as a stream of bytes
+ */
+function _openid_string_to_bytes($str) {
+    $cmp = bccomp($str, 0);
+    if ($cmp < 0) {
+        return FALSE;
+    }
+
+    if ($cmp == 0) {
+        return "\x00";
+    }
+
+    $bytes = array();
+  
+    while (bccomp($str, 0) > 0) {
+        array_unshift($bytes, bcmod($str, 256));
+        $str = bcdiv($str, pow(2, 8));
+    }
+  
+    if ($bytes && ($bytes[0] > 127)) {
+        array_unshift($bytes, 0);
+    }
+  
+    $byte_stream = '';
+    foreach ($bytes as $byte) {
+        $byte_stream .= pack('C', $byte);
+    }
+  
+    return $byte_stream;
+}
+
+/**
+ * Encode an integer as big-endian signed two's complement binary string.
+ * [4.2]
+ *
+ * @param string $num the binary integer
+ * @return string the signed two's complement binary string
+ */
+function _openid_btwoc($num) {
+    return pack('H*', $num);
 }
 
 /* ------- Hash and HMAC functions ------------------------------------------- */
