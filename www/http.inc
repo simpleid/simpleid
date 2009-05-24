@@ -46,7 +46,7 @@ define('SIMPLEID_USER_AGENT', 'SimpleID/' . SIMPLEID_VERSION);
  * @param int $retry the maximum number of redirects allowed
  * @return array containing keys 'error-code' (for communication errors), 'error'
  * (for communication errors), 'data' (content returned), 'code' (the HTTP status code), 'http-error'
- * (if the HTTP status code is not 200 or 304), 'headers' (an array of return headers),
+ * (if the HTTP status code is not 200 or 304), 'headers' (an array of return headers in lowercase),
  * 'content-type' (the HTTP content-type returned)
  */
 function http_request($url, $headers = array(), $method = 'GET', $retry = 3) {
@@ -68,13 +68,14 @@ function http_request($url, $headers = array(), $method = 'GET', $retry = 3) {
     
         // RFC 2616 states that all unknown HTTP codes must be treated the same as the
         // base code in their class.
-        if (!in_array($code, $valid_codes)) {
-            $code = floor($code / 100) * 100;
+        if (!in_array($response['code'], $valid_codes)) {
+            $response['code'] = floor($response['code'] / 100) * 100;
         }
         
-        if (($code != 200) || ($code != 304)) {
-            $response['http-error'] = $code;
+        if (($response['code'] != 200) && ($response['code'] != 304)) {
+            $response['http-error'] = $response['code'];
         }
+        
     }
 
     return $response;
@@ -105,10 +106,10 @@ function _http_request_curl($url, $headers = array(), $method = 'GET', $retry = 
     curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
     curl_setopt($curl, CURLOPT_MAXREDIRS, $retry);
     curl_setopt($curl, CURLOPT_HTTPHEADER, array(implode("\n", $headers) . "\n"));
-    curl_setopt($fp, CURLOPT_USERAGENT, SIMPLEID_USER_AGENT);
+    curl_setopt($curl, CURLOPT_USERAGENT, SIMPLEID_USER_AGENT);
     
-    curl_setopt($fp, CURLOPT_TIMEOUT, 20);
-    curl_setopt($fp, CURLOPT_CONNECTTIMEOUT, 20);
+    curl_setopt($curl, CURLOPT_TIMEOUT, 20);
+    curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 20);
     
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($curl, CURLOPT_HEADER, true);
@@ -246,7 +247,7 @@ function _http_request_fsock($url, $headers = array(), $method = 'GET', $retry =
             $result['error-code'] = 47;
             $result['error'] = 'Too many redirects';
         } else {
-            $result = _http_request_fsock($result['headers']['Location'], $headers, $method, $retry - 1);
+            $result = _http_request_fsock($result['headers']['location'], $headers, $method, $retry - 1);
         }
     }
 
@@ -278,8 +279,11 @@ function _http_parse_headers($header_block, $curl) {
     // Parse headers.
     while ($line = trim(array_shift($lines))) {
         list($header, $value) = explode(':', $line, 2);
-
-        if (isset($headers[$header]) && $header == 'Set-Cookie') {
+        
+        // Headers are case insensitive
+        $header = strtolower($header);
+        
+        if (isset($headers[$header]) && $header == 'set-cookie') {
             // RFC 2109: the Set-Cookie response header comprises the token Set-
             // Cookie:, followed by a comma-separated list of one or more cookies.
             $headers[$header] .= ','. trim($value);

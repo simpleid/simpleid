@@ -65,7 +65,7 @@ function discovery_get_services($identifier) {
     $url = discovery_get_url($identifier);
     
     $xrds = discovery_get_xrds($url);
-    
+
     if ($xrds) {
         return discovery_parse_xrds($xrds);
     } else {
@@ -123,13 +123,12 @@ function discovery_get_xrds($url, $check = TRUE, $retries = 5) {
     if ($retries == 0) return NULL;
     
     $response = http_request($url, array('Accept' => 'application/xrds+xml'));
-    
-    if ($response['http-error']) return NULL;
 
+    if (isset($response['http-error'])) return NULL;
     if (($response['content-type'] == 'application/xrds+xml') || ($check == FALSE)) {
         return $response['data'];
-    } elseif ($response['headers']['X-XRDS-Location']) {
-        return discovery_get_xrds($response['headers']['X-XRDS-Location'], false, $retries - 1);
+    } elseif (isset($response['headers']['x-xrds-location'])) {
+        return discovery_get_xrds($response['headers']['x-xrds-location'], false, $retries - 1);
     } else {
         $location = _discovery_meta_httpequiv('X-XRDS-Location', $response['data']);
         if ($location) {
@@ -156,7 +155,7 @@ function discovery_normalize($identifier) {
         if (stristr($identifier, 'xri://') !== false) $normalized = substr($identifier, 6);
     } else {
         if (stristr($identifier, '://') === false) $normalized = 'http://'. $identifier;
-        if (substr_count($normalized_url, '/') < 3) $normalized_url .= '/';
+        if (substr_count($normalized, '/') < 3) $normalized .= '/';
     }
     
     return $normalized;
@@ -181,14 +180,14 @@ function discovery_get_url($identifier) {
 /**
  * Determines whether an identifier is an XRI.
  *
- * XRI identifiers either start with xri:// or with @ or =.
+ * XRI identifiers either start with xri:// or with @, =, +, $ or !.
  *
  * @param string $identifier the parameter to test
  * @return bool true if the identifier is an XRI
  */
 function discovery_is_xri($identifier) {
     $firstchar = substr($identifier, 0, 1);
-    if ($firstchar == "@" || $firstchar == "=") return true;
+    if ($firstchar == "@" || $firstchar == "=" || $firstchar == "+" || $firstchar == "\$" || $firstchar == "!") return true;
     if (stristr($identifier, 'xri://') !== FALSE) return true;
     return false;
 }
@@ -231,6 +230,7 @@ function discovery_parse_xrds($xrds) {
     $parser->free();
     $services = $parser->services();
     uasort($services, 'discovery_priority_sort');
+
     return $services;
 }
 
@@ -294,7 +294,8 @@ class XRDSParser {
         list($ns, $name) = $this->parse_namespace($qualified);
         $name = strtolower($name);
         
-        if (($ns == XRD2_NS) && ($name == 'service')) {
+        // Expat XML parser returns namespaces in uppercase
+        if (($ns == strtoupper(XRD2_NS)) && ($name == 'service')) {
             $this->in_service = TRUE;
             $this->service = array();
             
@@ -304,10 +305,9 @@ class XRDSParser {
             if (in_array('id', $attribs)) {
                 $this->service['#id'] = $attribs['id'];
             }
-            break;
         }
         
-        if (($ns == XRD2_NS) && ($this->in_service)) {
+        if (($ns == strtoupper(XRD2_NS)) && ($this->in_service)) {
             switch ($name) {
                 case 'type':
                 case 'localid':
@@ -320,17 +320,18 @@ class XRDSParser {
             }
         }
         
-        $buffer = '';
+        $this->buffer = '';
     }
 
     function element_end(&$parser, $qualified) {
         list($ns, $name) = $this->parse_namespace($qualified);
         $name = strtolower($name);
         
-        if (($ns == XRD2_NS) && ($this->in_service)) {
+        if (($ns == strtoupper(XRD2_NS)) && ($this->in_service)) {
             switch ($name) {
                 case 'service':
                     foreach (array('type', 'localid', 'uri') as $key) {
+                        if (!isset($this->service[$key])) continue;
                         $this->service[$key] = $this->flatten_uris($this->service[$key]);
                     }
                 
@@ -345,30 +346,30 @@ class XRDSParser {
                         $this->service[$name] = array();
                     }
                     if ($this->priority != NULL) {
-                        $this->service[$name][] = array('#uri' => $buffer, '#priority' => $this->priority);
+                        $this->service[$name][] = array('#uri' => trim($this->buffer), '#priority' => $this->priority);
                     } else {
-                        $this->service[$name][] = array('#uri' => $buffer);
+                        $this->service[$name][] = array('#uri' => trim($this->buffer));
                     }
                     $this->priority = NULL;
                     break;
             }
         }
         
-        if (($ns == XRD_OPENID_NS) && ($this->in_service)) {
+        if (($ns == strtoupper(XRD_OPENID_NS)) && ($this->in_service)) {
             switch ($name) {
                 case 'delegate':
-                    $this->service['delegate'] = $buffer;
+                    $this->service['delegate'] = trim($this->buffer);
             }
         }
 
     }
 
     function cdata(&$parser, $data) {
-        $buffer .= $data;
+        $this->buffer .= $data;
     }
     
     function parse_namespace($qualified) {
-        $pos = strrpos($name, ':');
+        $pos = strrpos($qualified, ':');
         if ($pos !== FALSE) return array(substr($qualified, 0, $pos), substr($qualified, $pos + 1, strlen($qualified)));
         return array('', $qualified);
     }
