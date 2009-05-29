@@ -35,14 +35,17 @@
  */
  
  
-include "config.inc";
-include "config.default.inc";
-include "common.inc";
-include "simpleweb.inc";
-include "openid.inc";
-include "user.inc";
-include "cache.inc";
-include "filesystem.persistence.inc";
+define('SIMPLEID_VERSION', 0.7);
+ 
+include_once "config.inc";
+include_once "config.default.inc";
+include_once "common.inc";
+include_once "simpleweb.inc";
+include_once "openid.inc";
+include_once "discovery.inc";
+include_once "user.inc";
+include_once "cache.inc";
+include_once "filesystem.persistence.inc";
 
 // Allow for PHP5 version of xtemplate
 if (version_compare(PHP_VERSION, '5.0.0') === 1) {
@@ -52,7 +55,6 @@ if (version_compare(PHP_VERSION, '5.0.0') === 1) {
 }
 
 
-define('SIMPLEID_VERSION', '0.7');
 define('CACHE_DIR', SIMPLEID_CACHE_DIR);
 
 define('CHECKID_RETURN_TO_SUSPECT', 3);
@@ -253,12 +255,8 @@ function simpleid_process_openid($request) {
 function simpleid_associate($request) {
     global $version;
     
-    $supported_assoc_types = array('HMAC-SHA1');
-    if (OPENID_SHA256_SUPPORTED) $supported_assoc_types[] = 'HMAC-SHA256';
-    
-    $supported_session_types = array('no-encryption', 'DH-SHA1');
-    if (OPENID_SHA256_SUPPORTED) $supported_session_types[] = 'DH-SHA256';
-    if ($version == OPENID_VERSION_1_1) $supported_session_types[] = '';
+    $assoc_types = openid_association_types();
+    $session_types = openid_session_types($version);
 
     // Common Request Parameters [8.1.1]
     if (($version == OPENID_VERSION_1_1) && !isset($request['openid.session_type'])) $request['openid.session_type'] = '';
@@ -266,8 +264,8 @@ function simpleid_associate($request) {
     $session_type = $request['openid.session_type'];
     
     // Diffie-Hellman Request Parameters [8.1.2]
-    $dh_modulus = $request['openid.dh_modulus'];
-    $dh_gen = $request['openid.dh_gen'];
+    $dh_modulus = (isset($request['openid.dh_modulus'])) ? $request['openid.dh_modulus'] : NULL;
+    $dh_gen = (isset($request['openid.dh_gen'])) ? $request['openid.dh_gen'] : NULL;
     $dh_consumer_public = $request['openid.dh_consumer_public'];
     
     if (!isset($request['openid.session_type']) || !isset($request['openid.assoc_type'])) {
@@ -276,7 +274,7 @@ function simpleid_associate($request) {
     }
     
     // Check if the assoc_type is supported
-    if (!in_array($assoc_type, $supported_assoc_types)) {
+    if (!array_key_exists($assoc_type, $assoc_types)) {
         $error = array(
             'error_code' => 'unsupported-type',
             'session_type' => 'DH-SHA1',
@@ -286,7 +284,7 @@ function simpleid_associate($request) {
         return;
     }
     // Check if the assoc_type is supported
-    if (!in_array($session_type, $supported_session_types)) {
+    if (!array_key_exists($session_type, $session_types)) {
         $error = array(
             'error_code' => 'unsupported-type',
             'session_type' => 'DH-SHA1',
@@ -323,14 +321,18 @@ function simpleid_associate($request) {
  * association data for storage.
  */
 function _simpleid_create_association($mode = CREATE_ASSOCIATION_DEFAULT, $assoc_type = 'HMAC-SHA1', $session_type = 'no-encryption', $dh_modulus = NULL, $dh_gen = NULL, $dh_consumer_public = NULL) {
-    $secret_size = array('HMAC-SHA1' => 20, 'HMAC-SHA256' => 32);
-    $hmac_funcs = array('HMAC-SHA1' => '_openid_hmac_sha1', 'HMAC-SHA256' => '_openid_hmac_sha256');
-    $hash_funcs = array('DH-SHA1' => '_openid_sha1', 'DH-SHA256' => '_openid_sha256');
+    global $version;
+    
+    $assoc_types = openid_association_types();
+    $session_types = openid_session_types($version);
+    
+    $mac_size = $assoc_types[$assoc_type]['mac_size'];
+    $hmac_func = $assoc_types[$assoc_type]['hmac_func'];
     
     $assoc_handle = dechex(intval(time())) . bin2hex(_openid_get_bytes(4));
     $expires_in = SIMPLEID_ASSOC_EXPIRES_IN;
     
-    $secret = _openid_get_bytes($secret_size[$assoc_type]);
+    $secret = _openid_get_bytes($mac_size);
     
     $response = array(
         'assoc_handle' => $assoc_handle,
@@ -344,10 +346,12 @@ function _simpleid_create_association($mode = CREATE_ASSOCIATION_DEFAULT, $assoc
     if ($session_type != '') $response['session_type'] = $session_type;
     
     if (($session_type == 'no-encryption') || ($session_type == '')) {
-        $mac_key = base64_encode(call_user_func($hmac_funcs[$assoc_type], $secret, $response['assoc_handle']));
+        $mac_key = base64_encode(call_user_func($hmac_func, $secret, $response['assoc_handle']));
         $response['mac_key'] = $mac_key;
     } elseif ($session_type == 'DH-SHA1' || $session_type == 'DH-SHA256') {
-        $dh_assoc = openid_dh_server_assoc($secret, $dh_consumer_public, $dh_modulus, $dh_gen, $hash_funcs[$session_type]);
+        $hash_func = $session_types[$session_type]['hash_func'];
+        
+        $dh_assoc = openid_dh_server_assoc($secret, $dh_consumer_public, $dh_modulus, $dh_gen, $hash_func);
         $mac_key = base64_encode($secret);
         $response['dh_server_public'] = $dh_assoc['dh_server_public'];
         $response['enc_mac_key'] = $dh_assoc['enc_mac_key'];
@@ -430,6 +434,15 @@ function simpleid_checkid($request) {
                 } else {
                     $response = simpleid_checkid_ok($request);
                     return simpleid_rp_form($request, $response);
+                }
+                break;
+            case CHECKID_RETURN_TO_SUSPECT:
+                if ($immediate) {
+                    $response = simpleid_checkid_error($immediate);
+                    return redirect_form($request['openid.return_to'], $response);
+                } else {
+                    $response = simpleid_checkid_ok($request);
+                    return simpleid_rp_form($request, $response, CHECKID_RETURN_TO_SUSPECT);
                 }
                 break;
             case CHECKID_OK:

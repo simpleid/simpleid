@@ -34,6 +34,8 @@
  * @filesource
  */
  
+include_once "bignum.inc";
+ 
 /**
  * Diffie-Hellman Key Exchange Default Value
  */
@@ -370,7 +372,7 @@ function openid_url_matches_realm($url, $realm) {
  */
 function openid_realm_discovery_url($realm) {
     $parts = parse_url($realm);
-    $host = strtr($path['host'], array('*.' => 'www.'));;
+    $host = strtr($parts['host'], array('*.' => 'www.'));;
     
     $url = $parts['scheme'] . '://';
     if (isset($parts['user'])) {
@@ -380,7 +382,7 @@ function openid_realm_discovery_url($realm) {
     }
     $url .= $host;
     if (isset($parts['port'])) $url .= ':' . $parts['port'];
-    $url .= $path;
+    $url .= $parts['path'];
     if (isset($parts['query'])) $url .= '?' . $parts['query'];
     if (isset($parts['fragment'])) $url .= '#' . $parts['fragment'];
     return $url;
@@ -428,6 +430,42 @@ function openid_nonce() {
 /* ------- Diffie-Hellman Key Exchange functions ----------------------------- */
 
 /**
+ * Returns the association types supported by this server.
+ *
+ * @return array an array containing the association types supported by this server as keys
+ * and an array containing the key size (mac_size) and HMAC function (hmac_func) as
+ * values
+ */
+function openid_association_types() {
+    $association_types = array('HMAC-SHA1' => array('mac_size' => 20, 'hmac_func' => '_openid_hmac_sha1'));
+    if (OPENID_SHA256_SUPPORTED) $association_types['HMAC-SHA256'] = array('mac_size' => 32, 'hmac_func' => '_openid_hmac_sha256');
+    return $association_types;
+}
+
+/**
+ * Returns the association types supported by this server and the version of
+ * OpenID.
+ *
+ * OpenID version 1 supports an empty string as the session type.  OpenID version 2
+ * reqires a session type to be sent.
+ *
+ * @param int $version the OpenID version, either OPENID_VERSION_1_1 and OPENID_VERSION_2
+ * @return array an array containing the session types supported by this server as keys
+ * and an array containing the hash function (hash_func) as
+ * values
+ */
+function openid_session_types($version = OPENID_VERSION_2) {
+    $session_types = array(
+        'no-encryption' => array(),
+        'DH-SHA1' => array('hash_func' => '_openid_sha1'),
+    );
+    if (OPENID_SHA256_SUPPORTED) $session_types['DH-SHA256'] = array('hash_func' => '_openid_sha256');
+    if ($version == OPENID_VERSION_1_1) $session_types[''] = array();
+    return $session_types;
+}
+
+
+/**
  * Generates the cryptographic values required for responding to association
  * requests [8.4.2]
  *
@@ -460,38 +498,40 @@ function openid_dh_server_assoc($mac_key, $dh_consumer_public, $dh_modulus = NUL
  * @param string $dh_modulus modulus, in Base64 representation
  * @param string $dh_gen generator, in Base64 representation
  * @return array an array containing: (a) dh_server_public - the server's public
- * key (in Base64) and (b) ZZ - the shared secret (in BCMath)
+ * key (in Base64) and (b) ZZ - the shared secret (as a bignum)
  *
  * @link http://www.ietf.org/rfc/rfc2631.txt RFC 2631
  */
 function openid_dh_generate_public_and_shared_secret($dh_consumer_public, $dh_modulus = NULL, $dh_gen = NULL) {
     // Decode the consumer's public key
-    $y_consumer = _openid_base64_to_string($dh_consumer_public);
+    $y_consumer = _openid_base64_to_bignum($dh_consumer_public);
     
     if ($dh_modulus) {
-        $p = _openid_base64_to_string($dh_modulus);
+        $p = _openid_base64_to_bignum($dh_modulus);
     } else {
-        $p = OPENID_DH_DEFAULT_MOD;
+        //$p = OPENID_DH_DEFAULT_MOD;
+        $p = bignum_new(OPENID_DH_DEFAULT_MOD);
     }
 
     if ($dh_gen) {
-        $g = _openid_base64_to_string($dh_gen);
+        $g = _openid_base64_to_bignum($dh_gen);
     } else {
-        $g = OPENID_DH_DEFAULT_GEN;
+        //$g = OPENID_DH_DEFAULT_GEN;
+        $g = bignum_new(OPENID_DH_DEFAULT_GEN);
     }
 
     // Generate the server's private key - a random number which is less than p
     $rand = _openid_dh_rand($p);
-    $x_server = bcadd($rand, 1);
+    $x_server = bignum_add($rand, 1);
     
     // Server's public key is g ^ private mod p
-    $y_server = bcpowmod($g, $x_server, $p);
+    $y_server = bignum_powmod($g, $x_server, $p);
 
     // Encode the server's public key
-    $dh_server_public = _openid_string_to_base64($y_server);
+    $dh_server_public = _openid_bignum_to_base64($y_server, 256);
 
     // Generate the shared secret = consumer's public ^ server's private mod p = server's public ^ consumer's private mod p
-    $ZZ = bcpowmod($y_consumer, $x_server, $p);
+    $ZZ = bignum_powmod($y_consumer, $x_server, $p);
 
 
     return array(
@@ -503,8 +543,8 @@ function openid_dh_generate_public_and_shared_secret($dh_consumer_public, $dh_mo
 /**
  * Encrypts and encodes the MAC key.
  *
- * @param string $ZZ the Diffie-Hellman key exchange shared secret, in binary representation
- * @param string $secret the secret, in binary representation
+ * @param string $ZZ the Diffie-Hellman key exchange shared secre as a bignum
+ * @param string $mac_key a byte stream containing the MAC key
  * @param string $hash_func the hash function
  * @param string the encrypted MAC key in Base64 representation
  */
@@ -521,14 +561,14 @@ function openid_encrypt_mac_key($ZZ, $mac_key, $hash_func = '_openid_sha1') {
 /**
  * Encrypts/decrypts using XOR.
  *
- * @param string $key the encryption key, in BCMath representation.  This is usually
+ * @param string $key the encryption key as a bignum.  This is usually
  * the shared secret (ZZ) calculated from the Diffie-Hellman key exchange
  * @param string $plain_cipher the plaintext or ciphertext
  * @param string $hash_func the hash function
  * @return string the ciphertext or plaintext
  */
 function _openid_xor($key, $plain_cipher, $hash_func = '_openid_sha1') {
-    $decoded_key = _openid_string_to_bytes($key);
+    $decoded_key = bignum_val($key, 256);
     $hashed_key = call_user_func($hash_func, $decoded_key);
     
     $cipher_plain = "";
@@ -543,14 +583,14 @@ function _openid_xor($key, $plain_cipher, $hash_func = '_openid_sha1') {
  * Generates a random integer, which will be used to derive a private key
  * for Diffie-Hellman key exchange.  The integer must be less than $stop
  *
- * @param string $stop a prime number, in binary representation
- * @param string the random integer, in BCMath representation
+ * @param resource $stop a prime number as a bignum
+ * @param resource the random integer as a bignum
  */
 function _openid_dh_rand($stop) {
     static $duplicate_cache = array();
   
     // Used as the key for the duplicate cache
-    $rbytes = _openid_string_to_bytes($stop);
+    $rbytes = bignum_val($stop, 256);
   
     if (array_key_exists($rbytes, $duplicate_cache)) {
         list($duplicate, $nbytes) = $duplicate_cache[$rbytes];
@@ -561,11 +601,11 @@ function _openid_dh_rand($stop) {
             $nbytes = strlen($rbytes);
         }
     
-        $mxrand = bcpow(256, $nbytes);
+        $mxrand = bignum_pow(bignum_new(256), $nbytes);
 
         // If we get a number less than this, then it is in the
         // duplicated range.
-        $duplicate = bcmod($mxrand, $stop);
+        $duplicate = bignum_mod($mxrand, $stop);
 
         if (count($duplicate_cache) > 10) {
             $duplicate_cache = array();
@@ -576,23 +616,22 @@ function _openid_dh_rand($stop) {
   
     do {
         $bytes = "\x00" . _openid_get_bytes($nbytes);
-        $n = _openid_bytes_to_string($bytes);
+        $n = bignum_new($bytes, 256);
         // Keep looping if this value is in the low duplicated range
-    } while (bccomp($n, $duplicate) < 0);
+    } while (bignum_cmp($n, $duplicate) < 0);
 
-    return bcmod($n, $stop);
+    return bignum_mod($n, $stop);
 }
 
 /* ------- Arbitary precision arithmetic and conversion functions ------------ */
 /**
- * Converts an arbitary precision integer, encoded in Base64, to an ordinary
- * string
+ * Converts an arbitary precision integer, encoded in Base64, to a bignum
  *
  * @param string $str arbitary precision integer, encoded in Base64
- * @return string the string representation
+ * @return resource the string representation
  */
-function _openid_base64_to_string($str) {
-    return _openid_bytes_to_string(base64_decode($str));
+function _openid_base64_to_bignum($str) {
+    return bignum_new(base64_decode($str), 256);
 }
 
 /**
@@ -602,63 +641,8 @@ function _openid_base64_to_string($str) {
  * @param string $str the string representation
  * @return string the Base64 encoded arbitary precision integer
  */
-function _openid_string_to_base64($str) {
-    return base64_encode(_openid_string_to_bytes($str));
-}
-
-/**
- * Converts an arbitary precision integer to an ordinary string
- *
- * @param string $str the arbitary precision integer as a stream of bytes
- * @param string the string representation
- */
-function _openid_bytes_to_string($byte_stream) {
-    $bytes = array_merge(unpack('C*', $byte_stream));
-
-    $str = 0;
-  
-    foreach ($bytes as $byte) {
-        $str = bcmul($str, pow(2, 8));
-        $str = bcadd($str, $byte);
-    }
-
-    return $str;
-}
-
-/**
- * Converts an a string representation of an integer to an arbitary precision
- * integer, as a stream of bytes
- *
- * @param string $long the string representation
- * @param string the arbitary precision integer as a stream of bytes
- */
-function _openid_string_to_bytes($str) {
-    $cmp = bccomp($str, 0);
-    if ($cmp < 0) {
-        return FALSE;
-    }
-
-    if ($cmp == 0) {
-        return "\x00";
-    }
-
-    $bytes = array();
-  
-    while (bccomp($str, 0) > 0) {
-        array_unshift($bytes, bcmod($str, 256));
-        $str = bcdiv($str, pow(2, 8));
-    }
-  
-    if ($bytes && ($bytes[0] > 127)) {
-        array_unshift($bytes, 0);
-    }
-  
-    $byte_stream = '';
-    foreach ($bytes as $byte) {
-        $byte_stream .= pack('C', $byte);
-    }
-  
-    return $byte_stream;
+function _openid_bignum_to_base64($str) {
+    return base64_encode(bignum_val($str, 256));
 }
 
 /**
@@ -780,23 +764,5 @@ if (function_exists('hash_hmac') && function_exists('hash_algos') && (in_array('
     define('OPENID_SHA256_SUPPORTED', false);
 }
 
-
-
-// Provide bcpowmod support for PHP4
-if (!function_exists('bcpowmod')) {
-    /** @ignore */
-    function bcpowmod($base, $exp, $mod) {
-        $square = bcmod($base, $mod);
-        $result = 1;
-        while (bccomp($exp, 0) > 0) {
-            if (bcmod($exp, 2)) {
-                $result = bcmod(bcmul($result, $square), $mod);
-            }
-            $square = bcmod(bcmul($square, $square), $mod);
-            $exp = bcdiv($exp, 2);
-        }
-        return $result;
-    }
-}
 
 ?>
