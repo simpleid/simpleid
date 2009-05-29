@@ -57,10 +57,12 @@ define('XRD_OPENID_NS', 'http://openid.net/xmlns/1.0');
  * services.
  *
  * @param string $identifier the identifier
+ * @param bool $openid if true, performs additional discovery of OpenID services
+ * by looking for link elements within the discovered document
  * @param array an array of discovered services, or an empty array if no services
  * are found
  */
-function discovery_get_services($identifier) {
+function discovery_get_services($identifier, $openid = FALSE) {
     $identifier = discovery_normalize($identifier);
     $url = discovery_get_url($identifier);
     
@@ -69,6 +71,7 @@ function discovery_get_services($identifier) {
     if ($xrds) {
         return discovery_parse_xrds($xrds);
     } else {
+        if ($openid) return discovery_get_openid_services($url);
         return array();
     }
 }
@@ -235,6 +238,50 @@ function discovery_parse_xrds($xrds) {
 }
 
 /**
+ * Obtains the OpenID services for particular identifier by scanning for link
+ * elements in the returned document.
+ *
+ * Note that this function does not use the YADIS protocol to scan for services.
+ * To use the YADIS protocol, use {@link discovery_get_services()}.
+ *
+ * @param string $url the URL
+ * @param array an array of discovered services, or an empty array if no services
+ * are found
+ */
+function discovery_get_openid_services($url) {
+    $services = array();
+        
+    $response = http_request($url);
+    $html = $response['data'];
+        
+    $uri = _discovery_link_rel('openid2.provider', $html);
+    $delegate = _discovery_link_rel('openid2.local_id', $html);
+    
+    if ($uri) {
+        $service = array(
+            'type' => 'http://specs.openid.net/auth/2.0/signon',
+            'uri' => $uri
+            );
+        if ($delegate) $service['localid'] = $delegate;
+        $services[] = $service;
+    }
+
+    $uri = _discovery_link_rel('openid.server', $html);
+    $delegate = _discovery_link_rel('openid.delegate', $html);
+        
+    if ($uri) {
+        $service = array(
+            'type' => 'http://openid.net/signon/1.0',
+            'uri' => $uri
+            );
+        if ($delegate) $service['localid'] = $delegate;
+        $services[] = $service;
+    }
+    
+    return $services;
+}
+
+/**
  * Searches through an HTML document to obtain the value of a meta
  * element with a specified http-equiv attribute.
  *
@@ -250,6 +297,25 @@ function _discovery_meta_httpequiv($equiv, $html) {
         if (isset($content[1])) {
             return $content[1];
         }
+    }
+    return FALSE;
+}
+
+/**
+ * Searches through an HTML document to obtain the value of a link
+ * element with a specified rel attribute.
+ *
+ * @param string $equiv the rel attribute for which to search
+ * @param string $html the HTML document to search
+ * @return mixed the href of the link element, or FALSE if the element is not
+ * found
+ */
+function _discovery_link_rel($rel, $html) {
+    $rel = preg_quote($rel);
+    preg_match('|<link\s+rel=["\'](.*)'. $rel .'(.*)["\'](.*)/?>|iUs', $html, $matches);
+    if (isset($matches[3])) {
+        preg_match('|href=["\']([^"]+)["\']|iU', $matches[3], $href);
+        return trim($href[1]);
     }
     return FALSE;
 }
