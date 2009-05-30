@@ -81,12 +81,12 @@ function openid_get_version($request, $key = 'openid.ns') {
  *
  * The response will be encoded using Key-Value Form Encoding. [4.1.1]
  *
- * @param mixed $data the data in the response
+ * @param array $data the data in the response
  * @param int $version the message version
  * @return string the message in key-value form encoding
  */
 function openid_direct_message($data, $version = OPENID_VERSION_2) {
-    $encoded = '';
+    $message = '';
     if ($version == OPENID_VERSION_2) {
         $data['ns'] = OPENID_NS_2_0;
     }
@@ -102,9 +102,9 @@ function openid_direct_message($data, $version = OPENID_VERSION_2) {
         if (strpos($value, "\n") !== false) {
             return null;
         }
-        $encoded .= "$key:$value\n";
+        $message .= "$key:$value\n";
     }
-    return $encoded;
+    return $message;
 }
 
 /**
@@ -124,9 +124,9 @@ function openid_direct_response($message, $status = '200 OK') {
  *
  * The response will be encoded using HTTP Encoding. [4.1.2]
  *
- * @param mixed $data the data in the response
+ * @param array $data the data in the response
  * @param int $version the message version
- * @return mixed the message
+ * @return array the message
  */
 function openid_indirect_message($data, $version = OPENID_VERSION_2) {
     if ($version == OPENID_VERSION_2) {
@@ -139,7 +139,8 @@ function openid_indirect_message($data, $version = OPENID_VERSION_2) {
  * Sends an indirect response to a URL.
  *
  * @param string $url the URL to which the response is to be sent
- * @param mixed $message an OpenID message
+ * @param mixed $message an OpenID message, which can either be an array of keys
+ * and values, or a URL-encoded query string
  * @param string $response_func the method by which the indirect response is to
  * be sent, either openid_indirect_response_form or openid_indirect_response_redirect
  */
@@ -162,11 +163,14 @@ function openid_indirect_response_redirect($url, $message) {
 /**
  * Encodes an indirect message into a URL
  * @param string $url the URL to which the response is to be sent
- * @param mixed $message an OpenID message
+ * @param mixed $message an OpenID message, which can either be an array of keys
+ * and values, or a URL-encoded query string
  * @return string the URL to which the response is to be sent, with the
  * encoded message
  */
 function openid_indirect_response_url($url, $message) {
+    $query = '';
+    
     if (is_array($message)) {
         $pairs = array();
         
@@ -174,19 +178,19 @@ function openid_indirect_response_url($url, $message) {
             $pairs[] = urlencode($key) . '=' . urlencode($value);
         }
         
-        $encoded_message = implode('&', $pairs);
+        $query = implode('&', $pairs);
     } else {
-        $encoded_message = $message;
+        $query = $message;
     }    
     
-    return $url . '?' . $encoded_message;
+    return $url . (($query) ? '?' . $encoded_message : '');
 }
 
 /**
  * Sends an indirect message via an HTML form
  *
  * @param string $url the URL to which the response is to be sent
- * @param mixed $message an OpenID message
+ * @param array $message an OpenID message
  */
 function openid_indirect_response_form($url, $message) {
     $html = '<?xml version="1.0" encoding="utf-8"?>
@@ -265,6 +269,28 @@ function openid_get_realm($request, $version) {
     return $realm;
 }
 
+/**
+ * Parses a direct message.
+ *
+ * @param string $message the direct message to parse
+ * @return array an array containing the parsed key-value pairs
+ *
+ * @since 0.7
+ */
+function openid_parse_direct_message($message) {
+    $data = array();
+
+    $items = explode("\n", $message);
+    foreach ($items as $item) {
+        $parts = explode(':', $item, 2);
+
+        if (count($parts) == 2) {
+            $data[$parts[0]] = $parts[1];
+        }
+    }
+
+    return $data;
+}
 
 /**
  * Fix PHP's handling of POST data.  PHP changes dots in keys of
@@ -306,7 +332,7 @@ function openid_fix_post(&$post) {
 }
 
 /**
- * Determine whether a URL matches a realm.
+ * Determines whether a URL matches a realm.
  *
  * A URL matches a realm if:
  *
@@ -329,7 +355,7 @@ function openid_url_matches_realm($url, $realm) {
     $realm = parse_url($realm);
     
     if (array_key_exists('user', $url) || array_key_exists('pass', $url) || array_key_exists('fragment', $url)) return false;
-    if (array_key_exists('user', $realm) || array_key_exists('pass', $realm) || array_key_exists('fragment', $realm)) return false;    
+    if (array_key_exists('user', $realm) || array_key_exists('pass', $realm) || array_key_exists('fragment', $realm)) return false;
     
     if ($url['scheme'] != $realm['scheme']) return false;
     
@@ -396,7 +422,7 @@ function openid_realm_discovery_url($realm) {
  * @param int $num_bytes the number of bytes to generate
  * @return string a string containing random bytes
  */
-function _openid_get_bytes($num_bytes) {
+function openid_random($num_bytes) {
     static $f = null;
     $bytes = '';
     if ($f === null) {
@@ -424,7 +450,7 @@ function _openid_get_bytes($num_bytes) {
  * @return string an OpenID nonce
  */
 function openid_nonce() {
-    return gmstrftime('%Y-%m-%dT%H:%M:%SZ') . bin2hex(_openid_get_bytes(4));
+    return gmstrftime('%Y-%m-%dT%H:%M:%SZ') . bin2hex(openid_random(4));
 }
 
 /* ------- Diffie-Hellman Key Exchange functions ----------------------------- */
@@ -615,7 +641,7 @@ function _openid_dh_rand($stop) {
     }
   
     do {
-        $bytes = "\x00" . _openid_get_bytes($nbytes);
+        $bytes = "\x00" . openid_random($nbytes);
         $n = bignum_new($bytes, 256);
         // Keep looping if this value is in the low duplicated range
     } while (bignum_cmp($n, $duplicate) < 0);
@@ -657,37 +683,34 @@ function _openid_btwoc($num) {
 }
 
 /* ------- Hash and HMAC functions ------------------------------------------- */
-
 /**
- * Sign certain keys in a message
+ * Calculates a signature of an OpenID message
  *
- * @param mixed $association the association containing the signature information
- * @param array $message_array array of entire message about to be sent
- * @param array $keys_to_sign keys in the message to include in signature (without
- * 'openid.' appended)
+ * @param array $data the data in the message
+ * @param array $keys a list of keys in the message to be signed (without the
+ * 'openid.' prefix)
+ * @param string $mac_key the MAC key used to sign the message, in Base64 representation
+ * @param string $hmac_func the HMAC function used in the signing process 
  * @return string the signature encoded in Base64
  */
-function _openid_signature($association, $message_array, $keys_to_sign) {
-    $hmac_funcs = array('HMAC-SHA1' => '_openid_hmac_sha1', 'HMAC-SHA256' => '_openid_hmac_sha256');
-    
-    $hmac_func = $hmac_funcs[$association['assoc_type']];
-    
+function openid_sign($data, $keys, $mac_key, $hmac_func = '_openid_hmac_sha1') {
     $signature = '';
     $sign_data = array();
 
-    foreach ($keys_to_sign as $key) {
-        if (isset($message_array['openid.' . $key])) {
-            $sign_data[$key] = $message_array['openid.' . $key];
+    foreach ($keys as $key) {
+        if (array_key_exists('openid.' . $key, $data)) {
+            $sign_data[$key] = $data['openid.' . $key];
         }
     }
-
+    
     // We set OPENID_VERSION_1_1 because we don't want to sign the namespace header
     $message = openid_direct_message($sign_data, OPENID_VERSION_1_1);
-    $secret = base64_decode($association['mac_key']);
+    $secret = base64_decode($mac_key);
     $signature = call_user_func($hmac_func, $secret, $message);
 
     return base64_encode($signature);
 }
+
 
 /**
  * Obtains the SHA1 hash of a string in binary representation.

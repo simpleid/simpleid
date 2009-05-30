@@ -329,10 +329,10 @@ function _simpleid_create_association($mode = CREATE_ASSOCIATION_DEFAULT, $assoc
     $mac_size = $assoc_types[$assoc_type]['mac_size'];
     $hmac_func = $assoc_types[$assoc_type]['hmac_func'];
     
-    $assoc_handle = dechex(intval(time())) . bin2hex(_openid_get_bytes(4));
+    $assoc_handle = dechex(intval(time())) . bin2hex(openid_random(4));
     $expires_in = SIMPLEID_ASSOC_EXPIRES_IN;
     
-    $secret = _openid_get_bytes($mac_size);
+    $secret = openid_random($mac_size);
     
     $response = array(
         'assoc_handle' => $assoc_handle,
@@ -691,7 +691,11 @@ function simpleid_sign(&$response, $assoc_handle = NULL) {
     $response['openid.signed'] = implode(',', $to_sign);
   
     // Generate signature for this message
-    $response['openid.sig'] = _openid_signature($assoc, $response, $to_sign);
+    $mac_key = $assoc['mac_key'];
+    $assoc_types = openid_association_types();
+    $hmac_func = $assoc_types[$assoc['assoc_type']]['hmac_func'];
+    
+    $response['openid.sig'] = openid_sign($response, $to_sign, $mac_key, $hmac_func);
     return $response;
 }
 
@@ -711,8 +715,12 @@ function simpleid_authenticate($request) {
     if (!$assoc || !$assoc['assoc_type']) {
         $is_valid = FALSE;
     } else {
+        $mac_key = $assoc['mac_key'];
+        $assoc_types = openid_association_types();
+        $hmac_func = $assoc_types[$assoc['assoc_type']]['hmac_func'];
+        
         $signed_keys = explode(',', $request['openid.signed']);
-        $signature = _openid_signature($assoc, $request, $signed_keys);
+        $signature = openid_sign($response, $to_sign, $mac_key, $hmac_func);
         if ($signature != $request['openid.sig']) $is_valid = FALSE;
     }
 
