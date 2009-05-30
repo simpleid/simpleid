@@ -183,7 +183,7 @@ function openid_indirect_response_url($url, $message) {
         $query = $message;
     }    
     
-    return $url . (($query) ? '?' . $encoded_message : '');
+    return $url . (($query) ? '?' . $query : '');
 }
 
 /**
@@ -282,11 +282,34 @@ function openid_parse_direct_message($message) {
 
     $items = explode("\n", $message);
     foreach ($items as $item) {
-        $parts = explode(':', $item, 2);
+        list ($key, $value) = explode(':', $item, 2);
+        $data[$key] = $value;
+    }
 
-        if (count($parts) == 2) {
-            $data[$parts[0]] = $parts[1];
-        }
+    return $data;
+}
+
+/**
+ * Parses a query string.
+ *
+ * Query strings can be used to receive OpenID indirect messages.
+ *
+ * @param string $query the query string to parse
+ * @return array an array containing the parsed key-value pairs
+ *
+ * @since 0.7
+ */
+function openid_parse_query($query) {
+    $data = array();
+    
+    if ($query === NULL) return array();
+    if ($query === '') return array();
+    
+    $pairs = explode('&', $query);
+    
+    foreach ($pairs as $pair) {
+        list ($key, $value) = explode('=', $pair, 2);
+        $data[$key] = urldecode($value);
     }
 
     return $data;
@@ -414,6 +437,57 @@ function openid_realm_discovery_url($realm) {
     return $url;
 }
 
+/**
+ * Verifies a return_to URL against the actual URL of the HTTP request.
+ *
+ * The return_to URL matches if:
+ *
+ * - The URL scheme, authority, and path are the same; and
+ * - Any query parameters that are present in the return_to URL are also present
+ *   with the same values in the actual request.
+ *
+ * @param string $return_to the URL specified in the openid.return_to parameter
+ * @param string $actual_url the actual URL requested
+ * @return bool true if the URLs match
+ *
+ * @since 0.7
+ */
+function openid_verify_return_to($return_to, $actual_url) {
+    $expected = parse_url($return_to);
+    $actual = parse_url($actual_url);
+    
+    // Schemes are case insensitive
+    if (strtoupper($expected['scheme']) != strtoupper($actual['scheme'])) return false;
+    
+    // Hosts are case insensitive
+    if (strtoupper($expected['host']) != strtoupper($actual['host'])) return false;
+    
+    if ((!array_key_exists('port', $expected)) && (!array_key_exists('port', $actual))) {
+        $expected['port'] = '';
+        $actual['port'] = '';
+    }
+    
+    if ($expected['port'] != $actual['port']) return false;
+    
+    if ((!array_key_exists('path', $expected)) && (!array_key_exists('path', $actual))) {
+        $expected['path'] = '';
+        $actual['path'] = '';
+    }
+    if ($expected['path'] != $actual['path']) return false;
+    
+    if ($expected['query']) {
+        $expected_query = openid_parse_query($expected['query']);
+        $actual_query = openid_parse_query($actual['query']);
+        
+        foreach ($expected_query as $key => $value) {            
+            if (!array_key_exists($key, $actual_query)) return false;
+            if ($value != $actual_query[$key]) return false;
+        }
+    }
+    
+    return true;
+}
+
 /* ------- Random byte and nonce functions ----------------------------------- */
 /**
  * Obtains a number of random bytes.  This function uses an entropy source specified
@@ -445,7 +519,7 @@ function openid_random($num_bytes) {
 }
 
 /**
- * Obtains a nonce [10.1]
+ * Generates a nonce [10.1]
  *
  * @return string an OpenID nonce
  */
@@ -490,92 +564,131 @@ function openid_session_types($version = OPENID_VERSION_2) {
     return $session_types;
 }
 
-
 /**
  * Generates the cryptographic values required for responding to association
- * requests [8.4.2]
+ * requests [8.4.2].
+ *
+ * This involves generating a key pair for the OpenID provider, then calculating
+ * the shared secret.  The shared secret is then used to encrypt the MAC key.
  *
  * @param string $mac_key the MAC key, in binary representation
  * @param string $dh_consumer_public the consumer's public key, in Base64 representation
  * @param string $dh_modulus modulus - a large prime number
  * @param string $dh_gen generator - a primitive root modulo
  * @param string $hash_func the hash function
- * @return array an array containing the server's public key (in Base64), and encrypted MAC key
- * (in Base64), encrypted using the Diffie-Hellman shared secret
+ * @return array an array containing (a) dh_server_public - the server's public key (in Base64), and (b)
+ * enc_mac_key encrypted MAC key (in Base64), encrypted using the Diffie-Hellman shared secret
  */
 function openid_dh_server_assoc($mac_key, $dh_consumer_public, $dh_modulus = NULL, $dh_gen = NULL, $hash_func = '_openid_sha1') {
-    $shared = openid_dh_generate_public_and_shared_secret($dh_consumer_public, $dh_modulus, $dh_gen);
+    
+    // Generate a key pair for the server
+    $key_pair = openid_dh_generate_key_pair($dh_modulus, $dh_gen);
+    
+    // Generate the shared secret
+    $ZZ = openid_dh_shared_secret($dh_consumer_public, $key_pair['private'], $dh_modulus);
 
     return array(
-        'dh_server_public' => $shared['dh_server_public'],
-        'enc_mac_key' => openid_encrypt_mac_key($shared['ZZ'], $mac_key, $hash_func)
+        'dh_server_public' => $key_pair['public'],
+        'enc_mac_key' => openid_encrypt_mac_key($ZZ, $mac_key, $hash_func)
     );
 }
 
 /**
- * Generates a public key and a shared secret for Diffie-Hellman key exchange.
+ * Complete association by obtaining the session MAC key from the key obtained
+ * from the Diffie-Hellman key exchange
+ *
+ * @param string $enc_mac_key the encrypted session MAC key, in Base64 represnetation
+ * @param string $dh_server_public the server's public key, in Base64 representation
+ * @param string $dh_consumer_private the consumer's private key, in Base64 representation
+ * @param string $dh_modulus modulus - a large prime number
+ * @param string $hash_func the hash function
+ * @return string the decrypted session MAC key, in Base64 representation
+ */
+function openid_dh_consumer_assoc($enc_mac_key, $dh_server_public, $dh_consumer_private, $dh_modulus = NULL, $hash_func = '_openid_sha1') {
+    // Retrieve the shared secret
+    $ZZ = openid_dh_shared_secret($dh_server_public, $dh_consumer_private, $dh_modulus);
+    
+    // Decode the encrypted MAC key
+    $encrypted_mac_key = base64_decode($enc_mac_key);
+    
+    return openid_encrypt_mac_key($ZZ, $encrypted_mac_key, $hash_func);
+}
+
+/**
+ * Calculates the shared secret for Diffie-Hellman key exchange.
  *
  * This is the second step in the Diffle-Hellman key exchange process.  The other
  * party (in OpenID 1.0 terms, the consumer) has already generated the public
  * key ($dh_consumer_public) and sent it to this party (the server).  The Diffie-Hellman
  * modulus ($dh_modulus) and generator ($dh_gen) have either been sent or previously agreed.
  *
- * @param string $dh_consumer_public the consumer's public key, in Base64 representation
+ * @param string $their_public the other party's public key, in Base64 representation
+ * @param string $my_private this party's private key, in Base64 representation
  * @param string $dh_modulus modulus, in Base64 representation
- * @param string $dh_gen generator, in Base64 representation
- * @return array an array containing: (a) dh_server_public - the server's public
- * key (in Base64) and (b) ZZ - the shared secret (as a bignum)
+ * @return resource the shared secret (as a bignum)
  *
+ * @see openid_dh_generate_key_pair()
  * @link http://www.ietf.org/rfc/rfc2631.txt RFC 2631
  */
-function openid_dh_generate_public_and_shared_secret($dh_consumer_public, $dh_modulus = NULL, $dh_gen = NULL) {
-    // Decode the consumer's public key
-    $y_consumer = _openid_base64_to_bignum($dh_consumer_public);
+function openid_dh_shared_secret($their_public, $my_private, $dh_modulus = NULL) {
+    // Decode the keys
+    $y = _openid_base64_to_bignum($their_public);
+    $x = _openid_base64_to_bignum($my_private);
     
-    if ($dh_modulus) {
+    if ($dh_modulus != NULL) {
         $p = _openid_base64_to_bignum($dh_modulus);
     } else {
-        //$p = OPENID_DH_DEFAULT_MOD;
         $p = bignum_new(OPENID_DH_DEFAULT_MOD);
     }
 
-    if ($dh_gen) {
-        $g = _openid_base64_to_bignum($dh_gen);
-    } else {
-        //$g = OPENID_DH_DEFAULT_GEN;
-        $g = bignum_new(OPENID_DH_DEFAULT_GEN);
-    }
+    // Generate the shared secret = their public ^ my private mod p = my public ^ their private mod p
+    $ZZ = bignum_powmod($y, $x, $p);
 
-    // Generate the server's private key - a random number which is less than p
-    $rand = _openid_dh_rand($p);
-    $x_server = bignum_add($rand, 1);
-    
-    // Server's public key is g ^ private mod p
-    $y_server = bignum_powmod($g, $x_server, $p);
-
-    // Encode the server's public key
-    $dh_server_public = _openid_bignum_to_base64($y_server, 256);
-
-    // Generate the shared secret = consumer's public ^ server's private mod p = server's public ^ consumer's private mod p
-    $ZZ = bignum_powmod($y_consumer, $x_server, $p);
-
-
-    return array(
-        'dh_server_public' => $dh_server_public,
-        'ZZ' => $ZZ
-    );
+    return $ZZ;
 }
 
 /**
- * Encrypts and encodes the MAC key.
+ * Generates a key pair for Diffie-Hellman key exchange.
  *
- * @param string $ZZ the Diffie-Hellman key exchange shared secre as a bignum
+ * @param string $dh_modulus modulus, in Base64 representation
+ * @param string $dh_gen generator, in Base64 representation
+ * @return array an array containing: (a) private - the private key, in Base64
+ * and (b) public - the public key, in Base64
+ */
+function openid_dh_generate_key_pair($dh_modulus = NULL, $dh_gen = NULL) {
+    if ($dh_modulus != NULL) {
+        $p = _openid_base64_to_bignum($dh_modulus);
+    } else {
+        $p = bignum_new(OPENID_DH_DEFAULT_MOD);
+    }
+
+    if ($dh_gen != NULL) {
+        $g = _openid_base64_to_bignum($dh_gen);
+    } else {
+        $g = bignum_new(OPENID_DH_DEFAULT_GEN);
+    }
+
+    // Generate the private key - a random number which is less than p
+    $rand = _openid_dh_rand($p);
+    $x = bignum_add($rand, 1);
+    
+    // Calculate the public key is g ^ private mod p
+    $y = bignum_powmod($g, $x, $p);
+    
+    return array('private' => _openid_bignum_to_base64($x), 'public' => _openid_bignum_to_base64($y));
+}
+
+
+/**
+ * Encrypts/decrypts and encodes the MAC key.
+ *
+ * @param resource $ZZ the Diffie-Hellman key exchange shared secre as a bignum
  * @param string $mac_key a byte stream containing the MAC key
  * @param string $hash_func the hash function
  * @param string the encrypted MAC key in Base64 representation
  */
 function openid_encrypt_mac_key($ZZ, $mac_key, $hash_func = '_openid_sha1') {
-    // Encrypt the MAC key using the shared secret and the hash function
+    // Encrypt/decrypt the MAC key using the shared secret and the hash function
     $encrypted_mac_key = _openid_xor($ZZ, $mac_key, $hash_func);
     
     // Encode the encrypted MAC key
