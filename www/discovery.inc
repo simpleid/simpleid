@@ -305,7 +305,7 @@ function _discovery_meta_httpequiv($equiv, $html) {
  * Searches through an HTML document to obtain the value of a link
  * element with a specified rel attribute.
  *
- * @param string $equiv the rel attribute for which to search
+ * @param string $rel the rel attribute for which to search
  * @param string $html the HTML document to search
  * @return mixed the href of the link element, or FALSE if the element is not
  * found

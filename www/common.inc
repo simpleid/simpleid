@@ -164,7 +164,7 @@ function simpleid_url($query = '') {
 /**
  * Obtains a form token given a form ID.
  *
- * Form tokens are used in SimpleID forms to guard against cross-site forgary
+ * Form tokens are used in SimpleID forms to guard against cross-site forgery
  * attacks.
  *
  * @param string $id the form ID

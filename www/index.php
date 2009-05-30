@@ -720,7 +720,7 @@ function simpleid_authenticate($request) {
         $hmac_func = $assoc_types[$assoc['assoc_type']]['hmac_func'];
         
         $signed_keys = explode(',', $request['openid.signed']);
-        $signature = openid_sign($response, $to_sign, $mac_key, $hmac_func);
+        $signature = openid_sign($request, $signed_keys, $mac_key, $hmac_func);
         if ($signature != $request['openid.sig']) $is_valid = FALSE;
     }
 
