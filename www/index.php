@@ -151,9 +151,12 @@ function simpleid_start() {
 }
 
 function simpleid_index() {
+    header('Vary: Accept');
     if (isset($_REQUEST['openid.mode'])) {
         simpleid_process_openid($_REQUEST);
         return;
+    } elseif (stristr($_SERVER['HTTP_ACCEPT'], 'application/xrds+xml')) {
+        simpleid_xrds();
     } else {
         // Point to SimpleID's XRDS document
         header('X-XRDS-Location: ' . simpleid_url('q=xrds'));

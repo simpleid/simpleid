@@ -356,15 +356,22 @@ function user_public_page($uid = NULL) {
             header('Status: 500');
             set_message('User <strong>' . htmlspecialchars($uid, ENT_QUOTES, 'UTF-8') . '</strong> not found.');
         } else {
-            header('X-XRDS-Location: ' . simpleid_url('q=xrds/' . $uid));
+            header('Vary: Accept');
             
-            set_message('This is the user <strong>' . htmlspecialchars($uid, ENT_QUOTES, 'UTF-8') . '</strong>\'s SimpleID page.  It contains hidden information for the use by OpenID consumers.');
-            
-            $xtpl->assign('title', htmlspecialchars($uid, ENT_QUOTES, 'UTF-8'));
-            $xtpl->assign('provider', htmlspecialchars(simpleid_url(), ENT_QUOTES, 'UTF-8'));
-            $xtpl->assign('xrds', htmlspecialchars(simpleid_url('q=xrds/' . rawurlencode($uid)), ENT_QUOTES, 'UTF-8'));
-            if ($user["local_identity"]) {
-                $xtpl->assign('local_id', htmlspecialchars($user["identity"], ENT_QUOTES, 'UTF-8'));
+            if (stristr($_SERVER['HTTP_ACCEPT'], 'application/xrds+xml')) {
+                user_xrds($uid);
+                return;
+            } else {
+                header('X-XRDS-Location: ' . simpleid_url('q=xrds/' . $uid));
+                
+                set_message('This is the user <strong>' . htmlspecialchars($uid, ENT_QUOTES, 'UTF-8') . '</strong>\'s SimpleID page.  It contains hidden information for the use by OpenID consumers.');
+                
+                $xtpl->assign('title', htmlspecialchars($uid, ENT_QUOTES, 'UTF-8'));
+                $xtpl->assign('provider', htmlspecialchars(simpleid_url(), ENT_QUOTES, 'UTF-8'));
+                $xtpl->assign('xrds', htmlspecialchars(simpleid_url('q=xrds/' . rawurlencode($uid)), ENT_QUOTES, 'UTF-8'));
+                if ($user["local_identity"]) {
+                    $xtpl->assign('local_id', htmlspecialchars($user["identity"], ENT_QUOTES, 'UTF-8'));
+                }
             }
         }
     }
