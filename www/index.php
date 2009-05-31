@@ -34,9 +34,7 @@
  * @filesource
  */
  
- 
-define('SIMPLEID_VERSION', 0.7);
- 
+include_once "version.inc";
 include_once "config.inc";
 include_once "config.default.inc";
 include_once "common.inc";
