@@ -57,6 +57,19 @@ define('SIMPLEID_IDENTITIES_DIR', '../identities');
 define('SIMPLEID_CACHE_DIR', '../cache');
 
 /**
+ * Directory to store persistent data.
+ *
+ * This directory must exist and be readable and writable by the
+ * web server.
+ *
+ * For maximum security, it is highly recommended to place this
+ * directory outside your web browser's document root directory, so
+ * that it is not visible to user agents.
+ *
+ */
+define('SIMPLEID_STORE_DIR', '../store');
+
+/**
  * Allows legacy log-in system.
  *
  * Prior to SimpleID 0.6, the login system utilised by SimpleID requires users'

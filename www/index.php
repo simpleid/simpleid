@@ -43,7 +43,7 @@ include_once "openid.inc";
 include_once "discovery.inc";
 include_once "user.inc";
 include_once "cache.inc";
-include_once "filesystem.persistence.inc";
+include_once "filesystem.store.inc";
 
 // Allow for PHP5 version of xtemplate
 if (version_compare(PHP_VERSION, '5.0.0') === 1) {
@@ -180,7 +180,7 @@ function simpleid_autorelease() {
         return;
     }
 
-    $rps = persistence_rp_load_all($user['uid']);
+    $rps =& $user['rps'];
     
     if (isset($_POST['autorelease'])) {
         foreach ($_POST['autorelease'] as $realm => $autorelease) {
@@ -204,7 +204,7 @@ function simpleid_autorelease() {
         }
     }
     
-    persistence_rp_save_all($user['uid'], $rps);
+    user_save($user);
     
     set_message('Your preferences have been saved.');
     user_page();
@@ -515,7 +515,7 @@ function _simpleid_checkid(&$request) {
     }
     
     // Check 3: Discover the realm and match its return_to
-    $rp = persistence_rp_load($uid, $realm);
+    $rp = (isset($user['rp'][$realm])) ? $user['rp'][$realm] : NULL;
     
     if (($version == OPENID_VERSION_2) && SIMPLEID_VERIFY_RETURN_URL_USING_REALM) {
         $url = openid_realm_discovery_url($realm);
@@ -790,7 +790,7 @@ function simpleid_rp_form($request, $response, $reason = CHECKID_APPROVAL_REQUIR
         $xtpl->assign('identity', htmlspecialchars($request['openid.identity'], ENT_QUOTES, 'UTF-8'));
         $xtpl->parse('main.rp.cancel');
     } else {        
-        $rp = persistence_rp_load($user['uid'], $realm);
+        $rp = (isset($user['rp'][$realm])) ? $user['rp'][$realm] : NULL;
         
         $extensions = extension_invoke_all('form', $request, $rp);
         $xtpl->assign('extensions', implode($extensions));
@@ -847,7 +847,20 @@ function simpleid_send() {
         $response = simpleid_checkid_error(false);
         if (!$return_to) set_message('Log in cancelled.');
     } else {
-        persistence_rp_save($uid, $_REQUEST['openid.realm'], array('auto_release' => (isset($_REQUEST['autorelease']) && $_REQUEST['autorelease']) ? 1 : 0));
+        $now = time();
+        $realm = $_REQUEST['openid.realm'];
+        
+        if (isset($user['rp'][$realm])) {
+            $rp = $user['rp'][$realm];
+        } else {
+            $rp = array('realm' => $realm, 'first_time' => $now);
+        }
+        $rp['last_time'] = $now;
+        $rp['auto_release'] = (isset($_REQUEST['autorelease']) && $_REQUEST['autorelease']) ? 1 : 0;
+        
+        $user['rp'][$realm] = $rp;
+        user_save($user);
+        
         $response = simpleid_sign($response, $response['openid.assoc_handle']);
         if (!$return_to) set_message('You were logged in successfully.');
     }

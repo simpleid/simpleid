@@ -85,8 +85,8 @@ function user_init($q = NULL) {
  * @see user_load_from_identity()
  */
 function user_load($uid) {
-    if (persistence_user_exists($uid)) {
-        $user = persistence_user_load($uid);
+    if (store_user_exists($uid)) {
+        $user = store_user_load($uid);
         $user["uid"] = $uid;
         
         if (isset($user["identity"])) {
@@ -111,10 +111,20 @@ function user_load($uid) {
  * @see user_load()
  */
 function user_load_from_identity($identity) {
-    $uid = persistence_uid_from_identity($identity);
+    $uid = store_get_uid($identity);
     if ($uid !== NULL) return user_load($uid);
     
     return NULL;
+}
+
+/**
+ * Stores user data for a specified user name.
+ *
+ * @param array $user the user to save
+ */
+function user_save($user) {
+    $uid = $user['uid'];
+    store_user_save($uid, $user, array('uid', 'identity', 'pass'));
 }
 
 /**
@@ -287,7 +297,7 @@ function user_page() {
     
     user_block();
     
-    $rps = persistence_rp_load_all($user['uid']);
+    $rps = isset($user['rp']) ? $user['rp'] : array();
     
     if ($rps) {
         foreach ($rps as $realm => $rp) {
