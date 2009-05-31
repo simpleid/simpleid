@@ -776,7 +776,9 @@ function simpleid_rp_form($request, $response, $reason = CHECKID_APPROVAL_REQUIR
     global $xtpl;
     global $version;
     
-    user_block(false);
+    $request_state = pickle($request);
+    
+    user_block($request_state);
 
     $realm = openid_get_realm($request, $version);
     
@@ -785,7 +787,7 @@ function simpleid_rp_form($request, $response, $reason = CHECKID_APPROVAL_REQUIR
     $xtpl->assign('realm', htmlspecialchars($realm, ENT_QUOTES, 'UTF-8'));
 
     if ($response['openid.mode'] == 'cancel') {
-        $xtpl->assign('request_state', pickle($request));
+        $xtpl->assign('request_state', $request_state);
         $xtpl->assign('return_to', htmlspecialchars($request['openid.return_to'], ENT_QUOTES, 'UTF-8'));
         $xtpl->assign('identity', htmlspecialchars($request['openid.identity'], ENT_QUOTES, 'UTF-8'));
         $xtpl->parse('main.rp.cancel');

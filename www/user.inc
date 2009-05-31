@@ -421,16 +421,23 @@ function user_xrds($uid = NULL) {
 /**
  * Set up the user block, showing the currently logged in user.
  *
- * @param bool $allow_logout whether to include a logout link
+ * @param string $state the SimpleID state to retain once the user has logged out,
+ * if required.
  */
-function user_block($allow_logout = TRUE) {
+function user_block($state = NULL) {
     global $user;
     global $xtpl;
     
     if ($user != NULL) {
         $xtpl->assign('uid', htmlspecialchars($user['uid'], ENT_QUOTES, 'UTF-8'));
         $xtpl->assign('identity', htmlspecialchars($user['identity'], ENT_QUOTES, 'UTF-8'));
-        if ($allow_logout) $xtpl->assign('logout', '<a href="?q=logout">Logout</a>');
+        if ($state != NULL) {
+            $xtpl->assign('state', '&amp;destination=continue&amp;s=' . urlencode($state));
+            $xtpl->assign('logout', 'Log out and log in as a different user');
+        } else {
+            $xtpl->assign('logout', 'Log out');
+        }
+        $xtpl->parse('main.user.logout');
         $xtpl->parse('main.user');
     }
 }

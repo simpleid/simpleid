@@ -29,7 +29,19 @@
         <div id="update">        
         </div>
         <div id="header">
-            <h1><a href="http://simpleid.sourceforge.net/">SimpleID</a> {version}</h1>
+            <div id="logo">
+                <h1><a href="http://simpleid.sourceforge.net/">SimpleID</a> {version}</h1>
+            </div>
+            <!-- BEGIN: user -->
+            <div class="user">
+                <div class="logged-in-as">
+                    <strong title="{identity}" class="identity">{uid}</strong>
+                <!-- BEGIN: logout -->&middot; <a href="?q=logout{state}">{logout}</a><!-- END: logout -->
+                </div>
+                <div style="clear: both"></div>
+            </div>
+            <!-- END: user -->
+            <div style="clear: both;"></div>
         </div>
         <div id="content">
             <h1>{title}</h1>
@@ -39,14 +51,6 @@
                 <p>{message}</p>
             </div>
             <!-- END: message -->
-            
-            <!-- BEGIN: user -->
-            <div class="user">
-                <p class="logged-in-as">You are logged in as <strong>{uid}</strong> (<strong>{identity}</strong>).</p>
-                <p class="logout">{logout}</p>
-                <div style="clear: both"></div>
-            </div>
-            <!-- END: user -->
             
             <!-- BEGIN: frontpage -->
             <h2>Trusted Sites</h2>

@@ -43,6 +43,10 @@ body {
     border-bottom: none;
 }
 
+#logo {
+    float: left;
+}
+
 #footer {
     margin: 2em 0;
     padding: 0px 10px;
@@ -53,6 +57,7 @@ body {
 
 #content {
     margin: 1em 10px;
+    clear: both;
 }
 
 h1 {
@@ -132,17 +137,27 @@ th {
 }
 .secure p { padding-left: 20px; background: transparent url(lock.png) no-repeat top left; }
 
-.user {
+/*.user {
     border: 1px solid #1144AA;
     background-color: #DDEEFF;
     padding: 0px 10px;
     text-align: right;
+}*/
+.user {
+    float: right;
+    margin: 0.5em 0;
 }
 .logged-in-as {
     padding-left: 20px;
     background: transparent url(user.png) no-repeat top left;
-    float: left;
 }
+.logged-in-as .identity { color: #FFFFFF; }
+.logged-in-as a {
+    color: #FFFFFF;
+    border-bottom-color: #FFFFFF;
+    font-weight: normal;
+}
+
 
 /* Forms */
 .form-item {
@@ -163,8 +178,12 @@ label.option { font-weight: normal; }
 
 .dialog-page #content {
     margin: 50px auto;
-    width: 500px;
+    width: 400px; /* The user experience extension popup's width is 450px */
     padding: 20px;
     border: 10px solid #DDDDDD;
     background: #FFFFFF;
 }
+
+/* User experience extension */
+.ux { background: #EEEEEE; }
+.ux #content { margin: 10px auto; padding: 0; border: 0 }
