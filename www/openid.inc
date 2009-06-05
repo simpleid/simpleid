@@ -65,6 +65,15 @@ define('OPENID_IDENTIFIER_SELECT', 'http://specs.openid.net/auth/2.0/identifier_
 define('OPENID_RETURN_TO', 'http://specs.openid.net/auth/2.0/return_to');
 
 /**
+ * A mapping of Type URIs of OpenID extnesions to aliases provided in an OpenID
+ * request.
+ *
+ * @global array $ns_to_alias
+ */
+$ns_to_alias = array("http://openid.net/extensions/sreg/1.1" => "sreg"); // For sreg 1.0 compatibility
+
+
+/**
  * Detects the OpenID version of the current request
  *
  * @param mixed $request the OpenID request
@@ -324,7 +333,7 @@ function openid_parse_query($query) {
  *
  * @param array &$post the HTTP post data as returned by PHP
  */
-function openid_fix_post(&$post) {
+function openid_parse_request(&$post) {
     global $ns_to_alias;    
     
     foreach ($post as $key => $value) {
@@ -490,6 +499,76 @@ function openid_verify_return_to($return_to, $actual_url) {
     
     return true;
 }
+
+/**
+ * Filters an OpenID request to find keys specific to an extension, as specified
+ * by the Type URI.
+ *
+ * For exmaple, if the extension has the Type URI http://example.com/ and the
+ * alias example, this function will return an array of all the keys in the
+ * OpenID request which starts with openid.example
+ *
+ * @param string $ns the Type URI of the extension
+ * @param array $request the OpenID request
+ * @return array the filtered request, with the prefix (in the example above,
+ * openid.example.) stripped in the keys.
+ */
+function openid_extension_filter_request($ns, $request) {
+    global $ns_to_alias;
+    
+    $alias = $ns_to_alias[$ns];
+    $return = array();
+    
+    if (is_array($request)) {
+        foreach ($request as $key => $value) {
+            if ($key == 'openid.' . $alias) {
+                $return['#default'] = $value;
+            }
+            if (strpos($key, 'openid.' . $alias . '.') === 0) {
+                $return[substr($key, strlen('openid.' . $alias . '.'))] = $value;
+            }
+        }
+    }
+    
+    return $return;
+}
+
+/**
+ * Determines whether an extension is present in an OpenID request.
+ *
+ * @param string $ns the Type URI of the extension
+ * @param array $request the OpenID request
+ * @return bool true if the extension is present in the request
+ */
+function openid_extension_requested($ns, $request) {
+    global $ns_to_alias;
+    
+    $alias = $ns_to_alias[$ns];
+    
+    if (is_array($request)) {
+        foreach ($request as $key => $value) {
+            if ((strpos($key, 'openid.' . $alias . '.') === 0) || (strpos($key, 'openid.' . $alias . '=') === 0)) {
+                return true;
+            }
+        }
+    }
+    
+    return false;
+}
+
+/**
+ * Returns the OpenID alias for an extension, given a Type URI, based on the
+ * alias definitions in the current OpenID request.
+ *
+ * @param string $ns the Type URI
+ * @return string the alias
+ */
+function openid_extension_alias($ns) {
+    global $ns_to_alias;
+    
+    return $ns_to_alias[$ns];
+}
+
 
 /* ------- Random byte and nonce functions ----------------------------------- */
 /**
