@@ -21,6 +21,55 @@
  * $Id$
  */
 
+/**
+ * Simpleweb is a minimalist web framework.  It is similar to {@link http://webpy.org web.py},
+ * but in PHP.
+ *
+ * The key to Simpleweb is the <i>route array</i>.  The route array is an array that maps
+ * URLs (called <i>patterns</i>) to PHP functions or methods (called <i>routes</i>).
+ *
+ * Patterns are regular expressions, which are tested against the URL one at a time.
+ * Subpatterns (i.e. patterns within parentheses) are then passed on as arguments
+ * to the route.
+ *
+ * Routes are either functions, static methods or object methods.  A function is
+ * denoted by the function name.  A static method is denoted by the class name,
+ * followed by :: then the method name.  An object method is denoted by the class
+ * name, followed by -&gt; then the method name.  An instance of the class will be
+ * created before an object method is called.
+ *
+ * An example of a routes array is given below:
+ *
+ * <code>
+ * <?php
+ * $routes = array(
+ *     'a' => 'function1',
+ *     'b/(.+) => 'function2',    // arguments
+ *     'c' => 'ClassA::method',   // static method
+ *     'd' => 'ClassB->method',   // object method
+ * );
+ * ?>
+ * </code>
+ *
+ * Once the route array is populated, the {@link simpleweb_run()} function
+ * is then called to handle the URL.
+ *
+ * @package simpleweb
+ * @since 0.7
+ */
+
+/**
+ * Handles a supplied request, based on a set of routes.
+ *
+ * @param array $routes the routes array, as described in {@link simpleweb.inc this page}
+ * @param string $request_path the request path against which the routes are applied.  If
+ * NULL, then the request URI supplied by the web server will be used.
+ * @param string $not_found_route the default route if none of the patterns match.  If
+ * NULL, then an HTTP 404 error is raised
+ * @return mixed the result from calling the route.
+ *
+ */
+ 
 function simpleweb_run($routes, $request_path = NULL, $not_found_route = NULL) {
     if ($request_path == NULL) {
         // We take the request path from the request URI
@@ -45,8 +94,17 @@ function simpleweb_run($routes, $request_path = NULL, $not_found_route = NULL) {
     }
     
     if ($not_found_route) return _simpleweb_invoke($not_found_route, array($request_path));
+    
+    header('Status: 404');
 }
 
+/**
+ * Invokes a route.
+ *
+ * @param string $route the route
+ * @param array $args the arguments
+ * @return mixed the result from calling the route.
+ */
 function _simpleweb_invoke($route, $args = array()) {
     if (strpos($route, '::') !== false) {
         list($class, $method) = split($route, '::', 2);
