@@ -44,7 +44,7 @@
  * <?php
  * $routes = array(
  *     'a' => 'function1',
- *     'b/(.+) => 'function2',    // arguments
+ *     'b/(.+)' => 'function2',   // arguments
  *     'c' => 'ClassA::method',   // static method
  *     'd' => 'ClassB->method',   // object method
  * );
