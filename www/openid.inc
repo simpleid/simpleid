@@ -181,6 +181,7 @@ function openid_indirect_response_redirect($url, $message) {
  * encoded message
  */
 function openid_indirect_response_url($url, $message) {
+    // 1. Firstly, get the query string
     $query = '';
     
     if (is_array($message)) {
@@ -193,9 +194,28 @@ function openid_indirect_response_url($url, $message) {
         $query = implode('&', $pairs);
     } else {
         $query = $message;
-    }    
+    }
     
-    return $url . (($query) ? '?' . $query : '');
+    // 2. If there is no query string, then we just return the URL
+    if (!$query) return $url;
+    
+    // 3. The URL may already have a query and a fragment.  If this is so, we
+    //    need to slot in the new query string properly.  We disassemble and
+    //    reconstruct the URL.
+    $parts = parse_url($url);
+    
+    $url = $parts['scheme'] . '://';
+    if (isset($parts['user'])) {
+        $url .= $parts['user'];
+        if (isset($parts['pass'])) $url .= ':' . $parts['pass'];
+        $url .= '@';
+    }
+    $url .= $parts['host'];
+    if (isset($parts['port'])) $url .= ':' . $parts['port'];
+    $url .= $parts['path'];
+    $url .= '?' . ((isset($parts['query'])) ? $parts['query'] . '&' : '') . $query;
+    if (isset($parts['fragment'])) $url .= '#' . $parts['fragment'];
+    return $url;
 }
 
 /**
