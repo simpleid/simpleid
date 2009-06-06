@@ -435,7 +435,7 @@ function simpleid_checkid($request) {
     
     if (isset($request['openid.identity'])) {
         // Standard request
-        $result = simpleid_checkid_identity($request);
+        $result = simpleid_checkid_identity($request, $immediate);
     } else {
         // Extension request
         $results = extension_invoke_all('checkid', $request, $immediate);
@@ -507,11 +507,12 @@ function simpleid_checkid($request) {
  * supplied in an OpenID request.
  *
  * @param mixed &$request the OpenID request
+ * @param bool $immediate whether checkid_immediate was used
  * @return int one of CHECKID_OK, CHECKID_APPROVAL_REQUIRED, CHECKID_RETURN_TO_SUSPECT, CHECKID_IDENTITY_NOT_EXIST,
  * CHECKID_IDENTITIES_NOT_MATCHING, CHECKID_LOGIN_REQUIRED or CHECKID_PROTOCOL_ERROR
  * @global array the current logged in user
  */
-function simpleid_checkid_identity(&$request) {
+function simpleid_checkid_identity(&$request, $immediate) {
     global $user, $version;
     
     $realm = openid_get_realm($request, $version);
@@ -573,16 +574,19 @@ function simpleid_checkid_identity(&$request) {
         }
         
         if (!$verified) {
-            return min(array_merge(CHECKID_RETURN_TO_SUSPECT, $assertion_results));
+            $assertion_results[] = CHECKID_RETURN_TO_SUSPECT;
+            return min($assertion_results);
         }
     }
     
     // Check 4: For checkid_immediate, the user must already have given
     // permission to log in automatically.
     if (($rp != NULL) && ($rp['auto_release'] == 1)) {
-        return min(array_merge(CHECKID_OK, $assertion_results));
+        $assertion_results[] = CHECKID_OK;
+        return min($assertion_results);
     } else {
-        return min(array_merge(CHECKID_APPROVAL_REQUIRED, $assertion_results));
+        $assertion_results[] = CHECKID_APPROVAL_REQUIRED;
+        return min($assertion_results);
     }
 }
 
@@ -823,7 +827,7 @@ function simpleid_rp_form($request, $response, $reason = CHECKID_APPROVAL_REQUIR
     $xtpl->assign('realm', htmlspecialchars($realm, ENT_QUOTES, 'UTF-8'));
 
     if ($response['openid.mode'] == 'cancel') {
-        $xtpl->assign('request_state', $request_state);
+        $xtpl->assign('request_state', rawurlencode($request_state));
         $xtpl->assign('return_to', htmlspecialchars($request['openid.return_to'], ENT_QUOTES, 'UTF-8'));
         $xtpl->assign('identity', htmlspecialchars($request['openid.identity'], ENT_QUOTES, 'UTF-8'));
         $xtpl->parse('main.rp.cancel');

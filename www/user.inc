@@ -142,6 +142,22 @@ function user_login() {
     $query = 'q=' . $destination;
     $query .= ($state) ? '&s=' . rawurlencode($state) : '';
     
+    if ($_POST['op'] == 'Cancel') {
+        global $version;
+        
+        $request = unpickle($state);
+        $version = openid_get_version($request);
+        
+        if (isset($request['openid.return_to'])) {
+            $return_to = $request['openid.return_to'];
+            $response = simpleid_checkid_error(FALSE);
+            redirect_form($return_to, $response);
+        } else {
+            indirect_fatal_error('Login cancelled without a proper OpenID request.');
+        }
+        return;
+    }
+    
     if (!$_POST['name'] || ((SIMPLEID_ALLOW_LEGACY_LOGIN && (!$_POST['pass']) && (!$_POST['digest'])) || (!SIMPLEID_ALLOW_LEGACY_LOGIN && (!$_POST['digest'])))) {
         if (isset($_POST['destination'])) {
             // User came from a log in form.
@@ -252,6 +268,11 @@ function user_logout($destination = NULL) {
 function user_login_form($destination = '', $state = NULL) {    
     global $xtpl;
 
+    if ($state) {
+        $xtpl->assign('state', $state);
+        $xtpl->parse('main.login.state');
+    }
+    
     cache_gc(SIMPLEID_LOGIN_NONCE_EXPIRES_IN, 'user-nonce');
     $nonce = openid_nonce();
     cache_set('user-nonce', $nonce, 1);
@@ -272,11 +293,11 @@ function user_login_form($destination = '', $state = NULL) {
         }
     }
     
+
     $xtpl->assign('title', 'Log In');
     $xtpl->assign('page_class', 'dialog-page');
     $xtpl->assign('destination', htmlspecialchars($destination, ENT_QUOTES, 'UTF-8'));
     $xtpl->assign('nonce', htmlspecialchars($nonce, ENT_QUOTES, 'UTF-8'));
-    if ($state) $xtpl->assign('state', $state);
     
     $xtpl->parse('main.login');
     $xtpl->parse('main');
@@ -432,7 +453,7 @@ function user_block($state = NULL) {
         $xtpl->assign('uid', htmlspecialchars($user['uid'], ENT_QUOTES, 'UTF-8'));
         $xtpl->assign('identity', htmlspecialchars($user['identity'], ENT_QUOTES, 'UTF-8'));
         if ($state != NULL) {
-            $xtpl->assign('state', '&amp;destination=continue&amp;s=' . urlencode($state));
+            $xtpl->assign('state', '&amp;destination=continue&amp;s=' . rawurlencode($state));
             $xtpl->assign('logout', 'Log out and log in as a different user');
         } else {
             $xtpl->assign('logout', 'Log out');

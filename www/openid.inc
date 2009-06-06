@@ -188,7 +188,7 @@ function openid_indirect_response_url($url, $message) {
         $pairs = array();
         
         foreach ($message as $key => $value) {
-            $pairs[] = urlencode($key) . '=' . urlencode($value);
+            $pairs[] = $key . '=' . rawurlencode($value);
         }
         
         $query = implode('&', $pairs);

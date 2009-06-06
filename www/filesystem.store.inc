@@ -47,6 +47,13 @@
  * @filesource
  */
 
+/**
+ * This variable is a cache of SimpleID's application settings.  It is populated
+ * progressively as {@link store_get()} is called.
+ *
+ * @global array $settings
+ */
+$settings = array();
 
 /**
  * Returns whether the user name exists in the user store.

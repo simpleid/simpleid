@@ -33,8 +33,10 @@
         {javascript}
     </head>
     <body class="{page_class}">
+        <!-- BEGIN: update -->
         <div id="update">        
         </div>
+        <!-- END: update -->
         <div id="header">
             <div id="logo">
                 <h1><a href="http://simpleid.sourceforge.net/">SimpleID</a> {version}</h1>
@@ -68,7 +70,6 @@
             
             <form action="index.php" method="post" enctype="application/x-www-form-urlencoded" id="login-form">
                 <input type="hidden" name="q" value="login"/><input name="destination" type="hidden" value="{destination}"/>
-                <input type="hidden" name="s" value="{state}"/>
                 <input type="hidden" name="nonce" id="edit-nonce" value="{nonce}" />
                 
                 <input type="hidden" name="digest" id="edit-digest" value="" />
@@ -88,6 +89,10 @@
                     </label>
                 </div>                
                 <input type="submit" name="op" id="edit-submit" value="Log in" class="form-submit" {security_disabled} />
+                <!-- BEGIN: state -->
+                    <input type="submit" name="op" id="edit-cancel" value="Cancel" class="form-submit" />
+                    <input type="hidden" name="s" value="{state}"/>
+                <!-- END: state -->
             </form>
             <!-- END: login -->
             
@@ -130,7 +135,7 @@
                 
                 <p>Your current identity does not match the requested identity <strong>{identity}</strong>.</p>
                 
-                <p><a href="?q=logout">Log out of SimpleID</a> and try again.</p>
+                <p><a href="?q=logout&amp;destination=continue&amp;s={request_state}">Switch to a different user</a> and try again.</p>
                 
                 <input type="submit" name="op" id="edit-cancel" value="Cancel" class="form-submit" />
                 <!-- END: cancel -->                
