@@ -922,6 +922,12 @@ function simpleid_xrds() {
     header('Content-Type: application/xrds+xml');
     header('Content-Disposition: inline; filename=yadis.xml');
     
+    $types = extension_invoke_all('xrds_types');
+    foreach ($types as $type) {
+        $xtpl->assign('uri', htmlspecialchars($type));
+        $xtpl->parse('xrds.op_xrds.type');
+    }
+    
     $xtpl->assign('simpleid_base_url', htmlspecialchars(simpleid_url(), ENT_QUOTES, 'UTF-8'));
     $xtpl->parse('xrds.op_xrds');
     $xtpl->parse('xrds');
