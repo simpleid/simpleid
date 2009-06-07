@@ -217,10 +217,10 @@ function extension_init() {
     global $extensions;
     global $ns_to_extension;
     
-    $extensions = preg_split('/, */', SIMPLEID_EXTENSIONS);
+    $extensions = preg_split('/,\s*/', SIMPLEID_EXTENSIONS);
     
     foreach ($extensions as $extension) {
-        include_once 'extensions/' . $extension . ".extension.inc";
+        include_once 'extensions/' . $extension . '/' . $extension . '.extension.inc';
     }
 }
 
