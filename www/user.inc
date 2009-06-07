@@ -138,7 +138,7 @@ function user_login() {
     if (isset($user["uid"])) openid_indirect_response_redirect(simpleid_url(), 'q=frontpage');
     
     $destination = $_REQUEST['destination'];
-    $state = $_REQUEST['s'];
+    $state = (isset($_REQUEST['s'])) ? $_REQUEST['s'] : '';
     $query = 'q=' . $destination;
     $query .= ($state) ? '&s=' . rawurlencode($state) : '';
     
@@ -293,6 +293,7 @@ function user_login_form($destination = '', $state = NULL) {
         }
     }
     
+    extension_invoke_all('user_login_form', $destination, $state);
 
     $xtpl->assign('title', 'Log In');
     $xtpl->assign('page_class', 'dialog-page');

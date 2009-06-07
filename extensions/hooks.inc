@@ -135,6 +135,18 @@ function hook_signed_fields($response) {
 }
 
 /**
+ * Provides additional form items when displaying the login form
+ * 
+ * @param string $destination he SimpleID location to which the user is directed
+ * if login is successful
+ * @param string $state the current SimpleID state, if required by the location
+ * @see user_login_form()
+ */
+function hook_user_login_form($destination, $state) {
+}
+
+
+/**
  * Provides additional form items when displaying the relying party verification
  * form
  * 
