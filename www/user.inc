@@ -301,6 +301,7 @@ function user_login_form($destination = '', $state = NULL) {
     $xtpl->assign('nonce', htmlspecialchars($nonce, ENT_QUOTES, 'UTF-8'));
     
     $xtpl->parse('main.login');
+    $xtpl->parse('main.framekiller');
     $xtpl->parse('main');
     $xtpl->out('main');
 }

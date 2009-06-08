@@ -844,6 +844,7 @@ function simpleid_rp_form($request, $response, $reason = CHECKID_APPROVAL_REQUIR
     }
     
     $xtpl->parse('main.rp');
+    $xtpl->parse('main.framekiller');
     
     $xtpl->assign('title', 'OpenID Login');
     $xtpl->assign('page_class', 'dialog-page');
