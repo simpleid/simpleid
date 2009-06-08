@@ -640,6 +640,20 @@ function openid_nonce() {
     return gmstrftime('%Y-%m-%dT%H:%M:%SZ') . bin2hex(openid_random(4));
 }
 
+/**
+ * Generates a relatively unique identifier which can be used as, among other things,
+ * an association handle.  The identifier returned is 24 characters long and contains
+ * only hexadecimal characters.
+ *
+ * Note that the identifier returned is not cryptographically secure.
+ *
+ * @return string a relatively unique identifier
+ */
+function openid_handle() {
+    $timeofday = gettimeofday();
+    return vsprintf('%08x%08x', $timeofday) . bin2hex(openid_random(4));
+}
+
 /* ------- Diffie-Hellman Key Exchange functions ----------------------------- */
 
 /**

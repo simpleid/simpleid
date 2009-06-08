@@ -333,7 +333,7 @@ function _simpleid_create_association($mode = CREATE_ASSOCIATION_DEFAULT, $assoc
     $mac_size = $assoc_types[$assoc_type]['mac_size'];
     $hmac_func = $assoc_types[$assoc_type]['hmac_func'];
     
-    $assoc_handle = dechex(intval(time())) . bin2hex(openid_random(4));
+    $assoc_handle = openid_handle();
     $expires_in = SIMPLEID_ASSOC_EXPIRES_IN;
     
     $secret = openid_random($mac_size);
