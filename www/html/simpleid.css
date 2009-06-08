@@ -1,3 +1,25 @@
+/*
+ * SimpleID
+ *
+ * Copyright (C) Kelvin Mo 2009
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * 
+ * $Id$
+ */
+
 body {
 	margin: 0;
 	padding: 0;
@@ -137,12 +159,6 @@ th {
 }
 .secure p { padding-left: 20px; background: transparent url(lock.png) no-repeat top left; }
 
-/*.user {
-    border: 1px solid #1144AA;
-    background-color: #DDEEFF;
-    padding: 0px 10px;
-    text-align: right;
-}*/
 .user {
     float: right;
     margin: 0.5em 0;
@@ -178,12 +194,9 @@ label.option { font-weight: normal; }
 
 .dialog-page #content {
     margin: 50px auto;
-    width: 400px; /* The user experience extension popup's width is 450px */
+    width: 400px;
     padding: 20px;
     border: 10px solid #DDDDDD;
     background: #FFFFFF;
 }
 
-/* User experience extension */
-.ux { background: #EEEEEE; }
-.ux #content { margin: 10px auto; padding: 0; border: 0 }
