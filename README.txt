@@ -22,18 +22,28 @@ UPGRADE.txt for upgrade instructions.
 Installation
 ------------
 
-For installation instructions, please see the SimpleID manual at
-<http://simpleid.sourceforge.net/manual>.
+For installation instructions, please see the SimpleID Getting Started Guide at
+<http://simpleid.sourceforge.net/documentation/getting-started>.
 
 Documentation
 -------------
 
-The SimpleID manual can be found at <http://simpleid.sourceforge.net/manual>.
+Documentation for SimpleID can be found at
+<http://simpleid.sourceforge.net/documentation>.
 
 Licensing
 ---------
 
 Licensing information for SimpleID can be found in the file COPYING.txt.
+
+Donate
+------
+
+If you enjoy using SimpleID, please consider making a donation to support the
+ongoing development work.  To find out more on how to donate, visit
+<http://simpleid.sourceforge.net/donate>.
+
+Your donation is very much appreciated.
 
 Acknowledgements
 ----------------
