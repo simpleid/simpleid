@@ -3,10 +3,19 @@
 SimpleID 0.7
 ------------
 
-- Implemented discovery information page to provide help for users to claim
-  their sites
-  
 - Implemented XRDS document for SimpleID
+
+- Improved extension framework
+
+- Preliminary implementation of the OpenID User Interface extension
+
+- Improved OpenID compliance
+
+- Added support for GMP
+
+- Improved persistent storage system
+
+- Improved dashboard pages
 
 
 SimpleID 0.6.4

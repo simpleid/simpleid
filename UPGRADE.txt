@@ -3,6 +3,47 @@
 Upgrading SimpleID
 ==================
 
+Introduction
+------------
+
+SimpleID is currently in heavy development, with the software changing rapidly.
+As a result, it is very important to upgrade SimpleID when a new version is
+released.
+
+General information on upgrading can be found at
+<http://simpleid.sourceforge.net/documentation/getting-started/upgrading>.
+
+This document sets out the additional steps which may need to be performed to
+upgrade to a specific version of SimpleID.
+
+Upgrading to SimpleID 0.7
+-------------------------
+
+SimpleID introduced a new storage framework.  The new framework allows SimpleID
+to store additional information about your identity.
+
+As a result, you will need to be aware that there is a new configuration option
+called SIMPLEID_STORE_DIR, which specifies the directory where this information
+will be stored.  This directory must exist and be readable and writable by the
+web server.
+
+If you are upgrading from SimpleID 0.6, this setting will default to the
+directory specified by SIMPLEID_CACHE_DIR in your config.inc.  However, it is
+a good idea to place this in a separate directory.  To do this, add the
+following line to your config.inc:
+
+define('SIMPLEID_STORE_DIR', '<your directory here>');
+
+SimpleID also introduced a new upgrade script.  This means that whenever you
+upgrade you will also need to run the script.  To run the script, use your
+web browser to go to
+
+http://www.exmaple.com/simpleid/upgrade.php
+
+where http://www.exmaple.com/simpleid/ is the URL of your SimpleID server
+(where you have moved the www directory).
+
+
 Upgrading to SimpleID 0.6
 -------------------------
 

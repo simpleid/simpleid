@@ -62,7 +62,8 @@ set is licensed is licensed under a Creative Commons Attribution 2.5 License
 <http://creativecommons.org/licenses/by/2.5/>.
 
 SimpleID uses the jQuery JavaScript library <http://jquery.com>, by John
-Resig and the jQuery team.
+Resig and the jQuery team.  Licensing information for this library can be found
+at <http://docs.jquery.com/Licensing>.
 
 SimpleID uses a JavaScript MD5 message digest library
 <http://pajhome.org.uk/crypt/md5>, written by Paul Johnston, Greg Holt, Andrew
