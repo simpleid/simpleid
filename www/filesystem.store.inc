@@ -185,8 +185,8 @@ function store_set($name, $value) {
     $settings[$name] = $value;
     
     $setting_file = SIMPLEID_STORE_DIR . "/$name.setting";
-    $file = fopen($store_file, 'w');
-    fwrite($file, serialize($data));
+    $file = fopen($setting_file, 'w');
+    fwrite($file, serialize($value));
     fclose($file);
 }
 
