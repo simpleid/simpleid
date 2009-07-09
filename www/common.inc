@@ -173,11 +173,11 @@ function simpleid_url($query = '') {
 function get_form_token($id) {
     global $user;
 
-    if (cache_get('token', SIMPLEID_BASE_URL) == NULL) {
+    if (store_get('site-token') == NULL) {
         $site_token = mt_rand();
-        cache_set('token', SIMPLEID_BASE_URL, $site_token);
+        store_set('site-token', $site_token);
     } else {
-        $site_token = cache_get('token', SIMPLEID_BASE_URL);
+        $site_token = store_get('site-token');
     }
     
     if ($user == NULL) {
@@ -197,7 +197,7 @@ function get_form_token($id) {
 function validate_form_token($token, $id) {
     global $user;
     
-    $site_token = cache_get('token', SIMPLEID_BASE_URL);
+    $site_token = store_get('site-token');
     
     if ($user == NULL) {
         return ($token == md5($id . $site_token));

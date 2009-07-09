@@ -53,7 +53,7 @@ define('PRE_0_7_0_VERSION', '0.6.0 or earlier');
  * @global array $upgrade_functions
  */
 $upgrade_functions = array(
-    '0.7.0' => array()
+    '0.7.0' => array('upgrade_rp_to_store', 'upgrade_token_to_store')
 );
 
 
@@ -67,7 +67,7 @@ $xtpl = NULL;
 upgrade_start();
 
 /**
- * Entry point for SimpleID.
+ * Entry point for SimpleID upgrade script.
  *
  * @see user_init()
  */
@@ -123,6 +123,9 @@ function upgrade_start() {
     simpleweb_run($routes, implode('/', $q));
 }
 
+/**
+ * Displays the upgrade info page.
+ */
 function upgrade_info() {
     global $xtpl;
     
@@ -135,6 +138,11 @@ function upgrade_info() {
     $xtpl->out('main');
 }
 
+/**
+ * Detects the current installed version of SimpleID, selects the individual upgrade
+ * functions applicable to this upgrade and displays the upgrade
+ * selection page.
+ */
 function upgrade_selection() {
     global $xtpl, $upgrade_access_check;
     
@@ -170,6 +178,9 @@ function upgrade_selection() {
     $xtpl->out('main');
 }
 
+/**
+ * Applies the upgrade.
+ */
 function upgrade_apply() {
     global $xtpl, $upgrade_access_check;
     
@@ -196,15 +207,48 @@ function upgrade_apply() {
     $xtpl->out('main');
 }
 
+/**
+ * Detects the current installed version of SimpleID
+ *
+ * The current installed version of SimpleID is taken from the {@link store_get() version}
+ * application setting.  This setting is only available for versions 0.7 or later, so
+ * if it is absent we can assume it's prior to version 0.7.
+ *
+ * @return string the detected version, or the string '0.6.0 or earlier'
+ */
 function upgrade_get_version() {
     return store_get('version', '0.6.0 or earlier');
 }
 
+/**
+ * Sets the current version of SimpleID.
+ *
+ * This function sets the version application setting via {@link store_get()}.
+ * A specific version can be specified, or it can be taken from {@link SIMPLEID_VERSION}.
+ *
+ * @param string $version the version to set
+ */
 function upgrade_set_version($version = NULL) {
     if ($version == NULL) $version = SIMPLEID_VERSION;
     store_set('version', $version);
 }
 
+/**
+ * Selects the upgrade functions applicable for this upgrade.
+ *
+ * The upgrade functions are specified by the {@link $upgrade_functions}
+ * variable.  This variable is an associative array containing version numbers
+ * as keys and an array of upgrade function names as values.  This function
+ * merges all the upgrade function names of the version between the current
+ * installed version and the upgraded version.
+ *
+ * @param string $version the version of SimpleID to upgrade from, calls
+ * {@link upgrade_get_version()} if not specified
+ * @return array an array of strings, containing the list of upgrade functions
+ * to call.  The functions should be called in the same order as they appear
+ * in this array
+ *
+ */
 function upgrade_get_functions($version = NULL) {
     global $upgrade_functions;
     
@@ -224,10 +268,27 @@ function upgrade_get_functions($version = NULL) {
     return $functions;
 }
 
+/**
+ * Callback function for uksort() to reverse sort version numbers.
+ *
+ * @param string $a
+ * @param string $b
+ * @return int
+ */
 function _upgrade_version_reverse_sort($a, $b) {
     return -version_compare($a, $b);
 }
 
+/**
+ * Determines whether the current user has permission to run this script.
+ *
+ * A user has permission to run this script if:
+ *
+ * - administrator=1 appears in the user's identity file; or
+ * - {@link $upgrade_access_check} is false
+ *
+ * If the user does not have permission, {@link upgade_access_denied()} is called
+ */
 function upgrade_user_init() {
     global $user, $upgrade_access_check;
     
@@ -236,6 +297,10 @@ function upgrade_user_init() {
     }
 }
 
+/**
+ * Displays a page notifying the user that he or she does not have permission to
+ * run the upgrade script.
+ */
 function upgrade_access_denied() {
     global $xtpl;
     
@@ -248,9 +313,12 @@ function upgrade_access_denied() {
     exit;
 }
 
+/**
+ * Moves the user's site preferences from the cache to the store.
+ *
+ * @since 0.7
+ */
 function upgrade_rp_to_store() {
-    // For each user, do cache_get('rp', $uid), move to $user, then store_user_save()
-    
     $dir = opendir(SIMPLEID_IDENTITIES_DIR);
     
     while (($file = readdir($dir)) !== false) {
@@ -262,9 +330,25 @@ function upgrade_rp_to_store() {
         
         $user = user_load($uid);
         $rp = cache_get('rp', $uid);
-        $user['rp'] = $rp;
-        user_save($user);
+        if ($rp != NULL) {
+            $user['rp'] = $rp;
+            user_save($user);
+            cache_delete('rp', $uid);
+        }
     }
 }
 
+/**
+ * Moves the site token from the cache to the store.
+ *
+ * @since 0.7
+ */
+function upgrade_token_to_store() {
+    $site_token = cache_get('token', SIMPLEID_BASE_URL);
+    
+    if ($site_token != NULL) {
+        store_set('site-token', $site_token);
+        cache_delete('token', SIMPLEID_BASE_URL);
+    }
+}
 ?>
