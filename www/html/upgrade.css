@@ -1,0 +1,7 @@
+.upgrade-version {
+    font-weight: bold;
+    font-size: 1.5em;
+}
+
+.original-version { color: #666666; }
+.this-version { color: #4A80ED; }
