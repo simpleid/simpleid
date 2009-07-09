@@ -21,8 +21,31 @@
  * $Id$
  */
 
- 
-$upgrade_access_check = FALSE;
+/**
+ * SimpleID upgrade script.
+ *
+ * This script performs various upgrades to SimpleID's storage backend, which
+ * are required for different versions of SimpleID.
+ *
+ * @package simpleid
+ * @since 0.7
+ * @filesource
+ */
+
+/**
+ * Access control for this script.
+ *
+ * If you are upgrading your SimpleID installation using the upgrade.php script,
+ * and you are not logged in as an administrator, you will need to modify the access
+ * check statement below.
+ *
+ * Change the TRUE to a FALSE to disable the access
+ * check. After finishing the upgrade, be sure to open this file again
+ * and change the FALSE back to a TRUE.
+ *
+ * @global bool $upgrade_access_check
+ */
+$upgrade_access_check = TRUE;
 
 /* ----- Do not modify anything following this line ------------------------- */
 

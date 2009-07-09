@@ -59,7 +59,7 @@ define('XRD_OPENID_NS', 'http://openid.net/xmlns/1.0');
  * @param string $identifier the identifier
  * @param bool $openid if true, performs additional discovery of OpenID services
  * by looking for link elements within the discovered document
- * @param array an array of discovered services, or an empty array if no services
+ * @return array an array of discovered services, or an empty array if no services
  * are found
  */
 function discovery_get_services($identifier, $openid = FALSE) {
@@ -245,7 +245,7 @@ function discovery_parse_xrds($xrds) {
  * To use the YADIS protocol, use {@link discovery_get_services()}.
  *
  * @param string $url the URL
- * @param array an array of discovered services, or an empty array if no services
+ * @return array an array of discovered services, or an empty array if no services
  * are found
  */
 function discovery_get_openid_services($url) {
