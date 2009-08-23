@@ -306,47 +306,6 @@ function user_login_form($destination = '', $state = NULL) {
     $xtpl->out('main');
 }
 
-/**
- * Returns the user's home page.
- */
-function user_page() {
-    global $user;
-    global $xtpl;
-    
-    if ($user == NULL) {
-        user_login_form('');
-        return;
-    }
-    
-    user_block();
-    
-    $rps = isset($user['rp']) ? $user['rp'] : array();
-    
-    if ($rps) {
-        foreach ($rps as $realm => $rp) {
-            $xtpl->assign('realm', htmlspecialchars($rp['realm'], ENT_QUOTES, 'UTF-8'));
-            $xtpl->assign('last_time', htmlspecialchars(strftime(SIMPLEID_DATE_TIME_FORMAT, $rp['last_time']), ENT_QUOTES, 'UTF-8'));
-            $xtpl->assign('auto_release', (isset($rp['auto_release']) && $rp['auto_release']) ? 'checked="checked"' : '');
-            $xtpl->parse('main.frontpage.realm');
-        }
-    }
-    
-    if (!$rps || (count($rps) == 0)) {
-        $xtpl->assign('disabled', 'disabled="disabled"');
-    }
-    
-    $xtpl->assign('token', get_form_token('autorelease'));
-    
-    $extensions = extension_invoke_all('user_page');
-    $xtpl->assign('extensions', implode($extensions));
-    
-    $xtpl->parse('main.frontpage');
-    
-    $xtpl->assign('title', 'Home Page');
-    $xtpl->parse('main');
-    $xtpl->out('main');
-}
-
 function user_discovery() {
     global $user;
     global $xtpl;
@@ -356,7 +315,7 @@ function user_discovery() {
         return;
     }
     
-    user_block();
+    user_header();
     
     $xtpl->assign('op_endpoint', htmlspecialchars(simpleid_url()));
     $xtpl->assign('identity', htmlspecialchars($user['identity']));
@@ -442,12 +401,12 @@ function user_xrds($uid = NULL) {
 }
 
 /**
- * Set up the user block, showing the currently logged in user.
+ * Set up the user section in the header, showing the currently logged in user.
  *
  * @param string $state the SimpleID state to retain once the user has logged out,
  * if required.
  */
-function user_block($state = NULL) {
+function user_header($state = NULL) {
     global $user;
     global $xtpl;
     

@@ -44,6 +44,7 @@ include_once "discovery.inc";
 include_once "user.inc";
 include_once "cache.inc";
 include_once "filesystem.store.inc";
+include_once "page.inc";
 
 // Allow for PHP5 version of xtemplate
 if (version_compare(PHP_VERSION, '5.0.0') === 1) {
@@ -99,26 +100,34 @@ function simpleid_start() {
     
     // Check if the configuration file has been defined
     if (!defined('SIMPLEID_BASE_URL')) {
-        set_message('No configuration file found.  See the <a href="http://simpleid.sourceforge.net/manual">manual</a> for instructions on how to set up a configuration file.');
+        set_message('No configuration file found.  See the <a href="http://simpleid.sourceforge.net/documentation/getting-started">manual</a> for instructions on how to set up a configuration file.');
         $xtpl->parse('main');
         $xtpl->out('main');
         exit;
     }
     
     if (!is_dir(SIMPLEID_IDENTITIES_DIR)) {
-        set_message('Identities directory not found.  See the <a href="http://simpleid.sourceforge.net/manual">manual</a> for instructions on how to set up SimpleID.');
+        set_message('Identities directory not found.  See the <a href="http://simpleid.sourceforge.net/documentation/getting-started">manual</a> for instructions on how to set up SimpleID.');
         $xtpl->parse('main');
         $xtpl->out('main');
         exit;
     }
     
     if (!is_dir(SIMPLEID_CACHE_DIR) || !is_writeable(SIMPLEID_CACHE_DIR)) {
-        set_message('Cache directory not found or not writeable.  See the <a href="http://simpleid.sourceforge.net/manual">manual</a> for instructions on how to set up SimpleID.');
+        set_message('Cache directory not found or not writeable.  See the <a href="http://simpleid.sourceforge.net/documentation/getting-started">manual</a> for instructions on how to set up SimpleID.');
         $xtpl->parse('main');
         $xtpl->out('main');
         exit;
     }
     
+    
+    if (!is_dir(SIMPLEID_STORE_DIR) || !is_writeable(SIMPLEID_STORE_DIR)) {
+        set_message('Store directory not found or not writeable.  See the <a href="http://simpleid.sourceforge.net/documentation/getting-started">manual</a> for instructions on how to set up SimpleID.');
+        $xtpl->parse('main');
+        $xtpl->out('main');
+        exit;
+    }
+
     openid_parse_request($_REQUEST);
     
     $q = (isset($_REQUEST['q'])) ? $_REQUEST['q'] : '';
@@ -137,6 +146,9 @@ function simpleid_start() {
         'openid' => 'simpleid_process_openid',
         'login' => 'user_login',
         'logout' => 'user_logout',
+        'my/dashboard' => 'page_dashboard',
+        'my/sites' => 'page_sites',
+        'my/profile' => 'page_profile',
         'user' => 'user_public_page',
         'user/(.+)' => 'user_public_page',
         'discovery' => 'user_discovery',
@@ -157,11 +169,9 @@ function simpleid_index() {
     } elseif (stristr($_SERVER['HTTP_ACCEPT'], 'application/xrds+xml')) {
         simpleid_xrds();
     } else {
-        // Extensions check if you can process it!
-        
         // Point to SimpleID's XRDS document
         header('X-XRDS-Location: ' . simpleid_url('q=xrds'));
-        user_page();
+        page_dashboard();
     }
 }
 
@@ -173,13 +183,13 @@ function simpleid_autorelease() {
     global $user;
     
     if ($user == NULL) {
-        user_login_form('');
+        user_login_form('my/sites');
         return;
     }
     
     if (!validate_form_token($_POST['tk'], 'autorelease')) {
         set_message('SimpleID detected a potential security attack.  Please try again.');
-        user_page();
+        page_sites();
         return;
     }
 
@@ -210,7 +220,7 @@ function simpleid_autorelease() {
     user_save($user);
     
     set_message('Your preferences have been saved.');
-    user_page();
+    page_sites();
     
 }
 
@@ -240,7 +250,7 @@ function simpleid_process_openid($request) {
             break;
         default:
             set_message('Invalid OpenID message.');
-            user_page();
+            page_dashboard();
     }
 }
 
@@ -818,7 +828,7 @@ function simpleid_rp_form($request, $response, $reason = CHECKID_APPROVAL_REQUIR
     
     $request_state = pickle($request);
     
-    user_block($request_state);
+    user_header($request_state);
 
     $realm = openid_get_realm($request, $version);
     
@@ -913,7 +923,7 @@ function simpleid_send() {
     if ($return_to) {
         redirect_form($return_to, $response);
     } else {
-        user_page();
+        page_dashboard();
     }
 }
 

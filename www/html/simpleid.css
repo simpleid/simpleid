@@ -69,13 +69,38 @@ body {
     float: left;
 }
 
+#nav {
+    background-color: #666666;
+    color: #CCCCCC;
+    padding: 5px 10px;
+}
+#nav ul {
+    margin: 0;
+    padding: 0;
+    text-align: left;
+}
+#nav li {
+    display: inline;
+    list-style-type: none;
+}
+#nav a {
+    background-color: #888888;
+    padding: 6px 8px;
+    border-width: 0;
+    color: #FFFFFF;
+}
+#nav ul#nav-left { float: left; }
+#nav ul#nav-right { float: right; }
+
 #footer {
     margin: 2em 0;
     padding: 0px 10px;
     text-align: right;
+    font-size: 0.9em;
     color: #999999;
 }
 #footer address { font-style: normal }
+#footer a { color: #999999; }
 
 #content {
     margin: 1em 10px;
@@ -174,6 +199,31 @@ th {
     font-weight: normal;
 }
 
+.block {
+    background-color: #EEEEEE;
+}
+.block-header {
+    background-color: #666666;
+    margin:0 0 5px;
+    padding: 5px 10px;
+}
+.block-header h2 {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #FFFFFF;
+    margin: 0;
+    padding: 0;
+    border-top-width: 0;
+}
+.block-header-links {
+    float: right;
+    font-size: 0.9px;
+    text-align: right;
+    white-space: nowrap;
+}
+.block-content {
+    padding: 5px 10px;
+}
 
 /* Forms */
 .form-item {

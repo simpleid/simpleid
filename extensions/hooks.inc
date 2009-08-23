@@ -191,16 +191,35 @@ function hook_routes() {
 }
 
 /**
- * Provides additional form items when displaying the user page
+ * Returns additional blocks to be displayed in the user's dashboard.
  *
- * @global array the user
- * @return string HTML code to be inserted into the user page
+ * A block is coded as an array in accordance with the specifications set
+ * out in {@link page.inc}.
+ *
+ * This hook should return an <i>array</i> of blocks, i.e. an array of
+ * arrays.
+ *
+ * @see page_dashboard()
+ * @return array an array of blocks to add to the user's dashboard
+ * @since 0.7
  */
-function hook_user_page() {
-    global $user;
+function hook_page_dashboard() {
 }
 
-
-
+/**
+ * Returns additional blocks to be displayed in the user's profile page.
+ *
+ * A block is coded as an array in accordance with the specifications set
+ * out in {@link page.inc}.
+ *
+ * This hook should return an <i>array</i> of blocks, i.e. an array of
+ * arrays.
+ *
+ * @see page_profile()
+ * @return array an array of blocks to add to the user's profile page
+ * @since 0.7
+ */
+function hook_page_profile() {
+}
 
 ?>

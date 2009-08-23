@@ -126,15 +126,9 @@ function sreg_rp_form($request, $response, $rp) {
 }
 
 /**
- * @see hook_send()
+ * @see hook_page_profile()
  */
-function sreg_send() {
-}
-
-/**
- * @see hook_user_page()
- */
-function sreg_user_page() {
+function sreg_page_profile() {
     global $user;
     $xtpl2 = new XTemplate('extensions/sreg/sreg.xtpl');
     
@@ -144,10 +138,15 @@ function sreg_user_page() {
             $xtpl2->assign('value', htmlspecialchars($value, ENT_QUOTES, 'UTF-8'));
             $xtpl2->parse('user_page.sreg');
         }
-    }
+    }    
     
     $xtpl2->parse('user_page');
-    return $xtpl2->text('user_page');
+    
+    return array(array(
+        'id' => 'sreg',
+        'title' => 'Simple Registration Extension',
+        'content' => $xtpl2->text('user_page')
+    ));
 }
 
 ?>

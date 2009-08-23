@@ -1,6 +1,5 @@
 <!-- BEGIN: user_page -->
 <!-- :mode=html: $Id$ -->
-    <h2>Simple Registration Extension</h2>
     <p>SimpleID will send the following information to sites which supports
     the Simple Registration Extension.</p>
     

@@ -3,9 +3,8 @@
 <html xml:lang="en-AU" lang="en-AU" xmlns="http://www.w3.org/1999/xhtml">
     <!-- :mode=html: $Id$ -->
     <head>
-        <title>{title} - SimpleID</title>
+        <title>{title} - SimpleID Upgrade</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
-        <meta content="{version}" name="SimpleID-Version" />
         
         <style type="text/css" media="screen">
             @import url(html/simpleid.css);
@@ -20,15 +19,6 @@
             <div id="logo">
                 <h1><a href="http://simpleid.sourceforge.net/">SimpleID</a> {version}</h1>
             </div>
-            <!-- BEGIN: user -->
-            <div class="user">
-                <div class="logged-in-as">
-                    <strong title="{identity}" class="identity">{uid}</strong>
-                <!-- BEGIN: logout -->&middot; <a href="?q=logout{state}">{logout}</a><!-- END: logout -->
-                </div>
-                <div style="clear: both"></div>
-            </div>
-            <!-- END: user -->
             <div style="clear: both;"></div>
         </div>
         <div id="content">

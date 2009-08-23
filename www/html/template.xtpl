@@ -53,6 +53,19 @@
             <div style="clear: both;"></div>
         </div>
         <!-- BEGIN: nav -->
+        <div id="nav">
+            <ul id="nav-left">
+                <li><a href="?q=">Dashboard</a></li>
+                <li><a href="?q=my/profile">My Profile</a></li>
+                <li><a href="?q=my/sites">My Sites</a></li>
+            </ul>
+            <!-- BEGIN: nav_admin -->
+            <ul id="nav-right">
+                <li><a href="?q=admin">Admin</a></li>
+            </ul>
+            <!-- END: nav_admin -->
+            <div style="clear: both"></div>
+        </div>
         <!-- END: nav -->
         <div id="content">
             <h1>{title}</h1>
@@ -141,9 +154,25 @@
                 <!-- END: cancel -->                
             </form>
             <!-- END: rp -->
+            
+            <!-- BEGIN: blocks -->
+                {blocks}
+            <!-- END: blocks -->
 
-            <!-- BEGIN: frontpage -->
-            <h2>Trusted Sites</h2>
+            <!-- BEGIN: profile -->
+            
+            
+            {extensions}
+            
+            <h2>OpenID Discovery Information</h2>
+            
+            <p>You can view the <a href="index.php?q=discovery">OpenID discovery information</a>
+            applicable to this account to help you complete the set up process.</p>
+            
+            <!-- END: profile -->
+
+            
+            <!-- BEGIN: sites -->
             <form action="index.php" method="post" enctype="application/x-www-form-urlencoded" >
             <input name="q" type="hidden" value="autorelease" />
             <input name="tk" type="hidden" value="{token}"/>
@@ -151,7 +180,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Realm</th>
+                        <th>Site</th>
                         <th>Last access</th>
                         <th>Automatic</th>
                         <th>Remove</th>
@@ -170,17 +199,9 @@
             </table>
             <input type="submit" name="op" id="edit-submit" value="Submit" class="form-submit" {disabled} />
             </form>
-            
-            {extensions}
-            
-            <h2>OpenID Discovery Information</h2>
-            
-            <p>You can view the <a href="index.php?q=discovery">OpenID discovery information</a>
-            applicable to this account to help you complete the set up process.</p>
-            
-            <!-- END: frontpage -->
+            <!-- END: sites -->
 
-            
+
             <!-- BEGIN: discovery -->
             <h2>Introduction</h2>
             <p>SimpleID supports both version 1.1 and version 2 of the OpenID specification.  To
@@ -250,7 +271,11 @@
         </div>
 
         <div id="footer">
-            <address>SimpleID {version} &copy; Kelvin Mo 2007-8.</address>
+            <address>
+                SimpleID {version} &copy; Kelvin Mo 2007-9 &middot;
+                <a href="http://simpleid.sourceforge.net/documentation">Documentation</a> &middot;
+                <a href="http://sourceforge.net/apps/trac/simpleid">Support</a>
+            </address>
         </div>
     </body>
 </html>

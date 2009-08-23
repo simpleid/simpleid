@@ -1,0 +1,16 @@
+<!-- :mode=html: $Id$ -->
+<!-- BEGIN: block -->
+<div class="block" id="{id}">
+    <div class="block-header">
+        <!-- BEGIN: links -->
+        <div class="block-header-links">
+            {links}
+        </div>
+        <!-- END: links -->
+        <h2>{title}</h2>
+    </div>
+    <div class="block-content">
+    {content}
+    </div>
+</div>
+<!-- END: block -->
