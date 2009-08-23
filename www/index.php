@@ -183,7 +183,7 @@ function simpleid_autorelease() {
         return;
     }
 
-    $rps =& $user['rps'];
+    $rps =& $user['rp'];
     
     if (isset($_POST['autorelease'])) {
         foreach ($_POST['autorelease'] as $realm => $autorelease) {
