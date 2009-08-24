@@ -37,6 +37,7 @@
 include_once "version.inc";
 include_once "config.inc";
 include_once "config.default.inc";
+include_once "log.inc";
 include_once "common.inc";
 include_once "simpleweb.inc";
 include_once "openid.inc";
@@ -101,6 +102,7 @@ function simpleid_start() {
     // Check if the configuration file has been defined
     if (!defined('SIMPLEID_BASE_URL')) {
         set_message('No configuration file found.  See the <a href="http://simpleid.sourceforge.net/documentation/getting-started">manual</a> for instructions on how to set up a configuration file.');
+        log_fatal('No configuration file found.');
         $xtpl->parse('main');
         $xtpl->out('main');
         exit;
@@ -108,6 +110,7 @@ function simpleid_start() {
     
     if (!is_dir(SIMPLEID_IDENTITIES_DIR)) {
         set_message('Identities directory not found.  See the <a href="http://simpleid.sourceforge.net/documentation/getting-started">manual</a> for instructions on how to set up SimpleID.');
+        log_fatal('Identities directory not found.');
         $xtpl->parse('main');
         $xtpl->out('main');
         exit;
@@ -115,6 +118,7 @@ function simpleid_start() {
     
     if (!is_dir(SIMPLEID_CACHE_DIR) || !is_writeable(SIMPLEID_CACHE_DIR)) {
         set_message('Cache directory not found or not writeable.  See the <a href="http://simpleid.sourceforge.net/documentation/getting-started">manual</a> for instructions on how to set up SimpleID.');
+        log_fatal('Cache directory not found or not writeable.');
         $xtpl->parse('main');
         $xtpl->out('main');
         exit;
@@ -123,6 +127,7 @@ function simpleid_start() {
     
     if (!is_dir(SIMPLEID_STORE_DIR) || !is_writeable(SIMPLEID_STORE_DIR)) {
         set_message('Store directory not found or not writeable.  See the <a href="http://simpleid.sourceforge.net/documentation/getting-started">manual</a> for instructions on how to set up SimpleID.');
+        log_fatal('Store directory not found or not writeable.');
         $xtpl->parse('main');
         $xtpl->out('main');
         exit;
@@ -135,6 +140,7 @@ function simpleid_start() {
     
     extension_init();
     user_init($q[0]);
+    log_info('Session opened for "' . implode('/', $q) . '" [' . $_SERVER['REMOTE_ADDR'] . ', ' . $_SERVER['HTTP_HOST'] . ']');
     
     // Clean stale assocations
     cache_gc(SIMPLEID_ASSOC_EXPIRES_IN, 'association');
@@ -162,6 +168,8 @@ function simpleid_start() {
 }
 
 function simpleid_index() {
+    log_debug('simpleid_index');
+    
     header('Vary: Accept');
     if (isset($_REQUEST['openid.mode'])) {
         simpleid_process_openid($_REQUEST);
@@ -269,6 +277,8 @@ function simpleid_process_openid($request) {
 function simpleid_associate($request) {
     global $version;
     
+    log_info('OpenID association request: ' . log_array($request));
+    
     $assoc_types = openid_association_types();
     $session_types = openid_session_types($version);
 
@@ -283,6 +293,7 @@ function simpleid_associate($request) {
     $dh_consumer_public = $request['openid.dh_consumer_public'];
     
     if (!isset($request['openid.session_type']) || !isset($request['openid.assoc_type'])) {
+        log_error('Association failed: openid.session_type or openid.assoc_type not set');
         openid_direct_error('openid.session_type or openid.assoc_type not set');
         return;
     }
@@ -294,6 +305,7 @@ function simpleid_associate($request) {
             'session_type' => 'DH-SHA1',
             'assoc_type' => 'HMAC-SHA1'
         );
+        log_error('Association failed: The association type is not supported by SimpleID.');
         openid_direct_error('The association type is not supported by SimpleID.', $error, $version);
         return;
     }
@@ -304,12 +316,14 @@ function simpleid_associate($request) {
             'session_type' => 'DH-SHA1',
             'assoc_type' => 'HMAC-SHA1'
         );
+        log_error('Association failed: The session type is not supported by SimpleID.');
         openid_direct_error('The session type is not supported by SimpleID.', $error, $version);
         return;
     }
     
     if ($session_type == 'DH-SHA1' || $session_type == 'DH-SHA256') {
         if (!$dh_consumer_public) {
+            log_error('Association failed: openid.dh_consumer_public not set');
             openid_direct_error('openid.dh_consumer_public not set');
             return;
         }
@@ -376,8 +390,10 @@ function _simpleid_create_association($mode = CREATE_ASSOCIATION_DEFAULT, $assoc
     cache_set('association', $assoc_handle, $association);
 
     if ($mode == CREATE_ASSOCIATION_DEFAULT) {
+        log_info('Created association: ' . log_array($response));
         return $response;
     } else {
+        log_info('Created association: stateless; ' . log_array($association, array('assoc_handle', 'assoc_type')));
         return $association;
     }
 }
@@ -409,14 +425,18 @@ function simpleid_checkid($request) {
     global $version;
     
     $immediate = ($request['openid.mode'] == 'checkid_immediate');
+    
+    log_info('OpenID authentication request: ' . (($immediate) ? 'immediate' : 'setup') . '; '. log_array($request));
 
     // Check for protocol correctness    
     if ($version == OPENID_VERSION_1_1) {
         if (!isset($request['openid.return_to'])) {
+            log_error('Protocol Error: openid.return_to not set.');
             indirect_fatal_error('Protocol Error: openid.return_to not set.');
             return;
         }
         if (!isset($request['openid.identity'])) {
+            log_error('Protocol Error: openid.identity not set.');
             indirect_fatal_error('Protocol Error: openid.identity not set.');
             return;
         }
@@ -424,11 +444,13 @@ function simpleid_checkid($request) {
 
     if ($version == OPENID_VERSION_2) {
         if (isset($request['openid.identity']) && !isset($request['openid.claimed_id'])) {
+            log_error('Protocol Error: openid.identity set, but not openid.claimed_id.');
             indirect_fatal_error('Protocol Error: openid.identity set, but not openid.claimed_id.');
             return;
         }
         
         if (!isset($request['openid.realm']) && !isset($request['openid.return_to'])) {
+            log_error('Protocol Error: openid.return_to not set when openid.realm is not set.');
             indirect_fatal_error('Protocol Error: openid.return_to not set when openid.realm is not set.');
             return;
         }
@@ -438,6 +460,7 @@ function simpleid_checkid($request) {
         $realm = openid_get_realm($request, $version);
         
         if (!openid_url_matches_realm($request['openid.return_to'], $realm)) {
+            log_error('Protocol Error: openid.return_to does not match realm.');
             openid_indirect_error($request['openid.return_to'], 'Protocol Error: openid.return_to does not match realm.');
             return;
         }
@@ -459,6 +482,7 @@ function simpleid_checkid($request) {
     
     switch ($result) {
         case CHECKID_APPROVAL_REQUIRED:
+            log_info('CHECKID_APPROVAL_REQUIRED');
             if ($immediate) {
                 $response = simpleid_checkid_approval_required($request);
                 return redirect_form($request['openid.return_to'], $response);
@@ -468,6 +492,7 @@ function simpleid_checkid($request) {
             }
             break;
         case CHECKID_RETURN_TO_SUSPECT:
+            log_info('CHECKID_RETURN_TO_SUSPECT');
             if ($immediate) {
                 $response = simpleid_checkid_error($immediate);
                 return redirect_form($request['openid.return_to'], $response);
@@ -477,11 +502,13 @@ function simpleid_checkid($request) {
             }
             break;
         case CHECKID_OK:
+            log_info('CHECKID_OK');
             $response = simpleid_checkid_ok($request);
             $response = simpleid_sign($response, $request['openid.assoc_handle']);
             return redirect_form($request['openid.return_to'], $response);
             break;
         case CHECKID_LOGIN_REQUIRED:
+            log_info('CHECKID_LOGIN_REQUIRED');
             if ($immediate) {
                 $response = simpleid_checkid_login_required($request);
                 return redirect_form($request['openid.return_to'], $response);
@@ -492,6 +519,7 @@ function simpleid_checkid($request) {
             break;
         case CHECKID_IDENTITIES_NOT_MATCHING:
         case CHECKID_IDENTITY_NOT_EXIST:
+            log_info('CHECKID_IDENTITIES_NOT_MATCHING | CHECKID_IDENTITY_NOT_EXIST');
             $response = simpleid_checkid_error($immediate);
             if ($immediate) {                
                 return redirect_form($request['openid.return_to'], $response);
@@ -536,11 +564,13 @@ function simpleid_checkid_identity(&$request, $immediate) {
     
     // Check 2: Is the user logged in as the same identity as the identity requested?
     // Choose the identity URL for the user automatically
-    if ($request['openid.identity'] == OPENID_IDENTIFIER_SELECT) {        
+    if ($request['openid.identity'] == OPENID_IDENTIFIER_SELECT) {
         $test_user = user_load($uid);
         $identity = $test_user['identity'];
         $request['openid.claimed_id'] = $identity;
         $request['openid.identity'] = $identity;
+        
+        log_info('OpenID identifier selection: Selected ' . $uid . ' [' . $identity . ']');
     } else {
         $identity = $request['openid.identity'];
         $test_user = user_load_from_identity($identity);
@@ -559,15 +589,20 @@ function simpleid_checkid_identity(&$request, $immediate) {
     
     if (($version == OPENID_VERSION_2) && SIMPLEID_VERIFY_RETURN_URL_USING_REALM) {
         $url = openid_realm_discovery_url($realm);
+        log_info('OpenID 2 discovery: realm: ' . $realm . '; url: ' . $url);
+        
         $verified = FALSE;
         
         cache_gc(3600, 'rp-services');
         $services = cache_get('rp-services', $url);
         if ($services == NULL) {
+            log_info('OpenID 2 discovery: fetching ' . $url);
             $services = discovery_get_services($url);
             cache_set('rp-services', $url, $services);
         }
         $services = discovery_get_service_by_type($services, OPENID_RETURN_TO);
+        
+        log_info('OpenID 2 discovery: ' . count($services) . ' matching services');
         
         if ($services) {
             $return_to_uris = array();
@@ -577,6 +612,7 @@ function simpleid_checkid_identity(&$request, $immediate) {
             }
             foreach ($return_to_uris as $return_to) {
                 if (openid_url_matches_realm($request['openid.return_to'], $return_to)) {
+                    log_info('OpenID 2 discovery: verified');
                     $verified = TRUE;
                     break;
                 }
@@ -592,6 +628,7 @@ function simpleid_checkid_identity(&$request, $immediate) {
     // Check 4: For checkid_immediate, the user must already have given
     // permission to log in automatically.
     if (($rp != NULL) && ($rp['auto_release'] == 1)) {
+        log_info('Automatic set for realm ' . $realm);
         $assertion_results[] = CHECKID_OK;
         return min($assertion_results);
     } else {
@@ -625,6 +662,7 @@ function simpleid_checkid_ok($request) {
     
     $message = array_merge($message, extension_invoke_all('response', TRUE, $request));
     
+    log_info('OpenID authentication response: ', log_array($message));
     return openid_indirect_message($message, $version);
 }
 
@@ -651,6 +689,7 @@ function simpleid_checkid_approval_required($request) {
     
     $message = array_merge($message, extension_invoke_all('response', FALSE, $request));
     
+    log_info('OpenID authentication response: ', log_array($message));
     return openid_indirect_message($message, $version);
 }
 
@@ -675,6 +714,7 @@ function simpleid_checkid_login_required($request) {
     
     $message = array_merge($message, extension_invoke_all('response', FALSE, $request));
     
+    log_info('OpenID authentication response: ', log_array($message));
     return openid_indirect_message($message, $version);
 }
 
@@ -700,6 +740,7 @@ function simpleid_checkid_error($immediate) {
     
     $message = array_merge($message, extension_invoke_all('response', FALSE, $request));
     
+    log_info('OpenID authentication response: ', log_array($message));
     return openid_indirect_message($message, $version);
 }
 
@@ -759,6 +800,8 @@ function simpleid_sign(&$response, $assoc_handle = NULL) {
 function simpleid_authenticate($request) {
     global $version;
     
+    log_info('OpenID direct verification: ' . log_array($request));
+    
     $is_valid = TRUE;
   
     $assoc = (isset($request['openid.assoc_handle'])) ? cache_get('association', $request['openid.assoc_handle']) : NULL;
@@ -795,6 +838,8 @@ function simpleid_authenticate($request) {
         }
     }
 
+    log_info('OpenID direct verification response: ' . log_array($response));
+    
     openid_direct_response(openid_direct_message($response, $version));
 }
 
@@ -928,11 +973,13 @@ function simpleid_send() {
 }
 
 /**
- * Returns XDRS document for this SimpleID installation.
+ * Returns XRDS document for this SimpleID installation.
  * 
  */
 function simpleid_xrds() {
     global $xtpl;
+    
+    log_info('Providing XRDS.');
     
     header('Content-Type: application/xrds+xml');
     header('Content-Disposition: inline; filename=yadis.xml');

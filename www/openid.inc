@@ -563,6 +563,7 @@ function openid_extension_filter_request($ns, $request) {
 function openid_extension_requested($ns, $request) {
     global $ns_to_alias;
     
+    if (!isset($ns_to_alias[$ns])) return false;
     $alias = $ns_to_alias[$ns];
     
     if (is_array($request)) {

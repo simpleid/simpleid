@@ -130,4 +130,29 @@ define('SIMPLEID_ASSOC_EXPIRES_IN', 3600);
  *
  */
 define('SIMPLEID_EXTENSIONS', 'sreg,ui');
+
+/**
+ * Log file.
+ *
+ * You can specify a file into which SimpleID will log various diagnostic
+ * messages.
+ *
+ * The log file's directory must exist and must be writable by the web server.
+ *
+ * To disable logging, set this as an empty string.
+ *
+ */
+define('SIMPLEID_LOGFILE', '');
+
+/**
+ * The level of detail for log messages.
+ *
+ * You can determine which messages are captured in the log file by specifying
+ * a number between 0 and 5. The higher the number, the more messages are
+ * logged.
+ *
+ * This has effect only if logging is enabled.
+ *
+ */
+define('SIMPLEID_LOGLEVEL', 4);
 ?>
