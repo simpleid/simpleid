@@ -1,5 +1,11 @@
 // $Id$
 
+SimpleID 0.6.5
+--------------
+
+- Fixed XSS vulnerability in user login page
+
+
 SimpleID 0.6.4
 --------------
 
