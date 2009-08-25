@@ -269,7 +269,7 @@ function user_login_form($destination = '', $state = NULL) {
     global $xtpl;
 
     if ($state) {
-        $xtpl->assign('state', $state);
+        $xtpl->assign('state', htmlspecialchars($state, ENT_QUOTES, 'UTF-8'));
         $xtpl->parse('main.login.state');
     }
     

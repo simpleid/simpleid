@@ -18,6 +18,12 @@ SimpleID 0.7
 - Improved dashboard pages
 
 
+SimpleID 0.6.5
+--------------
+
+- Fixed XSS vulnerability in user login page
+
+
 SimpleID 0.6.4
 --------------
 
