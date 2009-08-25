@@ -289,7 +289,7 @@ function user_login_form($destination = '', $state = NULL) {
     $xtpl->assign('title', 'Log In');
     $xtpl->assign('destination', htmlspecialchars($destination, ENT_QUOTES, 'UTF-8'));
     $xtpl->assign('nonce', htmlspecialchars($nonce, ENT_QUOTES, 'UTF-8'));
-    if ($state) $xtpl->assign('state', $state);
+    if ($state) $xtpl->assign('state', htmlspecialchars($state, ENT_QUOTES, 'UTF-8'));
     
     $xtpl->parse('main.login');
     $xtpl->parse('main');
