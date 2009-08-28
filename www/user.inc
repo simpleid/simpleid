@@ -180,10 +180,12 @@ function user_login() {
     $time = strtotime(substr($_POST['nonce'], 0, 20));
     
     if (!cache_get('user-nonce', $_POST['nonce'])) {
+        log_warn('Login attempt: Nonce ' . $_POST['nonce'] . ' not issued or is being reused.');
         set_message('SimpleID detected a potential security attack on your log in.  Please log in again.');
         user_login_form($destination, $state);
         return;
     } elseif ($time < time() - SIMPLEID_LOGIN_NONCE_EXPIRES_IN) {
+        log_notice('Login attempt: Nonce ' . $_POST['nonce'] . ' expired.');
         set_message('The log in page has expired.  Please log in again.');
         user_login_form($destination, $state);
         return;
@@ -208,6 +210,7 @@ function user_login() {
         return;
     }
 
+    log_info('Login successful: ' . $test_user['uid']);
     _user_login($test_user);
     
     if ($_POST['autologin'] == 1) user_autologin_create();
@@ -339,13 +342,13 @@ function user_public_page($uid = NULL) {
     
     $xtpl->assign('title', 'User Page');
     if ($uid == NULL) {
-        header('Status: 500');
+        header('HTTP/1.1 400 Bad Request');
         set_message('No user specified.');
     } else {
         $user = user_load($uid);
         
         if ($user == NULL) {
-            header('Status: 500');
+            header('HTTP/1.1 404 Not Found');
             set_message('User <strong>' . htmlspecialchars($uid, ENT_QUOTES, 'UTF-8') . '</strong> not found.');
         } else {
             header('Vary: Accept');
@@ -379,25 +382,32 @@ function user_public_page($uid = NULL) {
  * 
  * @param string $uid the user ID
  */
-function user_xrds($uid = NULL) {
+function user_xrds($uid) {
     global $xtpl;
     
-    header('Content-Type: application/xrds+xml');
-    header('Content-Disposition: inline; filename=yadis.xml');
+    $user = user_load($uid);
     
-    if ($uid != NULL) {
-        $user = user_load($uid);
+    if ($user != NULL) {
+        header('Content-Type: application/xrds+xml');
+        header('Content-Disposition: inline; filename=yadis.xml');
+    
         if (($user != NULL) && ($user["local_identity"])) {
             $xtpl->assign('local_id', htmlspecialchars($user["identity"], ENT_QUOTES, 'UTF-8'));
             $xtpl->parse('xrds.user_xrds.local_id');
             $xtpl->parse('xrds.user_xrds.local_id2');
         }
-    }
     
-    $xtpl->assign('simpleid_base_url', htmlspecialchars(simpleid_url(), ENT_QUOTES, 'UTF-8'));
-    $xtpl->parse('xrds.user_xrds');
-    $xtpl->parse('xrds');
-    $xtpl->out('xrds');
+        $xtpl->assign('simpleid_base_url', htmlspecialchars(simpleid_url(), ENT_QUOTES, 'UTF-8'));
+        $xtpl->parse('xrds.user_xrds');
+        $xtpl->parse('xrds');
+        $xtpl->out('xrds');
+    } else {
+        header('HTTP/1.1 404 Not Found');
+        
+        set_message('User <strong>' . htmlspecialchars($uid, ENT_QUOTES, 'UTF-8') . '</strong> not found.');
+        $xtpl->parse('main');
+        $xtpl->out('main');
+    }
 }
 
 /**
@@ -455,6 +465,12 @@ function _user_verify_digest($digest, $nonce, $test_user) {
 function user_autologin_create($id = NULL, $expires = NULL) {
     global $user;
     
+    if ($expires == NULL) {
+        log_debug('Automatic login token created for ' . $user['uid']);
+    } else {
+        log_debug('Automatic login token renewed for ' . $user['uid']);
+    }
+    
     if ($id == NULL) $id = get_form_token(mt_rand());
     if ($expires == NULL) $expires = time() + SIMPLEID_USER_AUTOLOGIN_EXPIRES_IN;
     $token = get_form_token(mt_rand());
@@ -471,15 +487,23 @@ function user_autologin_verify() {
     $cookie = $_COOKIE[_user_autologin_cookie()];
     
     list($uid, $id, $token) = explode(':', $cookie);
+    log_debug('Automatic login token detected for ' . $uid);
     
     cache_gc(SIMPLEID_USER_AUTOLOGIN_EXPIRES_IN, 'autologin-' . $uid);
     $cache = cache_get('autologin-' . $uid, $id);
     
-    if (!$cache) return;  // Cookie doesn't exist
+    if (!$cache) {  // Cookie doesn't exist
+        log_notice('Automatic login: Token does not exist on server');
+        return;
+    }
     
-    if ($cache['expires'] < time()) return;  // Cookie expired
+    if ($cache['expires'] < time()) {  // Cookie expired
+        log_notice('Automatic login: Token on server expired');
+        return;
+    }
     
     if ($cache['token'] != $token) {
+        log_warn('Automatic login: Token on server does not match');
         // Token not the same - panic
         cache_gc(0, 'autologin-' . $uid);
         user_autologin_invalidate();
@@ -488,11 +512,18 @@ function user_autologin_verify() {
     
     // Load the user, tag it as an auto log in
     $user = user_load($uid);
-    $user['autologin'] = TRUE;
-    _user_login($user);
     
-    // Renew the token
-    user_autologin_create($id, $cache['expires']);
+    if ($user != NULL) {
+        log_debug('Automatic login token accepted for ' . $uid);
+        
+        $user['autologin'] = TRUE;
+        _user_login($user);
+    
+        // Renew the token
+        user_autologin_create($id, $cache['expires']);
+    } else {
+        log_warn('Automatic login token accepted for ' . $uid . ', but no such user exists');
+    }
 }
 
 /**
