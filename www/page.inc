@@ -195,7 +195,7 @@ function _page_discovery_block() {
 
     $html .= "<h3>YADIS</h3>";
     $html .= "<ol><li>Write your own or <a href=\"" . htmlspecialchars('?q=xrds/'. $user['uid'], ENT_QUOTES, 'UTF-8') . "\">download</a> your YADIS document</li>";
-    $html .= "<li><div>Add HTTP headers or &lt;meta&gt; tag, e.g.:<div><pre>&lt;meta http-equiv=&quot;X-XRDS-Location&quot; content=&quot;" . htmlspecialchars(simpleid_url('?q=xrds/'. $user['uid']), ENT_QUOTES, 'UTF-8') . "&quot; /></pre>";
+    $html .= "<li><div>Add HTTP headers or &lt;meta&gt; tag, e.g.:<div><pre>&lt;meta http-equiv=&quot;X-XRDS-Location&quot; content=&quot;" . htmlspecialchars(simpleid_url('q=xrds/'. $user['uid']), ENT_QUOTES, 'UTF-8') . "&quot; /></pre>";
     $html .= "</li></ol>";
     
     return array(array(
@@ -204,9 +204,5 @@ function _page_discovery_block() {
         'content' => $html,
         'links' => '<a href="http://simpleid.sourceforge.net/documentation/getting-started/setting-identity/claim-your-identifier">More information</a>'
     ));
-    //$xtpl->assign('op_endpoint', htmlspecialchars(simpleid_url()));
-    //$xtpl->assign('identity', htmlspecialchars($user['identity']));
-    //$xtpl->assign('uid_rawurlencode', htmlspecialchars(rawurlencode($user['uid'])));
-    //$xtpl->assign('xrds', htmlspecialchars(simpleid_url('q=xrds/' . rawurlencode($user['uid']))));
 }
 ?>
