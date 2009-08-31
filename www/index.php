@@ -620,6 +620,7 @@ function simpleid_checkid_identity(&$request, $immediate) {
         }
         
         if (!$verified) {
+            log_notice('OpenID 2 discovery: not verified');
             $assertion_results[] = CHECKID_RETURN_TO_SUSPECT;
             return min($assertion_results);
         }
@@ -979,14 +980,14 @@ function simpleid_send() {
 function simpleid_xrds() {
     global $xtpl;
     
-    log_info('Providing XRDS.');
+    log_debug('Providing XRDS.');
     
     header('Content-Type: application/xrds+xml');
     header('Content-Disposition: inline; filename=yadis.xml');
     
     $types = extension_invoke_all('xrds_types');
     foreach ($types as $type) {
-        $xtpl->assign('uri', htmlspecialchars($type));
+        $xtpl->assign('uri', htmlspecialchars($type, ENT_QUOTES, 'UTF-8'));
         $xtpl->parse('xrds.op_xrds.type');
     }
     
