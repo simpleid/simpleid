@@ -160,6 +160,16 @@ th {
     white-space: nowrap;
     font-weight: bold;
 }
+
+pre {
+    border:1px solid #CCCCCC;
+    padding: 5px;
+    font-family:"Bitstream Vera Sans Mono","Courier New",monospace;
+    font-size: 0.9em;
+    white-space: nowrap;
+    overflow: scroll;
+}
+
 .realm {
     padding-left: 20px;
     background: transparent url(world.png) no-repeat top left;
@@ -201,6 +211,7 @@ th {
 
 .block {
     background-color: #EEEEEE;
+    margin-bottom: 20px;
 }
 .block-header {
     background-color: #666666;
@@ -221,9 +232,27 @@ th {
     text-align: right;
     white-space: nowrap;
 }
+.block-header-links a {
+    color: #FFFFFF;
+    border-bottom-color: #FFFFFF;
+    font-weight: normal;
+}
 .block-content {
     padding: 5px 10px;
 }
+.block-content p {
+    margin: 0 0 5px 0;
+    padding: 0;
+}
+.block-content h3 {
+    font-size: 1em;
+    font-weight: bold;
+    margin: 0;
+    padding: 5px 0 0 0;
+}
+
+#discovery label { display: inline; }
+#discovery-templates { display: none; }
 
 /* Forms */
 .form-item {

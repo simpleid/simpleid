@@ -72,13 +72,14 @@ function page_profile() {
     user_header();
     page_nav();
     
-    $blocks = array();
+    $blocks = _page_discovery_block();
 
     $blocks = array_merge($blocks, extension_invoke_all('page_profile'));
     $blocks = array_map('page_render_block', $blocks); 
     $xtpl->assign('blocks', implode($blocks));
     $xtpl->parse('main.blocks');
     
+    $xtpl->assign('javascript', '</script><script src="html/page-profile.js" type="text/javascript"></script>');
     $xtpl->assign('title', 'My Profile');
     $xtpl->parse('main');
     $xtpl->out('main');
@@ -148,6 +149,7 @@ function page_render_block($block) {
     
     if (!$xtpl_block) $xtpl_block = new XTemplate('html/block.xtpl');
     
+    $xtpl_block->reset('block');
     $xtpl_block->assign('id', $block['id']);
     $xtpl_block->assign('title', $block['title']);
     $xtpl_block->assign('content', $block['content']);
@@ -172,7 +174,39 @@ function _page_welcome_block() {
     return array(array(
         'id' => 'welcome',
         'title' => 'Welcome',
-        'content' => 'You are logged in as <strong>' . htmlspecialchars($user['uid']) . '</strong> (<strong>' . htmlspecialchars($user['identity']) . '</strong>).'
+        'content' => 'You are logged in as <strong>' . htmlspecialchars($user['uid'], ENT_QUOTES, 'UTF-8') . '</strong> (<strong>' . htmlspecialchars($user['identity'], ENT_QUOTES, 'UTF-8') . '</strong>).'
     ));
+}
+
+function _page_discovery_block() {
+    global $user;
+    
+    $html = "<h3>&lt;link&gt; tags</h3>";
+    
+    $html .= "<div><label><input type=\"checkbox\" name=\"openid1\" value=\"1\" id=\"discovery-openid1\" class=\"discovery-checkbox\" />OpenID 1.x</label>";
+    $html .= "<label><input type=\"checkbox\" name=\"openid2\" value=\"1\" id=\"discovery-openid2\" class=\"discovery-checkbox\" />OpenID 2.0</label>";
+    $html .= "<label><input type=\"checkbox\" name=\"local-id\" value=\"1\" id=\"discovery-local-id\" class=\"discovery-checkbox\" />Claim a different identifier</label></div>";
+    $html .= "<pre id=\"discovery-link-tags\">";
+    $html .= "</pre>";
+    $html .= "<ul id=\"discovery-templates\"><li class=\"openid1\">&lt;link rel=&quot;openid.server&quot; href=&quot;" . htmlspecialchars(simpleid_url(), ENT_QUOTES, 'UTF-8') . "&quot; /&gt;</li>\n";
+    $html .= "<li class=\"openid2\">&lt;link rel=&quot;openid2.provider&quot; href=&quot;" . htmlspecialchars(simpleid_url(), ENT_QUOTES, 'UTF-8') ."&quot; /&gt;</li>\n";
+    $html .= "<li class=\"openid1-local-id\">&lt;link rel=&quot;openid.delegate&quot; href=&quot;" . htmlspecialchars($user['identity'], ENT_QUOTES, 'UTF-8') . "&quot; /&gt;</li>\n";
+    $html .= "<li class=\"openid2-local-id\">&lt;link rel=&quot;openid2.local_id&quot; href=&quot;" . htmlspecialchars($user['identity'], ENT_QUOTES, 'UTF-8') ."&quot; /&gt;</li></ul>\n";
+
+    $html .= "<h3>YADIS</h3>";
+    $html .= "<ol><li>Write your own or <a href=\"" . htmlspecialchars('?q=xrds/'. $user['uid'], ENT_QUOTES, 'UTF-8') . "\">download</a> your YADIS document</li>";
+    $html .= "<li><div>Add HTTP headers or &lt;meta&gt; tag, e.g.:<div><pre>&lt;meta http-equiv=&quot;X-XRDS-Location&quot; content=&quot;" . htmlspecialchars(simpleid_url('?q=xrds/'. $user['uid']), ENT_QUOTES, 'UTF-8') . "&quot; /></pre>";
+    $html .= "</li></ol>";
+    
+    return array(array(
+        'id' => 'discovery',
+        'title' => 'Claim your Identifier',
+        'content' => $html,
+        'links' => '<a href="http://simpleid.sourceforge.net/documentation/getting-started/setting-identity/claim-your-identifier">More information</a>'
+    ));
+    //$xtpl->assign('op_endpoint', htmlspecialchars(simpleid_url()));
+    //$xtpl->assign('identity', htmlspecialchars($user['identity']));
+    //$xtpl->assign('uid_rawurlencode', htmlspecialchars(rawurlencode($user['uid'])));
+    //$xtpl->assign('xrds', htmlspecialchars(simpleid_url('q=xrds/' . rawurlencode($user['uid']))));
 }
 ?>
