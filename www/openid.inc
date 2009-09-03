@@ -38,6 +38,8 @@ include_once "bignum.inc";
  
 /**
  * OpenID default modulus for Diffie-Hellman key exchange.
+ *
+ * @link http://openid.net/specs/openid-authentication-1_1.html#pvalue, http://openid.net/specs/openid-authentication-2_0.html#pvalue
  */
 define('OPENID_DH_DEFAULT_MOD', '155172898181473697471232257763715539915724801'.
        '966915404479707795314057629378541917580651227423698188993727816152646631'.
@@ -52,16 +54,31 @@ define('OPENID_DH_DEFAULT_GEN', '2');
 
 define('OPENID_SHA1_BLOCKSIZE', 64);
 
+/**
+ * The source of random bits.  On Unix-like systems, this could be /dev/random
+ * or /dev/urandom
+ */
 define('OPENID_RAND_SOURCE', '/dev/urandom');
 
+/** Constant for the global variable {@link $version} */
 define('OPENID_VERSION_2', 2);
+/** Constant for the global variable {@link $version} */
 define('OPENID_VERSION_1_1', 1);
 
+/** Constant for OpenID namespace */
 define('OPENID_NS_2_0', 'http://specs.openid.net/auth/2.0');
+/** Constant for OpenID namespace */
 define('OPENID_NS_1_1', 'http://openid.net/signon/1.1');
+/** Constant for OpenID namespace */
 define('OPENID_NS_1_0', 'http://openid.net/signon/1.0');
 
+/**
+ * Constant for the OP-local identifier which indicates that SimpleID should choose an identifier
+ *
+ * @link http://openid.net/specs/openid-authentication-2_0.html#anchor27
+ */
 define('OPENID_IDENTIFIER_SELECT', 'http://specs.openid.net/auth/2.0/identifier_select');
+/** Constant for the XRDS service type for return_to verification */
 define('OPENID_RETURN_TO', 'http://specs.openid.net/auth/2.0/return_to');
 
 /**
@@ -91,11 +108,12 @@ function openid_get_version($request, $key = 'openid.ns') {
 /**
  * Creates a OpenID message for direct response.
  *
- * The response will be encoded using Key-Value Form Encoding. [4.1.1]
+ * The response will be encoded using Key-Value Form Encoding.
  *
  * @param array $data the data in the response
  * @param int $version the message version
  * @return string the message in key-value form encoding
+ * @link http://openid.net/specs/openid-authentication-1_1.html#anchor32, http://openid.net/specs/openid-authentication-2_0.html#kvform
  */
 function openid_direct_message($data, $version = OPENID_VERSION_2) {
     $message = '';
@@ -134,11 +152,12 @@ function openid_direct_response($message, $status = '200 OK') {
 /**
  * Creates a OpenID message for indirect response.
  *
- * The response will be encoded using HTTP Encoding. [4.1.2]
+ * The response will be encoded using HTTP Encoding.
  *
  * @param array $data the data in the response
  * @param int $version the message version
  * @return array the message
+ * @link http://openid.net/specs/openid-authentication-2_0.html#indirect_comm
  */
 function openid_indirect_message($data, $version = OPENID_VERSION_2) {
     if ($version == OPENID_VERSION_2) {
@@ -151,7 +170,7 @@ function openid_indirect_message($data, $version = OPENID_VERSION_2) {
  * Sends an indirect response to a URL.
  *
  * @param string $url the URL to which the response is to be sent
- * @param mixed $message an OpenID message, which can either be an array of keys
+ * @param array $message an OpenID message, which can either be an array of keys
  * and values, or a URL-encoded query string
  * @param string $response_func the method by which the indirect response is to
  * be sent, either openid_indirect_response_form or openid_indirect_response_redirect
@@ -174,8 +193,9 @@ function openid_indirect_response_redirect($url, $message) {
 
 /**
  * Encodes an indirect message into a URL
+ *
  * @param string $url the URL to which the response is to be sent
- * @param mixed $message an OpenID message, which can either be an array of keys
+ * @param array $message an OpenID message, which can either be an array of keys
  * and values, or a URL-encoded query string
  * @return string the URL to which the response is to be sent, with the
  * encoded message
@@ -605,7 +625,8 @@ function openid_extension_alias($ns, $create = FALSE) {
 /* ------- Random byte and nonce functions ----------------------------------- */
 /**
  * Obtains a number of random bytes.  This function uses an entropy source specified
- * in OPENID_RAND_SOURCE.
+ * in OPENID_RAND_SOURCE.  If OPENID_RAND_SOURCE is not available, the mt_rand()
+ * PHP function is used
  *
  * @param int $num_bytes the number of bytes to generate
  * @return string a string containing random bytes
@@ -633,9 +654,10 @@ function openid_random($num_bytes) {
 }
 
 /**
- * Generates a nonce [10.1]
+ * Generates a nonce for use in OpenID responses
  *
  * @return string an OpenID nonce
+ * @link http://openid.net/specs/openid-authentication-2_0.html#positive_assertions
  */
 function openid_nonce() {
     return gmstrftime('%Y-%m-%dT%H:%M:%SZ') . bin2hex(openid_random(4));
@@ -694,7 +716,7 @@ function openid_session_types($version = OPENID_VERSION_2) {
 
 /**
  * Generates the cryptographic values required for responding to association
- * requests [8.4.2].
+ * requests
  *
  * This involves generating a key pair for the OpenID provider, then calculating
  * the shared secret.  The shared secret is then used to encrypt the MAC key.
@@ -914,10 +936,10 @@ function _openid_bignum_to_base64($str) {
 
 /**
  * Encode an integer as big-endian signed two's complement binary string.
- * [4.2]
  *
  * @param string $num the binary integer
  * @return string the signed two's complement binary string
+ * @link http://openid.net/specs/openid-authentication-2_0.html#btwoc
  */
 function _openid_btwoc($num) {
     return pack('H*', $num);

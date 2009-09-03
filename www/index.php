@@ -167,6 +167,20 @@ function simpleid_start() {
     simpleweb_run($routes, implode('/', $q));
 }
 
+/**
+ * The default route, called when the q parameter is missing or is invalid.
+ *
+ * This function performs the following:
+ *
+ * - If openid.mode is present, then the request is an OpenID request.  This
+ *   is passed to {@link simpleid_process_openid()}
+ * - If the Accept HTTP header contains the expression application/xrds+xml, then
+ *   the request is a YADIS discovery request for SimpleID as an OpenID provider.  Thi
+ *   is passed to {@link simpleid_xrds()}
+ * - Otherwise, the dashboard or the login page is displayed to the user as
+ *   appropriate
+ *
+ */
 function simpleid_index() {
     log_debug('simpleid_index');
     
@@ -235,11 +249,15 @@ function simpleid_autorelease() {
 /**
  * Process an OpenID request.
  *
- * <p>This function determines the version of the OpenID specification that is
+ * This function determines the version of the OpenID specification that is
  * relevant to this request, checks openid.mode and passes the
- * request on to the function required to process the request.</p>
+ * request on to the function required to process the request.
  *
- * @param mixed $request the OpenID request
+ * The OpenID request expressed as an array contain key-value pairs corresponding
+ * to the HTTP request.  This is usually contained in the <code>$_REQUEST</code>
+ * variable.
+ *
+ * @param array $request the OpenID request
  */
 function simpleid_process_openid($request) {
     global $version;
@@ -263,15 +281,16 @@ function simpleid_process_openid($request) {
 }
 
 /**
- * Processes an association request from a relying party.  [8]
+ * Processes an association request from a relying party.
  *
- * <p>An association request has an openid.mode value of
+ * An association request has an openid.mode value of
  * associate.  This function checks whether the association request
  * is valid, and if so, creates an association and sends the response to
- * the relying party.</p>
+ * the relying party.
  *
  * @see _simpleid_create_association()
- * @param mixed $request the OpenID request
+ * @param array $request the OpenID request
+ * @link http://openid.net/specs/openid-authentication-1_1.html#mode_associate, http://openid.net/specs/openid-authentication-2_0.html#associations
  *
  */
 function simpleid_associate($request) {
@@ -338,6 +357,9 @@ function simpleid_associate($request) {
 /**
  * Creates an association.
  *
+ * This function calls {@link openid_dh_server_assoc()} where required, to 
+ * generate the cryptographic values required for an association response.
+ *
  * @param int $mode either CREATE_ASSOCIATION_DEFAULT or CREATE_ASSOCIATION_STATELESS
  * @param string $assoc_type a valid OpenID association type
  * @param string $session_type a valid OpenID session type
@@ -347,6 +369,7 @@ function simpleid_associate($request) {
  * @return mixed if $mode is CREATE_ASSOCIATION_DEFAULT, an OpenID response
  * to the association request, if $mode is CREATE_ASSOCIATION_STATELESS, the
  * association data for storage.
+ * @link http://openid.net/specs/openid-authentication-1_1.html#anchor14, http://openid.net/specs/openid-authentication-2_0.html#anchor20
  */
 function _simpleid_create_association($mode = CREATE_ASSOCIATION_DEFAULT, $assoc_type = 'HMAC-SHA1', $session_type = 'no-encryption', $dh_modulus = NULL, $dh_gen = NULL, $dh_consumer_public = NULL) {
     global $version;
@@ -418,7 +441,7 @@ function _simpleid_create_association($mode = CREATE_ASSOCIATION_DEFAULT, $assoc
  * Depending on the OpenID version, this function will supply an appropriate
  * assertion.
  *
- * @param mixed $request the OpenID request
+ * @param array $request the OpenID request
  *
  */
 function simpleid_checkid($request) {
@@ -544,7 +567,7 @@ function simpleid_checkid($request) {
  * Checks whether the current user logged into SimpleID matches the identity
  * supplied in an OpenID request.
  *
- * @param mixed &$request the OpenID request
+ * @param array &$request the OpenID request
  * @param bool $immediate whether checkid_immediate was used
  * @return int one of CHECKID_OK, CHECKID_APPROVAL_REQUIRED, CHECKID_RETURN_TO_SUSPECT, CHECKID_IDENTITY_NOT_EXIST,
  * CHECKID_IDENTITIES_NOT_MATCHING, CHECKID_LOGIN_REQUIRED or CHECKID_PROTOCOL_ERROR
@@ -641,8 +664,9 @@ function simpleid_checkid_identity(&$request, $immediate) {
 /**
  * Returns an OpenID response indicating a positive assertion.
  *
- * @param mixed $request the OpenID request
- * @return mixed an OpenID response with a positive assertion
+ * @param array $request the OpenID request
+ * @return array an OpenID response with a positive assertion
+ * @link http://openid.net/specs/openid-authentication-1_1.html#anchor17, http://openid.net/specs/openid-authentication-1_1.html#anchor23, http://openid.net/specs/openid-authentication-2_0.html#positive_assertions
  */
 function simpleid_checkid_ok($request) {
     global $version;
@@ -670,10 +694,11 @@ function simpleid_checkid_ok($request) {
 /**
  * Returns an OpenID response indicating a negative assertion to a
  * checkid_immediate request, where an approval of the relying party by the
- * user is required  [10.2]
+ * user is required
  *
  * @param mixed $request the OpenID request
  * @return mixed an OpenID response with a negative assertion
+ * @link http://openid.net/specs/openid-authentication-1_1.html#anchor17, http://openid.net/specs/openid-authentication-1_1.html#anchor23, http://openid.net/specs/openid-authentication-2_0.html#negative_assertions
  */
 function simpleid_checkid_approval_required($request) {
     global $version;
@@ -696,10 +721,11 @@ function simpleid_checkid_approval_required($request) {
 
 /**
  * Returns an OpenID response indicating a negative assertion to a
- * checkid_immediate request, where a login is required  [10.2]
+ * checkid_immediate request, where the user has not logged in.
  *
- * @param mixed $request the OpenID request
- * @return mixed an OpenID response with a negative assertion
+ * @param array $request the OpenID request
+ * @return array an OpenID response with a negative assertion
+ * @link http://openid.net/specs/openid-authentication-1_1.html#anchor17, http://openid.net/specs/openid-authentication-1_1.html#anchor23, http://openid.net/specs/openid-authentication-2_0.html#negative_assertions
  */
 function simpleid_checkid_login_required($request) {
     global $version;
@@ -720,10 +746,14 @@ function simpleid_checkid_login_required($request) {
 }
 
 /**
- * Returns an OpenID response indicating a negative assertion  [10.2]
+ * Returns an OpenID response indicating a generic negative assertion.
  *
- * @param bool $immediate whether checkid_immediate was used
- * @return mixed an OpenID response with a negative assertion
+ * The content of the negative version depends on the OpenID version, and whether
+ * the openid.mode of the request was checkid_immediate
+ *
+ * @param bool $immediate true if openid.mode of the request was checkid_immediate
+ * @return array an OpenID response with a negative assertion
+ * @link http://openid.net/specs/openid-authentication-1_1.html#anchor17, http://openid.net/specs/openid-authentication-1_1.html#anchor23, http://openid.net/specs/openid-authentication-2_0.html#negative_assertions
  */
 function simpleid_checkid_error($immediate) {
     global $version;
@@ -793,10 +823,11 @@ function simpleid_sign(&$response, $assoc_handle = NULL) {
 }
 
 /**
- * Verify signatures generated using stateless mode [11.4.2]
+ * Verify signatures generated using stateless mode
  *
  *
- * @param mixed $request the OpenID request 
+ * @param array $request the OpenID request
+ * @see http://openid.net/specs/openid-authentication-1_1.html#mode_check_authentication, http://openid.net/specs/openid-authentication-2_0.html#verifying_signatures
  */
 function simpleid_authenticate($request) {
     global $version;
@@ -849,10 +880,10 @@ function simpleid_authenticate($request) {
 /**
  * Continues an OpenID authentication request.
  *
- * <p>This function decodes an OpenID authentication request specified in the
+ * This function decodes an OpenID authentication request specified in the
  * s request parameter and feeds it to the
  * {@link simpleid_process_openid} function.  This allows SimpleID to preserve
- * the state of an OpenID request.</p>
+ * the state of an OpenID request.
  */
 function simpleid_continue() {
     simpleid_process_openid(unpickle($_REQUEST['s']));
@@ -861,9 +892,10 @@ function simpleid_continue() {
 /**
  * Provides a form for user verification of a relying party, where the 
  * {@link simpleid_checkid_identity()} function returns a CHECKID_APPROVAL_REQUIRED
+ * or CHECKID_RETURN_TO_SUSPECT.
  *
- * @param mixed $request the original OpenID request
- * @param mixed $response the proposed OpenID response, subject to user
+ * @param array $request the original OpenID request
+ * @param array $response the proposed OpenID response, subject to user
  * verification
  * @param int $reason either CHECKID_APPROVAL_REQUIRED or CHECKID_RETURN_TO_SUSPECT
  */
@@ -913,8 +945,8 @@ function simpleid_rp_form($request, $response, $reason = CHECKID_APPROVAL_REQUIR
 /**
  * Processes a user response from the {@link simpleid_rp_form()} function.
  *
- * <p>If the user verifies the relying party, an OpenID response will be sent to
- * the relying party.</p>
+ * If the user verifies the relying party, an OpenID response will be sent to
+ * the relying party.  Otherwise, the dashboard will be displayed to the user.
  *
  */
 function simpleid_send() {
@@ -974,7 +1006,7 @@ function simpleid_send() {
 }
 
 /**
- * Returns XRDS document for this SimpleID installation.
+ * Displays the XRDS document for this SimpleID installation.
  * 
  */
 function simpleid_xrds() {
