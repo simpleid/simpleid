@@ -5,6 +5,7 @@
     <head>
         <title>{title} - SimpleID Upgrade</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+        <meta content="noindex,nofollow" name="robots" />
         
         <style type="text/css" media="screen">
             @import url(html/simpleid.css);

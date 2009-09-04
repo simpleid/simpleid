@@ -6,6 +6,7 @@
         <title>{title} - SimpleID</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
         <meta content="{version}" name="SimpleID-Version" />
+        <meta content="noindex,nofollow" name="robots" />
         
         <!-- BEGIN: provider -->
             <link rel="openid.server" href="{provider}"/>
