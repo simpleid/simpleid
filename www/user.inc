@@ -309,29 +309,6 @@ function user_login_form($destination = '', $state = NULL) {
     $xtpl->out('main');
 }
 
-function user_discovery() {
-    global $user;
-    global $xtpl;
-    
-    if ($user == NULL) {
-        user_login_form('');
-        return;
-    }
-    
-    user_header();
-    
-    $xtpl->assign('op_endpoint', htmlspecialchars(simpleid_url()));
-    $xtpl->assign('identity', htmlspecialchars($user['identity']));
-    $xtpl->assign('uid_rawurlencode', htmlspecialchars(rawurlencode($user['uid'])));
-    $xtpl->assign('xrds', htmlspecialchars(simpleid_url('q=xrds/' . rawurlencode($user['uid']))));
-    
-    $xtpl->parse('main.discovery');
-    
-    $xtpl->assign('title', 'OpenID Discovery Configuration for ' . htmlspecialchars($user['uid']));
-    $xtpl->parse('main');
-    $xtpl->out('main');
-}
-
 /**
  * Returns the user's public page.
  * 

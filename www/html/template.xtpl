@@ -161,19 +161,6 @@
                 {blocks}
             <!-- END: blocks -->
 
-            <!-- BEGIN: profile -->
-            
-            
-            {extensions}
-            
-            <h2>OpenID Discovery Information</h2>
-            
-            <p>You can view the <a href="index.php?q=discovery">OpenID discovery information</a>
-            applicable to this account to help you complete the set up process.</p>
-            
-            <!-- END: profile -->
-
-            
             <!-- BEGIN: sites -->
             <form action="index.php" method="post" enctype="application/x-www-form-urlencoded" >
             <input name="q" type="hidden" value="autorelease" />

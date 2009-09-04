@@ -149,7 +149,6 @@ function simpleid_start() {
         'continue' => 'simpleid_continue',
         'send' => 'simpleid_send',
         'autorelease' => 'simpleid_autorelease',
-        'openid' => 'simpleid_process_openid',
         'login' => 'user_login',
         'logout' => 'user_logout',
         'my/dashboard' => 'page_dashboard',
@@ -157,7 +156,6 @@ function simpleid_start() {
         'my/profile' => 'page_profile',
         'user' => 'user_public_page',
         'user/(.+)' => 'user_public_page',
-        'discovery' => 'user_discovery',
         'xrds/(.*)' => 'user_xrds',
         'xrds' => 'simpleid_xrds',
         '.*' => 'simpleid_index'
@@ -971,8 +969,6 @@ function simpleid_send() {
     $version = openid_get_version($response);
     $return_to = $response['openid.return_to'];
     if (!$return_to) $return_to = $_REQUEST['openid.return_to'];
-    
-    extension_invoke_all('send', $request, $response);
     
     if ($_REQUEST['op'] == 'Cancel') {
         $response = simpleid_checkid_error(false);
