@@ -79,7 +79,7 @@ function page_profile() {
     $xtpl->assign('blocks', implode($blocks));
     $xtpl->parse('main.blocks');
     
-    $xtpl->assign('javascript', '</script><script src="html/page-profile.js" type="text/javascript"></script>');
+    $xtpl->assign('javascript', '<script src="html/page-profile.js" type="text/javascript"></script>');
     $xtpl->assign('title', 'My Profile');
     $xtpl->parse('main');
     $xtpl->out('main');

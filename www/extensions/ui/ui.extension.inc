@@ -28,7 +28,8 @@
  * @subpackage extensions
  * @filesource
  */
- 
+
+/** Namespace for the User Interface extension */
 define('OPENID_NS_UI', 'http://specs.openid.net/extensions/ui/1.0');
 
 /**
@@ -47,7 +48,6 @@ function ui_xrds_types() {
  *
  * @param string $destination
  * @param string $state
- * @return array
  * @see hook_user_login_form()
  */
 function ui_user_login_form($destination, $state) {
@@ -56,13 +56,13 @@ function ui_user_login_form($destination, $state) {
     $request = unpickle($state);
     
     // Skip if popup does not exist
-    if (!openid_extension_requested(OPENID_NS_UI, $request)) return array();
+    if (!openid_extension_requested(OPENID_NS_UI, $request)) return;
     
     $filtered_request = openid_extension_filter_request(OPENID_NS_UI, $request);
     
     if (isset($filtered_request['mode']) && ($filtered_request['mode'] == 'popup')) _ui_insert_css_js();
     
-    return array();
+    return;
 }
 
 /**
