@@ -104,6 +104,24 @@ function indirect_fatal_error($error) {
 }
 
 /**
+ * Determines whether the current connection with the user agent is via
+ * HTTPS.
+ *
+ * HTTPS is detected if one of the following occurs:
+ *
+ * - $_SERVER['HTTPS'] is set to 'on' (Apache installations)
+ * - $_SERVER['HTTP_X_FORWARDED_PROTO'] is set to 'https' (reverse proxies)
+ * - $_SERVER['HTTP_FRONT_END_HTTPS'] is set to 'on'
+ *
+ * @return bool true if the connection is via HTTPS
+ */
+function is_https() {
+    return (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on'))
+        || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && (strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) == 'https'))
+        || (isset($_SERVER['HTTP_FRONT_END_HTTPS']) && ($_SERVER['HTTP_FRONT_END_HTTPS'] == 'on'));
+}
+
+/**
  * Serialises a variable for inclusion as a URL parameter.
  *
  * @param mixed $data the data to serialise

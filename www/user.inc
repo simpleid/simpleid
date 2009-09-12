@@ -158,7 +158,10 @@ function user_login() {
         return;
     }
     
-    if (!$_POST['name'] || ((SIMPLEID_ALLOW_LEGACY_LOGIN && (!$_POST['pass']) && (!$_POST['digest'])) || (!SIMPLEID_ALLOW_LEGACY_LOGIN && (!$_POST['digest'])))) {
+    // We allow legacy login if the connection is via HTTPS or if SIMPLEID_ALLOW_LEGACY_LOGIN is true
+    $allow_legacy_login = (is_https() || SIMPLEID_ALLOW_LEGACY_LOGIN);
+    
+    if (!$_POST['name'] || (($allow_legacy_login && (!$_POST['pass']) && (!$_POST['digest'])) || (!SIMPLEID_ALLOW_LEGACY_LOGIN && (!$_POST['digest'])))) {
         if (isset($_POST['destination'])) {
             // User came from a log in form.
             set_message('You need to supply the user name and the password in order to log in.');
@@ -204,7 +207,7 @@ function user_login() {
         set_message('The user name or password is not correct.');
         user_login_form($destination, $state);
         return;
-    } elseif (SIMPLEID_ALLOW_LEGACY_LOGIN && (md5($_POST['pass']) != $test_user['pass'])) {
+    } elseif ($allow_legacy_login && (md5($_POST['pass']) != $test_user['pass'])) {
         set_message('The user name or password is not correct.');
         user_login_form($destination, $state);
         return;
@@ -282,14 +285,14 @@ function user_login_form($destination = '', $state = NULL) {
     
     $xtpl->assign('javascript', '<script src="html/md5.js" type="text/javascript"></script><script src="html/user-login.js" type="text/javascript"></script>');
     
-    if ((isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on')) || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && ($_SERVER['HTTP_X_FORWARDED_PROTO'] == "https"))) {
+    if (is_https()) {
         $xtpl->assign('security_class', 'secure');
         $xtpl->assign('security_message', 'Secure login using <strong>HTTPS</strong>.');
     } else {
         $xtpl->assign('security_class', 'unsecure');
         
         if (!SIMPLEID_ALLOW_LEGACY_LOGIN) {
-            $xtpl->assign('security_message', 'Your SimpleID configuration does not allow you to log in unsecurely.  Please enable JavaScript and try again, or see <a href="http://simpleid.sourceforge.net/manual/login-security.html">the SimpleID manual</a> for more details.');
+            $xtpl->assign('security_message', 'Your SimpleID configuration does not allow you to log in unsecurely.  Please enable JavaScript and try again, or see <a href="http://simpleid.sourceforge.net/documentation/using-simpleid/logging-simpleid">the SimpleID documentation</a> for more details.');
             $xtpl->assign('security_disabled', 'disabled="disabled"');
         } else {
             $xtpl->assign('security_message', '<strong>WARNING:</strong>  Your password will be sent to SimpleID as plain text.');
