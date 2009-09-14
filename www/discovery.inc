@@ -291,6 +291,9 @@ function discovery_get_openid_services($url) {
  * found
  */
 function _discovery_meta_httpequiv($equiv, $html) {
+    $html = preg_replace('/<!(?:--(?:[^-]*|-[^-]+)*--\s*)>/', '', $html); // Strip html comments
+    
+    $equiv = preg_quote($equiv);
     preg_match('|<meta\s+http-equiv=["\']'. $equiv .'["\'](.*)/?>|iUs', $html, $matches);
     if (isset($matches[1])) {
         preg_match('|content=["\']([^"]+)["\']|iUs', $matches[1], $content);
@@ -311,6 +314,8 @@ function _discovery_meta_httpequiv($equiv, $html) {
  * found
  */
 function _discovery_link_rel($rel, $html) {
+    $html = preg_replace('/<!(?:--(?:[^-]*|-[^-]+)*--\s*)>/s', '', $html); // Strip html comments
+    
     $rel = preg_quote($rel);
     preg_match('|<link\s+rel=["\'](.*)'. $rel .'(.*)["\'](.*)/?>|iUs', $html, $matches);
     if (isset($matches[3])) {
