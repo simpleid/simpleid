@@ -265,7 +265,7 @@ function user_logout($destination = NULL) {
 }
 
 /**
- * Provides a user login form.
+ * Displays a user login form.
  *
  * @param string $destination the SimpleID location to which the user is directed
  * if login is successful

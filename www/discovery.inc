@@ -334,14 +334,53 @@ function _discovery_link_rel($rel, $html) {
  * The result is an array of discovered services.
  */
 class XRDSParser {
+    /**
+     * XML parser
+     * @var resource
+     * @access private
+     */
     var $parser;
+    
+    /**
+     * Discovered services
+     * @var array
+     * @access private
+     */
     var $services = array();
     
+    /**
+     * State: are we parsing a service element?
+     * @var bool
+     * @access private
+     */
     var $in_service = FALSE;
+    
+    /**
+     * CDATA buffer
+     * @var string
+     * @access private
+     */
     var $buffer;
+    
+    /**
+     * priority attribute buffer
+     * @var string
+     * @access private
+     */
     var $priority = NULL;
+    
+    /**
+     * Currently parsed service buffer
+     * @var array
+     * @access private
+     */
     var $service = array();
     
+    /**
+     * Creates an instance of the XRDS parser.
+     *
+     * This constructor also initialises the underlying XML parser.
+     */
     function XRDSParser() {
         $this->parser = xml_parser_create_ns();
         xml_set_object($this->parser, $this);
@@ -349,18 +388,47 @@ class XRDSParser {
         xml_set_character_data_handler($this->parser, 'cdata');
     }
     
+    /**
+     * Frees memory associated with the underlying XML parser.
+     *
+     * Note that only the memory associated with the underlying XML parser is
+     * freed.  Memory associated with the class itself is not freed.
+     *
+     * @access public
+     */
     function free() {
         xml_parser_free($this->parser);
     }
     
+    /**
+     * Parses an XRDS document.
+     *
+     * Once the parsing is complete, use {@link XRDSParser::services()} to obtain
+     * the services extracted from the document.
+     *
+     * @param string $xml the XML document to parse
+     * @access public
+     */
     function parse($xml) {
         xml_parse($this->parser, $xml);
     }
     
+    /**
+     * Gets an array of discovered services.
+     *
+     * @return array an array of discovered services, or an empty array
+     * @access public
+     * @see XRDSParser::parse()
+     */
     function services() {
         return $this->services;
     }
 
+    /**
+     * XML parser callback
+     *
+     * @access private
+     */
     function element_start(&$parser, $qualified, $attribs) {
         list($ns, $name) = $this->parse_namespace($qualified);
         $name = strtolower($name);
@@ -394,6 +462,11 @@ class XRDSParser {
         $this->buffer = '';
     }
 
+    /**
+     * XML parser callback
+     *
+     * @access private
+     */
     function element_end(&$parser, $qualified) {
         list($ns, $name) = $this->parse_namespace($qualified);
         $name = strtolower($name);
@@ -435,16 +508,45 @@ class XRDSParser {
 
     }
 
+    /**
+     * XML parser callback
+     *
+     * @access private
+     */
     function cdata(&$parser, $data) {
         $this->buffer .= $data;
     }
     
+    /**
+     * Parses a namespace-qualified element name.
+     *
+     * @param string $qualified the qualified name
+     * @return array an array with two elements - the first element contains
+     * the namespace qualifier (or an empty string), the second element contains
+     * the element name
+     * @access protected
+     */
     function parse_namespace($qualified) {
         $pos = strrpos($qualified, ':');
         if ($pos !== FALSE) return array(substr($qualified, 0, $pos), substr($qualified, $pos + 1, strlen($qualified)));
         return array('', $qualified);
     }
     
+    /**
+     * Flattens the service array.
+     *
+     * In an XRDS document, child elements of the service element often contains
+     * a list of URIs, with the priority specified in the priority attribute.
+     *
+     * When the document is parsed in this class, the URI and the priority are first
+     * extracted into the #uri and the #priorty keys respectively.  This function
+     * takes this array, sorts the elements using the #priority keys, then collapses
+     * the array using the value associated with the #uri key.
+     *
+     * @param array $array the service array, with URIs and priorities
+     * @return array the services array with URIs sorted by priority
+     * @access protected
+     */
     function flatten_uris($array) {
         $result = array();
         
