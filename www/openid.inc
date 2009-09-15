@@ -373,7 +373,7 @@ function openid_parse_query($query) {
  *
  * @param array &$post the HTTP post data as returned by PHP
  */
-function openid_parse_request(&$post) {
+function openid_fix_request(&$post) {
     global $ns_to_alias;    
     
     foreach ($post as $key => $value) {
@@ -381,15 +381,12 @@ function openid_parse_request(&$post) {
             $fixed_key = str_replace('openid_', 'openid.', $key);
             $fixed_key = str_replace('openid.ns_', 'openid.ns.', $fixed_key);
             
-            if (strpos($fixed_key, 'openid.ns.') === 0) {
-                $alias = substr($fixed_key, 10);
-                $ns_to_alias[$value] = $alias;
-            }
             unset($post[$key]);
             $post[$fixed_key] = $value;
         }
     }
     
+    openid_parse_request($post);
     $aliases = array_values($ns_to_alias);
     
     foreach ($post as $key => $value) {
@@ -402,6 +399,24 @@ function openid_parse_request(&$post) {
         if ($fixed_key != $key) {
             unset($post[$key]);
             $post[$fixed_key] = $value;
+        }
+    }
+}
+
+/**
+ * Parses the OpenID request to extract namespace information.
+ *
+ * This function builds a map between namespace aliases and their Type URIs.
+ *
+ * @param array $request the OpenID request
+ */
+function openid_parse_request($request) {
+    global $ns_to_alias;    
+    
+    foreach ($request as $key => $value) {
+        if (strpos($key, 'openid.ns.') === 0) {
+            $alias = substr($key, 10);
+            $ns_to_alias[$value] = $alias;
         }
     }
 }

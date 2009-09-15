@@ -133,7 +133,7 @@ function simpleid_start() {
         exit;
     }
 
-    openid_parse_request($_REQUEST);
+    openid_fix_request($_REQUEST);
     
     $q = (isset($_REQUEST['q'])) ? $_REQUEST['q'] : '';
     $q = explode('/', $q);
@@ -884,7 +884,9 @@ function simpleid_authenticate($request) {
  * the state of an OpenID request.
  */
 function simpleid_continue() {
-    simpleid_process_openid(unpickle($_REQUEST['s']));
+    $request = unpickle($_REQUEST['s']);
+    openid_parse_request($request);
+    simpleid_process_openid($request);
 }
 
 /**
@@ -920,7 +922,7 @@ function simpleid_rp_form($request, $response, $reason = CHECKID_APPROVAL_REQUIR
     } else {        
         $rp = (isset($user['rp'][$realm])) ? $user['rp'][$realm] : NULL;
         
-        $extensions = extension_invoke_all('form', $request, $response, $rp);
+        $extensions = extension_invoke_all('rp_form', $request, $response, $rp);
         $xtpl->assign('extensions', implode($extensions));
         
         if ($reason == CHECKID_RETURN_TO_SUSPECT) {

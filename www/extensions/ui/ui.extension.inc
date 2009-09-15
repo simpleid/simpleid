@@ -54,6 +54,7 @@ function ui_user_login_form($destination, $state) {
     if (($destination != 'continue') || (!$state)) return;
     
     $request = unpickle($state);
+    openid_parse_request($request);
     
     // Skip if popup does not exist
     if (!openid_extension_requested(OPENID_NS_UI, $request)) return;
