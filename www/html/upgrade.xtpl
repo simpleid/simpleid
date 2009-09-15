@@ -32,7 +32,7 @@
             <!-- END: message -->
             
             <!-- BEGIN: access_denied -->
-            <p>Access denied. You are not authorised to access this page. Please log in as an
+            <p>Access denied. You are not authorised to access this page. Please <a href="index.php?q=login">log in</a> as an
             administrator (a user whose identity file includes the line <code>administrator=1</code>).</p>
             
             <p>If you cannot log in, you will have to edit <code>upgrade.php</code> to bypass this access check. To do this:</p>
@@ -43,6 +43,9 @@
                 <li>As soon as the upgrade.php script is done, you must change the file back to its original form with <code>$upgrade_access_check = TRUE;</code>.</li>
                 <li>To avoid having this problem in future, remember to log in to SimpleID as an administrator before you run this script.</li>
             </ol>
+            
+            <p>For more detailed information, see the
+            <a href="http://simpleid.sourceforge.net/documentation/getting-started/upgrading/running-upgradephp">SimpleID documentation</a>.</p>
             <!-- END: access_denied -->
 
             <!-- BEGIN: info -->
