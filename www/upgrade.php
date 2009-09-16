@@ -97,8 +97,9 @@ upgrade_start();
 function upgrade_start() {
     global $xtpl;
         
-    $xtpl = new XTemplate('html/upgrade.xtpl');
+    $xtpl = new XTemplate('html/template.xtpl');
     $xtpl->assign('version', SIMPLEID_VERSION);
+    $xtpl->assign('css', '@import url(html/upgrade.css);');
     
     // Check if the configuration file has been defined
     if (!defined('SIMPLEID_BASE_URL')) {
@@ -153,7 +154,7 @@ function upgrade_info() {
     global $xtpl;
     
     $xtpl->assign('token', get_form_token('upgrade_info'));
-    $xtpl->parse('main.info');
+    $xtpl->parse('main.upgrade_info');
     
     $xtpl->assign('title', 'Upgrade');
     $xtpl->parse('main');
@@ -181,19 +182,19 @@ function upgrade_selection() {
     
     if (count($functions) == 0) {
         if (!$upgrade_access_check) $xtpl->parse('main.selection.selection_complete.upgrade_access_check');
-        $xtpl->parse('main.selection.selection_complete');
+        $xtpl->parse('main.upgrade_selection.selection_complete');
     } else {
         $handle = openid_handle();
         cache_set('upgrade', $handle, $functions);
         
         $xtpl->assign('handle', $handle);
         $xtpl->assign('token', get_form_token('upgrade_selection'));
-        $xtpl->parse('main.selection.selection_continue');
+        $xtpl->parse('main.upgrade_selection.selection_continue');
     }
     
     $xtpl->assign('original_version', upgrade_get_version());
     $xtpl->assign('this_version', SIMPLEID_VERSION);
-    $xtpl->parse('main.selection');
+    $xtpl->parse('main.upgrade_selection');
     
     $xtpl->assign('title', 'Upgrade');
     $xtpl->parse('main');
@@ -213,14 +214,16 @@ function upgrade_apply() {
         return;
     }
     
+    $results = '';
     $functions = cache_get('upgrade', $_POST['handle']);
     
     foreach ($functions as $function) {
-        call_user_func($function);
+        $results .= call_user_func($function);
     }
     
-    if (!$upgrade_access_check) $xtpl->parse('main.results.upgrade_access_check');
-    $xtpl->parse('main.results');
+    if (!$upgrade_access_check) $xtpl->parse('main.upgrade_results.upgrade_access_check');
+    $xtpl->assign('results', $results);
+    $xtpl->parse('main.upgrade_results');
     
     cache_gc(0, 'upgrade');
     
@@ -327,7 +330,7 @@ function upgrade_user_init() {
 function upgrade_access_denied() {
     global $xtpl;
     
-    $xtpl->parse('main.access_denied');
+    $xtpl->parse('main.upgrade_access_denied');
     
     $xtpl->assign('title', 'Access Denied');
     $xtpl->parse('main');

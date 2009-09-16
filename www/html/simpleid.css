@@ -27,18 +27,18 @@ body {
 	line-height: 1em;
 }
 
-#update {
+#upgrade-check {
     background-color: #AA1144;
     color: #FFFFFF;
     padding: 5px 10px;
     text-align: center;
     display: none;
 }
-#update p {
+#upgrade-check p {
     margin: 0;
     padding: 0;
 }
-#update a {
+#upgrade-check a {
     color: #FFFFFF;
     text-decoration: none;
     border-bottom-color: #FFFFFF;
