@@ -296,8 +296,9 @@
 <!-- END: main -->
 
 <!-- BEGIN: xrds --><?xml version="1.0" encoding="UTF-8"?>
-<xrds:XRDS xmlns:xrds="xri://$xrds" xmlns:simple="http://xrds-simple.net/core/1.0" xmlns="xri://$xrd*($v*2.0)" version="2.0">
-    <XRD>
+<xrds:XRDS xmlns="xri://$xrd*($v*2.0)" xmlns:xrds="xri://$xrds" xmlns:simple="http://xrds-simple.net/core/1.0">
+    <XRD version="2.0">
+        <Type>xri://$xrds*simple</Type>
         <!-- BEGIN: user_xrds -->
         <Service priority="10">
             <Type>http://specs.openid.net/auth/2.0/signon</Type>

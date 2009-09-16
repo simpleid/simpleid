@@ -45,6 +45,16 @@ define('XRDS_NS', 'xri://$xrds');
 define('XRD2_NS', 'xri://$xrd*($v*2.0)');
 
 /**
+ * The namespace identifier for XRDS Simple.
+ */
+define('XRDS_SIMPLE_NS', 'http://xrds-simple.net/core/1.0');
+
+/**
+ * The type identifier for XRDS Simple.
+ */
+define('XRDS_SIMPLE_TYPE', 'xri://$xrds*simple');
+
+/**
  * The namespace identifier for OpenID services.
  */
 define('XRD_OPENID_NS', 'http://openid.net/xmlns/1.0');
@@ -55,6 +65,10 @@ define('XRD_OPENID_NS', 'http://openid.net/xmlns/1.0');
  * This function attempts to discover and obtain the XRDS document associated
  * with the identifier, parses the XRDS document and returns an array of
  * services.
+ *
+ * If an XRDS document is not found, and $openid is set to true, this function
+ * will also attempt to discover OpenID services by looking for link elements
+ * with rel of openid.server or openid2.provider in the discovered HTML document.
  *
  * @param string $identifier the identifier
  * @param bool $openid if true, performs additional discovery of OpenID services
@@ -329,9 +343,11 @@ function _discovery_link_rel($rel, $html) {
  * A simple XRDS parser.
  *
  * This parser uses the classic expat functions available in PHP to parse the
- * XRDS XML document.
+ * XRDS Simple XML document.
  *
  * The result is an array of discovered services.
+ *
+ * @link http://xrds-simple.net/
  */
 class XRDSParser {
     /**
