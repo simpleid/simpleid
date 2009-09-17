@@ -75,7 +75,7 @@ define('CREATE_ASSOCIATION_DEFAULT', 1);
  * the current OpenID request.  This can be either {@link OPENID_VERSION_1_1}
  * or {@link OPENID_VERSION_2}.
  *
- * @global int $version
+ * @global float $version
  */
 $version = OPENID_VERSION_1_1;
 
@@ -463,7 +463,7 @@ function simpleid_checkid($request) {
         }
     }
 
-    if ($version == OPENID_VERSION_2) {
+    if ($version >= OPENID_VERSION_2) {
         if (isset($request['openid.identity']) && !isset($request['openid.claimed_id'])) {
             log_error('Protocol Error: openid.identity set, but not openid.claimed_id.');
             indirect_fatal_error('Protocol Error: openid.identity set, but not openid.claimed_id.');
@@ -608,7 +608,7 @@ function simpleid_checkid_identity(&$request, $immediate) {
     // Check 4: Discover the realm and match its return_to
     $rp = (isset($user['rp'][$realm])) ? $user['rp'][$realm] : NULL;
     
-    if (($version == OPENID_VERSION_2) && SIMPLEID_VERIFY_RETURN_URL_USING_REALM) {
+    if (($version >= OPENID_VERSION_2) && SIMPLEID_VERIFY_RETURN_URL_USING_REALM) {
         $url = openid_realm_discovery_url($realm);
         log_info('OpenID 2 discovery: realm: ' . $realm . '; url: ' . $url);
         
@@ -679,7 +679,7 @@ function simpleid_checkid_ok($request) {
     if (isset($request['openid.identity'])) $message['openid.identity'] = $request['openid.identity'];
     if (isset($request['openid.return_to'])) $message['openid.return_to'] = $request['openid.return_to'];
     
-    if (($version == OPENID_VERSION_2) && isset($request['openid.claimed_id'])) {
+    if (($version >= OPENID_VERSION_2) && isset($request['openid.claimed_id'])) {
         $message['openid.claimed_id'] = $request['openid.claimed_id'];
     }
     
@@ -701,7 +701,7 @@ function simpleid_checkid_ok($request) {
 function simpleid_checkid_approval_required($request) {
     global $version;
     
-    if ($version == OPENID_VERSION_2) {
+    if ($version >= OPENID_VERSION_2) {
         $message = array('openid.mode' => 'setup_needed');
     } else {
         $request['openid.mode'] = 'checkid_setup';
@@ -728,7 +728,7 @@ function simpleid_checkid_approval_required($request) {
 function simpleid_checkid_login_required($request) {
     global $version;
     
-    if ($version == OPENID_VERSION_2) {
+    if ($version >= OPENID_VERSION_2) {
         $message = array('openid.mode' => 'setup_needed');
     } else {    
         $message = array(
@@ -758,7 +758,7 @@ function simpleid_checkid_error($immediate) {
     
     $message = array();
     if ($immediate) {
-        if ($version == OPENID_VERSION_2) {
+        if ($version >= OPENID_VERSION_2) {
             $message['openid.mode'] = 'setup_needed';
         } else {
             $message['openid.mode'] = 'id_res';
@@ -785,6 +785,8 @@ function simpleid_checkid_error($immediate) {
  *
  */
 function simpleid_sign(&$response, $assoc_handle = NULL) {
+    global $version;
+    
     if (!$assoc_handle) {
         $assoc = _simpleid_create_association(CREATE_ASSOCIATION_STATELESS);
         $response['openid.assoc_handle'] = $assoc['assoc_handle'];
@@ -816,7 +818,7 @@ function simpleid_sign(&$response, $assoc_handle = NULL) {
     $assoc_types = openid_association_types();
     $hmac_func = $assoc_types[$assoc['assoc_type']]['hmac_func'];
     
-    $response['openid.sig'] = openid_sign($response, $to_sign, $mac_key, $hmac_func);
+    $response['openid.sig'] = openid_sign($response, $to_sign, $mac_key, $hmac_func, $version);
     return $response;
 }
 

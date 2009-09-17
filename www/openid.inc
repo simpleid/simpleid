@@ -96,7 +96,8 @@ $ns_to_alias = array("http://openid.net/extensions/sreg/1.1" => "sreg"); // For 
  * @param mixed $request the OpenID request
  * @param string $key the key to look for to determine the OpenID
  * version
- * @return int either OPENID_NS_2_0 or OPENID_VERSION_1_1
+ * @return float either OPENID_VERSION_2 or OPENID_VERSION_1_1
+ * @see $version
  *
  */
 function openid_get_version($request, $key = 'openid.ns') {
@@ -111,15 +112,22 @@ function openid_get_version($request, $key = 'openid.ns') {
  * The response will be encoded using Key-Value Form Encoding.
  *
  * @param array $data the data in the response
- * @param int $version the message version
+ * @param float $version the message version
  * @return string the message in key-value form encoding
  * @link http://openid.net/specs/openid-authentication-1_1.html#anchor32, http://openid.net/specs/openid-authentication-2_0.html#kvform
  */
 function openid_direct_message($data, $version = OPENID_VERSION_2) {
     $message = '';
-    if ($version == OPENID_VERSION_2) {
-        $data['ns'] = OPENID_NS_2_0;
+    $ns = '';
+    
+    switch ($version) {
+        case OPENID_VERSION_2:
+            $ns = OPENID_NS_2_0;
+            break;
     }
+
+    if ($ns != '') $data['ns'] = $ns;
+    
     foreach ($data as $key => $value) {
         if (strpos($key, ':') !== false) {
             return null;
@@ -155,13 +163,21 @@ function openid_direct_response($message, $status = '200 OK') {
  * The response will be encoded using HTTP Encoding.
  *
  * @param array $data the data in the response
- * @param int $version the message version
+ * @param float $version the message version
  * @return array the message
  * @link http://openid.net/specs/openid-authentication-2_0.html#indirect_comm
  */
 function openid_indirect_message($data, $version = OPENID_VERSION_2) {
-    if ($version == OPENID_VERSION_2) {
-        return array_merge($data, array('openid.ns' => OPENID_NS_2_0));
+    $ns = '';
+    
+    switch ($version) {
+        case OPENID_VERSION_2:
+            $ns = OPENID_NS_2_0;
+            break;
+    }
+    
+    if ($ns != '') {
+        return array_merge($data, array('openid.ns' => $ns));
     }
     return $data;
 }
@@ -273,7 +289,7 @@ function openid_indirect_response_form($url, $message) {
  * @param string $error the error message
  * @param array $additional any additional data to be sent with the error
  * message
- * @param int $version the message version
+ * @param float $version the message version
  */
 function openid_direct_error($error, $additional = array(), $version = OPENID_VERSION_2) {
     $message = openid_direct_message(array_merge(array('error' => $error), $additional), $version);
@@ -288,7 +304,7 @@ function openid_direct_error($error, $additional = array(), $version = OPENID_VE
  * @param string $error the error message
  * @param array $additional any additional data to be sent with the error
  * message
- * @param int $version the message version
+ * @param float $version the message version
  * @param string $response_func the method by which the indirect response is to
  * be sent, either openid_indirect_response_form or openid_indirect_response_redirect
  */
@@ -302,7 +318,7 @@ function openid_indirect_error($url, $error, $additional = array(), $version = O
  * depending on the OpenID version.
  *
  * @param mixed $request the OpenID request
- * @param int $version the OpenID version for the message
+ * @param float $version the OpenID version for the message
  * @return string the realm URI
  */
 function openid_get_realm($request, $version) {
@@ -310,7 +326,7 @@ function openid_get_realm($request, $version) {
         $realm = $request['openid.trust_root'];
     }
 
-    if ($version == OPENID_VERSION_2) {
+    if ($version >= OPENID_VERSION_2) {
         $realm = $request['openid.realm'];
     }
     
@@ -714,7 +730,7 @@ function openid_association_types() {
  * OpenID version 1 supports an empty string as the session type.  OpenID version 2
  * reqires a session type to be sent.
  *
- * @param int $version the OpenID version, either OPENID_VERSION_1_1 and OPENID_VERSION_2
+ * @param float $version the OpenID version, either OPENID_VERSION_1_1 and OPENID_VERSION_2
  * @return array an array containing the session types supported by this server as keys
  * and an array containing the hash function (hash_func) as
  * values
@@ -968,10 +984,11 @@ function _openid_btwoc($num) {
  * @param array $keys a list of keys in the message to be signed (without the
  * 'openid.' prefix)
  * @param string $mac_key the MAC key used to sign the message, in Base64 representation
- * @param string $hmac_func the HMAC function used in the signing process 
+ * @param string $hmac_func the HMAC function used in the signing process
+ * @param float $version the OpenID version
  * @return string the signature encoded in Base64
  */
-function openid_sign($data, $keys, $mac_key, $hmac_func = '_openid_hmac_sha1') {
+function openid_sign($data, $keys, $mac_key, $hmac_func = '_openid_hmac_sha1', $version = OPENID_VERSION_2) {
     $signature = '';
     $sign_data = array();
 
@@ -982,13 +999,38 @@ function openid_sign($data, $keys, $mac_key, $hmac_func = '_openid_hmac_sha1') {
     }
     
     // We set OPENID_VERSION_1_1 because we don't want to sign the namespace header
-    $message = openid_direct_message($sign_data, OPENID_VERSION_1_1);
+    $signature_base_string = _openid_signature_base_string($sign_data, $version);
     $secret = base64_decode($mac_key);
-    $signature = call_user_func($hmac_func, $secret, $message);
+    $signature = call_user_func($hmac_func, $secret, $signature_base_string);
 
     return base64_encode($signature);
 }
 
+/**
+ * Calculates the base string from which an OpenID signature is generated.
+ *
+ * OpenID versions 1 and 2 specify that messages are to be encoded using Key-Value
+ * Encoding when generating signatures.  However, future OpenID version may
+ * specify different ways of encoding the message, such as OAuth.
+ * 
+ * @param array $data the data to sign
+ * @param float $version the OpenID version
+ * @return string the signature base string
+ * @link http://openid.net/specs/openid-authentication-2_0.html#anchor11
+ */
+function _openid_signature_base_string($data, $version) {
+    switch ($version) {
+        case OPENID_VERSION_1_1:
+        case OPENID_VERSION_2:
+            // We set OPENID_VERSION_1_1 because we don't want to sign the namespace header
+            $signature_base_string = openid_direct_message($sign_data, OPENID_VERSION_1_1);
+            break;
+        default:
+            // We set OPENID_VERSION_1_1 because we don't want to sign the namespace header
+            $signature_base_string = openid_direct_message($sign_data, OPENID_VERSION_1_1);
+    }
+    return $signature_base_string;
+}
 
 /**
  * Obtains the SHA1 hash of a string in binary representation.
