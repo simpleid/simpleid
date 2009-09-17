@@ -19,6 +19,8 @@ upgrade to a specific version of SimpleID.
 Upgrading to SimpleID 0.7
 -------------------------
 
+1. New storage framework
+
 SimpleID introduced a new storage framework.  The new framework allows SimpleID
 to store additional information about your identity.
 
@@ -34,13 +36,27 @@ following line to your config.inc:
 
 define('SIMPLEID_STORE_DIR', '<your directory here>');
 
-Secondly, SimpleID introduced the concept of administrators.  Administrators
+2. Administrators
+
+SimpleID 0.7 introduced the concept of administrators.  Administrators
 have access to certain functions which regular users cannot.  To make a user
 an administrator, edit the user's identity file to include the following line:
 
 administrator=1
 
-Finally, SimpleID introduced a new upgrade script.  This means that whenever you
+3. User Interface Extension
+
+SimpleID 0.7 introduced support for the draft OpenID User Interface Extension.
+It is enabled by default for new installations of SimpleID, however if you
+are upgrading you may need to enable it manually.  To do so, edit
+your config.inc to change the SIMPLEID_EXTENSIONS configuration option to
+include ui.  For example:
+
+define('SIMPLEID_EXTENSIONS', 'sreg,ui');
+
+4. Upgrade script
+
+SimpleID introduced a new upgrade script.  This means that whenever you
 upgrade you will also need to run the script.  To run the script, use your
 web browser to go to
 

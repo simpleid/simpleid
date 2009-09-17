@@ -11,11 +11,11 @@ SimpleID 0.7
 
 - Improved OpenID compliance
 
-- Added support for GMP
+- Added support for GMP for improved performance
 
 - Improved persistent storage system
 
-- Improved dashboard pages
+- Improved user interface
 
 
 SimpleID 0.6.5

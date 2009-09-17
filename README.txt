@@ -14,6 +14,10 @@ The latest version of SimpleID can be found in the SimpleID web page at
 Upgrading
 ---------
 
+IMPORTANT: SimpleID version 0.7 introduced numerous changes.  A manual
+upgrading process is required.  If you are upgrading from an earlier version of
+SimpleID, please read UPGRADE.txt for upgrade instructions.
+
 IMPORTANT: SimpleID version 0.6 introduced a new log in mechanism.  If you
 are upgrading from an earlier version of SimpleID, please read
 UPGRADE.txt for upgrade instructions.
