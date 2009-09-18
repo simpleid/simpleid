@@ -1023,11 +1023,11 @@ function _openid_signature_base_string($data, $version) {
         case OPENID_VERSION_1_1:
         case OPENID_VERSION_2:
             // We set OPENID_VERSION_1_1 because we don't want to sign the namespace header
-            $signature_base_string = openid_direct_message($sign_data, OPENID_VERSION_1_1);
+            $signature_base_string = openid_direct_message($data, OPENID_VERSION_1_1);
             break;
         default:
             // We set OPENID_VERSION_1_1 because we don't want to sign the namespace header
-            $signature_base_string = openid_direct_message($sign_data, OPENID_VERSION_1_1);
+            $signature_base_string = openid_direct_message($data, OPENID_VERSION_1_1);
     }
     return $signature_base_string;
 }
