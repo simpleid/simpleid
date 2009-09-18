@@ -98,7 +98,7 @@ function sreg_rp_form($request, $response, $rp) {
     // We only respond if the extension is requested
     if (!openid_extension_requested('http://openid.net/extensions/sreg/1.1', $request)) return '';
     
-    $request = openid_extension_request('http://openid.net/extensions/sreg/1.1', $request);
+    $request = openid_extension_filter_request('http://openid.net/extensions/sreg/1.1', $request);
     $required = (isset($request['required'])) ? explode(',', $request['required']) : array();
     $optional = (isset($request['optional'])) ? explode(',', $request['optional']) : array();
     $keys = array_merge($required, $optional);

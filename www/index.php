@@ -140,7 +140,7 @@ function simpleid_start() {
     
     extension_init();
     user_init($q[0]);
-    log_info('Session opened for "' . implode('/', $q) . '" [' . $_SERVER['REMOTE_ADDR'] . ', ' . $_SERVER['HTTP_HOST'] . ']');
+    log_info('Session opened for "' . implode('/', $q) . '" [' . $_SERVER['REMOTE_ADDR'] . ', ' . gethostbyaddr($_SERVER['REMOTE_ADDR']) . ']');
     
     // Clean stale assocations
     cache_gc(SIMPLEID_ASSOC_EXPIRES_IN, 'association');
@@ -685,7 +685,7 @@ function simpleid_checkid_ok($request) {
     
     $message = array_merge($message, extension_invoke_all('response', TRUE, $request));
     
-    log_info('OpenID authentication response: ', log_array($message));
+    log_info('OpenID authentication response: ' . log_array($message));
     return openid_indirect_message($message, $version);
 }
 
@@ -713,7 +713,7 @@ function simpleid_checkid_approval_required($request) {
     
     $message = array_merge($message, extension_invoke_all('response', FALSE, $request));
     
-    log_info('OpenID authentication response: ', log_array($message));
+    log_info('OpenID authentication response: ' . log_array($message));
     return openid_indirect_message($message, $version);
 }
 
@@ -739,7 +739,7 @@ function simpleid_checkid_login_required($request) {
     
     $message = array_merge($message, extension_invoke_all('response', FALSE, $request));
     
-    log_info('OpenID authentication response: ', log_array($message));
+    log_info('OpenID authentication response: ' . log_array($message));
     return openid_indirect_message($message, $version);
 }
 
@@ -769,7 +769,7 @@ function simpleid_checkid_error($immediate) {
     
     $message = array_merge($message, extension_invoke_all('response', FALSE, $request));
     
-    log_info('OpenID authentication response: ', log_array($message));
+    log_info('OpenID authentication response: ' . log_array($message));
     return openid_indirect_message($message, $version);
 }
 
@@ -999,6 +999,7 @@ function simpleid_send() {
     }
 
     if ($return_to) {
+        log_info('OpenID authentication response: ' . log_array($response));
         redirect_form($return_to, $response);
     } else {
         page_dashboard();
