@@ -337,7 +337,7 @@ function user_public_page($uid = NULL) {
                 user_xrds($uid);
                 return;
             } else {
-                header('X-XRDS-Location: ' . simpleid_url('q=xrds/' . $uid));
+                header('X-XRDS-Location: ' . simpleid_url('q=xrds/' . rawurlencode($uid)));
                 
                 set_message('This is the user <strong>' . htmlspecialchars($uid, ENT_QUOTES, 'UTF-8') . '</strong>\'s SimpleID page.  It contains hidden information for the use by OpenID consumers.');
                 
