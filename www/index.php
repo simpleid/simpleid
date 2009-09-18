@@ -86,6 +86,14 @@ $version = OPENID_VERSION_1_1;
  */
 $xtpl = NULL;
 
+/**
+ * This variable holds the combined $_GET and $_POST superglobal arrays.
+ * This is then passed through {@link openid_fix_request()}.
+ *
+ * @global array $GETPOST
+ */
+$GETPOST = array_merge($_GET, $_POST);
+
 simpleid_start();
 
 /**
@@ -94,7 +102,7 @@ simpleid_start();
  * @see user_init()
  */
 function simpleid_start() {
-    global $xtpl;
+    global $xtpl, $GETPOST;
         
     $xtpl = new XTemplate('html/template.xtpl');
     $xtpl->assign('version', SIMPLEID_VERSION);
@@ -133,9 +141,9 @@ function simpleid_start() {
         exit;
     }
 
-    openid_fix_request($_REQUEST);
+    openid_fix_request($GETPOST);
     
-    $q = (isset($_REQUEST['q'])) ? $_REQUEST['q'] : '';
+    $q = (isset($GETPOST['q'])) ? $GETPOST['q'] : '';
     $q = explode('/', $q);
     
     extension_init();
@@ -180,11 +188,13 @@ function simpleid_start() {
  *
  */
 function simpleid_index() {
+    global $GETPOST;
+    
     log_debug('simpleid_index');
     
     header('Vary: Accept');
-    if (isset($_REQUEST['openid.mode'])) {
-        simpleid_process_openid($_REQUEST);
+    if (isset($GETPOST['openid.mode'])) {
+        simpleid_process_openid($GETPOST);
         return;
     } elseif (stristr($_SERVER['HTTP_ACCEPT'], 'application/xrds+xml')) {
         simpleid_xrds();
@@ -819,6 +829,9 @@ function simpleid_sign(&$response, $assoc_handle = NULL) {
     $hmac_func = $assoc_types[$assoc['assoc_type']]['hmac_func'];
     
     $response['openid.sig'] = openid_sign($response, $to_sign, $mac_key, $hmac_func, $version);
+    
+    log_info('OpenID signed authentication response: ' . log_array($response));
+    
     return $response;
 }
 
@@ -892,7 +905,9 @@ function simpleid_authenticate($request) {
  * the state of an OpenID request.
  */
 function simpleid_continue() {
-    $request = unpickle($_REQUEST['s']);
+    global $GETPOST;
+    
+    $request = unpickle($GETPOST['s']);
     openid_parse_request($request);
     simpleid_process_openid($request);
 }
@@ -958,14 +973,14 @@ function simpleid_rp_form($request, $response, $reason = CHECKID_APPROVAL_REQUIR
  *
  */
 function simpleid_send() {
-    global $user, $version;
+    global $user, $version, $GETPOST;
     
     if ($user == NULL) {
         user_login_form('');
         return;
     }
     
-    if (!validate_form_token($_REQUEST['tk'], 'rp')) {
+    if (!validate_form_token($GETPOST['tk'], 'rp')) {
         set_message('SimpleID detected a potential security attack.  Please try again.');
         $xtpl->assign('title', 'OpenID Login');
         $xtpl->parse('main');
@@ -975,17 +990,17 @@ function simpleid_send() {
     
     $uid = $user['uid'];
     
-    $response = unpickle($_REQUEST['s']);
+    $response = unpickle($GETPOST['s']);
     $version = openid_get_version($response);
     $return_to = $response['openid.return_to'];
-    if (!$return_to) $return_to = $_REQUEST['openid.return_to'];
+    if (!$return_to) $return_to = $GETPOST['openid.return_to'];
     
-    if ($_REQUEST['op'] == 'Cancel') {
+    if ($GETPOST['op'] == 'Cancel') {
         $response = simpleid_checkid_error(false);
         if (!$return_to) set_message('Log in cancelled.');
     } else {
         $now = time();
-        $realm = $_REQUEST['openid.realm'];
+        $realm = $GETPOST['openid.realm'];
         
         if (isset($user['rp'][$realm])) {
             $rp = $user['rp'][$realm];
@@ -993,9 +1008,9 @@ function simpleid_send() {
             $rp = array('realm' => $realm, 'first_time' => $now);
         }
         $rp['last_time'] = $now;
-        $rp['auto_release'] = (isset($_REQUEST['autorelease']) && $_REQUEST['autorelease']) ? 1 : 0;
+        $rp['auto_release'] = (isset($GETPOST['autorelease']) && $GETPOST['autorelease']) ? 1 : 0;
         
-        extension_invoke_all('send', $_REQUEST, $response, $rp);
+        extension_invoke_all('send', $GETPOST, $response, $rp);
         
         $user['rp'][$realm] = $rp;
         user_save($user);
@@ -1005,7 +1020,6 @@ function simpleid_send() {
     }
 
     if ($return_to) {
-        log_info('OpenID authentication response: ' . log_array($response));
         redirect_form($return_to, $response);
     } else {
         page_dashboard();

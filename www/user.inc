@@ -132,13 +132,13 @@ function user_save($user) {
  * HTTP request.
  */
 function user_login() {
-    global $user;
+    global $user, $GETPOST;
     
     // If the user is already logged in, return
     if (isset($user["uid"])) openid_indirect_response_redirect(simpleid_url(), 'q=frontpage');
     
-    $destination = $_REQUEST['destination'];
-    $state = (isset($_REQUEST['s'])) ? $_REQUEST['s'] : '';
+    $destination = $GETPOST['destination'];
+    $state = (isset($GETPOST['s'])) ? $GETPOST['s'] : '';
     $query = 'q=' . $destination;
     $query .= ($state) ? '&s=' . rawurlencode($state) : '';
     
@@ -242,12 +242,12 @@ function _user_login($login_user) {
  * login form
  */
 function user_logout($destination = NULL) {
-    global $user;
+    global $user, $GETPOST;
     
-    $state = (isset($_REQUEST['s'])) ? $_REQUEST['s'] : '';
+    $state = (isset($GETPOST['s'])) ? $GETPOST['s'] : '';
     if ($destination == NULL) {
-        if (isset($_REQUEST['destination'])) {
-            $destination = $_REQUEST['destination'];
+        if (isset($GETPOST['destination'])) {
+            $destination = $GETPOST['destination'];
         } else {
             $destination = '';
         }

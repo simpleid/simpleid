@@ -87,6 +87,14 @@ $upgrade_functions = array(
  */
 $xtpl = NULL;
 
+/**
+ * This variable holds the combined $_GET and $_POST superglobal arrays.
+ * This is then passed through {@link openid_fix_request()}.
+ *
+ * @global array $GETPOST
+ */
+$GETPOST = array_merge($_GET, $_POST);
+
 upgrade_start();
 
 /**
@@ -95,7 +103,7 @@ upgrade_start();
  * @see user_init()
  */
 function upgrade_start() {
-    global $xtpl;
+    global $xtpl, $GETPOST;
         
     $xtpl = new XTemplate('html/template.xtpl');
     $xtpl->assign('version', SIMPLEID_VERSION);
@@ -131,7 +139,7 @@ function upgrade_start() {
         exit;
     }
     
-    $q = (isset($_REQUEST['q'])) ? $_REQUEST['q'] : '';
+    $q = (isset($GETPOST['q'])) ? $GETPOST['q'] : '';
     $q = explode('/', $q);
     
     extension_init();
