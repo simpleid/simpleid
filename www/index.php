@@ -838,7 +838,14 @@ function simpleid_authenticate($request) {
   
     $assoc = (isset($request['openid.assoc_handle'])) ? cache_get('association', $request['openid.assoc_handle']) : NULL;
   
-    if (!$assoc || !$assoc['assoc_type']) {
+    if (!$assoc) {
+        log_notice('OpenID direct verification: Association not found.');
+        $is_valid = FALSE;
+    } elseif (!$assoc['assoc_type']) {
+        log_error('OpenID direct verification: Association does not contain valid assoc_type.');
+        $is_valid = FALSE;
+    } elseif (!$assoc['stateless']) {
+        log_warn('OpenID direct verification: Attempting to verify an association with a shared key.');
         $is_valid = FALSE;
     } else {
         $mac_key = $assoc['mac_key'];
@@ -846,16 +853,15 @@ function simpleid_authenticate($request) {
         $hmac_func = $assoc_types[$assoc['assoc_type']]['hmac_func'];
         
         $signed_keys = explode(',', $request['openid.signed']);
-        $signature = openid_sign($request, $signed_keys, $mac_key, $hmac_func);
-        if ($signature != $request['openid.sig']) $is_valid = FALSE;
+        $signature = openid_sign($request, $signed_keys, $mac_key, $hmac_func, $version);
+        if ($signature != $request['openid.sig']) {
+            log_warn('OpenID direct verification: Signature supplied in request does not match the signatured generated.');
+            $is_valid = FALSE;
+        }
     }
 
     if ($is_valid) {
         $response = array('is_valid' => 'true');
-        if ($assoc['stateless']) {
-            // Stateless association handles should be used once, thus we should invalidate this one.
-            $response['invalidate_handle'] = $request['openid.assoc_handle'];
-        }
     } else {
         $response = array('is_valid' => 'false');
     }
