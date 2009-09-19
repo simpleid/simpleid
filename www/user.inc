@@ -62,6 +62,8 @@ function user_init($q = NULL) {
     global $user;
     global $xtpl;
     
+    log_debug('user_init');
+    
     $user = NULL;
     
     session_set_cookie_params(0);
@@ -135,7 +137,7 @@ function user_login() {
     global $user, $GETPOST;
     
     // If the user is already logged in, return
-    if (isset($user["uid"])) openid_indirect_response_redirect(simpleid_url(), 'q=frontpage');
+    if (isset($user["uid"])) openid_indirect_response_redirect(simpleid_url());
     
     $destination = $GETPOST['destination'];
     $state = (isset($GETPOST['s'])) ? $GETPOST['s'] : '';
