@@ -268,8 +268,16 @@ function _http_parse_headers($header_block, $curl) {
     $headers = array();
     $result = array();
     
-    $lines = preg_split("/\r\n|\n|\r/", $header_block);
-    $status = array_shift($lines);  // Get rid of the status
+    // Split the status line from the rest of the message header
+    list($status, $header_block) = preg_split("/\r\n|\n|\r/", $header_block, 2);
+    
+    // RFC 2616, section 4.2: Header fields can be extended over multiple lines
+    // by preceding each extra line with at least one space or tab.  So we need
+    // to join them...
+    $header_block = preg_replace('/(\r\n|\n|\r)( |\t)+/', '', $header_block);
+    
+    // Then split them to get the fields
+    $fields = preg_split("/\r\n|\n|\r/", $header_block);
     
     if (!$curl) {
         // If we are not using CURL, we need to parse the status line as well
@@ -277,15 +285,16 @@ function _http_parse_headers($header_block, $curl) {
     }
 
     // Parse headers.
-    while ($line = trim(array_shift($lines))) {
-        list($header, $value) = explode(':', $line, 2);
+    while ($field = trim(array_shift($fields))) {
+        list($header, $value) = explode(':', $field, 2);
         
         // Headers are case insensitive
         $header = strtolower($header);
         
-        if (isset($headers[$header]) && $header == 'set-cookie') {
-            // RFC 2109: the Set-Cookie response header comprises the token Set-
-            // Cookie:, followed by a comma-separated list of one or more cookies.
+        if (isset($headers[$header])) {
+            // RFC 2616, section 4.2: Multiple headers with the same field
+            // name is the same as a concatenating all the headers in a single
+            // header, separated by commas.
             $headers[$header] .= ','. trim($value);
         } else {
             $headers[$header] = trim($value);
