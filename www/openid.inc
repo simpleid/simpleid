@@ -1100,7 +1100,7 @@ if (function_exists('hash_hmac') && function_exists('hash_algos') && (in_array('
      * @return string the hash in binary representation
      */
     function _openid_hmac_sha256($key, $text) {
-        return hash_hmac('sha256', $text, true);
+        return hash_hmac('sha256', $text, $key, true);
     }
 } else {
     /** @ignore */
