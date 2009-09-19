@@ -258,6 +258,7 @@ function extension_invoke_all() {
     
     foreach ($extensions as $extension) {
         if (function_exists($extension . '_' . $function)) {
+            log_debug('extension_invoke_all: ' . $extension . '_' . $function);
             $result = call_user_func_array($extension . '_' . $function, $args);
             if (isset($result) && is_array($result)) {
                 $return = array_merge($return, $result);
@@ -284,6 +285,7 @@ function extension_invoke() {
     $function = array_shift($args);
     
     if (function_exists($extension . '_' . $function)) {
+        log_debug('extension_invoke: ' . $extension . '_' . $function);
         return call_user_func_array($extension . '_' . $function, $args);
     }
 }

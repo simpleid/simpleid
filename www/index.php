@@ -212,6 +212,8 @@ function simpleid_index() {
 function simpleid_autorelease() {
     global $user;
     
+    log_debug('simpleid_autorelease');
+    
     if ($user == NULL) {
         user_login_form('my/sites');
         return;
@@ -422,9 +424,11 @@ function _simpleid_create_association($mode = CREATE_ASSOCIATION_DEFAULT, $assoc
 
     if ($mode == CREATE_ASSOCIATION_DEFAULT) {
         log_info('Created association: ' . log_array($response));
+        log_debug('***** MAC key: ' . $association['mac_key']);
         return $response;
     } else {
         log_info('Created association: stateless; ' . log_array($association, array('assoc_handle', 'assoc_type')));
+        log_debug('***** MAC key: ' . $association['mac_key']);
         return $association;
     }
 }
@@ -499,8 +503,10 @@ function simpleid_checkid($request) {
     
     if (isset($request['openid.identity'])) {
         // Standard request
+        log_debug('openid.identity found, use simpleid_checkid_identity');
         $result = simpleid_checkid_identity($request, $immediate);
     } else {
+        log_debug('openid.identity not found, trying extensions');
         // Extension request
         $results = extension_invoke_all('checkid', $request, $immediate);
         
@@ -608,6 +614,7 @@ function simpleid_checkid_identity(&$request, $immediate) {
     }
     if ($test_user == NULL) return CHECKID_IDENTITY_NOT_EXIST;
     if ($test_user['uid'] != $user['uid']) {
+        log_notice('Requested user ' . $test_user['uid'] . ' does not match logged in user ' . $user['uid']);
         return CHECKID_IDENTITIES_NOT_MATCHING;
     }
     
@@ -805,6 +812,7 @@ function simpleid_sign(&$response, $assoc_handle = NULL) {
         
         if ($assoc['created'] + SIMPLEID_ASSOC_EXPIRES_IN < time()) {
             // Association has expired, need to create a new one
+            log_notice('Association handle ' . $assoc['assoc_handle'] . ' expired.  Using stateless mode.');
             $response['openid.invalidate_handle'] = $assoc_handle;
             $assoc = _simpleid_create_association(CREATE_ASSOCIATION_STATELESS);
             $response['openid.assoc_handle'] = $assoc['assoc_handle'];
@@ -867,6 +875,8 @@ function simpleid_authenticate($request) {
         
         $signed_keys = explode(',', $request['openid.signed']);
         $signature = openid_sign($request, $signed_keys, $mac_key, $hmac_func, $version);
+        log_debug('***** Signature: ' . $signature);
+        
         if ($signature != $request['openid.sig']) {
             log_warn('OpenID direct verification: Signature supplied in request does not match the signatured generated.');
             $is_valid = FALSE;

@@ -151,6 +151,9 @@ define('SIMPLEID_LOGFILE', '');
  * a number between 0 and 5. The higher the number, the more messages are
  * logged.
  *
+ * WARNING: Setting the log level to 5 will result in security sensitive
+ * information also being logged.
+ *
  * This has effect only if logging is enabled.
  *
  */
