@@ -61,9 +61,9 @@
                 <li><a href="?q=my/sites">My Sites</a></li>
             </ul>
             <!-- BEGIN: nav_admin -->
-            <ul id="nav-right">
+            <!--ul id="nav-right">
                 <li><a href="?q=admin">Admin</a></li>
-            </ul>
+            </ul-->
             <!-- END: nav_admin -->
             <div style="clear: both"></div>
         </div>
