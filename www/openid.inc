@@ -473,7 +473,7 @@ function openid_url_matches_realm($url, $realm) {
             return false;
     
     if (substr($realm['host'], 0, 2) == '*.') {
-        $realm_re = '/^.*' . preg_quote(substr($realm['host'], 2)) . '$/i';
+        $realm_re = '/^([^.]+\.)?' . preg_quote(substr($realm['host'], 2)) . '$/i';
     } else {
         $realm_re = '/^' . preg_quote($realm['host']) . '$/i';
     }
