@@ -316,11 +316,11 @@
         </Service>
         <!-- END: user_xrds -->
         <!-- BEGIN: op_xrds -->
-        <Service xmlns:simpleid="http://simpleid.sourceforge.net/ns/">
+        <Service>
             <Type>http://specs.openid.net/auth/2.0/server</Type>
+            <Type>http://simpleid.sourceforge.net/type/version#{version}</Type>
             <!-- BEGIN: type --><Type>{uri}</Type><!-- END: type -->
             <URI>{simpleid_base_url}</URI>
-            <simpleid:Version>{version}</simpleid:Version>
         </Service>
         <!-- END: op_xrds -->
     </XRD>
