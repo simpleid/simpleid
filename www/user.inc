@@ -214,9 +214,13 @@ function user_login() {
         user_login_form($destination, $state);
         return;
     }
-
-    log_info('Login successful: ' . $test_user['uid']);
+    
+    $test_user['auth_time'] = time();
+    user_save($test_user);
+    
     _user_login($test_user);
+    log_info('Login successful: ' . $test_user['uid'] . '['. gmstrftime('%Y-%m-%dT%H:%M:%SZ', $test_user['auth_time']) . ']');
+    
     
     if ($_POST['autologin'] == 1) user_autologin_create();
 
@@ -255,15 +259,25 @@ function user_logout($destination = NULL) {
         }
     }
     
-    user_autologin_invalidate();
-    
-    cache_delete('user', $user['uid']);
-    unset($_SESSION['user']);
-    $user = NULL;
+    _user_logout();
     
     set_message('You have been logged out.');
     
     user_login_form($destination, $state);
+}
+
+/**
+ * Logs out the user by deleting the relevant session information.
+ */
+function _user_logout() {
+    global $user;
+    
+    user_autologin_invalidate();
+    session_destroy();
+    
+    cache_delete('user', $user['uid']);
+    unset($_SESSION['user']);
+    $user = NULL;
 }
 
 /**
