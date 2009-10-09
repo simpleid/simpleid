@@ -166,9 +166,8 @@ function simpleid_start() {
         'user/(.+)' => 'user_public_page',
         'xrds/(.*)' => 'user_xrds',
         'xrds' => 'simpleid_xrds',
-        '.*' => 'simpleid_index'
     );
-    $routes = array_merge($routes, extension_invoke_all('routes'));
+    $routes = array_merge($routes, extension_invoke_all('routes'), array('.*' => 'simpleid_index'));
     
     simpleweb_run($routes, implode('/', $q));
 }
