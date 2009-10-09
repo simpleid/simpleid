@@ -7,6 +7,7 @@
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
         <meta content="{version}" name="SimpleID-Version" />
         <meta content="noindex,nofollow" name="robots" />
+        <link rel="shortcut icon" href="html/simpleid.ico" type="image/x-icon" />
         
         <!-- BEGIN: provider -->
             <link rel="openid.server" href="{provider}"/>
