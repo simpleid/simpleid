@@ -76,7 +76,7 @@ function sreg_response($assertion, $request) {
  */
 function sreg_signed_fields($response) {
     // We only respond if the extension is requested
-    if (!openid_extension_requested('http://openid.net/extensions/sreg/1.1', $request)) return array();
+    if (!openid_extension_requested('http://openid.net/extensions/sreg/1.1', $response)) return array();
     
     $fields = array_keys(openid_extension_filter_request('http://openid.net/extensions/sreg/1.1', $response));
     $alias = openid_extension_alias('http://openid.net/extensions/sreg/1.1');
