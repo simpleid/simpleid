@@ -399,6 +399,7 @@ class XRDSParser {
      */
     function XRDSParser() {
         $this->parser = xml_parser_create_ns();
+        xml_parser_set_option($this->parser, XML_OPTION_CASE_FOLDING,0);
         xml_set_object($this->parser, $this);
         xml_set_element_handler($this->parser, 'element_start', 'element_end');
         xml_set_character_data_handler($this->parser, 'cdata');
@@ -447,10 +448,12 @@ class XRDSParser {
      */
     function element_start(&$parser, $qualified, $attribs) {
         list($ns, $name) = $this->parse_namespace($qualified);
-        $name = strtolower($name);
-        
-        // Expat XML parser returns namespaces in uppercase
-        if (($ns == strtoupper(XRD2_NS)) && ($name == 'service')) {
+
+        // Strictly speaking, XML namespace URIs are semi-case sensitive
+        // (i.e. the scheme and host are not case sensitive, but other elements
+        // are).  However, the XRDS-Simple specifications defines an incorrect
+        // namespace URI for XRD (xri://$XRD*($v*2.0) rather than xri://$xrd*($v*2.0)).
+        if ((strtolower($ns) == strtolower(XRD2_NS)) && ($name == 'Service')) {
             $this->in_service = TRUE;
             $this->service = array();
             
@@ -462,11 +465,11 @@ class XRDSParser {
             }
         }
         
-        if (($ns == strtoupper(XRD2_NS)) && ($this->in_service)) {
+        if ((strtolower($ns) == strtolower(XRD2_NS)) && ($this->in_service)) {
             switch ($name) {
-                case 'type':
-                case 'localid':
-                case 'uri':
+                case 'Type':
+                case 'LocalID':
+                case 'URI':
                     if (in_array('priority', $attribs)) {
                         $this->priority = $attribs['priority'];
                     } else {
@@ -485,11 +488,10 @@ class XRDSParser {
      */
     function element_end(&$parser, $qualified) {
         list($ns, $name) = $this->parse_namespace($qualified);
-        $name = strtolower($name);
         
-        if (($ns == strtoupper(XRD2_NS)) && ($this->in_service)) {
+        if ((strtolower($ns) == strtolower(XRD2_NS)) && ($this->in_service)) {
             switch ($name) {
-                case 'service':
+                case 'Service':
                     foreach (array('type', 'localid', 'uri') as $key) {
                         if (!isset($this->service[$key])) continue;
                         $this->service[$key] = $this->flatten_uris($this->service[$key]);
@@ -499,25 +501,26 @@ class XRDSParser {
                     $this->in_service = FALSE;
                     break;
 
-                case 'type':
-                case 'localid':
-                case 'uri':
-                    if (!isset($this->service[$name])) {
-                        $this->service[$name] = array();
+                case 'Type':
+                case 'LocalID':
+                case 'URI':
+                    $key = strtolower($name);
+                    if (!isset($this->service[$key])) {
+                        $this->service[$key] = array();
                     }
                     if ($this->priority != NULL) {
-                        $this->service[$name][] = array('#uri' => trim($this->buffer), '#priority' => $this->priority);
+                        $this->service[$key][] = array('#uri' => trim($this->buffer), '#priority' => $this->priority);
                     } else {
-                        $this->service[$name][] = array('#uri' => trim($this->buffer));
+                        $this->service[$key][] = array('#uri' => trim($this->buffer));
                     }
                     $this->priority = NULL;
                     break;
             }
         }
         
-        if (($ns == strtoupper(XRD_OPENID_NS)) && ($this->in_service)) {
+        if ((strtolower($ns) == strtolower(XRD_OPENID_NS)) && ($this->in_service)) {
             switch ($name) {
-                case 'delegate':
+                case 'Delegate':
                     $this->service['delegate'] = trim($this->buffer);
             }
         }
