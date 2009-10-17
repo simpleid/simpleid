@@ -633,8 +633,10 @@ function openid_extension_requested($ns, $request) {
  * alias definitions in the current OpenID request.
  *
  * @param string $ns the Type URI
- * @param bool $create whether to create an alias if the Type URI does not already
- * have an alias in the current OpenID request
+ * @param bool|string $create whether to create an alias if the Type URI does not already
+ * have an alias in the current OpenID request.  If this parameter is a string,
+ * then the string specified is the preferred alias to be created, unless a collision
+ * occurs
  * @return string the alias, or NULL if the Type URI does not already
  * have an alias in the current OpenID request <i>and</i> $create is false
  */
@@ -643,10 +645,22 @@ function openid_extension_alias($ns, $create = FALSE) {
     static $e = 1;
     
     if (isset($ns_to_alias[$ns])) return $ns_to_alias[$ns];
-    if ($create) {
-        $alias = 'e' . $e;
+    if ($create !== FALSE) {
+        if ($create === TRUE) {
+            $alias = 'e' . $e;
+            $e++;
+        } elseif (is_string($create)) {
+            $used_aliases = array_values($ns_to_alias);
+        
+            $alias = $create;
+            $i = 0;
+        
+            while (in_array($alias, $used_aliases)) {
+                $i++;
+                $alias = $create . $i;
+            }
+    }
         $ns_to_alias[$ns] = $alias;
-        $e++;
         return $alias;
     }
     return NULL;
