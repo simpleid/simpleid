@@ -1,0 +1,46 @@
+<!-- BEGIN: user_page -->
+<!-- :mode=html: $Id$ -->
+    <p>SimpleID will send the following information to sites which supports
+    the Attribute Exchange Extension.  If you also have the Simple Registration
+    Extension installed, these may also be sent as part of this Extension.</p>
+    
+    <p>To change these, or your password,
+    <a href="http://simpleid.sourceforge.net/documentation/getting-started/setting-identity/identity-files">edit your identity file</a>.</p>
+    
+    <table>
+        <tr>
+            <th>Type URL</th>
+            <th>Value</th>
+        </tr>
+        <!-- BEGIN: ax -->
+        <tr>
+            <td>{name}</td>
+            <td>{value}</td>
+        </tr>
+        <!-- END: ax -->
+    </table>
+<!-- END: user_page -->
+            
+<!-- BEGIN: fetch_request -->
+    <p>SimpleID will also be sending the following information to the site.</p>
+    
+    <table>
+        <tr>
+            <th>Type URL</th>
+            <th>Value</th>
+        </tr>
+        <!-- BEGIN: ax -->
+        <tr>
+            <td>{name}</td>
+            <td>{value}</td>
+        </tr>
+        <!-- END: ax -->
+    </table>
+<!-- END: fetch_request -->
+
+<!-- BEGIN: store_request -->
+<div class="message">
+    <p>This web site requested to store information about you on SimpleID.
+    Sadly, SimpleID does not support this feature.</p>
+</div>
+<!-- END: store_request -->
