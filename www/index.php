@@ -820,6 +820,7 @@ function simpleid_sign(&$response, $assoc_handle = NULL) {
     }
     
     // Get all the signed fields [10.1]
+    openid_parse_request($response); // Fill the namespace array
     $signed_fields = array('op_endpoint', 'return_to', 'response_nonce', 'assoc_handle', 'identity', 'claimed_id');
     $signed_fields = array_merge($signed_fields, extension_invoke_all('signed_fields', $response));
     
