@@ -95,7 +95,7 @@ function ax_response($assertion, $request) {
         $fields = array_merge($required, $optional);
         
         foreach ($fields as $field) {
-            $type = $request['type_' . $field];
+            $type = $request['type.' . $field];
             $response['openid.' . $alias . '.type.' . $field] = $type;
             $value = _ax_get_value($type);
             
