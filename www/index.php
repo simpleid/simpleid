@@ -92,7 +92,7 @@ $xtpl = NULL;
  *
  * @global array $GETPOST
  */
-$GETPOST = array_merge($_GET, $_POST);
+$GETPOST = array();
 
 simpleid_start();
 
@@ -141,7 +141,8 @@ function simpleid_start() {
         exit;
     }
 
-    openid_fix_request($GETPOST);
+    openid_fix_request();
+    $GETPOST = array_merge($_GET, $_POST);
     
     $q = (isset($GETPOST['q'])) ? $GETPOST['q'] : '';
     $q = explode('/', $q);
