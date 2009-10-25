@@ -140,9 +140,9 @@ function ax_signed_fields($response) {
 }
 
 /**
- * @see hook_rp_form()
+ * @see hook_consent_form()
  */
-function ax_rp_form($request, $response, $rp) {
+function ax_consent_form($request, $response, $rp) {
     global $user;
     
     // We only respond if the extension is requested

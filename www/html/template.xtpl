@@ -111,9 +111,9 @@
             </form>
             <!-- END: login -->
             
-            <!-- BEGIN: rp -->
+            <!-- BEGIN: consent -->
             <form action="index.php" method="post" enctype="application/x-www-form-urlencoded" id="rp-form">
-                <input type="hidden" name="q" value="send" />
+                <input type="hidden" name="q" value="consent" />
                 <input type="hidden" name="s" value="{state}" />
                 <input name="tk" type="hidden" value="{token}"/>
                 
@@ -157,7 +157,7 @@
                 <input type="submit" name="op" id="edit-cancel" value="Cancel" class="form-submit" />
                 <!-- END: cancel -->                
             </form>
-            <!-- END: rp -->
+            <!-- END: consent -->
             
             <!-- BEGIN: blocks -->
                 {blocks}

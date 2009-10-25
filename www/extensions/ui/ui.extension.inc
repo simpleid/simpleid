@@ -74,9 +74,9 @@ function ui_user_login_form($destination, $state) {
  * @param array $response
  * @param array $rp
  * @return string
- * @see hook_rp_form()
+ * @see hook_consent_form()
  */
-function ui_rp_form($request, $response, $rp) {
+function ui_consent_form($request, $response, $rp) {
     // Skip if popup does not exist
     if (!openid_extension_requested(OPENID_NS_UI, $request)) return '';
     

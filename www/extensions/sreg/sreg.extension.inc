@@ -90,9 +90,9 @@ function sreg_signed_fields($response) {
 }
 
 /**
- * @see hook_rp_form()
+ * @see hook_consent_form()
  */
-function sreg_rp_form($request, $response, $rp) {
+function sreg_consent_form($request, $response, $rp) {
     global $user;
     
     // We only respond if the extension is requested

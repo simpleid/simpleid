@@ -147,7 +147,7 @@ function hook_user_login_form($destination, $state) {
 
 
 /**
- * Provides additional form items when displaying the relying party verification
+ * Provides additional form items when displaying the relying party consent
  * form
  * 
  *
@@ -155,9 +155,44 @@ function hook_user_login_form($destination, $state) {
  * @param array $response the proposed OpenID response
  * @param array $rp the user's preferences saved with this relying party
  * @return string HTML code to be inserted into the verification form
- * @see simpleid_rp_form()
+ * @see simpleid_consent_form()
+ * @deprecated Use {@link hook_consent_form()}
  */
 function hook_rp_form($request, $response, $rp) {
+}
+
+/**
+ * Provides additional form items when displaying the relying party consent
+ * form
+ * 
+ *
+ * @param array $request the OpenID request
+ * @param array $response the proposed OpenID response
+ * @param array $rp the user's preferences saved with this relying party
+ * @return string HTML code to be inserted into the verification form
+ * @see simpleid_consent_form()
+ * @since 0.8
+ */
+function hook_consent_form($request, $response, $rp) {
+}
+
+/**
+ * Processes the relying party consent form.
+ *
+ * This provides the extension with the opportunity to:
+ *
+ * - modify the OpenID response based on the user's preferences by editing
+ *   $response
+ * - save the user's preferences by editing $rp
+ *
+ * @param array $form_request the data submitted by the user in the relying
+ * party verification form
+ * @param array &$response pointer to the proposed OpenID response
+ * @param array &$rp pointer to the user's preferences saved with this relying party
+ * @deprecated Use {@link hook_consent()}
+ *
+ */
+function hook_send($form_request, &$response, &$rp) {
 }
 
 /**
@@ -173,9 +208,10 @@ function hook_rp_form($request, $response, $rp) {
  * party verification form
  * @param array &$response pointer to the proposed OpenID response
  * @param array &$rp pointer to the user's preferences saved with this relying party
+ * @since 0.8
  *
  */
-function hook_send($form_request, &$response, &$rp) {
+function hook_consent($form_request, &$response, &$rp) {
 }
 
 /**
