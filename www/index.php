@@ -525,7 +525,7 @@ function simpleid_checkid($request) {
                 return redirect_form($request['openid.return_to'], $response);
             } else {
                 $response = simpleid_checkid_ok($request);
-                return simpleid_rp_form($request, $response);
+                return simpleid_rp_form($request, $response, $result);
             }
             break;
         case CHECKID_RETURN_TO_SUSPECT:
@@ -535,7 +535,7 @@ function simpleid_checkid($request) {
                 return redirect_form($request['openid.return_to'], $response);
             } else {
                 $response = simpleid_checkid_ok($request);
-                return simpleid_rp_form($request, $response, CHECKID_RETURN_TO_SUSPECT);
+                return simpleid_rp_form($request, $response, $result);
             }
             break;
         case CHECKID_OK:
@@ -561,7 +561,7 @@ function simpleid_checkid($request) {
             if ($immediate) {                
                 return redirect_form($request['openid.return_to'], $response);
             } else {                
-                return simpleid_rp_form($request, $response);                
+                return simpleid_rp_form($request, $response, $result);                
             }
             break;
         case CHECKID_PROTOCOL_ERROR:
@@ -845,8 +845,8 @@ function simpleid_sign(&$response, $assoc_handle = NULL) {
 }
 
 /**
- * Verify signatures generated using stateless mode
- *
+ * Processes a direct verification request.  This is used in the OpenID specification
+ * to verify signatures generated using stateless mode.
  *
  * @param array $request the OpenID request
  * @see http://openid.net/specs/openid-authentication-1_1.html#mode_check_authentication, http://openid.net/specs/openid-authentication-2_0.html#verifying_signatures
@@ -856,33 +856,7 @@ function simpleid_authenticate($request) {
     
     log_info('OpenID direct verification: ' . log_array($request));
     
-    $is_valid = TRUE;
-  
-    $assoc = (isset($request['openid.assoc_handle'])) ? cache_get('association', $request['openid.assoc_handle']) : NULL;
-  
-    if (!$assoc) {
-        log_notice('OpenID direct verification: Association not found.');
-        $is_valid = FALSE;
-    } elseif (!$assoc['assoc_type']) {
-        log_error('OpenID direct verification: Association does not contain valid assoc_type.');
-        $is_valid = FALSE;
-    } elseif (!$assoc['stateless']) {
-        log_warn('OpenID direct verification: Attempting to verify an association with a shared key.');
-        $is_valid = FALSE;
-    } else {
-        $mac_key = $assoc['mac_key'];
-        $assoc_types = openid_association_types();
-        $hmac_func = $assoc_types[$assoc['assoc_type']]['hmac_func'];
-        
-        $signed_keys = explode(',', $request['openid.signed']);
-        $signature = openid_sign($request, $signed_keys, $mac_key, $hmac_func, $version);
-        log_debug('***** Signature: ' . $signature);
-        
-        if ($signature != $request['openid.sig']) {
-            log_warn('OpenID direct verification: Signature supplied in request does not match the signatured generated.');
-            $is_valid = FALSE;
-        }
-    }
+    $is_valid = simpleid_verify_signatures($request);
 
     if ($is_valid) {
         $response = array('is_valid' => 'true');
@@ -905,6 +879,48 @@ function simpleid_authenticate($request) {
     openid_direct_response(openid_direct_message($response, $version));
 }
 
+/**
+ * Verifies the signature of a signed OpenID request/response.
+ *
+ * @param array $request the OpenID request/response
+ * @return bool true if the signature is verified
+ * @since 0.8
+ */
+function simpleid_verify_signatures($request) {
+    global $version;
+    
+    log_info('simpleid_verify_signatures');
+    
+    $is_valid = TRUE;
+  
+    $assoc = (isset($request['openid.assoc_handle'])) ? cache_get('association', $request['openid.assoc_handle']) : NULL;
+  
+    if (!$assoc) {
+        log_notice('simpleid_verify_signatures: Association not found.');
+        $is_valid = FALSE;
+    } elseif (!$assoc['assoc_type']) {
+        log_error('simpleid_verify_signatures: Association does not contain valid assoc_type.');
+        $is_valid = FALSE;
+    } elseif (!$assoc['stateless']) {
+        log_warn('simpleid_verify_signatures: Attempting to verify an association with a shared key.');
+        $is_valid = FALSE;
+    } else {
+        $mac_key = $assoc['mac_key'];
+        $assoc_types = openid_association_types();
+        $hmac_func = $assoc_types[$assoc['assoc_type']]['hmac_func'];
+        
+        $signed_keys = explode(',', $request['openid.signed']);
+        $signature = openid_sign($request, $signed_keys, $mac_key, $hmac_func, $version);
+        log_debug('***** Signature: ' . $signature);
+        
+        if ($signature != $request['openid.sig']) {
+            log_warn('simpleid_verify_signatures: Signature supplied in request does not match the signatured generated.');
+            $is_valid = FALSE;
+        }
+    }
+    
+    return $is_valid;
+}
 
 
 /**
