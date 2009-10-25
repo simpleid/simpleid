@@ -119,6 +119,8 @@ define('SIMPLEID_DATE_TIME_FORMAT', '%Y-%m-%d %H:%M:%S %Z');
 /**
  * The number of seconds before associations expire.  This is an advanced
  * option, for which the default setting should work fine.
+ *
+ * Note that for ICAM compliance, this number must be less than 86400.
  */
 define('SIMPLEID_ASSOC_EXPIRES_IN', 3600);
 
