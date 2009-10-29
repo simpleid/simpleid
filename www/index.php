@@ -153,6 +153,7 @@ function simpleid_start() {
     
     // Clean stale assocations
     cache_gc(SIMPLEID_ASSOC_EXPIRES_IN, 'association');
+    cache_gc(300, 'stateless');
     
     $routes = array(
         'continue' => 'simpleid_continue',
@@ -819,6 +820,14 @@ function simpleid_sign(&$response, $assoc_handle = NULL) {
         }
     }
     
+    // If we are using stateless mode, then we need to cache the response_nonce
+    // so that the RP can only verify once
+    if (isset($assoc['stateless']) && ($assoc['stateless'] == 1) && isset($response['openid.response_nonce'])) {
+        cache_set('stateless', $response['openid.response_nonce'], array(
+            'response_nonce' => $response['openid.response_nonce'],
+            'assoc_handle' => $response['openid.assoc_handle']));
+    }
+    
     // Get all the signed fields [10.1]
     openid_parse_request($response); // Fill the namespace array
     $signed_fields = array('op_endpoint', 'return_to', 'response_nonce', 'assoc_handle', 'identity', 'claimed_id');
@@ -894,6 +903,7 @@ function simpleid_verify_signatures($request) {
     $is_valid = TRUE;
   
     $assoc = (isset($request['openid.assoc_handle'])) ? cache_get('association', $request['openid.assoc_handle']) : NULL;
+    $stateless = (isset($request['openid.response_nonce'])) ? cache_get('stateless', $request['openid.response_nonce']) : NULL;
   
     if (!$assoc) {
         log_notice('simpleid_verify_signatures: Association not found.');
@@ -901,8 +911,11 @@ function simpleid_verify_signatures($request) {
     } elseif (!$assoc['assoc_type']) {
         log_error('simpleid_verify_signatures: Association does not contain valid assoc_type.');
         $is_valid = FALSE;
-    } elseif (!$assoc['stateless']) {
+    } elseif (!isset($assoc['stateless']) || ($assoc['stateless'] != 1)) {
         log_warn('simpleid_verify_signatures: Attempting to verify an association with a shared key.');
+        $is_valid = FALSE;
+    } elseif (!$stateless || ($stateless['assoc_handle'] != $request['openid.assoc_handle'])) {
+        log_warn('simpleid_verify_signatures: Attempting to verify a response_nonce more than once, or private association expired.');
         $is_valid = FALSE;
     } else {
         $mac_key = $assoc['mac_key'];
@@ -917,6 +930,8 @@ function simpleid_verify_signatures($request) {
             log_warn('simpleid_verify_signatures: Signature supplied in request does not match the signatured generated.');
             $is_valid = FALSE;
         }
+        
+        cache_delete('stateless', $request['openid.response_nonce']);
     }
     
     return $is_valid;
