@@ -2,7 +2,7 @@
 /*
  * SimpleID
  *
- * Copyright (C) Kelvin Mo 2007-8
+ * Copyright (C) Kelvin Mo 2007-9
  *
  * Includes code Drupal OpenID module (http://drupal.org/project/openid)
  * Rowan Kerr <rowan@standardinteractive.com>
@@ -127,6 +127,26 @@ function cache_gc($expiry, $type = NULL) {
     }
     
     closedir($dir);
+}
+
+/**
+ * Returns the time remaining, in seconds, before the data associated with the
+ * type and key become subject to garbage collection by {@link cache_gc()}.
+ *
+ * @param string $type the type of data in the cache
+ * @param string $key an identifier
+ * @param int $expiry the expiry time, in seconds, which would be passed onto the
+ * {@link cache_gc()} function
+ * @return int the time remaining before expiry, rounded downwards,
+ * or zero if the cache does not contain the requested data
+ * @since 0.8
+ */
+function cache_ttl($type, $key, $expiry) {
+    $filename = _cache_get_name($type, $key);
+    
+    if (!file_exists($filename)) return 0;
+    
+    return filectime($filename) - (time() - $expiry) - 1;
 }
 
 /**
