@@ -56,27 +56,10 @@ function set_message($msg) {
 function redirect_form($url, $message) {
     global $xtpl;
     
-    // Preserve GET parameters in url
-    $parts = parse_url($url);
-    $query = $parts['query'];
-    if ($query) {
-        $parts = explode('&', $query);
-        foreach ($parts as $part) {
-            list($key, $value) = explode('=', $part);
-            $xtpl->assign('name', htmlspecialchars($key, ENT_QUOTES, 'UTF-8'));
-            $xtpl->assign('value', htmlspecialchars(urldecode($value), ENT_QUOTES, 'UTF-8'));
-            $xtpl->parse('main.redirect.parameter');
-        }
-    }
-    foreach ($message as $key => $value) {
-        if ($key) {
-            $xtpl->assign('name', htmlspecialchars($key, ENT_QUOTES, 'UTF-8'));
-            $xtpl->assign('value', htmlspecialchars($value, ENT_QUOTES, 'UTF-8'));
-            $xtpl->parse('main.redirect.parameter');
-        }
-    }
-
-    $xtpl->assign('url', $url);
+    $redirect_url = openid_indirect_response_url($url, $message);
+    
+    $xtpl->assign('redirect_url_js', addcslashes($redirect_url, "\\\'\"&\n\r<>"));
+    $xtpl->assign('redirect_url_link', htmlspecialchars($redirect_url, ENT_QUOTES, 'UTF-8'));
     $xtpl->assign('title', 'Redirecting...');
     $xtpl->assign('page_class', 'dialog-page');
     

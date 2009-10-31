@@ -192,12 +192,9 @@
             <!-- END: sites -->
             
             <!-- BEGIN: redirect -->
-            <form action="{url}" enctype="application/x-www-form-urlencoded" id="simpleid_redirect">
-                <p>Redirecting...</p>
-                <!-- BEGIN: parameter --><input type="hidden" name="{name}" value="{value}" /><!-- END: parameter -->
-                <noscript><input type="submit" value="Continue" /></noscript>
-                <script type="text/javascript">document.getElementById("simpleid_redirect").submit();</script>
-            </form>
+            <p>Redirecting...</p>
+            <noscript><p><a href="{redirect_url_link}">Click here to continue.</a></p></noscript>
+            <script type="text/javascript">document.location.href = '{redirect_url_js}';</script>
             <!-- END: redirect -->
             
             <!-- BEGIN: upgrade_access_denied -->
