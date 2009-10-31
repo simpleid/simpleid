@@ -81,6 +81,11 @@ define('OPENID_IDENTIFIER_SELECT', 'http://specs.openid.net/auth/2.0/identifier_
 /** Constant for the XRDS service type for return_to verification */
 define('OPENID_RETURN_TO', 'http://specs.openid.net/auth/2.0/return_to');
 
+/** Parameter for {@link openid_indirect_response_url()} */
+define('OPENID_RESPONSE_QUERY', 0);
+/** Parameter for {@link openid_indirect_response_url()} */
+define('OPENID_RESPONSE_FRAGMENT', 1);
+
 /**
  * A mapping of Type URIs of OpenID extnesions to aliases provided in an OpenID
  * request.
@@ -196,14 +201,18 @@ function openid_indirect_response($url, $message, $response_func = 'openid_indir
 }
 
 /**
- * Sends an indirect message via an HTTP redirect
+ * Sends an indirect message via an HTTP redirect.
+ *
+ * The indirect message is encoded in the query of the URL.  This is because
+ * user agent support for a HTTP redirect location containing a fragment is
+ * undefined.
  *
  * @param string $url the URL to which the response is to be sent
  * @param mixed $message an OpenID message
  */ 
 function openid_indirect_response_redirect($url, $message) {    
     header('Status: 303 See Other');
-    header('Location: ' . openid_indirect_response_url($url, $message));
+    header('Location: ' . openid_indirect_response_url($url, $message, OPENID_RESPONSE_QUERY));
     exit;
 }
 
@@ -211,12 +220,14 @@ function openid_indirect_response_redirect($url, $message) {
  * Encodes an indirect message into a URL
  *
  * @param string $url the URL to which the response is to be sent
- * @param array $message an OpenID message, which can either be an array of keys
+ * @param array|string $message an OpenID message, which can either be an array of keys
  * and values, or a URL-encoded query string
+ * @param int $component the component of the URL in which the indirect message is
+ * encoded, either OPENID_RESPONSE_QUERY or OPENID_RESPONSE_FRAGMENT
  * @return string the URL to which the response is to be sent, with the
  * encoded message
  */
-function openid_indirect_response_url($url, $message) {
+function openid_indirect_response_url($url, $message, $component = OPENID_RESPONSE_QUERY) {
     // 1. Firstly, get the query string
     $query = '';
     
@@ -249,8 +260,21 @@ function openid_indirect_response_url($url, $message) {
     $url .= $parts['host'];
     if (isset($parts['port'])) $url .= ':' . $parts['port'];
     $url .= $parts['path'];
-    $url .= '?' . ((isset($parts['query'])) ? $parts['query'] . '&' : '') . $query;
-    if (isset($parts['fragment'])) $url .= '#' . $parts['fragment'];
+    
+    if (($component == OPENID_RESPONSE_QUERY) || (strpos($url, '#') === FALSE)) {
+        $url .= '?' . ((isset($parts['query'])) ? $parts['query'] . '&' : '') . $query;
+        if (isset($parts['fragment'])) $url .= '#' . $parts['fragment'];
+    } elseif ($component == OPENID_RESPONSE_FRAGMENT) {
+        // In theory $parts['fragment'] should be an empty string, but the
+        // current draft specification does not prohibit putting other things
+        // in the fragment.
+        
+        if (isset($parts['query'])) {
+            $url .= '?' . $parts['query'] . '#' . $parts['fragment'] . '&' . $query;
+        } else {
+            $url .= '#' . $parts['fragment'] . '?' . $query;
+        }
+    }
     return $url;
 }
 
@@ -261,21 +285,17 @@ function openid_indirect_response_url($url, $message) {
  * @param array $message an OpenID message
  */
 function openid_indirect_response_form($url, $message) {
+    $redirect_url = openid_indirect_response_url($url, $message);
+    $redirect_url_js = addcslashes($redirect_url, "\\\'\"&\n\r<>");
+    $redirect_url_link = htmlspecialchars($redirect_url, ENT_QUOTES, 'UTF-8');
+    
     $html = '<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xml:lang="en-AU" lang="en-AU" xmlns="http://www.w3.org/1999/xhtml"><body>';
+<html xml:lang="en-AU" lang="en-AU" xmlns="http://www.w3.org/1999/xhtml"><head>Redirecting...</head><body>';
 
-    $html .= '<form action="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '" enctype="application/x-www-form-urlencoded" id="redirect"><p>Redirecting...</p>';
-
-    foreach ($message as $key => $value) {
-        if ($key) {
-            $html .= '<input type="hidden" name="' . htmlspecialchars($key, ENT_QUOTES, 'UTF-8') . '" value="' . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . '" />';
-        }
-    }
-
-    $html .= '<noscript><input type="submit" value="Continue" /></noscript>
-                <script type="text/javascript">document.getElementById("redirect").submit();</script>
-            </form></body></html>';
+    $html .= '<p>Redirecting...</p>';
+    $html .= '<noscript><p><a href="' . $redirect_url_link . '">Click here to continue.</a></p></noscript>';
+    $html .= '<script type="text/javascript">document.location.href = \'' . $redirect_url_js . '\';</script></div></form></body></html>';
             
     print $html;
     
@@ -1030,7 +1050,6 @@ function openid_sign($data, $keys, $mac_key, $hmac_func = '_openid_hmac_sha1', $
         }
     }
     
-    // We set OPENID_VERSION_1_1 because we don't want to sign the namespace header
     $signature_base_string = _openid_signature_base_string($sign_data, $version);
     $secret = base64_decode($mac_key);
     $signature = call_user_func($hmac_func, $secret, $signature_base_string);
