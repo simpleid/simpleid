@@ -131,7 +131,7 @@ function openid_direct_message($data, $version = OPENID_VERSION_2) {
             break;
     }
 
-    if ($ns != '') $data['ns'] = $ns;
+    if (($ns != '') && !isset($data['ns'])) $data['ns'] = $ns;
     
     foreach ($data as $key => $value) {
         if (strpos($key, ':') !== false) {
@@ -181,9 +181,8 @@ function openid_indirect_message($data, $version = OPENID_VERSION_2) {
             break;
     }
     
-    if ($ns != '') {
-        return array_merge($data, array('openid.ns' => $ns));
-    }
+    if (($ns != '') && !isset($data['openid.ns'])) $data['openid.ns'] = $ns;
+    
     return $data;
 }
 
