@@ -153,7 +153,7 @@ function user_login() {
         if (isset($request['openid.return_to'])) {
             $return_to = $request['openid.return_to'];
             $response = simpleid_checkid_error(FALSE);
-            redirect_form($return_to, $response);
+            simpleid_assertion_response($return_to, $response);
         } else {
             indirect_fatal_error('Login cancelled without a proper OpenID request.');
         }

@@ -47,31 +47,6 @@ function set_message($msg) {
 }
 
 /**
- * Provides an HTML-based redirection form for OpenID messages.
- *
- * @param string $url the location to which the user agent is redirected
- * @param mixed $message the OpenID message to include in the redirection
- * request.
- */
-function redirect_form($url, $message) {
-    global $xtpl;
-    
-    $redirect_url = openid_indirect_response_url($url, $message);
-    
-    $xtpl->assign('redirect_url_js', addcslashes($redirect_url, "\\\'\"&\n\r<>"));
-    $xtpl->assign('redirect_url_link', htmlspecialchars($redirect_url, ENT_QUOTES, 'UTF-8'));
-    $xtpl->assign('title', 'Redirecting...');
-    $xtpl->assign('page_class', 'dialog-page');
-    
-    $xtpl->parse('main.redirect');
-    $xtpl->parse('main');
-    
-    $xtpl->out('main');
-    
-    exit;
-}
-
-/**
  * Displays a fatal error message and exits.
  *
  * @param string $error the message to set

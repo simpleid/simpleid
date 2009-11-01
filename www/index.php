@@ -145,11 +145,10 @@ function simpleid_start() {
     $GETPOST = array_merge($_GET, $_POST);
     
     $q = (isset($GETPOST['q'])) ? $GETPOST['q'] : '';
-    $q = explode('/', $q);
     
     extension_init();
-    user_init($q[0]);
-    log_info('Session opened for "' . implode('/', $q) . '" [' . $_SERVER['REMOTE_ADDR'] . ', ' . gethostbyaddr($_SERVER['REMOTE_ADDR']) . ']');
+    user_init($q);
+    log_info('Session opened for "' . $q . '" [' . $_SERVER['REMOTE_ADDR'] . ', ' . gethostbyaddr($_SERVER['REMOTE_ADDR']) . ']');
     
     // Clean stale assocations
     cache_gc(SIMPLEID_ASSOC_EXPIRES_IN, 'association');
@@ -171,7 +170,7 @@ function simpleid_start() {
     );
     $routes = array_merge($routes, extension_invoke_all('routes'), array('.*' => 'simpleid_index'));
     
-    simpleweb_run($routes, implode('/', $q));
+    simpleweb_run($routes, $q);
 }
 
 /**
@@ -523,33 +522,33 @@ function simpleid_checkid($request) {
             log_info('CHECKID_APPROVAL_REQUIRED');
             if ($immediate) {
                 $response = simpleid_checkid_approval_required($request);
-                return redirect_form($request['openid.return_to'], $response);
+                simpleid_assertion_response($request['openid.return_to'], $response);
             } else {
                 $response = simpleid_checkid_ok($request);
-                return simpleid_consent_form($request, $response, $result);
+                simpleid_consent_form($request, $response, $result);
             }
             break;
         case CHECKID_RETURN_TO_SUSPECT:
             log_info('CHECKID_RETURN_TO_SUSPECT');
             if ($immediate) {
                 $response = simpleid_checkid_error($immediate);
-                return redirect_form($request['openid.return_to'], $response);
+                simpleid_assertion_response($request['openid.return_to'], $response);
             } else {
                 $response = simpleid_checkid_ok($request);
-                return simpleid_consent_form($request, $response, $result);
+                simpleid_consent_form($request, $response, $result);
             }
             break;
         case CHECKID_OK:
             log_info('CHECKID_OK');
             $response = simpleid_checkid_ok($request);
             $response = simpleid_sign($response, $request['openid.assoc_handle']);
-            return redirect_form($request['openid.return_to'], $response);
+            simpleid_assertion_response($request['openid.return_to'], $response);
             break;
         case CHECKID_LOGIN_REQUIRED:
             log_info('CHECKID_LOGIN_REQUIRED');
             if ($immediate) {
                 $response = simpleid_checkid_login_required($request);
-                return redirect_form($request['openid.return_to'], $response);
+                simpleid_assertion_response($request['openid.return_to'], $response);
             } else {
                 user_login_form('continue', pickle($request));
                 exit;
@@ -560,15 +559,15 @@ function simpleid_checkid($request) {
             log_info('CHECKID_IDENTITIES_NOT_MATCHING | CHECKID_IDENTITY_NOT_EXIST');
             $response = simpleid_checkid_error($immediate);
             if ($immediate) {                
-                return redirect_form($request['openid.return_to'], $response);
+                simpleid_assertion_response($request['openid.return_to'], $response);
             } else {                
-                return simpleid_consent_form($request, $response, $result);                
+                simpleid_consent_form($request, $response, $result);                
             }
             break;
         case CHECKID_PROTOCOL_ERROR:
             if (isset($request['openid.return_to'])) {
                 $response = openid_checkid_error($immediate);
-                return redirect_form($request['openid.return_to'], $response);
+                simpleid_assertion_response($request['openid.return_to'], $response);
             } else {
                 indirect_fatal_error('Unrecognised request.');
             }
@@ -1062,16 +1061,63 @@ function simpleid_consent() {
     }
 
     if ($return_to) {
-        redirect_form($return_to, $response);
+        simpleid_assertion_response($return_to, $response);
     } else {
         page_dashboard();
     }
 }
 
 /**
- * Sends an assertion.
+ * Sends an OpenID assertion response.
+ *
+ * The OpenID specification version 2.0 provides for the sending of assertions
+ * via indirect communication.  However, future versions of the OpenID
+ * specification may provide for sending of assertions via direct communication.
+ *
+ * This function is flexible when accepting arguments:
+ *
+ * - If the first argument is a string, then the response will be sent via indirect
+ *   communication.  The second argument is then the OpenID assertion response.
+ * - If the first argument is an array, then the response will be sent via direct
+ *   communication.
+ *
+ * @param string $indirect_url the URL to which the OpenID response is sent.  If
+ * this is an empty string, the response is sent via direct communication
+ * @param array $response the OpenID assertion response to send
  */
-function simpleid_assertion_response($message, $indirect_url = '') {
+function simpleid_assertion_response() {
+    global $xtpl, $version;
+    
+    $args = func_get_args();
+    $arg1 = array_shift($args);
+    
+    if (is_string($arg1)) {
+        // Rename the arguments to something useful
+        $url = $arg1;
+        $response = array_shift($args);
+        
+        // We want to see if the extensions want to change the way indirect responses are made
+        $results = extension_invoke_all('indirect_response', $url, $response);
+        $results = array_filter($results, 'is_null');
+        $component = ($results) ? max($results) : OPENID_RESPONSE_QUERY;
+        
+        $redirect_url = openid_indirect_response_url($url, $response, $component);
+    
+        $xtpl->assign('redirect_url_js', addcslashes($redirect_url, "\\\'\"&\n\r<>"));
+        $xtpl->assign('redirect_url_link', htmlspecialchars($redirect_url, ENT_QUOTES, 'UTF-8'));
+        $xtpl->assign('title', 'Redirecting...');
+        $xtpl->assign('page_class', 'dialog-page');
+    
+        $xtpl->parse('main.redirect');
+        $xtpl->parse('main');
+    
+        $xtpl->out('main');
+    
+        exit;
+    } elseif (is_array($arg1)) {
+        $response = $arg1;
+        openid_direct_response(openid_direct_message($response, $version));
+    }
 }
 
 /**
