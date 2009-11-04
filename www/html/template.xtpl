@@ -168,7 +168,7 @@
             <input name="q" type="hidden" value="autorelease" />
             <input name="tk" type="hidden" value="{token}"/>
             <input name="update-all" type="hidden" value="1"/>
-            <table>
+            <table id="sites">
                 <thead>
                     <tr>
                         <th>Site</th>
@@ -181,7 +181,7 @@
                     <!-- BEGIN:realm -->
                     <tr>
                         <td><span class="realm">{realm}</span></td>
-                        <td>{last_time}</td>
+                        <td><span class="last-time">{last_time}</span> {last_time_formatted}</td>
                         <td><input type="checkbox" value="1" name="autorelease[{realm}]" {auto_release}/></td>
                         <td><input type="checkbox" value="1" name="remove[{realm}]"/></td>
                     </tr>

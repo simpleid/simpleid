@@ -175,6 +175,8 @@ pre {
     background: transparent url(world.png) no-repeat top left;
 }
 
+span.last-time { display: none }
+
 .message, .login-security {
     border: 1px solid #666666;
     padding: 0 10px;
