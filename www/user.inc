@@ -471,7 +471,7 @@ function user_autologin_create($id = NULL, $expires = NULL) {
     if ($expires == NULL) $expires = time() + SIMPLEID_USER_AUTOLOGIN_EXPIRES_IN;
     $token = get_form_token(mt_rand());
     
-    cache_set('autologin-'. $user['uid'], $id, array('token' => $token, 'expires' => $expires, 'ip' => $_SERVER['REMOTE_ADDR']));
+    cache_set('autologin-'. md5($user['uid']), $id, array('token' => $token, 'expires' => $expires, 'ip' => $_SERVER['REMOTE_ADDR']));
     
     setcookie(_user_autologin_cookie(), $user['uid'] . ':' . $id . ':' . $token, $expires);
 }
@@ -485,8 +485,8 @@ function user_autologin_verify() {
     list($uid, $id, $token) = explode(':', $cookie);
     log_debug('Automatic login token detected for ' . $uid);
     
-    cache_gc(SIMPLEID_USER_AUTOLOGIN_EXPIRES_IN, 'autologin-' . $uid);
-    $cache = cache_get('autologin-' . $uid, $id);
+    cache_gc(SIMPLEID_USER_AUTOLOGIN_EXPIRES_IN, 'autologin-' . md5($uid));
+    $cache = cache_get('autologin-' . md5($uid), $id);
     
     if (!$cache) {  // Cookie doesn't exist
         log_notice('Automatic login: Token does not exist on server');
@@ -501,7 +501,7 @@ function user_autologin_verify() {
     if ($cache['token'] != $token) {
         log_warn('Automatic login: Token on server does not match');
         // Token not the same - panic
-        cache_gc(0, 'autologin-' . $uid);
+        cache_gc(0, 'autologin-' . md5($uid));
         user_autologin_invalidate();
         return;
     }
@@ -532,7 +532,7 @@ function user_autologin_invalidate() {
         
         list($uid, $id, $token) = explode(':', $cookie);
         
-        cache_delete('autologin-' . $uid, $id);
+        cache_delete('autologin-' . md5($uid), $id);
         
         setcookie(_user_autologin_cookie(), "", time() - 3600);
     }
