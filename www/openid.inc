@@ -90,9 +90,9 @@ define('OPENID_RESPONSE_FRAGMENT', 1);
  * A mapping of Type URIs of OpenID extnesions to aliases provided in an OpenID
  * request.
  *
- * @global array $ns_to_alias
+ * @global array $openid_ns_to_alias
  */
-$ns_to_alias = array("http://openid.net/extensions/sreg/1.1" => "sreg"); // For sreg 1.0 compatibility
+$openid_ns_to_alias = array("http://openid.net/extensions/sreg/1.1" => "sreg"); // For sreg 1.0 compatibility
 
 
 /**
@@ -464,12 +464,12 @@ function openid_fix_request() {
  * @param array $request the OpenID request
  */
 function openid_parse_request($request) {
-    global $ns_to_alias;    
+    global $openid_ns_to_alias;    
     
     foreach ($request as $key => $value) {
         if (strpos($key, 'openid.ns.') === 0) {
             $alias = substr($key, 10);
-            $ns_to_alias[$value] = $alias;
+            $openid_ns_to_alias[$value] = $alias;
         }
     }
 }
@@ -622,9 +622,9 @@ function openid_verify_return_to($return_to, $actual_url) {
  * openid.example.) stripped in the keys.
  */
 function openid_extension_filter_request($ns, $request) {
-    global $ns_to_alias;
+    global $openid_ns_to_alias;
     
-    $alias = $ns_to_alias[$ns];
+    $alias = $openid_ns_to_alias[$ns];
     $return = array();
     
     if (is_array($request)) {
@@ -649,10 +649,10 @@ function openid_extension_filter_request($ns, $request) {
  * @return bool true if the extension is present in the request
  */
 function openid_extension_requested($ns, $request) {
-    global $ns_to_alias;
+    global $openid_ns_to_alias;
     
-    if (!isset($ns_to_alias[$ns])) return false;
-    $alias = $ns_to_alias[$ns];
+    if (!isset($openid_ns_to_alias[$ns])) return false;
+    $alias = $openid_ns_to_alias[$ns];
     
     if (is_array($request)) {
         foreach ($request as $key => $value) {
@@ -678,16 +678,16 @@ function openid_extension_requested($ns, $request) {
  * have an alias in the current OpenID request <i>and</i> $create is false
  */
 function openid_extension_alias($ns, $create = FALSE) {
-    global $ns_to_alias;
+    global $openid_ns_to_alias;
     static $e = 1;
     
-    if (isset($ns_to_alias[$ns])) return $ns_to_alias[$ns];
+    if (isset($openid_ns_to_alias[$ns])) return $openid_ns_to_alias[$ns];
     if ($create !== FALSE) {
         if ($create === TRUE) {
             $alias = 'e' . $e;
             $e++;
         } elseif (is_string($create)) {
-            $used_aliases = array_values($ns_to_alias);
+            $used_aliases = array_values($openid_ns_to_alias);
         
             $alias = $create;
             $i = 0;
@@ -697,7 +697,7 @@ function openid_extension_alias($ns, $create = FALSE) {
                 $alias = $create . $i;
             }
     }
-        $ns_to_alias[$ns] = $alias;
+        $openid_ns_to_alias[$ns] = $alias;
         return $alias;
     }
     return NULL;
