@@ -184,18 +184,26 @@ function validate_form_token($token, $id) {
 
 /* ------- SimpleID extension support ---------------------------------------- */
 
+
+/**
+ * This variable holds an array of extensions specified by the user
+ *
+ * @global array $simpleid_extensions
+ * @see SIMPLEID_EXTENSIONS
+ */
+$simpleid_extensions = array();
+
 /**
  * Initialises the extension mechanism.  This function looks up the extensions
  * to load in the {@link SIMPLEID_EXTENSIONS} constants, loads them, then
  * calls the ns hook.
  */
 function extension_init() {
-    global $extensions;
-    global $ns_to_extension;
+    global $simpleid_extensions;
     
-    $extensions = preg_split('/,\s*/', SIMPLEID_EXTENSIONS);
+    $simpleid_extensions = preg_split('/,\s*/', SIMPLEID_EXTENSIONS);
     
-    foreach ($extensions as $extension) {
+    foreach ($simpleid_extensions as $extension) {
         include_once 'extensions/' . $extension . '/' . $extension . '.extension.inc';
     }
 }
@@ -208,13 +216,13 @@ function extension_init() {
  * @return array the return values from the hook
  */
 function extension_invoke_all() {
-    global $extensions;
+    global $simpleid_extensions;
     
     $args = func_get_args();
     $function = array_shift($args);
     $return = array();
     
-    foreach ($extensions as $extension) {
+    foreach ($simpleid_extensions as $extension) {
         if (function_exists($extension . '_' . $function)) {
             log_debug('extension_invoke_all: ' . $extension . '_' . $function);
             $result = call_user_func_array($extension . '_' . $function, $args);
@@ -254,8 +262,8 @@ function extension_invoke() {
  * @param array a list of the names of the currently loaded extensions.
  */
 function get_extensions() {
-    global $extensions;
+    global $simpleid_extensions;
     
-    return $extensions;
+    return $simpleid_extensions;
 }
 ?>
