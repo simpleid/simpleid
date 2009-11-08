@@ -51,9 +51,9 @@
  * This variable is a cache of SimpleID's application settings.  It is populated
  * progressively as {@link store_get()} is called.
  *
- * @global array $settings
+ * @global array $simpleid_settings
  */
-$settings = array();
+$simpleid_settings = array();
 
 /**
  * Returns whether the user name exists in the user store.
@@ -157,19 +157,19 @@ function store_user_save($uid, $data, $exclude = array()) {
  *
  */
 function store_get($name, $default = NULL) {
-    global $settings;
+    global $simpleid_settings;
     
-    if (!isset($settings[$name])) {
+    if (!isset($simpleid_settings[$name])) {
         $setting_file = SIMPLEID_STORE_DIR . "/$name.setting";
         
         if (file_exists($setting_file)) {
-            $settings[$name] = unserialize(file_get_contents($setting_file));
+            $simpleid_settings[$name] = unserialize(file_get_contents($setting_file));
         } else {
             return $default;
         }
     }
     
-    return $settings[$name];
+    return $simpleid_settings[$name];
 }
 
 /**
@@ -180,9 +180,9 @@ function store_get($name, $default = NULL) {
  *
  */
 function store_set($name, $value) {
-    global $settings;
+    global $simpleid_settings;
     
-    $settings[$name] = $value;
+    $simpleid_settings[$name] = $value;
     
     $setting_file = SIMPLEID_STORE_DIR . "/$name.setting";
     $file = fopen($setting_file, 'w');
@@ -197,9 +197,9 @@ function store_set($name, $value) {
  *
  */
 function store_del($name) {
-    global $settings;
+    global $simpleid_settings;
     
-    if (isset($settings[$name])) unset($settings[$name]);;
+    if (isset($simpleid_settings[$name])) unset($simpleid_settings[$name]);;
     
     $setting_file = SIMPLEID_STORE_DIR . "/$name.setting";
     if (file_exists($setting_file)) unlink($setting_file);
