@@ -52,6 +52,7 @@ $upgrade_access_check = TRUE;
 include_once "version.inc";
 include_once "config.inc";
 include_once "config.default.inc";
+include_once "log.inc";
 include_once "common.inc";
 include_once "simpleweb.inc";
 include_once "openid.inc";
