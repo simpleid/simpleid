@@ -40,9 +40,10 @@
 define('SIMPLEID_LOGIN_NONCE_EXPIRES_IN', 3600);
 
 /**
- * The time the auto login cookie will last.
+ * The time (in seconds) the auto login cookie will last.  This is currently
+ * set as 2 weeks.
  */
-define('SIMPLEID_USER_AUTOLOGIN_EXPIRES_IN', 50400);
+define('SIMPLEID_USER_AUTOLOGIN_EXPIRES_IN', 1209600);
 
 /**
  * This variable holds data on the currently logged-in user.  If the user is
