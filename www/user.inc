@@ -303,7 +303,7 @@ function user_login_form($destination = '', $state = NULL) {
     $xtpl->assign('javascript', '<script src="html/md5.js" type="text/javascript"></script><script src="html/user-login.js" type="text/javascript"></script>');
     
     if (is_https()) {
-        $xtpl->assign('security_class', 'secure');
+        $xtpl->assign('security_class', 'secure user-login-https');
         $xtpl->assign('security_message', 'Secure login using <strong>HTTPS</strong>.');
     } else {
         $xtpl->assign('security_class', 'unsecure');

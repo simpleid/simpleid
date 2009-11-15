@@ -1,29 +1,33 @@
 $(document).ready(function() {
-    // Javascript is working, so tell the user
-    $('.login-security').removeClass('unsecure').addClass('secure');
-    $('.login-security p').html('Secure login using <strong>digest</strong>.  Your password is secured before it is sent to SimpleID.');
-    $('input:disabled').removeAttr('disabled');
     $('#edit-pass').attr('autocomplete', 'off');
     
-    $('form#login-form').submit(function() {
-        $('#edit-submit').disabled = 'disabled';
+    if (!($('.login-security').is('.user-login-https'))) {
+        // If we are not logging in via HTTPS, we need Javascript to be working
+        $('.login-security').removeClass('unsecure').addClass('secure');
+        $('.login-security p').html('Secure login using <strong>digest</strong>.  Your password is secured before it is sent to SimpleID.');
+        $('input:disabled').removeAttr('disabled');
         
-        var user = $('#edit-name').val();
-        var password = $('#edit-pass').val();
-        var nonce = $('#edit-nonce').val();
         
-        var digest1 = md5(user + ':' + md5(password));
-        var digest = md5(nonce + ':' + digest1);
-        
-        // Set the digest
-        $('#edit-digest').val(digest);
-        
-        // Set password to nothing
-        $('#edit-pass').val('');
-        $('#edit-pass').disabled = 'disabled';
-        
-        return true;
-    });
+        $('form#login-form').submit(function() {
+            $('#edit-submit').disabled = 'disabled';
+            
+            var user = $('#edit-name').val();
+            var password = $('#edit-pass').val();
+            var nonce = $('#edit-nonce').val();
+            
+            var digest1 = md5(user + ':' + md5(password));
+            var digest = md5(nonce + ':' + digest1);
+            
+            // Set the digest
+            $('#edit-digest').val(digest);
+            
+            // Set password to nothing
+            $('#edit-pass').val('');
+            $('#edit-pass').disabled = 'disabled';
+            
+            return true;
+        });
+    }
 });
 
 function utf8_encode(s) {
