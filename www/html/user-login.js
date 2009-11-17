@@ -1,8 +1,8 @@
 $(document).ready(function() {
     $('#edit-pass').attr('autocomplete', 'off');
     
-    if (!($('.login-security').is('.user-login-https'))) {
-        // If we are not logging in via HTTPS, we need Javascript to be working
+    if ($('.login-security').is('.login-digest')) {
+        // If we are logging in via digest, we need Javascript to be working
         $('.login-security').removeClass('unsecure').addClass('secure');
         $('.login-security p').html('Secure login using <strong>digest</strong>.  Your password is secured before it is sent to SimpleID.');
         $('input:disabled').removeAttr('disabled');
