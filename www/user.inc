@@ -40,9 +40,10 @@
 define('SIMPLEID_LOGIN_NONCE_EXPIRES_IN', 3600);
 
 /**
- * The time the auto login cookie will last.
+ * The time (in seconds) the auto login cookie will last.  This is currently
+ * set as 2 weeks.
  */
-define('SIMPLEID_USER_AUTOLOGIN_EXPIRES_IN', 50400);
+define('SIMPLEID_USER_AUTOLOGIN_EXPIRES_IN', 1209600);
 
 /**
  * This variable holds data on the currently logged-in user.  If the user is
@@ -291,12 +292,12 @@ function user_login_form($destination = '', $state = NULL) {
         $xtpl->assign('security_class', 'secure');
         $xtpl->assign('security_message', 'Secure login using <strong>HTTPS</strong>.');
     } else {
-        $xtpl->assign('security_class', 'unsecure');
-        
         if (!SIMPLEID_ALLOW_LEGACY_LOGIN) {
+            $xtpl->assign('security_class', 'unsecure login-digest');
             $xtpl->assign('security_message', 'Your SimpleID configuration does not allow you to log in unsecurely.  Please enable JavaScript and try again, or see <a href="http://simpleid.sourceforge.net/documentation/using-simpleid/logging-simpleid">the SimpleID documentation</a> for more details.');
             $xtpl->assign('security_disabled', 'disabled="disabled"');
         } else {
+            $xtpl->assign('security_class', 'unsecure');
             $xtpl->assign('security_message', '<strong>WARNING:</strong>  Your password will be sent to SimpleID as plain text.');
         }
     }
