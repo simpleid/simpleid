@@ -22,7 +22,7 @@
  */
 
 /**
- * Support for XRDS based discovery.
+ * Support for XRDS and XRD based discovery.
  *
  * The functions for this file supports HTTP-based identifiers.  For XRIs, the
  * resolution service xri.net is used to resolve to HTTP-based URLs.
@@ -53,6 +53,16 @@ define('XRDS_SIMPLE_NS', 'http://xrds-simple.net/core/1.0');
  * The type identifier for XRDS Simple.
  */
 define('XRDS_SIMPLE_TYPE', 'xri://$xrds*simple');
+
+/**
+ * The namespace identifier for an XRD document.
+ */
+define('XRD_NS', 'http://docs.oasis-open.org/ns/xri/xrd-1.0');
+
+/**
+ * The namespace identifier for an host metadata.
+ */
+define('HOST_META_NS', 'http://host-meta.net/ns/1.0');
 
 /**
  * The namespace identifier for OpenID services.
@@ -158,7 +168,7 @@ function discovery_get_xrds($url, $check = TRUE, $retries = 5) {
 /**
  * Normalises an identifier for discovery.
  *
- * If the identifier begins with xri://, this is stripped out.  If the identifier
+ * If the identifier begins with xri://, acct: or mailto:, this is stripped out.  If the identifier
  * does not begin with a valid URI scheme, http:// is assumed and added to the
  * identifier.
  *
@@ -170,6 +180,9 @@ function discovery_normalize($identifier) {
     
     if (discovery_is_xri($identifier)) {
         if (stristr($identifier, 'xri://') !== false) $normalized = substr($identifier, 6);
+    } elseif (discovery_is_email($identifier)) {
+        if (stristr($identifier, 'acct:') !== false) $normalized = substr($identifier, 5);
+        if (stristr($identifier, 'mailto:') !== false) $normalized = substr($identifier, 7);
     } else {
         if (stristr($identifier, '://') === false) $normalized = 'http://'. $identifier;
         if (substr_count($normalized, '/') < 3) $normalized .= '/';
@@ -188,6 +201,9 @@ function discovery_normalize($identifier) {
 function discovery_get_url($identifier) {
     if (discovery_is_xri($identifier)) {
         return 'http://xri.net/' . $identifier;
+    } elseif (discovery_is_email($identifier)) {
+        //list($user, $host) = explode('@', $identifier, 2);
+        //$host_meta = 'http://' . $host . '/.well-known/host-meta';
     } else {
         return $identifier;
     }
@@ -208,6 +224,37 @@ function discovery_is_xri($identifier) {
     if (stristr($identifier, 'xri://') !== FALSE) return true;
     return false;
 }
+
+/**
+ * Determines whether an identifier is an e-mail address.
+ *
+ * An identifier is an e-mail address if it:
+ *
+ * - has a single @ character
+ * - does not have a slash character
+ *
+ * @param string $identifier the parameter to test
+ * @return bool true if the identifier is an e-mail address
+ */
+function discovery_is_email($identifier) {
+    // If it begins with acct: or mailto:, strip it out
+    if (stristr($identifier, 'acct:') !== false) $identifier = substr($identifier, 5);
+    if (stristr($identifier, 'mailto:') !== false) $identifier = substr($identifier, 7);
+    
+    // If it contains a slash, it is not an e-mail address
+    if (strpos($identifier, "/") !== false) return false;
+    
+    $at = strpos($identifier, "@");
+    
+    // If it does not contain a @, it is not an e-mail address
+    if ($at === false) return false;
+    
+    // If it contains more than one @, it is not an e-mail
+    if (strrpos($identifier, "@") != $at) return false;
+    
+    return true;
+}
+
 
 /**
  * Callback function to sort service and URI elements based on priorities
@@ -293,6 +340,48 @@ function discovery_get_openid_services($url) {
     }
     
     return $services;
+}
+
+/**
+ * Generates a URI from a URI template and another URI.
+ *
+ * The URI must be able to be parsed by PHP's parse_url function.
+ *
+ * @param string $template the URI template
+ * @param string $uri the URI
+ * @return string the generated URI
+ *
+ */
+function discovery_uri_template($template, $uri) {
+    $parts = @parse_url($uri);
+    
+    // The {uri} template variable excludes the fragment
+    $short_uri = array_shift(explode('#', $uri, 2));
+    
+    // The {userinfo} template variable is the user and the pass
+    $userinfo = (isset($parts['user'])) ? $parts['user'] . ((isset($parts['pass'])) ? ':' . $parts['pass'] : '') : '';
+    
+    // The {authority] tempalte is the userinfo, host and port
+    $authority = $userinfo . ((isset($parts['host'])) ? '@' . $parts['host'] . ((isset($parts['port'])) ? ':' . $parts['port'] : '') : '');
+    
+    $args = array(
+        'uri' => $short_uri,
+        'scheme' => (isset($parts['scheme'])) ? $parts['scheme'] : '',
+        'authority' => $authority,
+        'path' => (isset($parts['path'])) ? $parts['path'] : '',
+        'query' => (isset($parts['query'])) ? $parts['query'] : '',
+        'fragment' => (isset($parts['fragment'])) ? $parts['fragment'] : '',
+        'userinfo' => $userinfo,
+        'host' => (isset($parts['host'])) ? $parts['host'] : '',
+        'port' => (isset($parts['port'])) ? $parts['port'] : ''
+    );
+    
+    // Define the % encoded versions
+    foreach ($args as $key => $value) {
+        $args['%' . $key] = rfc3986_urlencode($value);
+    }
+    
+    return strtr($template, $args);
 }
 
 /**
@@ -393,6 +482,43 @@ class XRDSParser {
     var $service = array();
     
     /**
+     * The canonical identifier for the resource described.  Used in XRD
+     * documents only.
+     * @var string
+     * @access private
+     * @since 0.8
+     */
+    var $subject = NULL;
+    
+    /**
+     * Additional identifies for the resource described.  Used in XRD
+     * documents only.
+     * @var array
+     * @access private
+     * @since 0.8
+     */
+    var $aliases = array();
+    
+    /**
+     * Additional properties for the resource described.  Used in XRD
+     * documents only.
+     * @var array
+     * @access private
+     * @since 0.8
+     */
+    var $types = array();
+
+    /**
+     * Mapping between XRDS elements and XRD elements
+     * @var array
+     * @access private
+     * @since 0.8
+     */
+    var $xrds_map = array(
+        'Type' => 'Rel'
+    );
+    
+    /**
      * Creates an instance of the XRDS parser.
      *
      * This constructor also initialises the underlying XML parser.
@@ -440,7 +566,40 @@ class XRDSParser {
     function services() {
         return $this->services;
     }
+    
+    /**
+     * Returns the canonical identifier.
+     *
+     * @return string the canonical identifier
+     * @access public
+     * @since 0.8
+     */
+    function subject() {
+        return $this->subject;
+    }
+    
+    /**
+     * Returns additional identifiers.
+     *
+     * @return array the additional identifiers
+     * @access public
+     * @since 0.8
+     */
+    function aliases() {
+        return $this->aliases;
+    }
 
+    /**
+     * Returns additional properties.
+     *
+     * @return array the additional properties
+     * @access public
+     * @since 0.8
+     */
+    function types() {
+        return $this->types;
+    }
+    
     /**
      * XML parser callback
      *
@@ -451,8 +610,9 @@ class XRDSParser {
 
         // Strictly speaking, XML namespace URIs are semi-case sensitive
         // (i.e. the scheme and host are not case sensitive, but other elements
-        // are).  However, the XRDS-Simple specifications defines an incorrect
-        // namespace URI for XRD (xri://$XRD*($v*2.0) rather than xri://$xrd*($v*2.0)).
+        // are).  However, the XRDS-Simple specifications defines a
+        // namespace URI for XRD (xri://$XRD*($v*2.0) rather than xri://$xrd*($v*2.0))
+        // with an unusual case.
         if ((strtolower($ns) == strtolower(XRD2_NS)) && ($name == 'Service')) {
             $this->in_service = TRUE;
             $this->service = array();
@@ -463,6 +623,10 @@ class XRDSParser {
             if (in_array('id', $attribs)) {
                 $this->service['#id'] = $attribs['id'];
             }
+        }
+        if (($ns == XRD_NS) && ($name == 'Link')) {
+            $this->in_service = TRUE;
+            $this->service = array();
         }
         
         if ((strtolower($ns) == strtolower(XRD2_NS)) && ($this->in_service)) {
@@ -477,6 +641,9 @@ class XRDSParser {
                     }
             }
         }
+        if ($ns == XRD_NS) {
+            $this->priority = NULL;
+        }
         
         $this->buffer = '';
     }
@@ -488,6 +655,20 @@ class XRDSParser {
      */
     function element_end(&$parser, $qualified) {
         list($ns, $name) = $this->parse_namespace($qualified);
+        
+        if (($ns == XRD_NS) && !$this->in_service) {
+            switch ($name) {
+                case 'Subject':
+                    $this->subject = trim($this->buffer);
+                    break;
+                case 'Alias':
+                    $this->aliases[] = trim($this->buffer);
+                    break;
+                case 'Type':
+                    $this->types[] = trim($this->buffer);
+                    break;
+            }
+        }
         
         if ((strtolower($ns) == strtolower(XRD2_NS)) && ($this->in_service)) {
             switch ($name) {
@@ -514,6 +695,25 @@ class XRDSParser {
                         $this->service[$key][] = array('#uri' => trim($this->buffer));
                     }
                     $this->priority = NULL;
+                    break;
+            }
+        }
+        if (($ns == XRD_NS) && ($this->in_service)) {
+            switch ($name) {
+                case 'Link':
+                    $this->services[] = $this->service;
+                    $this->in_service = FALSE;
+                    break;
+
+                case 'Rel':
+                case 'URI':
+                case 'URITemplate':
+                case 'MediaType':
+                    $key = strtolower((in_array($name, $this->xrds_map)) ? $this->xrds_map[$name] : $name);
+                    if (!isset($this->service[$key])) {
+                        $this->service[$key] = array();
+                    }
+                    $this->service[$key][] = trim($this->buffer);
                     break;
             }
         }
@@ -558,18 +758,20 @@ class XRDSParser {
      * a list of URIs, with the priority specified in the priority attribute.
      *
      * When the document is parsed in this class, the URI and the priority are first
-     * extracted into the #uri and the #priorty keys respectively.  This function
-     * takes this array, sorts the elements using the #priority keys, then collapses
-     * the array using the value associated with the #uri key.
+     * extracted into the #uri and the #priority keys respectively.  This function
+     * takes this array, sorts the elements using the #priority keys (if $sort is
+     * true), then collapses the array using the value associated with the #uri key.
      *
      * @param array $array the service array, with URIs and priorities
+     * @param bool $sort whether to sort the service array using the #priority
+     * keys
      * @return array the services array with URIs sorted by priority
      * @access protected
      */
-    function flatten_uris($array) {
+    function flatten_uris($array, $sort = TRUE) {
         $result = array();
         
-        uasort($array, 'discovery_priority_sort');
+        if ($sort) uasort($array, 'discovery_priority_sort');
         
         for ($i = 0; $i < count($array); $i++) {
             $result[] = $array[$i]['#uri'];
@@ -579,4 +781,22 @@ class XRDSParser {
     }
 }
 
+if (!function_exists('rfc3986_urlencode')) {
+    /**
+     * Encodes a URL using RFC 3986.
+     *
+     * PHP's rawurlencode function encodes a URL using RFC 1738.  RFC 1738 has been
+     * updated by RFC 3986, which change the list of characters which needs to be
+     * encoded.
+     *
+     * Strictly correct encoding is required for various purposes, such as OAuth
+     * signature base strings.
+     *
+     * @param string $s the URL to encode
+     * @return string the encoded URL
+     */
+    function rfc3986_urlencode($s) {
+        return str_replace('%7E', '~', rawurlencode($s));
+    }
+}
 ?>
