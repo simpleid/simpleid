@@ -9,7 +9,7 @@ $(document).ready(function() {
         
         
         $('form#login-form').submit(function() {
-            $('#edit-submit').disabled = 'disabled';
+            $('#edit-submit').attr('disabled', 'disabled');
             
             var user = $('#edit-name').val();
             var password = $('#edit-pass').val();
@@ -27,7 +27,7 @@ $(document).ready(function() {
             
             // Set password to nothing
             $('#edit-pass').val('');
-            $('#edit-pass').disabled = 'disabled';
+            $('#edit-pass').attr('disabled', 'disabled');
             
             return true;
         });
