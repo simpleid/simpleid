@@ -9,21 +9,25 @@ $(document).ready(function() {
         
         
         $('form#login-form').submit(function() {
-            $('#edit-submit').disabled = 'disabled';
+            $('#edit-submit').attr('disabled', 'disabled');
             
             var user = $('#edit-name').val();
             var password = $('#edit-pass').val();
             var nonce = $('#edit-nonce').val();
             
-            var digest1 = md5(user + ':' + md5(password));
-            var digest = md5(nonce + ':' + digest1);
+            if (password != '') {
+                var digest1 = md5(user + ':' + md5(password));
+                var digest = md5(nonce + ':' + digest1);
+            } else {
+                var digest = '';
+            }
             
             // Set the digest
             $('#edit-digest').val(digest);
             
             // Set password to nothing
             $('#edit-pass').val('');
-            $('#edit-pass').disabled = 'disabled';
+            $('#edit-pass').attr('disabled', 'disabled');
             
             return true;
         });

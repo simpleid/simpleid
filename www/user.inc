@@ -138,7 +138,7 @@ function user_login() {
     global $user, $GETPOST;
     
     // If the user is already logged in, return
-    if (isset($user["uid"])) openid_indirect_response_redirect(simpleid_url());
+    if (isset($user["uid"])) openid_indirect_response_redirect(simpleid_url(), '');
     
     $destination = $GETPOST['destination'];
     $state = (isset($GETPOST['s'])) ? $GETPOST['s'] : '';
@@ -164,7 +164,7 @@ function user_login() {
     // We allow legacy login if the connection is via HTTPS or if SIMPLEID_ALLOW_LEGACY_LOGIN is true
     $allow_legacy_login = (is_https() || SIMPLEID_ALLOW_LEGACY_LOGIN);
     
-    if (!$_POST['name'] || (($allow_legacy_login && (!$_POST['pass']) && (!$_POST['digest'])) || (!SIMPLEID_ALLOW_LEGACY_LOGIN && (!$_POST['digest'])))) {
+    if (!$_POST['name'] || (($allow_legacy_login && (!$_POST['pass']) && (!$_POST['digest'])) || (!$allow_legacy_login && (!$_POST['digest'])))) {
         if (isset($_POST['destination'])) {
             // User came from a log in form.
             set_message('You need to supply the user name and the password in order to log in.');
@@ -219,7 +219,7 @@ function user_login() {
     log_info('Login successful: ' . $test_user['uid']);
     _user_login($test_user);
     
-    if ($_POST['autologin'] == 1) user_autologin_create();
+    if (isset($_POST['autologin']) && ($_POST['autologin'] == 1)) user_autologin_create();
 
     openid_indirect_response_redirect(simpleid_url(), $query);
 }
