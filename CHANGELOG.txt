@@ -1,5 +1,11 @@
 // $Id$
 
+SimpleID 0.7.1
+--------------
+
+- Various bug fixes
+
+
 SimpleID 0.7
 ------------
 

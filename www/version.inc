@@ -30,5 +30,5 @@
 /**
  * The current version of SimpleID
  */
-define('SIMPLEID_VERSION', '0.7');
+define('SIMPLEID_VERSION', '0.7.1');
 ?>
