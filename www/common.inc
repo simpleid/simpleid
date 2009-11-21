@@ -118,6 +118,34 @@ function get_request_uri($base) {
 }
 
 /**
+ * Returns the base URL path, relative to the current host, of the SimpleID
+ * installation.
+ *
+ * This is worked out from {@link SIMPLEID_BASE_URL}.  It will always contain
+ * a trailing slash.
+ *
+ * @return string the base URL path
+ * @since 0.8
+ * @see SIMPLEID_BASE_URL
+ */
+function get_base_path() {
+    static $base_path;
+    
+    if (!$base_path) {
+        if ((substr(SIMPLEID_BASE_URL, -1) == '/') || (substr(SIMPLEID_BASE_URL, -9) == 'index.php')) {
+            $url = SIMPLEID_BASE_URL;
+        } else {
+            $url = SIMPLEID_BASE_URL . '/';
+        }
+        
+        $parts = parse_url($url);
+        $base_path = $parts['path'];
+    }
+    
+    return $base_path;
+}
+
+/**
  * Obtains a SimpleID URL.  URLs produced by SimpleID should use this function.
  *
  * @param string $query a properly encoded query string
@@ -125,7 +153,7 @@ function get_request_uri($base) {
  *
  * @since 0.7
  */
-function simpleid_url($query = '') {
+/*function simpleid_url($query = '') {
     // Make sure that the base has a trailing slash
     if ((substr(SIMPLEID_BASE_URL, -1) == '/') || (substr(SIMPLEID_BASE_URL, -9) == 'index.php')) {
         $url = SIMPLEID_BASE_URL;
@@ -134,6 +162,24 @@ function simpleid_url($query = '') {
     }
     if ($query == '') return $url;
     $url .= 'index.php?' . $query;
+    return $url;
+}*/
+function simpleid_url($q = '', $params = '', $relative = false) {
+    if ($relative) {
+        $url = get_base_path();
+    } else {
+        // Make sure that the base has a trailing slash
+        if ((substr(SIMPLEID_BASE_URL, -1) == '/') || (substr(SIMPLEID_BASE_URL, -9) == 'index.php')) {
+            $url = SIMPLEID_BASE_URL;
+        } else {
+            $url = SIMPLEID_BASE_URL . '/';
+        }
+    }
+    if (SIMPLEID_CLEAN_URL) {
+        $url .= $q . (($params == '') ? '' : '?' . $params);
+    } else {
+        $url .= 'index.php?q=' . $q . (($params == '') ? '' : '&' . $params);
+    }
     return $url;
 }
 

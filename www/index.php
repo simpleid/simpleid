@@ -106,6 +106,7 @@ function simpleid_start() {
         
     $xtpl = new XTemplate('html/template.xtpl');
     $xtpl->assign('version', SIMPLEID_VERSION);
+    $xtpl->assign('base_path', get_base_path());
     
     // Check if the configuration file has been defined
     if (!defined('SIMPLEID_BASE_URL')) {
@@ -200,7 +201,7 @@ function simpleid_index() {
         simpleid_xrds();
     } else {
         // Point to SimpleID's XRDS document
-        header('X-XRDS-Location: ' . simpleid_url('q=xrds'));
+        header('X-XRDS-Location: ' . simpleid_url('xrds'));
         page_dashboard();
     }
 }
@@ -724,7 +725,7 @@ function simpleid_checkid_approval_required($request) {
         $request['openid.mode'] = 'checkid_setup';
         $message = array(
             'openid.mode' => 'id_res',            
-            'openid.user_setup_url' => simpleid_url('q=continue&s=' . rawurlencode(pickle($request)))
+            'openid.user_setup_url' => simpleid_url('continue', 's=' . rawurlencode(pickle($request)))
         );
     }
     
@@ -750,7 +751,7 @@ function simpleid_checkid_login_required($request) {
     } else {    
         $message = array(
             'openid.mode' => 'id_res',
-            'openid.user_setup_url' => simpleid_url('q=login&destination=continue&s=' . rawurlencode(pickle($request)))
+            'openid.user_setup_url' => simpleid_url('login', 'destination=continue&s=' . rawurlencode(pickle($request)))
         );
     }
     

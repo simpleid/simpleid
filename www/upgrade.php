@@ -108,7 +108,8 @@ function upgrade_start() {
         
     $xtpl = new XTemplate('html/template.xtpl');
     $xtpl->assign('version', SIMPLEID_VERSION);
-    $xtpl->assign('css', '@import url(html/upgrade.css);');
+    $xtpl->assign('base_path', get_base_path());
+    $xtpl->assign('css', '@import url(' . get_base_path() . 'html/upgrade.css);');
     
     // Check if the configuration file has been defined
     if (!defined('SIMPLEID_BASE_URL')) {

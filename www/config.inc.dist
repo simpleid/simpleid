@@ -32,6 +32,22 @@
 define('SIMPLEID_BASE_URL', 'http://www.example.com');
 
 /**
+ * Allow clean URLs.
+ *
+ * URLs used in SimpleID are normally in the form
+ * http://www.example.com/index.php?q=foo.  Enabling clean URLs will allow for
+ * SimpleID URLs to be in the form http://www.example.com/foo
+ *
+ * In order to support clean URLs, you must be using Apache with mod_rewrite
+ * enabled.  You will need to rename .htaccess.dist in the SimpleID web directory
+ * to .htaccess
+ *
+ * @since 0.8
+ *
+ */
+define('SIMPLEID_CLEAN_URL', false);
+
+/**
  * Directory to store identity information.
  *
  * This directory must exist and be readable by the web server.
@@ -143,6 +159,8 @@ define('SIMPLEID_EXTENSIONS', 'sreg,ui');
  *
  * To disable logging, set this as an empty string.
  *
+ * @since 0.7
+ *
  */
 define('SIMPLEID_LOGFILE', '');
 
@@ -157,6 +175,8 @@ define('SIMPLEID_LOGFILE', '');
  * information also being logged.
  *
  * This has effect only if logging is enabled.
+ *
+ * @since 0.7
  *
  */
 define('SIMPLEID_LOGLEVEL', 4);

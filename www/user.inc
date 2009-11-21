@@ -95,7 +95,7 @@ function user_load($uid) {
         if (isset($user["identity"])) {
             $user["local_identity"] = true;
         } else {
-            $user["identity"] = simpleid_url('q=user/' . rawurlencode($uid));
+            $user["identity"] = simpleid_url('user/' . rawurlencode($uid));
             $user["local_identity"] = false;
         }
         
@@ -142,8 +142,7 @@ function user_login() {
     
     $destination = $GETPOST['destination'];
     $state = (isset($GETPOST['s'])) ? $GETPOST['s'] : '';
-    $query = 'q=' . $destination;
-    $query .= ($state) ? '&s=' . rawurlencode($state) : '';
+    $query = ($state) ? 's=' . rawurlencode($state) : '';
     
     if ($_POST['op'] == 'Cancel') {
         global $version;
@@ -225,7 +224,7 @@ function user_login() {
     
     if (isset($_POST['autologin']) && ($_POST['autologin'] == 1)) user_autologin_create();
 
-    openid_indirect_response_redirect(simpleid_url(), $query);
+    openid_indirect_response_redirect(simpleid_url($destination, $query), '');
 }
 
 /**
@@ -300,7 +299,9 @@ function user_login_form($destination = '', $state = NULL) {
     $nonce = openid_nonce();
     cache_set('user-nonce', $nonce, 1);
     
-    $xtpl->assign('javascript', '<script src="html/md5.js" type="text/javascript"></script><script src="html/user-login.js" type="text/javascript"></script>');
+    $base_path = get_base_path();
+    
+    $xtpl->assign('javascript', '<script src="' . $base_path . 'html/md5.js" type="text/javascript"></script><script src="' . $base_path . 'html/user-login.js" type="text/javascript"></script>');
     
     if (is_https()) {
         $xtpl->assign('security_class', 'secure');
@@ -354,13 +355,13 @@ function user_public_page($uid = NULL) {
                 user_xrds($uid);
                 return;
             } else {
-                header('X-XRDS-Location: ' . simpleid_url('q=xrds/' . rawurlencode($uid)));
+                header('X-XRDS-Location: ' . simpleid_url('xrds/' . rawurlencode($uid)));
                 
                 set_message('This is the user <strong>' . htmlspecialchars($uid, ENT_QUOTES, 'UTF-8') . '</strong>\'s SimpleID page.  It contains hidden information for the use by OpenID consumers.');
                 
                 $xtpl->assign('title', htmlspecialchars($uid, ENT_QUOTES, 'UTF-8'));
                 $xtpl->assign('provider', htmlspecialchars(simpleid_url(), ENT_QUOTES, 'UTF-8'));
-                $xtpl->assign('xrds', htmlspecialchars(simpleid_url('q=xrds/' . rawurlencode($uid)), ENT_QUOTES, 'UTF-8'));
+                $xtpl->assign('xrds', htmlspecialchars(simpleid_url('xrds/' . rawurlencode($uid)), ENT_QUOTES, 'UTF-8'));
                 if ($user["local_identity"]) {
                     $xtpl->assign('local_id', htmlspecialchars($user["identity"], ENT_QUOTES, 'UTF-8'));
                 }
@@ -421,9 +422,10 @@ function user_header($state = NULL) {
         $xtpl->assign('uid', htmlspecialchars($user['uid'], ENT_QUOTES, 'UTF-8'));
         $xtpl->assign('identity', htmlspecialchars($user['identity'], ENT_QUOTES, 'UTF-8'));
         if ($state != NULL) {
-            $xtpl->assign('state', '&amp;destination=continue&amp;s=' . rawurlencode($state));
+            $xtpl->assign('url', htmlspecialchars(simpleid_url('logout', 'destination=continue&s=' . rawurlencode($state), true)));
             $xtpl->assign('logout', 'Log out and log in as a different user');
         } else {
+            $xtpl->assign('url', htmlspecialchars(simpleid_url('logout', '', true)));
             $xtpl->assign('logout', 'Log out');
         }
         $xtpl->parse('main.user.logout');

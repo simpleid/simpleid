@@ -79,7 +79,7 @@ function page_profile() {
     $xtpl->assign('blocks', implode($blocks));
     $xtpl->parse('main.blocks');
     
-    $xtpl->assign('javascript', '<script src="html/page-profile.js" type="text/javascript"></script>');
+    $xtpl->assign('javascript', '<script src="' . get_base_path() . 'html/page-profile.js" type="text/javascript"></script>');
     $xtpl->assign('title', 'My Profile');
     $xtpl->parse('main');
     $xtpl->out('main');
@@ -131,6 +131,8 @@ function page_sites() {
 function page_nav() {
     global $user;
     global $xtpl;
+    
+    $xtpl->assign('nav_base', trim(simpleid_url(' ', '', true)));
     
     if ($user != NULL) {
         if (isset($user['administrator']) && ($user['administrator'] == 1)) $xtpl->parse('main.nav.nav_admin');
@@ -195,8 +197,8 @@ function _page_discovery_block() {
     $html .= "<li class=\"openid2-local-id\">&lt;link rel=&quot;openid2.local_id&quot; href=&quot;" . htmlspecialchars($user['identity'], ENT_QUOTES, 'UTF-8') ."&quot; /&gt;</li></ul>\n";
 
     $html .= "<h3>YADIS</h3>";
-    $html .= "<ol><li>Write your own or <a href=\"" . htmlspecialchars('?q=xrds/'. $user['uid'], ENT_QUOTES, 'UTF-8') . "\">download</a> your YADIS document</li>";
-    $html .= "<li><div>Add HTTP headers or &lt;meta&gt; tag, e.g.:<div><pre>&lt;meta http-equiv=&quot;X-XRDS-Location&quot; content=&quot;" . htmlspecialchars(simpleid_url('q=xrds/'. $user['uid']), ENT_QUOTES, 'UTF-8') . "&quot; /></pre>";
+    $html .= "<ol><li>Write your own or <a href=\"" . htmlspecialchars(simpleid_url('xrds/'. $user['uid'], '', true), ENT_QUOTES, 'UTF-8') . "\">download</a> your YADIS document</li>";
+    $html .= "<li><div>Add HTTP headers or &lt;meta&gt; tag, e.g.:<div><pre>&lt;meta http-equiv=&quot;X-XRDS-Location&quot; content=&quot;" . htmlspecialchars(simpleid_url('xrds/'. $user['uid']), ENT_QUOTES, 'UTF-8') . "&quot; /></pre>";
     $html .= "</li></ol>";
     
     return array(array(

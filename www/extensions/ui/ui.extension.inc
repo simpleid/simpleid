@@ -97,8 +97,8 @@ function _ui_insert_css_js() {
     $css = (isset($xtpl->vars['css'])) ? $xtpl->vars['css'] : '';
     $js = (isset($xtpl->vars['javascript'])) ? $xtpl->vars['javascript'] : '';
     
-    $xtpl->assign('css', $css . '@import url(extensions/ui/ui.css);');
-    $xtpl->assign('javascript', $js . '<script src="extensions/ui/ui.js" type="text/javascript"></script>');
+    $xtpl->assign('css', $css . '@import url(' . get_base_path() . 'extensions/ui/ui.css);');
+    $xtpl->assign('javascript', $js . '<script src="' . get_base_path() . 'extensions/ui/ui.js" type="text/javascript"></script>');
 }
 
 ?>

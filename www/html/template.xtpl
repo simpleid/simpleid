@@ -7,7 +7,7 @@
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
         <meta content="{version}" name="SimpleID-Version" />
         <meta content="noindex,nofollow" name="robots" />
-        <link rel="shortcut icon" href="html/simpleid.ico" type="image/x-icon" />
+        <link rel="shortcut icon" href="{base_path}html/simpleid.ico" type="image/x-icon" />
         
         <!-- BEGIN: provider -->
             <link rel="openid.server" href="{provider}"/>
@@ -20,11 +20,11 @@
         <!-- END: local_id -->
                 
         <style type="text/css" media="screen">
-            @import url(html/simpleid.css);
+            @import url({base_path}html/simpleid.css);
             {css}
         </style>
         
-        <script src="html/jquery.js" type="text/javascript"></script>
+        <script src="{base_path}html/jquery.js" type="text/javascript"></script>
         <!-- BEGIN: framekiller -->
         <script type="text/javascript">
             $(document).ready(function() {
@@ -47,7 +47,7 @@
             <div class="user">
                 <div class="logged-in-as">
                     <strong title="{identity}" class="identity">{uid}</strong>
-                <!-- BEGIN: logout -->&middot; <a href="?q=logout{state}">{logout}</a><!-- END: logout -->
+                <!-- BEGIN: logout -->&middot; <a href="{url}">{logout}</a><!-- END: logout -->
                 </div>
                 <div style="clear: both"></div>
             </div>
@@ -57,9 +57,9 @@
         <!-- BEGIN: nav -->
         <div id="nav">
             <ul id="nav-left">
-                <li><a href="?q=">Dashboard</a></li>
-                <li><a href="?q=my/profile">My Profile</a></li>
-                <li><a href="?q=my/sites">My Sites</a></li>
+                <li><a href="{nav_base}">Dashboard</a></li>
+                <li><a href="{nav_base}my/profile">My Profile</a></li>
+                <li><a href="{nav_base}my/sites">My Sites</a></li>
             </ul>
             <!-- BEGIN: nav_admin -->
             <!--ul id="nav-right">
@@ -83,7 +83,7 @@
                 <p>{security_message}</p>
             </div>
             
-            <form action="index.php" method="post" enctype="application/x-www-form-urlencoded" id="login-form">
+            <form action="{base_path}index.php" method="post" enctype="application/x-www-form-urlencoded" id="login-form">
                 <input type="hidden" name="q" value="login"/><input name="destination" type="hidden" value="{destination}"/>
                 <input type="hidden" name="nonce" id="edit-nonce" value="{nonce}" />
                 
@@ -112,7 +112,7 @@
             <!-- END: login -->
             
             <!-- BEGIN: consent -->
-            <form action="index.php" method="post" enctype="application/x-www-form-urlencoded" id="rp-form">
+            <form action="{base_path}index.php" method="post" enctype="application/x-www-form-urlencoded" id="rp-form">
                 <input type="hidden" name="q" value="consent" />
                 <input type="hidden" name="s" value="{state}" />
                 <input name="tk" type="hidden" value="{token}"/>
@@ -164,7 +164,7 @@
             <!-- END: blocks -->
 
             <!-- BEGIN: sites -->
-            <form action="index.php" method="post" enctype="application/x-www-form-urlencoded" >
+            <form action="{base_path}index.php" method="post" enctype="application/x-www-form-urlencoded" >
             <input name="q" type="hidden" value="autorelease" />
             <input name="tk" type="hidden" value="{token}"/>
             <input name="update-all" type="hidden" value="1"/>
@@ -232,7 +232,7 @@
   
             <p>When you have performed the steps above, click <strong>Continue</strong>.</p>
 
-            <form method="post" action="upgrade.php">
+            <form method="post" action="{base_path}upgrade.php">
                 <input type="hidden" name="q" value="upgrade-selection" />
                 <input type="hidden" name="tk" value="{token}" />
                 <input type="submit" value="Continue" />
@@ -258,7 +258,7 @@
                 <!-- BEGIN: selection_continue -->
                 <p>Click <strong>Continue</strong> to proceed with the upgrade.</p>
 
-                <form method="post" action="upgrade.php">
+                <form method="post" action="{base_path}upgrade.php">
                     <input type="hidden" name="q" value="upgrade-apply" />
                     <input type="hidden" name="tk" value="{token}" />
                     <input type="hidden" name="handle" value="{handle}" />
