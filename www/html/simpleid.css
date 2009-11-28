@@ -150,7 +150,7 @@ table {
 td, th {
     border-bottom: 1px solid #CCCCCC;
     text-align: left;
-    vertical-align: center;
+    vertical-align: top;
     padding: 5px 5px;
 }
 th {

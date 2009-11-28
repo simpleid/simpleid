@@ -288,13 +288,10 @@ function openid_indirect_response_form($url, $message) {
     $redirect_url_js = addcslashes($redirect_url, "\\\'\"&\n\r<>");
     $redirect_url_link = htmlspecialchars($redirect_url, ENT_QUOTES, 'UTF-8');
     
-    $html = '<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xml:lang="en-AU" lang="en-AU" xmlns="http://www.w3.org/1999/xhtml"><head>Redirecting...</head><body>';
-
+    $html = '<!DOCTYPE html><html lang="en"><head><title>Redirecting...</title></head><body>';
     $html .= '<p>Redirecting...</p>';
     $html .= '<noscript><p><a href="' . $redirect_url_link . '">Click here to continue.</a></p></noscript>';
-    $html .= '<script type="text/javascript">document.location.href = \'' . $redirect_url_js . '\';</script></div></form></body></html>';
+    $html .= '<script type="text/javascript">document.location.href = \'' . $redirect_url_js . '\';</script></body></html>';
             
     print $html;
     

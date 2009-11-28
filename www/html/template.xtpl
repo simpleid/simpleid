@@ -1,22 +1,21 @@
-<!-- BEGIN: main --><?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xml:lang="en-AU" lang="en-AU" xmlns="http://www.w3.org/1999/xhtml">
+<!-- BEGIN: main --><!DOCTYPE html>
+<html lang="en">
     <!-- :mode=html: $Id$ -->
     <head>
         <title>{title} - SimpleID</title>
-        <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
         <meta content="{version}" name="SimpleID-Version" />
         <meta content="noindex,nofollow" name="robots" />
         <link rel="shortcut icon" href="{base_path}html/simpleid.ico" type="image/x-icon" />
         
         <!-- BEGIN: provider -->
-            <link rel="openid.server" href="{provider}"/>
-            <link rel="openid2.provider" href="{provider}"/>
+            <link rel="openid.server" href="{provider}" />
+            <link rel="openid2.provider" href="{provider}" />
             <meta content="{xrds}" http-equiv="X-XRDS-Location" />
         <!-- END: provider -->
         <!-- BEGIN: local_id -->
-            <link rel="openid.delegate" href="{local_id}"/>
-            <link rel="openid2.local_id" href="{local_id}"/>
+            <link rel="openid.delegate" href="{local_id}" />
+            <link rel="openid2.local_id" href="{local_id}" />
         <!-- END: local_id -->
                 
         <style type="text/css" media="screen">
@@ -36,7 +35,7 @@
     </head>
     <body class="{page_class}">
         <!-- BEGIN: upgrade_check -->
-        <div id="upgrade-check">        
+        <div id="upgrade-check">
         </div>
         <!-- END: upgrade_check -->
         <div id="header">
@@ -90,7 +89,7 @@
                 <input type="hidden" name="digest" id="edit-digest" value="" />
                 
                 <div class="form-item">
-                    <label for="edit-name">User name:</span></label>
+                    <label for="edit-name">User name:</label>
                     <input type="text" maxlength="60" name="name" id="edit-name"  size="60" value=""  class="form-text required" {security_disabled} />
                 </div>
                 <div class="form-item">
