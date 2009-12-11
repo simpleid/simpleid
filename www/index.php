@@ -980,7 +980,7 @@ function simpleid_consent_form($request, $response, $reason = CHECKID_APPROVAL_R
     $xtpl->assign('realm', htmlspecialchars($realm, ENT_QUOTES, 'UTF-8'));
 
     if ($response['openid.mode'] == 'cancel') {
-        $xtpl->assign('request_state', rawurlencode($request_state));
+        $xtpl->assign('switch_user_url', htmlspecialchars(simpleid_url('logout', 'destination=continue&s=' . rawurlencode($request_state), true)));
         $xtpl->assign('return_to', htmlspecialchars($request['openid.return_to'], ENT_QUOTES, 'UTF-8'));
         $xtpl->assign('identity', htmlspecialchars($request['openid.identity'], ENT_QUOTES, 'UTF-8'));
         $xtpl->parse('main.consent.cancel');

@@ -116,6 +116,9 @@
                 <input type="hidden" name="s" value="{state}" />
                 <input name="tk" type="hidden" value="{token}"/>
                 
+                <!-- BEGIN: icon -->
+                <!-- END: icon -->
+                
                 <!-- BEGIN: setup -->
                 <input type="hidden" name="openid.realm" value="{realm}" />
                 
@@ -151,7 +154,7 @@
                 
                 <p>Your current identity does not match the requested identity <strong>{identity}</strong>.</p>
                 
-                <p><a href="?q=logout&amp;destination=continue&amp;s={request_state}">Switch to a different user</a> and try again.</p>
+                <p><a href="{switch_user_url}">Switch to a different user</a> and try again.</p>
                 
                 <input type="submit" name="op" id="edit-cancel" value="Cancel" class="form-submit" />
                 <!-- END: cancel -->                
