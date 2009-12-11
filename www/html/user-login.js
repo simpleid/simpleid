@@ -32,6 +32,8 @@ $(document).ready(function() {
             return true;
         });
     }
+    
+    $('#edit-name').focus();
 });
 
 function utf8_encode(s) {
