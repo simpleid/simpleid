@@ -163,7 +163,17 @@ function user_login() {
     // We allow legacy login if the connection is via HTTPS or if SIMPLEID_ALLOW_LEGACY_LOGIN is true
     $allow_legacy_login = (is_https() || SIMPLEID_ALLOW_LEGACY_LOGIN);
     
-    if (!$_POST['name'] || (($allow_legacy_login && (!$_POST['pass']) && (!$_POST['digest'])) || (!$allow_legacy_login && (!$_POST['digest'])))) {
+    if (!isset($_POST['name'])) $_POST['name'] = '';
+    if (!isset($_POST['pass'])) $_POST['pass'] = '';
+    if (!isset($_POST['digest'])) $_POST['digest'] = '';
+    
+    if (
+        ($_POST['name'] == '')
+        || (
+            ($allow_legacy_login && ($_POST['pass'] == '') && ($_POST['digest'] == ''))
+            || (!$allow_legacy_login && ($_POST['digest'] == ''))
+        )
+    ) {
         if (isset($_POST['destination'])) {
             // User came from a log in form.
             set_message('You need to supply the user name and the password in order to log in.');
@@ -173,7 +183,7 @@ function user_login() {
         return;
     }
     
-    if (!$_POST['nonce']) {
+    if (!isset($_POST['nonce'])) {
         if (isset($_POST['destination'])) {
             // User came from a log in form.
             set_message('You seem to be attempting to log in from another web page.  You must use this page to log in.');
