@@ -73,7 +73,7 @@
 function simpleweb_run($routes, $request_path = NULL, $not_found_route = NULL) {
     if ($request_path == NULL) {
         // We take the request path from the request URI
-        $request_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $request_path = $_SERVER['REQUEST_URI'];
         
         // Strip off all parts to the script file name
         $script_name = basename($_SERVER['SCRIPT_NAME']);
