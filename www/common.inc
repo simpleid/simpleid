@@ -148,22 +148,13 @@ function get_base_path() {
 /**
  * Obtains a SimpleID URL.  URLs produced by SimpleID should use this function.
  *
- * @param string $query a properly encoded query string
+ * @param string $q the q parameter
+ * @param string $params a properly encoded query string
+ * @param bool $relative whether a relative URL should be returns
  * @return string the url
  *
  * @since 0.7
  */
-/*function simpleid_url($query = '') {
-    // Make sure that the base has a trailing slash
-    if ((substr(SIMPLEID_BASE_URL, -1) == '/') || (substr(SIMPLEID_BASE_URL, -9) == 'index.php')) {
-        $url = SIMPLEID_BASE_URL;
-    } else {
-        $url = SIMPLEID_BASE_URL . '/';
-    }
-    if ($query == '') return $url;
-    $url .= 'index.php?' . $query;
-    return $url;
-}*/
 function simpleid_url($q = '', $params = '', $relative = false) {
     if ($relative) {
         $url = get_base_path();
