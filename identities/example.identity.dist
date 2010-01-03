@@ -16,6 +16,10 @@
 ; Relying parties must be able to resolve the identity to obtain the address
 ; of this SimpleID installation.
 ;
+; WARNING: If you change the OpenID Identifier after you have used it in
+; SimpleID, you will need to delete all files named 'identity-*.cache' in the
+; cache directory.
+;
 ; Examples:
 ;    http://example.com/
 ;    http://example.com:8888/
