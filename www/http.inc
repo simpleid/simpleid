@@ -32,7 +32,7 @@
 /**
  * The user agent to use during HTTP requests.
  */
-define('SIMPLEID_USER_AGENT', 'SimpleID/' . SIMPLEID_VERSION);
+define('SIMPLEHTTP_USER_AGENT', 'SimpleHTTP/' . substr('$Rev$', 6, -2));
 
 /**
  * Performs an HTTP request.
@@ -107,7 +107,7 @@ function _http_request_curl($url, $headers = array(), $method = 'GET', $retry = 
     curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
     curl_setopt($curl, CURLOPT_MAXREDIRS, $retry);
     curl_setopt($curl, CURLOPT_HTTPHEADER, array(implode("\n", $headers) . "\n"));
-    curl_setopt($curl, CURLOPT_USERAGENT, SIMPLEID_USER_AGENT);
+    curl_setopt($curl, CURLOPT_USERAGENT, SIMPLEHTTP_USER_AGENT);
     
     curl_setopt($curl, CURLOPT_TIMEOUT, 20);
     curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 20);
@@ -206,7 +206,7 @@ function _http_request_fsock($url, $headers = array(), $method = 'GET', $retry =
     $headers = array_merge(
         array(
             'Host' => $parts['host'],
-            'User-Agent' => SIMPLEID_USER_AGENT,
+            'User-Agent' => SIMPLEHTTP_USER_AGENT,
             'Connection' => 'close'
         ),
         $headers
