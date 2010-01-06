@@ -135,6 +135,28 @@ function hook_signed_fields($response) {
 }
 
 /**
+ * Determines the format in which assertions are sent, when they are sent via
+ * indirect communication.
+ *
+ * The OpenID specification version 2.0 provides for the sending of assertions
+ * via indirect communication.  The original specifications provide that the
+ * response should be formatted within the query string.
+ *
+ * Some extensions to the OpenID specification allows the assertion to be
+ * formatted in some other way, e.g. via the fragment.  This hook allows
+ * extensions to specify which format the assertion should be sent.
+ *
+ * If the extension is indifferent regarding the format, it should return
+ * null
+ *
+ * @param string $url the URL of the RP to which the response is to be sent
+ * @param array $response the assertion to be sent
+ * @return int one of OPENID_RESPONSE_QUERY or OPENID_RESPONSE_FRAGMENT or NULL
+ */
+function hook_indirect_response($url, $response) {
+}
+
+/**
  * Provides additional form items when displaying the login form
  * 
  * @param string $destination he SimpleID location to which the user is directed
