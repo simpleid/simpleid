@@ -80,6 +80,78 @@ function is_https() {
 }
 
 /**
+ * Content type negotiation using the Accept Header.
+ *
+ * Under HTTP, the user agent is able to negoatiate the content type returned with
+ * the server using HTTP Accept header.  This header contains a comma-delimited
+ * list of items (e.g. content types) which the user agent is able to
+ * accept, ranked by a quality parameter.
+ *
+ * This function takes the header from the user agent, compares it against the
+ * content types which the server can provide, then returns the item which the highest
+ * quality which the server can provide.
+ *
+ * @param array $content_types an array of content types which the server can
+ * provide
+ * @param string $accept_header the header string provided by the user agent.
+ * If NULL, this defaults to $_SERVER['HTTP_ACCEPT'] if available
+ * @return string the negotiated content type, FALSE if $accept_header is NULL and
+ * the user agent did not provide an Accept header, or NULL if the negotiation is
+ * unsuccessful
+ *
+ * @since 0.8
+ *
+ */
+function negotiate_content_type($content_types, $accept_header = NULL) {
+    $content_types = array_map("strtolower", $content_types);
+    if (($accept_header == NULL) && isset($_SERVER['HTTP_ACCEPT'])) $accept_header = $_SERVER['HTTP_ACCEPT'];
+    
+    if ($accept_header) {
+        $acceptible = preg_split('/\s*,\s*/', strtolower(trim($accept_header)));
+        for ($i = 0; $i < count($acceptible); $i++) {
+            list($item, $q) = preg_split('/\s*;\s*q\s*=\s*/', $acceptible[$i], 2);
+            
+            if ($q == NULL) {
+                $q = 1.0;
+            } else {
+                $q = doubleval($q);
+            }
+            
+            if ($q > 0.0) {
+                if (in_array($item, $content_types)) {
+                    if ($q == 1.0) {
+                        return $item;
+                    }
+                    $candidates[$item] = $q;
+                } else {
+                    $item = preg_quote($item, '/');
+                    $item = strtr($item, '\*', '.+');
+                    
+                    foreach ($content_types as $value) {
+                        if (preg_match("/^$item$/", $value)) {
+                            if ($q == 1.0) {
+                                return $value;
+                            }
+                            $candidates[$value] = $q;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        if (isset($candidates)) {
+            arsort($candidates);
+            reset($candidates);
+            return key($candidates);
+        }
+        return NULL;
+    } else {
+        // No headers
+        return FALSE;
+    }
+}
+
+/**
  * Serialises a variable for inclusion as a URL parameter.
  *
  * @param mixed $data the data to serialise

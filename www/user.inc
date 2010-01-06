@@ -361,7 +361,9 @@ function user_public_page($uid = NULL) {
         } else {
             header('Vary: Accept');
             
-            if (stristr($_SERVER['HTTP_ACCEPT'], 'application/xrds+xml')) {
+            $content_type = negotiate_content_type(array('text/html', 'application/xml', 'application/xhtml+xml', 'application/xrds+xml'));
+            
+            if ($content_type == 'application/xrds+xml') {
                 user_xrds($uid);
                 return;
             } else {

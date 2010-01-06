@@ -181,11 +181,13 @@ function simpleid_index() {
     
     log_debug('simpleid_index');
     
+    $content_type = negotiate_content_type(array('text/html', 'application/xml', 'application/xhtml+xml', 'application/xrds+xml'));
+    
     header('Vary: Accept');
     if (isset($GETPOST['openid.mode'])) {
         simpleid_process_openid($GETPOST);
         return;
-    } elseif (stristr($_SERVER['HTTP_ACCEPT'], 'application/xrds+xml')) {
+    } elseif ($content_type == 'application/xrds+xml') {
         simpleid_xrds();
     } else {
         // Point to SimpleID's XRDS document
@@ -214,27 +216,27 @@ function simpleid_autorelease() {
         return;
     }
 
-    $rps =& $user['rp'];
+    $user_rps =& $user['rp'];
     
     if (isset($_POST['autorelease'])) {
         foreach ($_POST['autorelease'] as $realm => $autorelease) {
-            if (isset($rps[$realm])) {
-                $rps[$realm]['auto_release'] = ($autorelease) ? 1 : 0;
+            if (isset($user_rps[$realm])) {
+                $user_rps[$realm]['auto_release'] = ($autorelease) ? 1 : 0;
             }
         }
     }
     
     if (isset($_POST['remove'])) {
         foreach ($_POST['remove'] as $realm => $autorelease) {
-            if (isset($rps[$realm])) {
-                unset($rps[$realm]);
+            if (isset($user_rps[$realm])) {
+                unset($user_rps[$realm]);
             }
         }
     }
     
     if (isset($_POST['update-all'])) {
-        foreach ($rps as $realm => $rp) {
-            $rps[$realm]['auto_release'] = (isset($_POST['autorelease'][$realm]) && $_POST['autorelease'][$realm]) ? 1 : 0;
+        foreach ($user_rps as $realm => $values) {
+            $user_rps[$realm]['auto_release'] = (isset($_POST['autorelease'][$realm]) && $_POST['autorelease'][$realm]) ? 1 : 0;
         }
     }
     
@@ -610,22 +612,9 @@ function simpleid_checkid_identity(&$request, $immediate) {
     $assertion_results = array_filter($assertion_results, 'is_null');
     
     // Check 4: Discover the realm and match its return_to
-    $rp = (isset($user['rp'][$realm])) ? $user['rp'][$realm] : NULL;
-    
     if (($version >= OPENID_VERSION_2) && SIMPLEID_VERIFY_RETURN_URL_USING_REALM) {
-        $url = openid_realm_discovery_url($realm);
-        log_info('OpenID 2 discovery: realm: ' . $realm . '; url: ' . $url);
-        
-        $verified = FALSE;
-        
-        cache_gc(3600, 'rp-services');
-        $services = cache_get('rp-services', $url);
-        if ($services == NULL) {
-            log_info('OpenID 2 discovery: fetching ' . $url);
-            $services = discovery_get_services($url);
-            cache_set('rp-services', $url, $services);
-        }
-        $services = discovery_get_service_by_type($services, OPENID_RETURN_TO);
+        $rp_info = simpleid_get_rp_info($realm);
+        $services = discovery_get_service_by_type($rp_info['services'], OPENID_RETURN_TO);
         
         log_info('OpenID 2 discovery: ' . count($services) . ' matching services');
         
@@ -651,9 +640,11 @@ function simpleid_checkid_identity(&$request, $immediate) {
         }
     }
     
-    // Check 4: For checkid_immediate, the user must already have given
-    // permission to log in automatically.
-    if (($rp != NULL) && ($rp['auto_release'] == 1)) {
+    // Check 5: For checkid_immediate, the user must already have given
+    // permission to log in automatically.    
+    $user_rp = (isset($user['rp'][$realm])) ? $user['rp'][$realm] : NULL;
+    
+    if (($user_rp != NULL) && ($user_rp['auto_release'] == 1)) {
         log_info('Automatic set for realm ' . $realm);
         $assertion_results[] = CHECKID_OK;
         return min($assertion_results);
@@ -661,6 +652,37 @@ function simpleid_checkid_identity(&$request, $immediate) {
         $assertion_results[] = CHECKID_APPROVAL_REQUIRED;
         return min($assertion_results);
     }
+}
+
+/**
+ * Obtains information on a relying party.
+ *
+ * @param string $realm the openid.realm parameter
+ * @return array containing information on a relying party.
+ *
+ * @since 0.8
+ */
+function simpleid_get_rp_info($realm) {
+    $url = openid_realm_discovery_url($realm);
+    
+    log_info('simpleid_get_rp_info');
+    
+    cache_gc(3600, 'rp-info');
+    
+    $rp_info = cache_get('rp-info', $realm);
+    
+    if ($rp_info == NULL) {
+        log_info('OpenID 2 RP discovery: realm: ' . $realm . '; url: ' . $url);
+        
+        $rp_info = array(
+            'url' => $url,
+            'services' => discovery_get_services($url)
+        );
+        
+        cache_set('rp-info', $realm, $rp_info);
+    }
+
+    return $rp_info;
 }
 
 /**
@@ -970,7 +992,7 @@ function simpleid_consent_form($request, $response, $reason = CHECKID_APPROVAL_R
         $xtpl->assign('return_to', htmlspecialchars($request['openid.return_to'], ENT_QUOTES, 'UTF-8'));
         $xtpl->assign('identity', htmlspecialchars($request['openid.identity'], ENT_QUOTES, 'UTF-8'));
         $xtpl->parse('main.consent.cancel');
-    } else {        
+    } else {
         $rp = (isset($user['rp'][$realm])) ? $user['rp'][$realm] : NULL;
         
         $extensions = extension_invoke_all('consent_form', $request, $response, $rp);
