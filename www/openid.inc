@@ -2,7 +2,7 @@
 /*
  * SimpleID
  *
- * Copyright (C) Kelvin Mo 2007-8
+ * Copyright (C) Kelvin Mo 2007-10
  *
  * Includes code Drupal OpenID module (http://drupal.org/project/openid)
  * Rowan Kerr <rowan@standardinteractive.com>
@@ -461,7 +461,7 @@ function openid_fix_request() {
  * @param array $request the OpenID request
  */
 function openid_parse_request($request) {
-    global $openid_ns_to_alias;    
+    global $openid_ns_to_alias;
     
     foreach ($request as $key => $value) {
         if (strpos($key, 'openid.ns.') === 0) {
@@ -693,7 +693,7 @@ function openid_extension_alias($ns, $create = FALSE) {
                 $i++;
                 $alias = $create . $i;
             }
-    }
+        }
         $openid_ns_to_alias[$ns] = $alias;
         return $alias;
     }
@@ -829,7 +829,7 @@ function openid_dh_server_assoc($mac_key, $dh_consumer_public, $dh_modulus = NUL
  * @param string $enc_mac_key the encrypted session MAC key, in Base64 represnetation
  * @param string $dh_server_public the server's public key, in Base64 representation
  * @param string $dh_consumer_private the consumer's private key, in Base64 representation
- * @param string $dh_modulus modulus - a large prime number
+ * @param string $dh_modulus modulus, in Base64 representation
  * @param string $hash_func the hash function
  * @return string the decrypted session MAC key, in Base64 representation
  */
@@ -911,7 +911,7 @@ function openid_dh_generate_key_pair($dh_modulus = NULL, $dh_gen = NULL) {
 /**
  * Encrypts/decrypts and encodes the MAC key.
  *
- * @param resource $ZZ the Diffie-Hellman key exchange shared secre as a bignum
+ * @param resource $ZZ the Diffie-Hellman key exchange shared secret as a bignum
  * @param string $mac_key a byte stream containing the MAC key
  * @param string $hash_func the hash function
  * @param string the encrypted MAC key in Base64 representation
@@ -920,7 +920,7 @@ function openid_encrypt_mac_key($ZZ, $mac_key, $hash_func = '_openid_sha1') {
     // Encrypt/decrypt the MAC key using the shared secret and the hash function
     $encrypted_mac_key = _openid_xor($ZZ, $mac_key, $hash_func);
     
-    // Encode the encrypted MAC key
+    // Encode the encrypted/decrypted MAC key
     $enc_mac_key = base64_encode($encrypted_mac_key);
     
     return $enc_mac_key;
@@ -952,7 +952,7 @@ function _openid_xor($key, $plain_cipher, $hash_func = '_openid_sha1') {
  * for Diffie-Hellman key exchange.  The integer must be less than $stop
  *
  * @param resource $stop a prime number as a bignum
- * @param resource the random integer as a bignum
+ * @return resource the random integer as a bignum
  */
 function _openid_dh_rand($stop) {
     static $duplicate_cache = array();
@@ -1086,17 +1086,12 @@ function _openid_signature_base_string($data, $version) {
  * @return string the hash in binary representation
  */
 function _openid_sha1($text) {
-    if (function_exists('hash_hmac') && function_exists('hash_algos') && (in_array('sha256', hash_algos()))) {
+    if (version_compare(PHP_VERSION, '5.0.0', '>=')) {
+        return sha1($text, true);
+    } elseif (function_exists('hash') && function_exists('hash_algos') && (in_array('sha1', hash_algos()))) {
         return hash('sha1', $text, true);
     } else {
-        $hex = sha1($text);
-        $raw = '';
-        for ($i = 0; $i < 40; $i += 2) {
-            $hexcode = substr($hex, $i, 2);
-            $charcode = (int) base_convert($hexcode, 16, 10);
-            $raw .= chr($charcode);
-        }
-        return $raw;
+        return pack('H*', sha1($text));
     }
 }
 
@@ -1108,16 +1103,20 @@ function _openid_sha1($text) {
  * @return string the hash in binary representation
  */
 function _openid_hmac_sha1($key, $text) {
-    if (strlen($key) > OPENID_SHA1_BLOCKSIZE) {
-        $key = _openid_sha1($key);
+    if (function_exists('hash_hmac') && function_exists('hash_algos') && (in_array('sha1', hash_algos()))) {
+        return hash_hmac('sha1', $text, $key, true);
+    } else {
+        if (strlen($key) > OPENID_SHA1_BLOCKSIZE) {
+            $key = _openid_sha1($key);
+        }
+    
+        $key = str_pad($key, OPENID_SHA1_BLOCKSIZE, chr(0x00));
+        $ipad = str_repeat(chr(0x36), OPENID_SHA1_BLOCKSIZE);
+        $opad = str_repeat(chr(0x5c), OPENID_SHA1_BLOCKSIZE);
+        $hash1 = _openid_sha1(($key ^ $ipad) . $text, true);
+        $hmac = _openid_sha1(($key ^ $opad) . $hash1, true);
+        return $hmac;
     }
-
-    $key = str_pad($key, OPENID_SHA1_BLOCKSIZE, chr(0x00));
-    $ipad = str_repeat(chr(0x36), OPENID_SHA1_BLOCKSIZE);
-    $opad = str_repeat(chr(0x5c), OPENID_SHA1_BLOCKSIZE);
-    $hash1 = _openid_sha1(($key ^ $ipad) . $text, true);
-    $hmac = _openid_sha1(($key ^ $opad) . $hash1, true);
-    return $hmac;
 }
 
 // Check if SHA-256 support is available
