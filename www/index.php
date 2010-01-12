@@ -276,8 +276,15 @@ function simpleid_process_openid($request) {
             simpleid_authenticate($request);
             break;
         default:
-            set_message('Invalid OpenID message.');
-            page_dashboard();
+            if (isset($request['openid.return_to'])) {
+                // Indirect communication - send error via indirect communication.
+                header('HTTP/1.1 400 Bad Request');
+                set_message('Invalid OpenID message.');
+                page_dashboard();
+            } else {
+                // Direct communication
+                openid_direct_error('Invalid OpenID message.');
+            }
     }
 }
 
