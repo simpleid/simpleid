@@ -307,7 +307,7 @@ function simpleid_associate($request) {
     log_info('OpenID association request: ' . log_array($request));
     
     $assoc_types = openid_association_types();
-    $session_types = openid_session_types($version);
+    $session_types = openid_session_types(is_https(), $version);
 
     // Common Request Parameters [8.1.1]
     if (($version == OPENID_VERSION_1_1) && !isset($request['openid.session_type'])) $request['openid.session_type'] = '';
@@ -383,7 +383,7 @@ function _simpleid_create_association($mode = CREATE_ASSOCIATION_DEFAULT, $assoc
     global $version;
     
     $assoc_types = openid_association_types();
-    $session_types = openid_session_types($version);
+    $session_types = openid_session_types(is_https(), $version);
     
     $mac_size = $assoc_types[$assoc_type]['mac_size'];
     $hmac_func = $assoc_types[$assoc_type]['hmac_func'];

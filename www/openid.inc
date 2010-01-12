@@ -52,8 +52,6 @@ define('OPENID_DH_DEFAULT_MOD', '155172898181473697471232257763715539915724801'.
  */
 define('OPENID_DH_DEFAULT_GEN', '2');
 
-define('OPENID_SHA1_BLOCKSIZE', 64);
-
 /**
  * The source of random bits.  On Unix-like systems, this could be /dev/random
  * or /dev/urandom
@@ -778,17 +776,22 @@ function openid_association_types() {
  * OpenID version 1 supports an empty string as the session type.  OpenID version 2
  * reqires a session type to be sent.
  *
+ * @param bool $is_https whether the transport layer encryption is used for the current
+ * connection
  * @param float $version the OpenID version, either OPENID_VERSION_1_1 and OPENID_VERSION_2
  * @return array an array containing the session types supported by this server as keys
  * and an array containing the hash function (hash_func) as
  * values
  */
-function openid_session_types($version = OPENID_VERSION_2) {
+function openid_session_types($is_https = FALSE, $version = OPENID_VERSION_2) {
     $session_types = array(
-        'no-encryption' => array(),
         'DH-SHA1' => array('hash_func' => '_openid_sha1'),
     );
     if (OPENID_SHA256_SUPPORTED) $session_types['DH-SHA256'] = array('hash_func' => '_openid_sha256');
+    if (($version >= OPENID_VERSION_2_0) && ($is_https == TRUE)) {
+        // Under OpenID 2.0 no-encryption is only allowed if TLS is used
+        $session_types['no-encryption'] = array();
+    }
     if ($version == OPENID_VERSION_1_1) $session_types[''] = array();
     return $session_types;
 }
@@ -1106,6 +1109,8 @@ function _openid_hmac_sha1($key, $text) {
     if (function_exists('hash_hmac') && function_exists('hash_algos') && (in_array('sha1', hash_algos()))) {
         return hash_hmac('sha1', $text, $key, true);
     } else {
+        define('OPENID_SHA1_BLOCKSIZE', 64);
+        
         if (strlen($key) > OPENID_SHA1_BLOCKSIZE) {
             $key = _openid_sha1($key);
         }
@@ -1113,8 +1118,8 @@ function _openid_hmac_sha1($key, $text) {
         $key = str_pad($key, OPENID_SHA1_BLOCKSIZE, chr(0x00));
         $ipad = str_repeat(chr(0x36), OPENID_SHA1_BLOCKSIZE);
         $opad = str_repeat(chr(0x5c), OPENID_SHA1_BLOCKSIZE);
-        $hash1 = _openid_sha1(($key ^ $ipad) . $text, true);
-        $hmac = _openid_sha1(($key ^ $opad) . $hash1, true);
+        $hash1 = _openid_sha1(($key ^ $ipad) . $text);
+        $hmac = _openid_sha1(($key ^ $opad) . $hash1);
         return $hmac;
     }
 }
