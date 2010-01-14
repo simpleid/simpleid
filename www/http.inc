@@ -95,6 +95,8 @@ function http_request($url, $headers = array(), $method = 'GET', $retry = 3) {
  * 'content-type' (the HTTP content-type returned)
  */
 function _http_request_curl($url, $headers = array(), $method = 'GET', $retry = 3) {
+    $safe_mode = ((@ini_get('safe_mode') === 1) || (@ini_get('safe_mode') == 'On'));
+    
     $version = curl_version();
     
     $curl = curl_init($url);
@@ -103,8 +105,10 @@ function _http_request_curl($url, $headers = array(), $method = 'GET', $retry = 
         curl_setopt($curl, CURLOPT_ENCODING, '');
     }
     
+    // CURLOPT_FOLLOWLOCATION only works when safe mode is off
+    if (!$safe_mode) curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+    
     curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
-    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
     curl_setopt($curl, CURLOPT_MAXREDIRS, $retry);
     curl_setopt($curl, CURLOPT_HTTPHEADER, array(implode("\n", $headers) . "\n"));
     curl_setopt($curl, CURLOPT_USERAGENT, SIMPLEHTTP_USER_AGENT);
@@ -147,6 +151,18 @@ function _http_request_curl($url, $headers = array(), $method = 'GET', $retry = 
         $header_block = array_pop($header_blocks);
 
         $result = array_merge($result, _http_parse_headers($header_block, TRUE));
+        
+        // If we are in safe mode, we need to process redirects manually
+        if ($safe_mode && (($result['code'] == 301) || ($result['code'] == 302) || ($result['code'] == 307))) {
+            if ($retry == 0) {
+                // Too many times, return an error
+                $result['error-code'] = 47;
+                $result['error'] = 'Too many redirects';
+            } else {
+                curl_close($curl);
+                return _http_request_curl($result['headers']['location'], $headers, $method, $retry - 1);
+            }
+        }
     }
     
     curl_close($curl);
