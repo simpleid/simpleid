@@ -32,7 +32,7 @@
 /**
  * The user agent to use during HTTP requests.
  */
-define('SIMPLEID_USER_AGENT', 'SimpleID/' . SIMPLEID_VERSION);
+define('SIMPLEHTTP_USER_AGENT', 'SimpleHTTP/' . substr('$Rev$', 6, -2));
 
 /**
  * Performs an HTTP request.
@@ -46,7 +46,8 @@ define('SIMPLEID_USER_AGENT', 'SimpleID/' . SIMPLEID_VERSION);
  * @param int $retry the maximum number of redirects allowed
  * @return array containing keys 'error-code' (for communication errors), 'error'
  * (for communication errors), 'data' (content returned), 'code' (the HTTP status code), 'http-error'
- * (if the HTTP status code is not 200 or 304), 'headers' (an array of return headers in lowercase),
+ * (if the HTTP status code is not 200 or 304), 'protocol' (the HTTP protocol in the response),
+ * 'headers' (an array of return headers in lowercase),
  * 'content-type' (the HTTP content-type returned)
  */
 function http_request($url, $headers = array(), $method = 'GET', $retry = 3) {
@@ -94,6 +95,8 @@ function http_request($url, $headers = array(), $method = 'GET', $retry = 3) {
  * 'content-type' (the HTTP content-type returned)
  */
 function _http_request_curl($url, $headers = array(), $method = 'GET', $retry = 3) {
+    $safe_mode = ((@ini_get('safe_mode') === 1) || (strtolower(@ini_get('safe_mode')) == 'on'));
+    
     $version = curl_version();
     
     $curl = curl_init($url);
@@ -102,11 +105,13 @@ function _http_request_curl($url, $headers = array(), $method = 'GET', $retry = 
         curl_setopt($curl, CURLOPT_ENCODING, '');
     }
     
+    // CURLOPT_FOLLOWLOCATION only works when safe mode is off
+    if (!$safe_mode) curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+    
     curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
-    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
     curl_setopt($curl, CURLOPT_MAXREDIRS, $retry);
     curl_setopt($curl, CURLOPT_HTTPHEADER, array(implode("\n", $headers) . "\n"));
-    curl_setopt($curl, CURLOPT_USERAGENT, SIMPLEID_USER_AGENT);
+    curl_setopt($curl, CURLOPT_USERAGENT, SIMPLEHTTP_USER_AGENT);
     
     curl_setopt($curl, CURLOPT_TIMEOUT, 20);
     curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 20);
@@ -132,7 +137,6 @@ function _http_request_curl($url, $headers = array(), $method = 'GET', $retry = 
         $result['code'] = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         $result['url'] = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
         $result['content-type'] = curl_getinfo($curl, CURLINFO_CONTENT_TYPE);
-        $result['headers'] = array();
         
         // Parse response.
         $result['raw'] = $response;
@@ -146,7 +150,19 @@ function _http_request_curl($url, $headers = array(), $method = 'GET', $retry = 
         $header_blocks = explode("\r\n\r\n", $response_headers);
         $header_block = array_pop($header_blocks);
 
-        $result['headers'] = _http_parse_headers($header_block, TRUE);
+        $result = array_merge($result, _http_parse_headers($header_block, TRUE));
+        
+        // If we are in safe mode, we need to process redirects manually
+        if ($safe_mode && (($result['code'] == 301) || ($result['code'] == 302) || ($result['code'] == 307))) {
+            if ($retry == 0) {
+                // Too many times, return an error
+                $result['error-code'] = 47;
+                $result['error'] = 'Too many redirects';
+            } else {
+                curl_close($curl);
+                return _http_request_curl($result['headers']['location'], $headers, $method, $retry - 1);
+            }
+        }
     }
     
     curl_close($curl);
@@ -206,7 +222,7 @@ function _http_request_fsock($url, $headers = array(), $method = 'GET', $retry =
     $headers = array_merge(
         array(
             'Host' => $parts['host'],
-            'User-Agent' => SIMPLEID_USER_AGENT,
+            'User-Agent' => SIMPLEHTTP_USER_AGENT,
             'Connection' => 'close'
         ),
         $headers
@@ -261,8 +277,9 @@ function _http_request_fsock($url, $headers = array(), $method = 'GET', $retry =
  * @param string $header_block the unparsed header block
  * @param bool $curl if true, use simplified parsing as libcurl already parses
  * the headers
- * @return if $curl is true, an array of response headers, otherwise additional parsing
- * is done for 'code' and 'content-type'
+ * @return an array containing the following keys: 'protocol' (the HTTP protocol in the response),
+ * 'headers' (an array of return headers in lowercase).  If $curl is false, additional
+ * parsing is done for 'code' and 'content-type'
  */
 function _http_parse_headers($header_block, $curl) {
     $headers = array();
@@ -279,10 +296,11 @@ function _http_parse_headers($header_block, $curl) {
     // Then split them to get the fields
     $fields = preg_split("/\r\n|\n|\r/", $header_block);
     
-    if (!$curl) {
-        // If we are not using CURL, we need to parse the status line as well
-        list($protocol, $result['code'], $text) = explode(' ', trim($status), 3);
-    }
+    // Parse the status line
+    list($protocol, $code, $reason) = explode(' ', trim($status), 3);
+    
+    $result['protocol'] = $protocol;    
+    if (!$curl) $result['code'] = $code;
 
     // Parse headers.
     while ($field = trim(array_shift($fields))) {
@@ -303,10 +321,7 @@ function _http_parse_headers($header_block, $curl) {
         if (!$curl && (strtolower($header) == 'content-type')) $result['content-type'] = $value;
     }
         
-    if ($curl) {  
-        return $headers;
-    } else {
-        return $result;
-    }
+    $result['headers'] = $headers;
+    return $result;
 }
 ?>
