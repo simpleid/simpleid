@@ -219,7 +219,7 @@ function user_login() {
         set_message('The user name or password is not correct.');
         user_login_form($destination, $state);
         return;
-    } elseif ($allow_legacy_login && (md5($_POST['pass']) != $test_user['pass'])) {
+    } elseif ($allow_legacy_login && !$_POST['digest'] && (md5($_POST['pass']) != $test_user['pass'])) {
         set_message('The user name or password is not correct.');
         user_login_form($destination, $state);
         return;
@@ -322,7 +322,7 @@ function user_login_form($destination = '', $state = NULL) {
             $xtpl->assign('security_message', 'Your SimpleID configuration does not allow you to log in unsecurely.  Please enable JavaScript and try again, or see <a href="http://simpleid.sourceforge.net/documentation/using-simpleid/logging-simpleid">the SimpleID documentation</a> for more details.');
             $xtpl->assign('security_disabled', 'disabled="disabled"');
         } else {
-            $xtpl->assign('security_class', 'unsecure');
+            $xtpl->assign('security_class', 'unsecure login-digest');
             $xtpl->assign('security_message', '<strong>WARNING:</strong>  Your password will be sent to SimpleID as plain text.');
         }
     }
