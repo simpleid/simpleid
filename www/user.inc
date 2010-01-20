@@ -313,19 +313,22 @@ function user_login_form($destination = '', $state = NULL) {
     
     $xtpl->assign('javascript', '<script src="' . $base_path . 'html/md5.js" type="text/javascript"></script><script src="' . $base_path . 'html/user-login.js" type="text/javascript"></script>');
     
+    $security_class = (SIMPLEID_ALLOW_AUTOCOMPLETE) ? 'allow-autocomplete ' : '';
+    
     if (is_https()) {
-        $xtpl->assign('security_class', 'secure');
+        $security_class .= 'secure';
         $xtpl->assign('security_message', 'Secure login using <strong>HTTPS</strong>.');
     } else {
         if (!SIMPLEID_ALLOW_LEGACY_LOGIN) {
-            $xtpl->assign('security_class', 'unsecure login-digest');
+            $security_class .= 'unsecure login-digest';
             $xtpl->assign('security_message', 'Your SimpleID configuration does not allow you to log in unsecurely.  Please enable JavaScript and try again, or see <a href="http://simpleid.sourceforge.net/documentation/using-simpleid/logging-simpleid">the SimpleID documentation</a> for more details.');
             $xtpl->assign('security_disabled', 'disabled="disabled"');
         } else {
-            $xtpl->assign('security_class', 'unsecure login-digest');
+            $security_class .= 'unsecure login-digest';
             $xtpl->assign('security_message', '<strong>WARNING:</strong>  Your password will be sent to SimpleID as plain text.');
         }
     }
+    $xtpl->assign('security_class', $security_class);
     
     extension_invoke_all('user_login_form', $destination, $state);
 

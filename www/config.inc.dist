@@ -89,7 +89,7 @@ define('SIMPLEID_STORE_DIR', '../store');
  * Allows legacy log-in system.
  *
  * Prior to SimpleID 0.6, the login system utilised by SimpleID requires users'
- * passwords to be sent in plaintet to the web server for verification.  This is
+ * passwords to be sent in plaintext to the web server for verification.  This is
  * an inherent security risk.
  *
  * From version 0.6, SimpleID implemented a form of digest authentication, which
@@ -105,6 +105,22 @@ define('SIMPLEID_STORE_DIR', '../store');
  * @since 0.6
  */
 define('SIMPLEID_ALLOW_LEGACY_LOGIN', false);
+
+/**
+ * Allows web browsers to save passwords.
+ *
+ * SimpleID prevents web browsers from saving user passwords entered in a user
+ * logs into SimpleID.  Setting this value to true will allow browsers to
+ * ask the user whether the password should be saved in the browser's password
+ * store.
+ *
+ * The default is set to false for security reasons.  You should not change
+ * this value unless you are certain regarding the security of your browser's
+ * password store.
+ *
+ * @since 0.8
+ */
+define('SIMPLEID_ALLOW_AUTOCOMPLETE', false);
 
 /**
  * Performs additional verification of relying party return URLs.

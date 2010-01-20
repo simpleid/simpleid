@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    $('#edit-pass').attr('autocomplete', 'off');
+    if (!$('.login-security').is('.allow-autocomplete')) $('#edit-pass').attr('autocomplete', 'off');
     
     if ($('.login-security').is('.login-digest')) {
         // If we are logging in via digest, we need Javascript to be working
