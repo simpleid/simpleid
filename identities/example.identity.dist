@@ -8,6 +8,9 @@
 ; always be named username.identity, where username is the user name to be used
 ; when logging into SimpleID.
 ;
+; In this file, if a value contains non-numeric characters, you will need to
+; surround it with quotation characters.
+;
 
 ;
 ; The OpenID Identifier associated with this identity.  This is typically a
@@ -26,7 +29,7 @@
 ;    http://example.com/myopenid
 ;    https://example.com:8080/myopenid
 ;
-identity=http://example.com/
+identity="http://example.com/"
 
 ;
 ; The password associated with this identity.  This password is hashed using
@@ -36,7 +39,7 @@ identity=http://example.com/
 ; given string.  Wikipedia (http://en.wikipedia.org/wiki/MD5) is a good place
 ; to start.
 ;
-pass=c8e24ae844b7cb9381g722ae8209a19a
+pass="c8e24ae844b7cb9381g722ae8209a19a"
 
 ;
 ; Whether this user is given administrative privileges in SimpleID.
@@ -67,15 +70,15 @@ pass=c8e24ae844b7cb9381g722ae8209a19a
 ; sreg
 ;
 ;[sreg]
-;nickname=Example
-;email=example@example.com
-;fullname=Example
-;dob=2000-00-00
-;gender=M
-;postcode=1234
-;country=en
-;language=au
-;timezone=Australia/Sydney
+;nickname="Example"
+;email="example@example.com"
+;fullname="Example"
+;dob="2000-00-00"
+;gender="M"
+;postcode="1234"
+;country="en"
+;language="au"
+;timezone="Australia/Sydney"
 
 
 ;
@@ -110,7 +113,7 @@ pass=c8e24ae844b7cb9381g722ae8209a19a
 ; ax
 ;
 ;[ax]
-;http://axschema.org/company/name=Example Company Limited
-;http://axschema.org/company/title=Managing Director
-;http://axschema.org/contact/web/blog=http://simpleid.sourceforge.net/
+;http://axschema.org/company/name="Example Company Limited"
+;http://axschema.org/company/title="Managing Director"
+;http://axschema.org/contact/web/blog="http://simpleid.sourceforge.net/"
 
