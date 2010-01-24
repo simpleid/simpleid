@@ -117,6 +117,9 @@
                 <input name="tk" type="hidden" value="{token}"/>
                 
                 <!-- BEGIN: icon -->
+                <div class="icon">
+                    <img src="{icon_url}" alt="" />
+                </div>
                 <!-- END: icon -->
                 
                 <!-- BEGIN: setup -->

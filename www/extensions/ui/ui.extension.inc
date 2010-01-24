@@ -2,7 +2,7 @@
 /*
  * SimpleID
  *
- * Copyright (C) Kelvin Mo 2007-9
+ * Copyright (C) Kelvin Mo 2009
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,7 +22,7 @@
  */
 
 /**
- * Implements the popup mode from the User Interface extension
+ * Implements the popup and icon modes from the User Interface extension
  *
  * @package simpleid
  * @subpackage extensions
@@ -39,7 +39,10 @@ define('OPENID_NS_UI', 'http://specs.openid.net/extensions/ui/1.0');
  * @see hook_xrds_types()
  */
 function ui_xrds_types() {
-    return array('http://specs.openid.net/extensions/ui/1.0/mode/popup');
+    return array(
+        'http://specs.openid.net/extensions/ui/1.0/mode/popup',
+        'http://specs.openid.net/extensions/ui/1.0/icon'
+    );
 }
 
 /**
@@ -84,7 +87,66 @@ function ui_consent_form($request, $response, $rp) {
     
     if (isset($filtered_request['mode']) && ($filtered_request['mode'] == 'popup')) _ui_insert_css_js();
     
+    if (isset($filtered_request['icon']) && ($filtered_request['icon'] == 'true')) {
+        global $xtpl;
+        
+        $realm = $request['openid.realm'];
+        $icon_url = simpleid_url('ui/icon', 'realm=' . rawurlencode($realm) . '&tk=' . _ui_icon_token($realm));
+        
+        $xtpl->assign('icon_url', htmlspecialchars($icon_url, ENT_QUOTES, 'UTF-8'));
+        $xtpl->parse('main.consent.icon');
+    }
+    
     return '';
+}
+
+/**
+ * Specifies that the OpenID response should be sent via the fragment
+ *
+ */
+function ui_indirect_response($url, $response) {
+    global $openid_ns_to_alias;
+    if (!array_key_exists(OPENID_NS_UI, $openid_ns_to_alias)) return NULL;
+    
+    // Cheat - if we run this, then the redirect page will also be themed!
+    _ui_insert_css_js();
+    
+    if (strstr($url, '#')) {
+        return OPENID_RESPONSE_FRAGMENT;
+    } else {
+        return NULL;
+    }
+}
+
+/**
+ * Adds an extra route to the SimpleWeb framework.
+ */
+function ui_routes() {
+    return array('ui/icon' => 'ui_icon');
+}
+
+/**
+ * Returns an icon.
+ */
+function ui_icon() {
+    if (!isset($_GET['realm']) || !isset($_GET['tk']) || ($_GET['tk'] != _ui_icon_token($_GET['realm']))) {
+        header('HTTP/1.1 404 Not Found');
+        indirect_fatal_error('Invalid UI icon parameters.');
+    }
+    
+    $realm = $_GET['realm'];
+    $icon_res = _ui_get_icon($realm);
+    
+    if ($icon_res === NULL) {
+        header('HTTP/1.1 404 Not Found');
+        indirect_fatal_error('Unable to get icon.');
+    }
+    
+    header('Via: ' . $icon_res['protocol'] . ' simpleid-ui-icon-' . md5($realm));
+    header('Cache-Control: max-age=86400');
+    header('Content-Type: ' . $icon_res['headers']['content-type']);
+    if (isset($icon_res['headers']['content-encoding'])) header('Content-Encoding: ' . $icon_res['headers']['content-encoding']);
+    print $icon_res['data'];
 }
 
 /**
@@ -101,4 +163,44 @@ function _ui_insert_css_js() {
     $xtpl->assign('javascript', $js . '<script src="' . get_base_path() . 'extensions/ui/ui.js" type="text/javascript"></script>');
 }
 
+/**
+ * Attempts to obtain an icon from a RP
+ *
+ * @param string $realm the openid.realm parameter
+ * @return array the response from {@link http_request()} with the discovered URL of the
+ * RP's icon
+ */
+function _ui_get_icon($realm) {
+    $rp_info = simpleid_get_rp_info($realm);
+    
+    if (isset($rp_info['ui_icon'])) return $rp_info['ui_icon'];
+    
+    $services = discovery_get_service_by_type($rp_info['services'], 'http://specs.openid.net/extensions/ui/icon');
+        
+    if ($services) {
+        $icon_url = $services[0]['uri'];
+        
+        $icon_res = http_request($icon_url);
+        if (isset($icon_res['http-error'])) {
+            return NULL;
+        }
+        
+        $rp_info['ui_icon'] = $icon_res;
+        simpleid_set_rp_info($realm, $rp_info);
+    } else {
+        return NULL;
+    }
+}
+
+/**
+ * Returns a token to be used when requesting the icon.
+ *
+ * The token is used to prevent flooding SimpleID with external requests.
+ *
+ * @param string $realm the openid.realm parameter
+ * @return string the token
+ */
+function _ui_icon_token($realm) {
+    return get_form_token('q=ui/icon&realm=' . rawurlencode($realm));
+}
 ?>
