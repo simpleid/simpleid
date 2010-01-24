@@ -193,6 +193,8 @@ function user_login() {
     }
     
     $time = strtotime(substr($_POST['nonce'], 0, 20));
+    // Some old versions of PHP does not recognise the T in the ISO 8601 date.  We may need to convert the T to a space
+    if (($time == -1) || ($time === FALSE)) $time = strtotime(strtr(substr($_POST['nonce'], 0, 20), 'T', ' '));
     
     if (!cache_get('user-nonce', $_POST['nonce'])) {
         log_warn('Login attempt: Nonce ' . $_POST['nonce'] . ' not issued or is being reused.');
