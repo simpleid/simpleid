@@ -279,3 +279,6 @@ label.option { font-weight: normal; }
     background: #FFFFFF;
 }
 
+.dialog-page .form-text {
+    width: 100%;
+}
