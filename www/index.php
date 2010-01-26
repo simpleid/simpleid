@@ -620,6 +620,8 @@ function simpleid_checkid_identity(&$request, $immediate) {
     
     // Check 4: Discover the realm and match its return_to
     if (($version >= OPENID_VERSION_2) && SIMPLEID_VERIFY_RETURN_URL_USING_REALM) {
+        $verified = FALSE;
+        
         $rp_info = simpleid_get_rp_info($realm);
         $services = discovery_get_service_by_type($rp_info['services'], OPENID_RETURN_TO);
         
@@ -640,10 +642,16 @@ function simpleid_checkid_identity(&$request, $immediate) {
             }
         }
         
+        $rp_info['return_to_verified'] = $verified;
+        simpleid_set_rp_info($realm, $rp_info);
+        
         if (!$verified) {
-            log_notice('OpenID 2 discovery: not verified');
-            $assertion_results[] = CHECKID_RETURN_TO_SUSPECT;
-            return min($assertion_results);
+            if (($user_rp != NULL) && ($user_rp['auto_release'] == 1)) {
+                log_notice('OpenID 2 discovery: not verified, but overridden by user preference');
+            } else {
+                log_notice('OpenID 2 discovery: not verified');
+                $assertion_results[] = CHECKID_RETURN_TO_SUSPECT;
+            }
         }
     }
     
@@ -662,34 +670,52 @@ function simpleid_checkid_identity(&$request, $immediate) {
 }
 
 /**
- * Obtains information on a relying party.
+ * Obtains information on a relying party by performing discovery on them.  Information
+ * obtained includes the discovery URL, the parsed XRDS document, and any other
+ * information saved by SimpleID extensions
+ *
+ * The results are cached for 1 hour.  For performance reasons, stale results may
+ * be obtained by using the $allow_stale parameter
  *
  * @param string $realm the openid.realm parameter
+ * @param bool $allow_stale allow stale results to be returned, otherwise discovery
+ * will occur
  * @return array containing information on a relying party.
- *
+ * @link http://openid.net/specs/openid-authentication-2_0.html#rp_discovery
  * @since 0.8
  */
-function simpleid_get_rp_info($realm) {
+function simpleid_get_rp_info($realm, $allow_stale = FALSE) {
     $url = openid_realm_discovery_url($realm);
     
     log_info('simpleid_get_rp_info');
     
-    cache_gc(3600, 'rp-info');
-    
     $rp_info = cache_get('rp-info', $realm);
     
-    if ($rp_info == NULL) {
+    if (($rp_info == NULL) || (!$allow_stale && ($rp_info['updated'] < time() - 3600))) {
         log_info('OpenID 2 RP discovery: realm: ' . $realm . '; url: ' . $url);
         
         $rp_info = array(
             'url' => $url,
-            'services' => discovery_get_services($url)
+            'services' => discovery_get_services($url),
+            'updated' => time()
         );
         
         cache_set('rp-info', $realm, $rp_info);
     }
 
     return $rp_info;
+}
+
+/**
+ * Saves information on a relying party to disk.
+ *
+ * @param string $realm the openid.realm parameter
+ * @param array $rp_info containing information on a relying party.
+ *
+ * @since 0.8
+ */
+function simpleid_set_rp_info($realm, $rp_info) {
+    cache_set('rp-info', $realm, $rp_info, $rp_info['updated']);
 }
 
 /**
@@ -1000,6 +1026,8 @@ function simpleid_consent_form($request, $response, $reason = CHECKID_APPROVAL_R
         $xtpl->assign('identity', htmlspecialchars($request['openid.identity'], ENT_QUOTES, 'UTF-8'));
         $xtpl->parse('main.consent.cancel');
     } else {
+        $xtpl->assign('javascript', '<script src="' . get_base_path() . 'html/consent.js" type="text/javascript"></script>');
+        
         $rp = (isset($user['rp'][$realm])) ? $user['rp'][$realm] : NULL;
         
         $extensions = extension_invoke_all('consent_form', $request, $response, $rp);
@@ -1007,6 +1035,7 @@ function simpleid_consent_form($request, $response, $reason = CHECKID_APPROVAL_R
         
         if ($reason == CHECKID_RETURN_TO_SUSPECT) {
             $xtpl->parse('main.consent.setup.suspect');
+            $xtpl->assign('realm_class', 'return-to-suspect');
         }
         $xtpl->parse('main.consent.setup');
     }

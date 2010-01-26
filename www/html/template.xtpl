@@ -139,7 +139,7 @@
                 
                 <div class="form-item">
                     <label class="option">
-                        <input type="checkbox" name="autorelease" {auto_release} value="1" />
+                        <input class="{realm_class}" type="checkbox" name="autorelease" {auto_release} value="1" />
                         Automatically send my information to this site for any future requests.
                     </label>
                 </div>
@@ -187,7 +187,7 @@
                     <tr>
                         <td><span class="realm">{realm}</span></td>
                         <td><span class="last-time">{last_time}</span> {last_time_formatted}</td>
-                        <td><input type="checkbox" value="1" name="autorelease[{realm}]" {auto_release}/></td>
+                        <td><input class="{realm_class}" type="checkbox" value="1" name="autorelease[{realm}]" {auto_release}/></td>
                         <td><input type="checkbox" value="1" name="remove[{realm}]"/></td>
                     </tr>
                     <!-- END: realm -->

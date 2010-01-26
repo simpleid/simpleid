@@ -108,6 +108,13 @@ function page_sites() {
             $xtpl->assign('last_time', htmlspecialchars($rp['last_time'], ENT_QUOTES, 'UTF-8'));
             $xtpl->assign('last_time_formatted', htmlspecialchars(strftime(SIMPLEID_DATE_TIME_FORMAT, $rp['last_time']), ENT_QUOTES, 'UTF-8'));
             $xtpl->assign('auto_release', (isset($rp['auto_release']) && $rp['auto_release']) ? 'checked="checked"' : '');
+            
+            if (SIMPLEID_VERIFY_RETURN_URL_USING_REALM) {
+                // $rp_info would usually expire by now, so we allow for stale results to be retrieved to improve performance
+                $rp_info = simpleid_get_rp_info($realm, TRUE);
+                if (!$rp_info['return_to_verified']) $xtpl->assign('realm_class', 'return-to-suspect');
+            }
+            
             $xtpl->parse('main.sites.realm');
         }
     }
@@ -121,6 +128,7 @@ function page_sites() {
     $xtpl->parse('main.sites');
     
     $xtpl->assign('title', 'My Sites');
+    $xtpl->assign('javascript', '<script src="' . get_base_path() . 'html/consent.js" type="text/javascript"></script>');
     $xtpl->parse('main');
     $xtpl->out('main');
 }
