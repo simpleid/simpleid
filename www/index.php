@@ -66,8 +66,8 @@ define('CHECKID_IDENTITIES_NOT_MATCHING', -2);
 define('CHECKID_IDENTITY_NOT_EXIST', -3);
 define('CHECKID_PROTOCOL_ERROR', -127);
 
-define('CREATE_ASSOCIATION_STATELESS', 2);
-define('CREATE_ASSOCIATION_DEFAULT', 1);
+define('ASSOCIATION_PRIVATE', 2);
+define('ASSOCIATION_SHARED', 1);
 
 
 /**
@@ -356,7 +356,7 @@ function simpleid_associate($request) {
         }
     }
 
-    $response = _simpleid_create_association(CREATE_ASSOCIATION_DEFAULT, $assoc_type, $session_type, $dh_modulus, $dh_gen, $dh_consumer_public);
+    $response = _simpleid_create_association(ASSOCIATION_SHARED, $assoc_type, $session_type, $dh_modulus, $dh_gen, $dh_consumer_public);
     
     openid_direct_response(openid_direct_message($response, $version));
 }
@@ -368,18 +368,18 @@ function simpleid_associate($request) {
  * This function calls {@link openid_dh_server_assoc()} where required, to 
  * generate the cryptographic values required for an association response.
  *
- * @param int $mode either CREATE_ASSOCIATION_DEFAULT or CREATE_ASSOCIATION_STATELESS
+ * @param int $mode either ASSOCIATION_SHARED or ASSOCIATION_PRIVATE
  * @param string $assoc_type a valid OpenID association type
  * @param string $session_type a valid OpenID session type
  * @param string $dh_modulus for Diffie-Hellman key exchange, the modulus encoded in Base64
  * @param string $dh_gen for Diffie-Hellman key exchange, g encoded in Base64
  * @param string $dh_consumer_public for Diffie-Hellman key exchange, the public key of the relying party encoded in Base64
- * @return mixed if $mode is CREATE_ASSOCIATION_DEFAULT, an OpenID response
- * to the association request, if $mode is CREATE_ASSOCIATION_STATELESS, the
+ * @return mixed if $mode is ASSOCIATION_SHARED, an OpenID response
+ * to the association request, if $mode is ASSOCIATION_PRIVATE, the
  * association data for storage.
  * @link http://openid.net/specs/openid-authentication-1_1.html#anchor14, http://openid.net/specs/openid-authentication-2_0.html#anchor20
  */
-function _simpleid_create_association($mode = CREATE_ASSOCIATION_DEFAULT, $assoc_type = 'HMAC-SHA1', $session_type = 'no-encryption', $dh_modulus = NULL, $dh_gen = NULL, $dh_consumer_public = NULL) {
+function _simpleid_create_association($mode = ASSOCIATION_SHARED, $assoc_type = 'HMAC-SHA1', $session_type = 'no-encryption', $dh_modulus = NULL, $dh_gen = NULL, $dh_consumer_public = NULL) {
     global $version;
     
     $assoc_types = openid_association_types();
@@ -417,15 +417,15 @@ function _simpleid_create_association($mode = CREATE_ASSOCIATION_DEFAULT, $assoc
     }
 
     $association = array('assoc_handle' => $assoc_handle, 'assoc_type' => $assoc_type, 'mac_key' => $mac_key, 'created' => time());
-    if ($mode == CREATE_ASSOCIATION_STATELESS) $association['stateless'] = 1;
+    if ($mode == ASSOCIATION_PRIVATE) $association['private'] = 1;
     cache_set('association', $assoc_handle, $association);
 
-    if ($mode == CREATE_ASSOCIATION_DEFAULT) {
+    if ($mode == ASSOCIATION_SHARED) {
         log_info('Created association: ' . log_array($response));
         log_debug('***** MAC key: ' . $association['mac_key']);
         return $response;
     } else {
-        log_info('Created association: stateless; ' . log_array($association, array('assoc_handle', 'assoc_type')));
+        log_info('Created association: private; ' . log_array($association, array('assoc_handle', 'assoc_type')));
         log_debug('***** MAC key: ' . $association['mac_key']);
         return $association;
     }
@@ -838,7 +838,7 @@ function simpleid_checkid_error($immediate) {
  *
  * @param array &$response the OpenID response
  * @param array $assoc_handle the association handle containing key information
- * for the signature.  If $assoc_handle is not specified, a stateless association
+ * for the signature.  If $assoc_handle is not specified, a private association
  * is created
  * @return array the signed OpenID response
  *
@@ -847,7 +847,7 @@ function simpleid_sign(&$response, $assoc_handle = NULL) {
     global $version;
     
     if (!$assoc_handle) {
-        $assoc = _simpleid_create_association(CREATE_ASSOCIATION_STATELESS);
+        $assoc = _simpleid_create_association(ASSOCIATION_PRIVATE);
         $response['openid.assoc_handle'] = $assoc['assoc_handle'];
     } else {
         $assoc = cache_get('association', $assoc_handle);
@@ -856,14 +856,14 @@ function simpleid_sign(&$response, $assoc_handle = NULL) {
             // Association has expired, need to create a new one
             log_notice('Association handle ' . $assoc['assoc_handle'] . ' expired.  Using stateless mode.');
             $response['openid.invalidate_handle'] = $assoc_handle;
-            $assoc = _simpleid_create_association(CREATE_ASSOCIATION_STATELESS);
+            $assoc = _simpleid_create_association(ASSOCIATION_PRIVATE);
             $response['openid.assoc_handle'] = $assoc['assoc_handle'];
         }
     }
     
     // If we are using stateless mode, then we need to cache the response_nonce
     // so that the RP can only verify once
-    if (isset($assoc['stateless']) && ($assoc['stateless'] == 1) && isset($response['openid.response_nonce'])) {
+    if (isset($assoc['private']) && ($assoc['private'] == 1) && isset($response['openid.response_nonce'])) {
         cache_set('stateless', $response['openid.response_nonce'], array(
             'response_nonce' => $response['openid.response_nonce'],
             'assoc_handle' => $response['openid.assoc_handle']));
@@ -952,7 +952,7 @@ function simpleid_verify_signatures($request) {
     } elseif (!$assoc['assoc_type']) {
         log_error('simpleid_verify_signatures: Association does not contain valid assoc_type.');
         $is_valid = FALSE;
-    } elseif (!isset($assoc['stateless']) || ($assoc['stateless'] != 1)) {
+    } elseif (!isset($assoc['private']) || ($assoc['private'] != 1)) {
         log_warn('simpleid_verify_signatures: Attempting to verify an association with a shared key.');
         $is_valid = FALSE;
     } elseif (!$stateless || ($stateless['assoc_handle'] != $request['openid.assoc_handle'])) {
