@@ -518,7 +518,7 @@ function simpleid_checkid($request) {
             log_info('CHECKID_APPROVAL_REQUIRED');
             if ($immediate) {
                 $response = simpleid_checkid_approval_required($request);
-                simpleid_assertion_response($request['openid.return_to'], $response);
+                simpleid_assertion_response($response, $request['openid.return_to']);
             } else {
                 $response = simpleid_checkid_ok($request);
                 simpleid_consent_form($request, $response, $result);
@@ -528,7 +528,7 @@ function simpleid_checkid($request) {
             log_info('CHECKID_RETURN_TO_SUSPECT');
             if ($immediate) {
                 $response = simpleid_checkid_error($immediate);
-                simpleid_assertion_response($request['openid.return_to'], $response);
+                simpleid_assertion_response($response, $request['openid.return_to']);
             } else {
                 $response = simpleid_checkid_ok($request);
                 simpleid_consent_form($request, $response, $result);
@@ -538,13 +538,13 @@ function simpleid_checkid($request) {
             log_info('CHECKID_OK');
             $response = simpleid_checkid_ok($request);
             $response = simpleid_sign($response, $request['openid.assoc_handle']);
-            simpleid_assertion_response($request['openid.return_to'], $response);
+            simpleid_assertion_response($response, $request['openid.return_to']);
             break;
         case CHECKID_LOGIN_REQUIRED:
             log_info('CHECKID_LOGIN_REQUIRED');
             if ($immediate) {
                 $response = simpleid_checkid_login_required($request);
-                simpleid_assertion_response($request['openid.return_to'], $response);
+                simpleid_assertion_response($response, $request['openid.return_to']);
             } else {
                 user_login_form('continue', pickle($request));
                 exit;
@@ -555,7 +555,7 @@ function simpleid_checkid($request) {
             log_info('CHECKID_IDENTITIES_NOT_MATCHING | CHECKID_IDENTITY_NOT_EXIST');
             $response = simpleid_checkid_error($immediate);
             if ($immediate) {                
-                simpleid_assertion_response($request['openid.return_to'], $response);
+                simpleid_assertion_response($response, $request['openid.return_to']);
             } else {                
                 simpleid_consent_form($request, $response, $result);                
             }
@@ -563,7 +563,7 @@ function simpleid_checkid($request) {
         case CHECKID_PROTOCOL_ERROR:
             if (isset($request['openid.return_to'])) {
                 $response = openid_checkid_error($immediate);
-                simpleid_assertion_response($request['openid.return_to'], $response);
+                simpleid_assertion_response($response, $request['openid.return_to']);
             } else {
                 indirect_fatal_error('Unrecognised request.');
             }
@@ -1106,7 +1106,7 @@ function simpleid_consent() {
     }
 
     if ($return_to) {
-        simpleid_assertion_response($return_to, $response);
+        simpleid_assertion_response($response, $return_to);
     } else {
         page_dashboard();
     }
@@ -1119,34 +1119,20 @@ function simpleid_consent() {
  * via indirect communication.  However, future versions of the OpenID
  * specification may provide for sending of assertions via direct communication.
  *
- * This function is flexible when accepting arguments:
- *
- * - If the first argument is a string, then the response will be sent via indirect
- *   communication.  The second argument is then the OpenID assertion response.
- * - If the first argument is an array, then the response will be sent via direct
- *   communication.
- *
+ * @param array $response the signed OpenID assertion response to send
  * @param string $indirect_url the URL to which the OpenID response is sent.  If
  * this is an empty string, the response is sent via direct communication
- * @param array $response the OpenID assertion response to send
  */
-function simpleid_assertion_response() {
+function simpleid_assertion_response($response, $indirect_url = NULL) {
     global $xtpl, $version;
     
-    $args = func_get_args();
-    $arg1 = array_shift($args);
-    
-    if (is_string($arg1)) {
-        // Rename the arguments to something useful
-        $url = $arg1;
-        $response = array_shift($args);
-        
+    if ($indirect_url) {
         // We want to see if the extensions want to change the way indirect responses are made
-        $results = extension_invoke_all('indirect_response', $url, $response);
+        $results = extension_invoke_all('indirect_response', $indirect_url, $response);
         $results = array_filter($results, 'is_null');
         $component = ($results) ? max($results) : OPENID_RESPONSE_QUERY;
         
-        $redirect_url = openid_indirect_response_url($url, $response, $component);
+        $redirect_url = openid_indirect_response_url($indirect_url, $response, $component);
     
         $xtpl->assign('redirect_url_js', addcslashes($redirect_url, "\\\'\"&\n\r<>"));
         $xtpl->assign('redirect_url_link', htmlspecialchars($redirect_url, ENT_QUOTES, 'UTF-8'));
@@ -1159,8 +1145,7 @@ function simpleid_assertion_response() {
         $xtpl->out('main');
     
         exit;
-    } elseif (is_array($arg1)) {
-        $response = $arg1;
+    } else {
         openid_direct_response(openid_direct_message($response, $version));
     }
 }
