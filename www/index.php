@@ -273,7 +273,7 @@ function simpleid_process_openid($request) {
         case 'checkid_setup':
             return simpleid_checkid($request);
         case 'check_authentication':
-            simpleid_authenticate($request);
+            simpleid_check_authentication($request);
             break;
         default:
             if (isset($request['openid.return_to'])) {
@@ -901,7 +901,7 @@ function simpleid_sign(&$response, $assoc_handle = NULL) {
  * @param array $request the OpenID request
  * @see http://openid.net/specs/openid-authentication-1_1.html#mode_check_authentication, http://openid.net/specs/openid-authentication-2_0.html#verifying_signatures
  */
-function simpleid_authenticate($request) {
+function simpleid_check_authentication($request) {
     global $version;
     
     log_info('OpenID direct verification: ' . log_array($request));
@@ -1000,10 +1000,15 @@ function simpleid_continue() {
  * {@link simpleid_checkid_identity()} function returns a CHECKID_APPROVAL_REQUIRED
  * or CHECKID_RETURN_TO_SUSPECT.
  *
+ * Alternatively, provide a form for the user to rectify the situation where
+ * {@link simpleid_checkid_identity()} function returns a CHECKID_IDENTITIES_NOT_MATCHING
+ * or CHECKID_IDENTITY_NOT_EXIST
+ *
  * @param array $request the original OpenID request
  * @param array $response the proposed OpenID response, subject to user
  * verification
- * @param int $reason either CHECKID_APPROVAL_REQUIRED or CHECKID_RETURN_TO_SUSPECT
+ * @param int $reason either CHECKID_APPROVAL_REQUIRED, CHECKID_RETURN_TO_SUSPECT,
+ * CHECKID_IDENTITIES_NOT_MATCHING or CHECKID_IDENTITY_NOT_EXIST
  */
 function simpleid_consent_form($request, $response, $reason = CHECKID_APPROVAL_REQUIRED) {
     global $user;
