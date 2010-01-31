@@ -146,7 +146,6 @@ function simpleid_start() {
     $routes = array(
         'continue' => 'simpleid_continue',
         'consent' => 'simpleid_consent',
-        'autorelease' => 'simpleid_autorelease',
         'login' => 'user_login',
         'logout' => 'user_logout',
         'my/dashboard' => 'page_dashboard',
@@ -196,56 +195,6 @@ function simpleid_index() {
     }
 }
 
-/**
- * Processes a user's preferences in relation to automatic verification of a
- * relying party.
- */
-function simpleid_autorelease() {
-    global $user;
-    
-    log_debug('simpleid_autorelease');
-    
-    if ($user == NULL) {
-        user_login_form('my/sites');
-        return;
-    }
-    
-    if (!validate_form_token($_POST['tk'], 'autorelease')) {
-        set_message('SimpleID detected a potential security attack.  Please try again.');
-        page_sites();
-        return;
-    }
-
-    $user_rps =& $user['rp'];
-    
-    if (isset($_POST['autorelease'])) {
-        foreach ($_POST['autorelease'] as $realm => $autorelease) {
-            if (isset($user_rps[$realm])) {
-                $user_rps[$realm]['auto_release'] = ($autorelease) ? 1 : 0;
-            }
-        }
-    }
-    
-    if (isset($_POST['remove'])) {
-        foreach ($_POST['remove'] as $realm => $autorelease) {
-            if (isset($user_rps[$realm])) {
-                unset($user_rps[$realm]);
-            }
-        }
-    }
-    
-    if (isset($_POST['update-all'])) {
-        foreach ($user_rps as $realm => $values) {
-            $user_rps[$realm]['auto_release'] = (isset($_POST['autorelease'][$realm]) && $_POST['autorelease'][$realm]) ? 1 : 0;
-        }
-    }
-    
-    user_save($user);
-    
-    set_message('Your preferences have been saved.');
-    page_sites();
-    
-}
 
 /**
  * Process an OpenID request.

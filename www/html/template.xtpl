@@ -170,7 +170,7 @@
 
             <!-- BEGIN: sites -->
             <form action="{base_path}index.php" method="post" enctype="application/x-www-form-urlencoded" >
-            <input name="q" type="hidden" value="autorelease" />
+            <input name="q" type="hidden" value="my/sites" />
             <input name="tk" type="hidden" value="{token}"/>
             <input name="update-all" type="hidden" value="1"/>
             <table id="sites">

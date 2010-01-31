@@ -100,10 +100,46 @@ function page_sites() {
     user_header();
     page_nav();
     
-    $rps = isset($user['rp']) ? $user['rp'] : array();
+    if (isset($user['rp'])) {
+        $user_rps =& $user['rp'];
+    } else {
+        $user_rps = array();
+    }
     
-    if ($rps) {
-        foreach ($rps as $realm => $rp) {
+    if (isset($_POST['tk'])) {
+        if (!validate_form_token($_POST['tk'], 'autorelease')) {
+            set_message('SimpleID detected a potential security attack.  Please try again.');
+        } else {
+            if (isset($_POST['autorelease'])) {
+                foreach ($_POST['autorelease'] as $realm => $autorelease) {
+                    if (isset($user_rps[$realm])) {
+                        $user_rps[$realm]['auto_release'] = ($autorelease) ? 1 : 0;
+                    }
+                }
+            }
+            
+            if (isset($_POST['remove'])) {
+                foreach ($_POST['remove'] as $realm => $autorelease) {
+                    if (isset($user_rps[$realm])) {
+                        unset($user_rps[$realm]);
+                    }
+                }
+            }
+            
+            if (isset($_POST['update-all'])) {
+                foreach ($user_rps as $realm => $values) {
+                    $user_rps[$realm]['auto_release'] = (isset($_POST['autorelease'][$realm]) && $_POST['autorelease'][$realm]) ? 1 : 0;
+                }
+            }
+            
+            user_save($user);
+    
+            set_message('Your preferences have been saved.');
+        }
+    }
+    
+    if ($user_rps) {
+        foreach ($user_rps as $realm => $rp) {
             $xtpl->assign('realm', htmlspecialchars($rp['realm'], ENT_QUOTES, 'UTF-8'));
             $xtpl->assign('last_time', htmlspecialchars($rp['last_time'], ENT_QUOTES, 'UTF-8'));
             $xtpl->assign('last_time_formatted', htmlspecialchars(strftime(SIMPLEID_DATE_TIME_FORMAT, $rp['last_time']), ENT_QUOTES, 'UTF-8'));
@@ -119,7 +155,7 @@ function page_sites() {
         }
     }
     
-    if (!$rps || (count($rps) == 0)) {
+    if (!$user_rps || (count($user_rps) == 0)) {
         $xtpl->assign('disabled', 'disabled="disabled"');
     }
     
