@@ -344,7 +344,7 @@ function upgrade_access_denied() {
  *
  * @since 0.8
  */
-function upgrade_reset_auto_release() {
+function upgrade_rp_to_store() {
     $dir = opendir(SIMPLEID_IDENTITIES_DIR);
     
     while (($file = readdir($dir)) !== false) {
