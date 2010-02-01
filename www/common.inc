@@ -152,23 +152,49 @@ function negotiate_content_type($content_types, $accept_header = NULL) {
 }
 
 /**
- * Serialises a variable for inclusion as a URL parameter.
+ * Serialises an OpenID message for inclusion as a URL parameter.
  *
- * @param mixed $data the data to serialise
+ * @param array $data the data to serialise
  * @return string serialised data
  */
 function pickle($data) {
-    return base64_encode(gzcompress(serialize($data)));
+    $string = '';
+    
+    foreach ($data as $key => $value) {
+        if (strpos($key, ':') !== false) {
+            return null;
+        }
+    
+        if (strpos($key, "\n") !== false) {
+            return null;
+        }
+    
+        if (strpos($value, "\n") !== false) {
+            return null;
+        }
+        $string .= "$key:$value\n";
+    }
+
+    return base64_encode(gzcompress($string));
 }
 
 /**
- * Deserialises data specified in a URL parameter as a variable.
+ * Deserialises data specified in a URL parameter as an OpenID message.
  *
  * @param string $pickle the serialised data
  * @return mixed the deserialised data
  */
 function unpickle($pickle) {
-    return unserialize(gzuncompress(base64_decode($pickle)));
+    $string = gzuncompress(base64_decode($pickle));
+    $data = array();
+
+    $items = explode("\n", $string);
+    foreach ($items as $item) {
+        list ($key, $value) = explode(':', $item, 2);
+        $data[$key] = $value;
+    }
+
+    return $data;
 }
 
 /**

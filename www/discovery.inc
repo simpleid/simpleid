@@ -348,7 +348,7 @@ function discovery_get_openid_services($url) {
  * The URI must be able to be parsed by PHP's parse_url function.
  *
  * @param string $template the URI template
- * @param string $uri the URI
+ * @param string $uri the input URI
  * @return string the generated URI
  *
  */
@@ -465,7 +465,13 @@ class XRDSParser {
      * @var string
      * @access private
      */
-    var $buffer;
+    var $_buffer;
+    /**
+     * Attributes buffer
+     * @var array
+     * @access private
+     */
+    var $_attribs = array();
     
     /**
      * priority attribute buffer
@@ -506,16 +512,17 @@ class XRDSParser {
      * @access private
      * @since 0.8
      */
-    var $types = array();
+    var $properties = array();
 
     /**
-     * Mapping between XRDS elements and XRD elements
+     * Mapping between XRDS elements and XRD attributes
      * @var array
      * @access private
      * @since 0.8
      */
     var $xrds_map = array(
-        'Type' => 'Rel'
+        'rel' => 'type',
+        'href' => 'uri'
     );
     
     /**
@@ -596,8 +603,8 @@ class XRDSParser {
      * @access public
      * @since 0.8
      */
-    function types() {
-        return $this->types;
+    function properties() {
+        return $this->properties;
     }
     
     /**
@@ -627,6 +634,10 @@ class XRDSParser {
         if (($ns == XRD_NS) && ($name == 'Link')) {
             $this->in_service = TRUE;
             $this->service = array();
+            
+            foreach ($attribs as $name => $value) {
+                $this->service[(in_array($name, $this->xrds_map)) ? $this->xrds_map[$name] : $name] = $value;
+            }
         }
         
         if ((strtolower($ns) == strtolower(XRD2_NS)) && ($this->in_service)) {
@@ -641,11 +652,12 @@ class XRDSParser {
                     }
             }
         }
-        if ($ns == XRD_NS) {
+        if (strtolower($ns) == strtolower(XRD_NS)) {
             $this->priority = NULL;
         }
         
-        $this->buffer = '';
+        $this->_buffer = '';
+        $this->_attribs = $attribs;
     }
 
     /**
@@ -659,13 +671,13 @@ class XRDSParser {
         if (($ns == XRD_NS) && !$this->in_service) {
             switch ($name) {
                 case 'Subject':
-                    $this->subject = trim($this->buffer);
+                    $this->subject = trim($this->_buffer);
                     break;
                 case 'Alias':
-                    $this->aliases[] = trim($this->buffer);
+                    $this->aliases[] = trim($this->_buffer);
                     break;
-                case 'Type':
-                    $this->types[] = trim($this->buffer);
+                case 'Property':
+                    $this->properties[$this->_attribs['type']] = trim($this->_buffer);
                     break;
             }
         }
@@ -690,9 +702,9 @@ class XRDSParser {
                         $this->service[$key] = array();
                     }
                     if ($this->priority != NULL) {
-                        $this->service[$key][] = array('#uri' => trim($this->buffer), '#priority' => $this->priority);
+                        $this->service[$key][] = array('#uri' => trim($this->_buffer), '#priority' => $this->priority);
                     } else {
-                        $this->service[$key][] = array('#uri' => trim($this->buffer));
+                        $this->service[$key][] = array('#uri' => trim($this->_buffer));
                     }
                     $this->priority = NULL;
                     break;
@@ -704,16 +716,11 @@ class XRDSParser {
                     $this->services[] = $this->service;
                     $this->in_service = FALSE;
                     break;
-
-                case 'Rel':
-                case 'URI':
-                case 'URITemplate':
-                case 'MediaType':
-                    $key = strtolower((in_array($name, $this->xrds_map)) ? $this->xrds_map[$name] : $name);
-                    if (!isset($this->service[$key])) {
-                        $this->service[$key] = array();
-                    }
-                    $this->service[$key][] = trim($this->buffer);
+                case 'Property':
+                    if (!isset($this->service['properties'])) $this->service['properties'] = array();
+                    $this->service['properties'][$this->_attribs['type']] = trim($this->_buffer);
+                case 'Title':
+                    $this->service['title'] = trim($this->_buffer);
                     break;
             }
         }
@@ -721,10 +728,11 @@ class XRDSParser {
         if ((strtolower($ns) == strtolower(XRD_OPENID_NS)) && ($this->in_service)) {
             switch ($name) {
                 case 'Delegate':
-                    $this->service['delegate'] = trim($this->buffer);
+                    $this->service['delegate'] = trim($this->_buffer);
             }
         }
 
+        $this->_attribs = array();
     }
 
     /**
@@ -733,7 +741,7 @@ class XRDSParser {
      * @access private
      */
     function cdata(&$parser, $data) {
-        $this->buffer .= $data;
+        $this->_buffer .= $data;
     }
     
     /**
