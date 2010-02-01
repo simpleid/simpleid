@@ -256,7 +256,7 @@ function openid_indirect_response_url($url, $message, $component = OPENID_RESPON
     }
     $url .= $parts['host'];
     if (isset($parts['port'])) $url .= ':' . $parts['port'];
-    $url .= $parts['path'];
+    if (isset($parts['path'])) $url .= $parts['path'];
     
     if (($component == OPENID_RESPONSE_QUERY) || (strpos($url, '#') === FALSE)) {
         $url .= '?' . ((isset($parts['query'])) ? $parts['query'] . '&' : '') . $query;
@@ -492,17 +492,19 @@ function openid_url_matches_realm($url, $realm) {
     $url = parse_url($url);
     $realm = parse_url($realm);
     
-    if (array_key_exists('user', $url) || array_key_exists('pass', $url) || array_key_exists('fragment', $url)) return false;
-    if (array_key_exists('user', $realm) || array_key_exists('pass', $realm) || array_key_exists('fragment', $realm)) return false;
+    foreach(array('user', 'pass', 'fragment') as $key) {
+        if (array_key_exists($key, $url) || array_key_exists($key, $realm))
+            return false;
+    }
     
     if ($url['scheme'] != $realm['scheme']) return false;
     
-    if ((!array_key_exists('port', $url)) && (!array_key_exists('port', $realm))) {
+    if (!isset($url['port']))
         $url['port'] = '';
+    if (!isset($realm['port']))
         $realm['port'] = '';
-    }
     if (($url['port'] != $realm['port']))
-            return false;
+        return false;
     
     if (substr($realm['host'], 0, 2) == '*.') {
         $realm_re = '/^([^.]+\.)?' . preg_quote(substr($realm['host'], 2)) . '$/i';
@@ -512,10 +514,10 @@ function openid_url_matches_realm($url, $realm) {
     
     if (!preg_match($realm_re, $url['host'])) return false;
     
-    if ((!array_key_exists('path', $url)) && (!array_key_exists('path', $realm))) {
+    if (!isset($url['path']))
         $url['path'] = '';
+    if (!isset($realm['path']))
         $realm['path'] = '';
-    }
     if (substr($realm['path'], -1) == '/') $realm['path'] = substr($realm['path'], 0, -1);
     if (($url['path'] != $realm['path']) && !preg_match('#^' . preg_quote($realm['path']) . '/.*$#', $url['path'])) return false;
     
@@ -546,7 +548,7 @@ function openid_realm_discovery_url($realm) {
     }
     $url .= $host;
     if (isset($parts['port'])) $url .= ':' . $parts['port'];
-    $url .= $parts['path'];
+    if (isset($parts['path'])) $url .= $parts['path'];
     if (isset($parts['query'])) $url .= '?' . $parts['query'];
     if (isset($parts['fragment'])) $url .= '#' . $parts['fragment'];
     return $url;
@@ -577,17 +579,16 @@ function openid_verify_return_to($return_to, $actual_url) {
     // Hosts are case insensitive
     if (strtoupper($expected['host']) != strtoupper($actual['host'])) return false;
     
-    if ((!array_key_exists('port', $expected)) && (!array_key_exists('port', $actual))) {
+    if (!isset($expected['port']))
         $expected['port'] = '';
+    if (!isset($actual['port']))
         $actual['port'] = '';
-    }
-    
     if ($expected['port'] != $actual['port']) return false;
     
-    if ((!array_key_exists('path', $expected)) && (!array_key_exists('path', $actual))) {
+    if (!isset($expected['path']))
         $expected['path'] = '';
+    if (!isset($actual['path']))
         $actual['path'] = '';
-    }
     if ($expected['path'] != $actual['path']) return false;
     
     if ($expected['query']) {
