@@ -742,7 +742,7 @@ function openid_nonce() {
 
 /**
  * Generates a relatively unique identifier which can be used as, among other things,
- * an association handle.  The identifier returned is 24 characters long and contains
+ * an association handle.  The identifier returned is at least 24 characters long and contains
  * only hexadecimal characters.
  *
  * Note that the identifier returned is not cryptographically secure.
@@ -788,7 +788,7 @@ function openid_session_types($is_https = FALSE, $version = OPENID_VERSION_2) {
         'DH-SHA1' => array('hash_func' => '_openid_sha1'),
     );
     if (OPENID_SHA256_SUPPORTED) $session_types['DH-SHA256'] = array('hash_func' => '_openid_sha256');
-    if (($version >= OPENID_VERSION_2_0) && ($is_https == TRUE)) {
+    if (($version >= OPENID_VERSION_2) && ($is_https == TRUE)) {
         // Under OpenID 2.0 no-encryption is only allowed if TLS is used
         $session_types['no-encryption'] = array();
     }
