@@ -109,12 +109,13 @@ function negotiate_content_type($content_types, $accept_header = NULL) {
     if ($accept_header) {
         $acceptible = preg_split('/\s*,\s*/', strtolower(trim($accept_header)));
         for ($i = 0; $i < count($acceptible); $i++) {
-            list($item, $q) = array(1 => NULL) + preg_split('/\s*;\s*q\s*=\s*/', $acceptible[$i], 2); // The array(1 => NULL) ensures that array contains at least 2 items
+            $split = preg_split('/\s*;\s*q\s*=\s*/', $acceptible[$i], 2);
+            $item = $split[0];
             
-            if ($q == NULL) {
+            if (count($split) == 1) {
                 $q = 1.0;
             } else {
-                $q = doubleval($q);
+                $q = doubleval($split[1]);
             }
             
             if ($q > 0.0) {
