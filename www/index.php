@@ -567,7 +567,9 @@ function simpleid_checkid_identity(&$request, $immediate) {
     $assertion_results = extension_invoke_all('checkid_identity', $request, $immediate);
     $assertion_results = array_filter($assertion_results, 'is_null');
     
-    // Check 4: Discover the realm and match its return_to
+    // Check 3: Discover the realm and match its return_to
+    $user_rp = (isset($user['rp'][$realm])) ? $user['rp'][$realm] : NULL;
+
     if (($version >= OPENID_VERSION_2) && SIMPLEID_VERIFY_RETURN_URL_USING_REALM) {
         $verified = FALSE;
         
@@ -604,10 +606,8 @@ function simpleid_checkid_identity(&$request, $immediate) {
         }
     }
     
-    // Check 5: For checkid_immediate, the user must already have given
+    // Check 4: For checkid_immediate, the user must already have given
     // permission to log in automatically.    
-    $user_rp = (isset($user['rp'][$realm])) ? $user['rp'][$realm] : NULL;
-    
     if (($user_rp != NULL) && ($user_rp['auto_release'] == 1)) {
         log_info('Automatic set for realm ' . $realm);
         $assertion_results[] = CHECKID_OK;
