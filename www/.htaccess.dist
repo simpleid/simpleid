@@ -1,4 +1,4 @@
-# :mode=apacheconf:
+# :mode=htaccess:
 #
 # SimpleID
 #
@@ -43,3 +43,5 @@ Options -Indexes
     RewriteRule ^(.*)$ index.php?q=$1 [L,QSA]
 </IfModule>
 
+# Switch register_globals to off
+php_value register_globals 0
