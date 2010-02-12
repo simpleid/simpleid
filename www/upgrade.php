@@ -112,34 +112,25 @@ function upgrade_start() {
     
     // Check if the configuration file has been defined
     if (!defined('SIMPLEID_BASE_URL')) {
-        set_message('No configuration file found.  See the <a href="http://simpleid.sourceforge.net/documentation/getting-started">manual</a> for instructions on how to set up a configuration file.');
-        $xtpl->parse('main');
-        $xtpl->out('main');
-        exit;
+        indirect_fatal_error('No configuration file found.  See the <a href="http://simpleid.sourceforge.net/documentation/getting-started">manual</a> for instructions on how to set up a configuration file.');
     }
     
     if (!is_dir(SIMPLEID_IDENTITIES_DIR)) {
-        set_message('Identities directory not found.  See the <a href="http://simpleid.sourceforge.net/documentation/getting-started">manual</a> for instructions on how to set up SimpleID.');
-        $xtpl->parse('main');
-        $xtpl->out('main');
-        exit;
+        indirect_fatal_error('Identities directory not found.  See the <a href="http://simpleid.sourceforge.net/documentation/getting-started">manual</a> for instructions on how to set up SimpleID.');
     }
     
     if (!is_dir(SIMPLEID_CACHE_DIR) || !is_writeable(SIMPLEID_CACHE_DIR)) {
-        set_message('Cache directory not found or not writeable.  See the <a href="http://simpleid.sourceforge.net/documentation/getting-started">manual</a> for instructions on how to set up SimpleID.');
-        $xtpl->parse('main');
-        $xtpl->out('main');
-        exit;
+        indirect_fatal_error('Cache directory not found or not writeable.  See the <a href="http://simpleid.sourceforge.net/documentation/getting-started">manual</a> for instructions on how to set up SimpleID.');
     }
-    
     
     if (!is_dir(SIMPLEID_STORE_DIR) || !is_writeable(SIMPLEID_STORE_DIR)) {
-        set_message('Store directory not found or not writeable.  See the <a href="http://simpleid.sourceforge.net/documentation/getting-started">manual</a> for instructions on how to set up SimpleID.');
-        $xtpl->parse('main');
-        $xtpl->out('main');
-        exit;
+        indirect_fatal_error('Store directory not found or not writeable.  See the <a href="http://simpleid.sourceforge.net/documentation/getting-started">manual</a> for instructions on how to set up SimpleID.');
     }
-    
+
+    if ((@ini_get('register_globals') === 1) || (strtolower(@ini_get('register_globals')) == 'on')) {
+        indirect_fatal_error('register_globals is enabled in PHP configuration, which is not supported by SimpleID.  See the <a href="http://simpleid.sourceforge.net/documentation/getting-started/system-requirements">manual</a> for further information.');
+    }    
+
     $q = (isset($GETPOST['q'])) ? $GETPOST['q'] : '';
     $q = explode('/', $q);
     
