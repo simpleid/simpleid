@@ -516,7 +516,7 @@ function simpleid_checkid($request) {
             break;
         case CHECKID_PROTOCOL_ERROR:
             if (isset($request['openid.return_to'])) {
-                $response = openid_checkid_error($immediate);
+                $response = simpleid_checkid_error($immediate);
                 simpleid_assertion_response($response, $request['openid.return_to']);
             } else {
                 indirect_fatal_error('Unrecognised request.');
