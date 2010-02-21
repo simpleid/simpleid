@@ -89,7 +89,7 @@ function simpleweb_run($routes, $request_path = NULL, $not_found_route = NULL) {
         
         if (!preg_match($regex, $request_path, $args) > 0) continue;
         
-        $args = (count($args) > 1) ? array_slice($args, 1) : null;
+        $args = (count($args) > 1) ? array_slice($args, 1) : array();
         return _simpleweb_invoke($route, $args);
     }
     
