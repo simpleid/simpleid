@@ -148,7 +148,7 @@ function page_sites() {
             if (SIMPLEID_VERIFY_RETURN_URL_USING_REALM) {
                 // $rp_info would usually expire by now, so we allow for stale results to be retrieved to improve performance
                 $rp_info = simpleid_get_rp_info($realm, TRUE);
-                if (!$rp_info['return_to_verified']) $xtpl->assign('realm_class', 'return-to-suspect');
+                if (!isset($rp_info['return_to_verified']) || !$rp_info['return_to_verified']) $xtpl->assign('realm_class', 'return-to-suspect');
             }
             
             $xtpl->parse('main.sites.realm');
