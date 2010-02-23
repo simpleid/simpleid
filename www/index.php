@@ -532,7 +532,7 @@ function simpleid_checkid($request) {
         case CHECKID_OK:
             log_info('CHECKID_OK');
             $response = simpleid_checkid_ok($request);
-            $response = simpleid_sign($response, $request['openid.assoc_handle']);
+            $response = simpleid_sign($response, isset($request['openid.assoc_handle']) ? $request['openid.assoc_handle'] : NULL);
             return redirect_form($request['openid.return_to'], $response);
             break;
         case CHECKID_LOGIN_REQUIRED:
@@ -1016,7 +1016,7 @@ function simpleid_send() {
         $user['rp'][$realm] = $rp;
         user_save($user);
         
-        $response = simpleid_sign($response, $response['openid.assoc_handle']);
+        $response = simpleid_sign($response, isset($response['openid.assoc_handle']) ? $response['openid.assoc_handle'] : NULL);
         if (!$return_to) set_message('You were logged in successfully.');
     }
 
