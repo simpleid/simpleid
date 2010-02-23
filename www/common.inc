@@ -110,7 +110,7 @@ function negotiate_content_type($content_types, $accept_header = NULL) {
         $acceptible = preg_split('/\s*,\s*/', strtolower(trim($accept_header)));
         for ($i = 0; $i < count($acceptible); $i++) {
             $split = preg_split('/\s*;\s*q\s*=\s*/', $acceptible[$i], 2);
-            $item = $split[0];
+            $item = strtolower($split[0]);
             
             if (count($split) == 1) {
                 $q = 1.0;
@@ -126,7 +126,7 @@ function negotiate_content_type($content_types, $accept_header = NULL) {
                     $candidates[$item] = $q;
                 } else {
                     $item = preg_quote($item, '/');
-                    $item = strtr($item, '\*', '.+');
+                    $item = strtr($item, array('\*' => '[^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+'));
                     
                     foreach ($content_types as $value) {
                         if (preg_match("/^$item$/", $value)) {
