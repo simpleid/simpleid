@@ -46,6 +46,39 @@ function ui_xrds_types() {
 }
 
 /**
+ * Detects the openid.ui.x-has-session parameter and processes it accordingly.
+ *
+ * @return array
+ * @see hook_response()
+ */
+function ui_response($assertion, $request) {
+    global $user;
+    global $version;
+    
+    // We only deal with negative assertions
+    if ($assertion) return array();
+    
+    // We only respond if the extension is requested
+    if (!openid_extension_requested(OPENID_NS_UI, $request)) return array();
+    
+    // We only deal with openid.ui.x-has-session requests
+    $filtered_request = openid_extension_filter_request(OPENID_NS_UI, $request);
+    if (!isset($filtered_request['mode']) || ($filtered_request['mode'] != 'x-has-session')) return array();
+    
+    // If user is null, there is no active session
+    if ($user == NULL) return array();
+    
+    // There is an active session
+    $alias = openid_extension_alias(OPENID_NS_UI);
+    $response = array();
+    
+    $response['openid.ns.' . $alias] = OPENID_NS_UI;
+    $response['openid.' . $alias . '.mode'] = 'x-has-session';
+    
+    return $response;
+}
+
+/**
  * Detects the presence of the UI extension and modifies the login form
  * accordingly.
  *
