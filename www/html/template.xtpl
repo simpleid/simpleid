@@ -329,3 +329,20 @@
     </XRD>
 </xrds:XRDS>
 <!-- END: xrds -->
+
+<!-- BEGIN: xrd --><?xml version="1.0" encoding="UTF-8"?>
+<XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0">
+    {signature}
+    <!-- BEGIN: user_xrd -->
+    <Subject>{acct_uri}</Subject>
+    <Alias>{simpleid_user_uri}</Alias>
+    <!-- BEGIN: local_id -->
+    <Alias>{local_id}</Alias>
+    <!-- END: local_id -->
+    <Link rel="http://specs.openid.net/auth/2.0/provider" href="{simpleid_base_url}" />
+    <!-- END: user_xrd -->
+    <!-- BEGIN: xrd_link -->
+    <Link rel="{rel}" href="{href}" />
+    <!-- END: xrd_link -->
+</XRD>
+<!-- END: xrd -->
