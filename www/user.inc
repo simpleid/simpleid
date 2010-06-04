@@ -145,7 +145,7 @@ function user_login() {
     $query = 'q=' . $destination;
     $query .= ($state) ? '&s=' . rawurlencode($state) : '';
     
-    if ($_POST['op'] == 'Cancel') {
+    if (isset($_POST['op']) && $_POST['op'] == 'Cancel') {
         global $version;
         
         $request = unpickle($state);
