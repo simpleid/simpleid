@@ -241,7 +241,12 @@ function discovery_priority_sort($a, $b) {
  * @see XRDSParser
  */
 function discovery_parse_xrds($xrds) {
-    $parser =& new XRDSParser();
+    // Allow for PHP5 version of xtemplate
+    if (version_compare(PHP_VERSION, '5.0.0') === 1) {
+        $parser = new XRDSParser();
+    } else {
+        $parser =& new XRDSParser();
+    }
     
     $parser->parse($xrds);
     $parser->free();

@@ -320,7 +320,7 @@ class XTemplate {
 		$this->restart($file, $tpldir, $files, $mainblock, $autosetup, $this->tag_start_delim, $this->tag_end_delim);
 	}
 
-	/**
+	/*
      * PHP 4 Constructor - Instantiate the object
      *
      * @deprecated Use PHP 5 constructor instead
@@ -330,11 +330,11 @@ class XTemplate {
      * @param string $mainblock Name of main block in the template
      * @param boolean $autosetup If true, run setup() as part of constuctor
      * @return XTemplate
-     */
+     *
 	public function XTemplate ($file, $tpldir = '', $files = null, $mainblock = 'main', $autosetup = true) {
 
 		assert('Deprecated - use PHP 5 constructor');
-	}
+	}*/
 
 
 	/***************************************************************************/
