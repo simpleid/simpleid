@@ -1110,7 +1110,7 @@ function _openid_hmac_sha1($key, $text) {
     if (function_exists('hash_hmac') && function_exists('hash_algos') && (in_array('sha1', hash_algos()))) {
         return hash_hmac('sha1', $text, $key, true);
     } else {
-        define('OPENID_SHA1_BLOCKSIZE', 64);
+        if (!defined('OPENID_SHA1_BLOCKSIZE')) define('OPENID_SHA1_BLOCKSIZE', 64);
         
         if (strlen($key) > OPENID_SHA1_BLOCKSIZE) {
             $key = _openid_sha1($key);
