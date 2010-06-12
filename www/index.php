@@ -92,7 +92,7 @@ $xtpl = NULL;
  *
  * @global array $GETPOST
  */
-$GETPOST = array_merge($_GET, $_POST);
+$GETPOST = array();
 
 simpleid_start();
 
@@ -134,7 +134,8 @@ function simpleid_start() {
         indirect_fatal_error('register_globals is enabled in PHP configuration, which is not supported by SimpleID.  See the <a href="http://simpleid.sourceforge.net/documentation/getting-started/system-requirements">manual</a> for further information.');
     }
 
-    openid_fix_request($GETPOST);
+    openid_fix_request();
+    $GETPOST = array_merge($_GET, $_POST);
     
     $q = (isset($GETPOST['q'])) ? $GETPOST['q'] : '';
     $q = explode('/', $q);
