@@ -241,6 +241,8 @@ function simpleid_url($q = '', $params = '', $relative = false) {
     }
     if (SIMPLEID_CLEAN_URL) {
         $url .= $q . (($params == '') ? '' : '?' . $params);
+    } elseif (($q == '') && ($params == '')) {
+        $url .= '';
     } else {
         $url .= 'index.php?q=' . $q . (($params == '') ? '' : '&' . $params);
     }
