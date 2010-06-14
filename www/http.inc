@@ -83,6 +83,24 @@ function http_request($url, $headers = array(), $method = 'GET', $retry = 3) {
 }
 
 /**
+ * Returns the protocols currently supported for making remote requests.
+ *
+ * If libcurl is used, this function returns a list of protocols supported by the
+ * included build of the library.  If libcurl is not used, then HTTP is the
+ * only protocol supported.
+ *
+ * @return array an array of protocols
+ */
+function http_protocols() {
+    if (extension_loaded('curl')) {
+        $curl_version = curl_version();
+        return $curl_version['protocols'];
+    } else {
+        return array('http');
+    }
+}
+
+/**
  * Performs an HTTP request using libcurl.
  *
  * @param string $url the URL
