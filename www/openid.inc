@@ -229,13 +229,7 @@ function openid_indirect_response_url($url, $message, $component = OPENID_RESPON
     $query = '';
     
     if (is_array($message)) {
-        $pairs = array();
-        
-        foreach ($message as $key => $value) {
-            $pairs[] = $key . '=' . rawurlencode($value);
-        }
-        
-        $query = implode('&', $pairs);
+        $query = openid_urlencode_message($message);
     } else {
         $query = $message;
     }
@@ -273,6 +267,23 @@ function openid_indirect_response_url($url, $message, $component = OPENID_RESPON
         }
     }
     return $url;
+}
+
+/**
+ * Encodes a message in application/x-www-form-urlencoded format.
+ *
+ * @param array $message the OpenID message to encode
+ * @return string the encoded message
+ * @since 0.8
+ */
+function openid_urlencode_message($message) {
+    $pairs = array();
+    
+    foreach ($message as $key => $value) {
+        $pairs[] = $key . '=' . rfc3986_urlencode($value);
+    }
+        
+    return implode('&', $pairs);
 }
 
 /**
@@ -918,7 +929,7 @@ function openid_dh_generate_key_pair($dh_modulus = NULL, $dh_gen = NULL) {
  * @param resource $ZZ the Diffie-Hellman key exchange shared secret as a bignum
  * @param string $mac_key a byte stream containing the MAC key
  * @param string $hash_func the hash function
- * @param string the encrypted MAC key in Base64 representation
+ * @return string the encrypted MAC key in Base64 representation
  */
 function openid_encrypt_mac_key($ZZ, $mac_key, $hash_func = '_openid_sha1') {
     // Encrypt/decrypt the MAC key using the shared secret and the hash function
@@ -1159,5 +1170,27 @@ if (function_exists('hash_hmac') && function_exists('hash_algos') && (in_array('
     define('OPENID_SHA256_SUPPORTED', false);
 }
 
-
+if (!function_exists('rfc3986_urlencode')) {
+    /**
+     * Encodes a URL using RFC 3986.
+     *
+     * PHP's rfc3986_urlencode function encodes a URL using RFC 1738 for PHP versions
+     * prior to 5.3.  RFC 1738 has been
+     * updated by RFC 3986, which change the list of characters which needs to be
+     * encoded.
+     *
+     * Strictly correct encoding is required for various purposes, such as OAuth
+     * signature base strings.
+     *
+     * @param string $s the URL to encode
+     * @return string the encoded URL
+     */
+    function rfc3986_urlencode($s) {
+        if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
+            return rfc3986_urlencode($s);
+        } else {
+            return str_replace('%7E', '~', rfc3986_urlencode($s));
+        }
+    }
+}
 ?>
