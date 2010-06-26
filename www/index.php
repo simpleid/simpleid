@@ -150,12 +150,12 @@ function simpleid_start() {
     
     $routes = array(
         'continue' => 'simpleid_continue',
-        'consent' => 'simpleid_consent',
         'login' => 'user_login',
         'logout' => 'user_logout',
         'my/dashboard' => 'page_dashboard',
         'my/sites' => 'page_sites',
         'my/profile' => 'page_profile',
+        'openid/consent' => 'simpleid_openid_consent',
         'user' => 'user_public_page',
         'user/(.+)' => 'user_public_page',
         'xrds/(.*)' => 'user_xrds',
@@ -475,7 +475,7 @@ function simpleid_checkid($request) {
                 simpleid_assertion_response($response, $request['openid.return_to']);
             } else {
                 $response = simpleid_checkid_ok($request);
-                simpleid_consent_form($request, $response, $result);
+                simpleid_openid_consent_form($request, $response, $result);
             }
             break;
         case CHECKID_RETURN_TO_SUSPECT:
@@ -485,7 +485,7 @@ function simpleid_checkid($request) {
                 simpleid_assertion_response($response, $request['openid.return_to']);
             } else {
                 $response = simpleid_checkid_ok($request);
-                simpleid_consent_form($request, $response, $result);
+                simpleid_openid_consent_form($request, $response, $result);
             }
             break;
         case CHECKID_OK:
@@ -511,7 +511,7 @@ function simpleid_checkid($request) {
             if ($immediate) {                
                 simpleid_assertion_response($response, $request['openid.return_to']);
             } else {                
-                simpleid_consent_form($request, $response, $result);                
+                simpleid_openid_consent_form($request, $response, $result);                
             }
             break;
         case CHECKID_PROTOCOL_ERROR:
@@ -950,7 +950,7 @@ function simpleid_continue() {
 }
 
 /**
- * Provides a form for user consent of a relying party, where the 
+ * Provides a form for user consent of an OpenID relying party, where the 
  * {@link simpleid_checkid_identity()} function returns a CHECKID_APPROVAL_REQUIRED
  * or CHECKID_RETURN_TO_SUSPECT.
  *
@@ -964,7 +964,7 @@ function simpleid_continue() {
  * @param int $reason either CHECKID_APPROVAL_REQUIRED, CHECKID_RETURN_TO_SUSPECT,
  * CHECKID_IDENTITIES_NOT_MATCHING or CHECKID_IDENTITY_NOT_EXIST
  */
-function simpleid_consent_form($request, $response, $reason = CHECKID_APPROVAL_REQUIRED) {
+function simpleid_openid_consent_form($request, $response, $reason = CHECKID_APPROVAL_REQUIRED) {
     global $user;
     global $xtpl;
     global $version;
@@ -983,9 +983,9 @@ function simpleid_consent_form($request, $response, $reason = CHECKID_APPROVAL_R
         $xtpl->assign('switch_user_url', htmlspecialchars(simpleid_url('logout', 'destination=continue&s=' . rawurlencode($request_state), true)));
         $xtpl->assign('return_to', htmlspecialchars($request['openid.return_to'], ENT_QUOTES, 'UTF-8'));
         $xtpl->assign('identity', htmlspecialchars($request['openid.identity'], ENT_QUOTES, 'UTF-8'));
-        $xtpl->parse('main.consent.cancel');
+        $xtpl->parse('main.openid_consent.cancel');
     } else {
-        $xtpl->assign('javascript', '<script src="' . get_base_path() . 'html/consent.js" type="text/javascript"></script>');
+        $xtpl->assign('javascript', '<script src="' . get_base_path() . 'html/openid-consent.js" type="text/javascript"></script>');
         
         $rp = (isset($user['rp'][$realm])) ? $user['rp'][$realm] : NULL;
         
@@ -993,13 +993,13 @@ function simpleid_consent_form($request, $response, $reason = CHECKID_APPROVAL_R
         $xtpl->assign('extensions', implode($extensions));
         
         if ($reason == CHECKID_RETURN_TO_SUSPECT) {
-            $xtpl->parse('main.consent.setup.suspect');
+            $xtpl->parse('main.openid_consent.setup.suspect');
             $xtpl->assign('realm_class', 'return-to-suspect');
         }
-        $xtpl->parse('main.consent.setup');
+        $xtpl->parse('main.openid_consent.setup');
     }
     
-    $xtpl->parse('main.consent');
+    $xtpl->parse('main.openid_consent');
     $xtpl->parse('main.framekiller');
     
     $xtpl->assign('title', 'OpenID Login');
@@ -1011,13 +1011,13 @@ function simpleid_consent_form($request, $response, $reason = CHECKID_APPROVAL_R
 
 
 /**
- * Processes a user response from the {@link simpleid_consent_form()} function.
+ * Processes a user response from the {@link simpleid_openid_consent_form()} function.
  *
  * If the user verifies the relying party, an OpenID response will be sent to
  * the relying party.  Otherwise, the dashboard will be displayed to the user.
  *
  */
-function simpleid_consent() {
+function simpleid_openid_consent() {
     global $user, $version, $GETPOST;
     
     if ($user == NULL) {
