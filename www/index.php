@@ -148,6 +148,17 @@ function simpleid_start() {
     cache_gc(SIMPLEID_ASSOC_EXPIRES_IN, 'association');
     cache_gc(300, 'stateless');
     
+    simpleid_route($q);
+}
+
+/**
+ * Dispatches to the correct SimpleID function based on the request path.  The
+ * request path usually comes from the q parameter in the query string (which may
+ * be inserted by mod_rewrite), but can come from other functions as well.
+ *
+ * @param string $q the request path
+ */
+function simpleid_route($q) {
     $routes = array(
         'continue' => 'simpleid_continue',
         'login' => 'user_login',
