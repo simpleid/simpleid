@@ -36,8 +36,20 @@ identity="http://example.com/"
 ; the MD5 algorithm.
 ;
 ; There are various tools available which will give you the MD5 hash of any
-; given string.  Wikipedia (http://en.wikipedia.org/wiki/MD5) is a good place
-; to start.
+; given string.  If you have access to the command-line interface of PHP, you
+; can run the following command to give you the hash.
+;
+; php -r "print md5('example password');"
+;
+; Alternatively, you can upload the following PHP code to your web server, then
+; read off the hash with your web browser.  (This is recommended only if your
+; web server supports secure uploads (e.g. SFTP) and HTTPS, you that your
+; password is not sent over the Internet as clear text.)
+;
+; <?php header('Content-Type: text/plain'); print md5('example password'); ?>
+;
+; Alternatively, Wikipedia (http://en.wikipedia.org/wiki/MD5) has other resources
+; on generating this hash.
 ;
 pass="c8e24ae844b7cb9381g722ae8209a19a"
 
