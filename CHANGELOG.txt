@@ -1,5 +1,12 @@
 // $Id$
 
+SimpleID 0.7.3
+--------------
+
+- Various bug fixes.  See http://sourceforge.net/apps/trac/simpleid/query?status=closed&group=resolution&milestone=0.7.3
+  for further details
+
+
 SimpleID 0.7.2
 --------------
 
