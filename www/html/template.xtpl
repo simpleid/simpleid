@@ -90,7 +90,7 @@
                 
                 <div class="form-item">
                     <label for="edit-name">User name:</label>
-                    <input type="text" maxlength="60" name="name" id="edit-name"  size="60" value=""  class="form-text required" {security_disabled} />
+                    <input type="text" maxlength="60" name="name" id="edit-name"  size="60" value="" autocapitalize="off" autocorrect="off" class="form-text required" {security_disabled} />
                 </div>
                 <div class="form-item">
                     <label for="edit-pass">Password:</label>
