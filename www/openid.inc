@@ -1187,9 +1187,9 @@ if (!function_exists('rfc3986_urlencode')) {
      */
     function rfc3986_urlencode($s) {
         if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
-            return rfc3986_urlencode($s);
+            return rawurlencode($s);
         } else {
-            return str_replace('%7E', '~', rfc3986_urlencode($s));
+            return str_replace('%7E', '~', rawurlencode($s));
         }
     }
 }
