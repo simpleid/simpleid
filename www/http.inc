@@ -95,7 +95,9 @@ function http_request($url, $headers = array(), $method = 'GET', $retry = 3) {
  * 'content-type' (the HTTP content-type returned)
  */
 function _http_request_curl($url, $headers = array(), $method = 'GET', $retry = 3) {
-    $safe_mode = ((@ini_get('safe_mode') === 1) || (strtolower(@ini_get('safe_mode')) == 'on'));
+    $safe_mode = ((@ini_get('safe_mode') === 1)   // safe mode
+        || (strtolower(@ini_get('safe_mode')) == 'on')  // safe mode
+        || (@ini_get('open_basedir') != false)); // open_basedir
     
     $version = curl_version();
     
