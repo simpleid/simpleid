@@ -186,7 +186,7 @@ function upgrade_selection() {
         if (!$upgrade_access_check) $xtpl->parse('main.selection.selection_complete.upgrade_access_check');
         $xtpl->parse('main.upgrade_selection.selection_complete');
     } else {
-        $handle = openid_handle();
+        $handle = random_id();
         cache_set('upgrade', $handle, $functions);
         
         $xtpl->assign('handle', $handle);

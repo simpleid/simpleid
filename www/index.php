@@ -103,7 +103,7 @@ simpleid_start();
  */
 function simpleid_start() {
     global $xtpl, $GETPOST;
-        
+    
     $xtpl = new XTemplate('html/template.xtpl');
     $xtpl->assign('version', SIMPLEID_VERSION);
     $xtpl->assign('base_path', get_base_path());
@@ -353,10 +353,10 @@ function _simpleid_create_association($mode = ASSOCIATION_SHARED, $assoc_type = 
     $mac_size = $assoc_types[$assoc_type]['mac_size'];
     $hmac_func = $assoc_types[$assoc_type]['hmac_func'];
     
-    $assoc_handle = openid_handle();
+    $assoc_handle = random_id();
     $expires_in = SIMPLEID_ASSOC_EXPIRES_IN;
     
-    $secret = openid_random($mac_size);
+    $secret = random_bytes($mac_size);
     
     $response = array(
         'assoc_handle' => $assoc_handle,

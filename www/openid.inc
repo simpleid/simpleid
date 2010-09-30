@@ -35,6 +35,7 @@
  */
  
 include_once "bignum.inc";
+include_once "random.inc";
  
 /**
  * OpenID default modulus for Diffie-Hellman key exchange.
@@ -51,12 +52,6 @@ define('OPENID_DH_DEFAULT_MOD', '155172898181473697471232257763715539915724801'.
  * OpenID default generator for Diffie-Hellman key exchange.
  */
 define('OPENID_DH_DEFAULT_GEN', '2');
-
-/**
- * The source of random bits.  On Unix-like systems, this could be /dev/random
- * or /dev/urandom
- */
-define('OPENID_RAND_SOURCE', '/dev/urandom');
 
 /** Constant for the global variable {@link $version} */
 define('OPENID_VERSION_2', 2);
@@ -711,37 +706,7 @@ function openid_extension_alias($ns, $create = FALSE) {
 }
 
 
-/* ------- Random byte and nonce functions ----------------------------------- */
-/**
- * Obtains a number of random bytes.  This function uses an entropy source specified
- * in OPENID_RAND_SOURCE.  If OPENID_RAND_SOURCE is not available, the mt_rand()
- * PHP function is used
- *
- * @param int $num_bytes the number of bytes to generate
- * @return string a string containing random bytes
- */
-function openid_random($num_bytes) {
-    static $f = null;
-    $bytes = '';
-    if ($f === null) {
-        if (OPENID_RAND_SOURCE === null) {
-            $f = FALSE;
-        } else {
-            $f = @fopen(OPENID_RAND_SOURCE, "r");
-        }
-    }
-    if ($f === FALSE) {
-        $bytes = '';
-        for ($i = 0; $i < $num_bytes; $i += 4) {
-            $bytes .= pack('L', mt_rand());
-        }
-        $bytes = substr($bytes, 0, $num_bytes);
-    } else {
-        $bytes = fread($f, $num_bytes);
-    }
-    return $bytes;
-}
-
+/* ------- OpenID nonce functions -------------------------------------------- */
 /**
  * Generates a nonce for use in OpenID responses
  *
@@ -749,21 +714,7 @@ function openid_random($num_bytes) {
  * @link http://openid.net/specs/openid-authentication-2_0.html#positive_assertions
  */
 function openid_nonce() {
-    return gmstrftime('%Y-%m-%dT%H:%M:%SZ') . bin2hex(openid_random(4));
-}
-
-/**
- * Generates a relatively unique identifier which can be used as, among other things,
- * an association handle.  The identifier returned is at least 24 characters long and contains
- * only hexadecimal characters.
- *
- * Note that the identifier returned is not cryptographically secure.
- *
- * @return string a relatively unique identifier
- */
-function openid_handle() {
-    $timeofday = gettimeofday();
-    return vsprintf('%08x%08x', $timeofday) . bin2hex(openid_random(4));
+    return gmstrftime('%Y-%m-%dT%H:%M:%SZ') . bin2hex(random_bytes(4));
 }
 
 /* ------- Diffie-Hellman Key Exchange functions ----------------------------- */
@@ -998,7 +949,7 @@ function _openid_dh_rand($stop) {
     }
   
     do {
-        $bytes = "\x00" . openid_random($nbytes);
+        $bytes = "\x00" . random_bytes($nbytes);
         $n = bignum_new($bytes, 256);
         // Keep looping if this value is in the low duplicated range
     } while (bignum_cmp($n, $duplicate) < 0);
