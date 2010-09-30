@@ -81,8 +81,8 @@ function random_bytes($num_bytes) {
  * random string
  * @param string the random string
  */
-function random_secret($num_bytes) {
-    return strtr(base64_encode(random_bytes(32)),
+function random_secret($num_bytes = 32) {
+    return strtr(base64_encode(random_bytes($num_bytes)),
         'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=',
         '-_.9876543210zyxwvutsrqponmlkjihgfedcbaZYXWVUTSRQPONMLKJIHGFEDCBA');
 }
