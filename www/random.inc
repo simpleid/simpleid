@@ -38,7 +38,7 @@ if (!defined('SIMPLEID_RAND_SOURCE')) {
 
 /**
  * Obtains a number of random bytes.  This function uses an entropy source specified
- * in OPENID_RAND_SOURCE.  If OPENID_RAND_SOURCE is not available, the mt_rand()
+ * in SIMPLEID_RAND_SOURCE.  If SIMPLEID_RAND_SOURCE is not available, the mt_rand()
  * PHP function is used
  *
  * @param int $num_bytes the number of bytes to generate
@@ -48,10 +48,10 @@ function random_bytes($num_bytes) {
     static $f = null;
     $bytes = '';
     if ($f === null) {
-        if (OPENID_RAND_SOURCE === null) {
+        if (SIMPLEID_RAND_SOURCE === null) {
             $f = FALSE;
         } else {
-            $f = @fopen(OPENID_RAND_SOURCE, "r");
+            $f = @fopen(SIMPLEID_RAND_SOURCE, "r");
         }
     }
     if ($f === FALSE) {
