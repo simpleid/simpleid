@@ -52,4 +52,6 @@ define_default('SIMPLEID_VERIFY_RETURN_URL_USING_REALM', true);
 define_default('SIMPLEID_STORE_DIR', SIMPLEID_CACHE_DIR);
 define_default('SIMPLEID_LOGFILE', '');
 define_default('SIMPLEID_LOGLEVEL', 4);
+
+if (function_exists('date_default_timezone_set')) date_default_timezone_set(@date_default_timezone_get());
 ?>
