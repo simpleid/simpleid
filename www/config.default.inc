@@ -51,6 +51,7 @@ define_default('SIMPLEID_ALLOW_LEGACY_LOGIN', false);
 define_default('SIMPLEID_ALLOW_AUTOCOMPLETE', false);
 define_default('SIMPLEID_EXTENSIONS', 'sreg');
 define_default('SIMPLEID_VERIFY_RETURN_URL_USING_REALM', true);
+define_default('SIMPLEID_STORE', 'filesystem');
 define_default('SIMPLEID_STORE_DIR', SIMPLEID_CACHE_DIR);
 define_default('SIMPLEID_LOGFILE', '');
 define_default('SIMPLEID_LOGLEVEL', 4);

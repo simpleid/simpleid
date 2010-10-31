@@ -58,7 +58,7 @@ include_once "simpleweb.inc";
 include_once "openid.inc";
 include_once "user.inc";
 include_once "cache.inc";
-include_once "filesystem.store.inc";
+include_once SIMPLEID_STORE . ".store.inc";
 
 // Allow for PHP5 version of xtemplate
 if (version_compare(PHP_VERSION, '5.0.0') === 1) {

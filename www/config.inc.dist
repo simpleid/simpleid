@@ -73,6 +73,20 @@ define('SIMPLEID_IDENTITIES_DIR', '../identities');
 define('SIMPLEID_CACHE_DIR', '../cache');
 
 /**
+ * Persistent data storage mechanism.
+ *
+ * SimpleID provides flexible methods to store and retrieve persistent data.
+ * By default, SimpleID uses the file system to store this data, implemented
+ * in filesystem.store.inc.  Users can implement other methods by creating
+ * a file with extension .store.inc and specifying the file through this
+ * setting.
+ * 
+ * Generally you do not need to change this setting.
+ *
+ */
+define('SIMPLEID_STORE', 'filesystem');
+
+/**
  * Directory to store persistent data.
  *
  * This directory must exist and be readable and writable by the
