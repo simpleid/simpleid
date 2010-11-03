@@ -210,23 +210,13 @@ function user_login() {
         cache_delete('user-nonce', $_POST['nonce']);
     }
     
+    if (store_user_verify_credentials($_POST['name'], $_POST) === false) {
+        set_message('The user name or password is not correct.');
+        user_login_form($destination, $state);
+        return;
+    }
+    
     $test_user = user_load($_POST['name']);
-    if ($test_user == NULL) {
-        set_message('The user name or password is not correct.');
-        user_login_form($destination, $state);
-        return;
-    }
-    
-    if ($_POST['digest'] && !_user_verify_digest($_POST['digest'], $_POST['nonce'], $test_user)) {
-        set_message('The user name or password is not correct.');
-        user_login_form($destination, $state);
-        return;
-    } elseif ($allow_legacy_login && !$_POST['digest'] && (md5($_POST['pass']) != $test_user['pass'])) {
-        set_message('The user name or password is not correct.');
-        user_login_form($destination, $state);
-        return;
-    }
-    
     $test_user['auth_time'] = time();
     user_save($test_user);
     

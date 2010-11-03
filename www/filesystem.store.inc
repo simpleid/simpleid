@@ -91,6 +91,47 @@ function store_user_load($uid) {
 }
 
 /**
+ * Verifies a set of credentials for a specified user.
+ *
+ * A set of credentials comprises:
+ *
+ * - A user name
+ * - Some kind of verifying information, such as a plaintext password, a hashed
+ *   password (e.g. digest) or some other kind of identifying information.
+ *
+ * The user name is passed to this function using the $uid parameter.  The user
+ * name may or may not exist.  If the user name does not exist, this function
+ * <strong>must</strong> return false.
+ *
+ * The credentials are supplied as an array using the $credentials parameter.
+ * Typically this array will be a subset of the $_POST superglobal passed to the
+ * {@link user_login()} function.  Thus it will generally contain the keys 'pass' and
+ * 'digest'.
+ *
+ * This function must check whether the credentials supplied matches the credentials
+ * for the specified user in the store.  If for any reason that credentials
+ * do not match, this function <strong>must</strong> return false.
+ *
+ * @param string $uid the name of the user to verify
+ * @param array $credentials the credentials supplied by the browser
+ * @return bool whether the credentials supplied matches those for the specified
+ * user
+ */
+function store_user_verify_credentials($uid, $credentials) {
+    $test_user = user_load($uid);
+    
+    if ($test_user == NULL) return false;
+    
+    if ($credentials['digest'] && !_user_verify_digest($credentials['digest'], $credentials['nonce'], $test_user)) {
+        return false;
+    } elseif ($allow_legacy_login && !$credentials['digest'] && (md5($credentials['pass']) != $test_user['pass'])) {
+        return false;
+    }
+    
+    return true;
+}
+
+/**
  * Finds the user name from a specified OpenID Identity URI.
  *
  * @param string $identity the Identity URI of the user to load
