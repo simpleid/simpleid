@@ -1,114 +1,159 @@
 // $Id$
 
-SimpleID 0.7.3 and 0.7.4
-------------------------
+SimpleID 0.7.4
+--------------
 
-- Various bug fixes.  See http://sourceforge.net/apps/trac/simpleid/query?status=closed&group=resolution&milestone=0.7.3
-  for further details
+- Fixed incorrect implementation of fix for PHP's handling of HTTP parameters.
+
+
+SimpleID 0.7.3
+--------------
+
+- Bug fixes:
+    * #47 PHP syntax warnings in discovery.inc.
+    * #48 PHP syntax warnings in user.inc.
+    * #50 Fix for PHP's handling of HTTP parameters.
 
 
 SimpleID 0.7.2
 --------------
 
-- Various bug fixes
+- Bug fixes:
+    * #40 PHP syntax warnings in simpleweb.inc.
+    * #42 PHP syntax warnings in index.php.
 
 
 SimpleID 0.7.1
 --------------
 
-- Various bug fixes
+- Bug fixes:
+    * Incorrect specification for expiry time for auto login.
+    * Fixed verification of credentials under legacy authentication.
+    * Fixed incorrect signing of Simple Registration Extension response.
+    * Fixed Javascript for digest authentication.
+    * Used Javascript instead of forms for page redirection for better HTTPS
+      user experience.
 
 
 SimpleID 0.7
 ------------
 
-- Implemented XRDS document for SimpleID
-
-- Improved extension framework
-
-- Preliminary implementation of the OpenID User Interface extension
-
-- Improved OpenID compliance
-
-- Added support for GMP for improved performance
-
-- Improved persistent storage system
-
-- Improved user interface
+- Improved OpenID specification compliance:
+    * Added additional return_to verification using discovery.
+    * Fixed support for SHA256.
+    * Fixed indirect message URL encoding.
+    * Fixed filtering of extension-specific parameters.
+    * Fixed XRDS document for SimpleID.
+- Preliminary implementation of the OpenID User Interface extension.
+- Added support for GMP for improved performance for arbitary precision
+  arithmetic operations.
+- Improved user interface:
+    * Separated Dashboard, My Profile and My Sites pages.
+    * Added "log in as different user" functionality.
+    * CSS improvements.
+    * Added framekiller code.
+    * Support for nicer URLs via mod_rewrite.
+- Enhanced detection of SSL/TLS for user login page.
+- Implemented flexible persistent storage system to store user data.
+- Improved extension framework: major refactoring of hooks available to be
+  utilised by extensions.
+- Improved URL routing framework: included simpleweb.inc.
+- Added upgrade script.
+- Enhanced logging of status and errors.
+- Enhanced code documentation.
 
 
 SimpleID 0.6.5
 --------------
 
-- Fixed XSS vulnerability in user login page
+- Bug fixes:
+    * Fixed XSS vulnerability in user login page.
+    * Fixed XRDS-Location HTTP header.
 
 
 SimpleID 0.6.4
 --------------
 
-- Fixed user interface bug on trusted sites page
+- Fixed user interface bug on trusted sites page (disable Submit button when
+  there are no trusted sites).
 
 
 SimpleID 0.6.3
 --------------
 
-- Fixed session_type verification issue when using OpenID 1.1
+- Fixed session_type verification response when using OpenID 1.1 associations.
 
 
 SimpleID 0.6.2
 --------------
 
-- Fixed session_type verification issue when using OpenID 1.1
+- Fixed session_type verification issue when using OpenID 1.1 associations.
 
 
 SimpleID 0.6.1
 --------------
   
-- Fixed return_to verification issue when using OpenID 1.1
+- Fixed return_to verification issue when using OpenID 1.1 (legacy handling of
+  nonce parameter).
 
 SimpleID 0.6
 ------------
 
-- Fixed bugs in Simple Registration Extension
-
-- Implemented digest authentication (security enhancements)
-
+- Bug fixes:
+    * Fixed syntax errors in openid.inc.
+    * Fixed incorrect error authentication response.
+- Implemented digest authentication for user login (security enhancements).
 - Implemented persistent login
-
-- Enhanced form security
-
-- Changed extension of extensions from .inc to .extension.inc
+- Enhanced form security:
+    * Added form token verification.
+    * Enhanced encoding of HTML special characters.
+- Improved compliance against OpenID specifications:
+    * Added return_to verification.
+- Changed extension of extensions from .inc to .extension.inc.
+- Enhanced code documentation.
 
 
 SimpleID 0.5.1
 --------------
 
-- Fixed bug in user.inc
+- Bug fixes:
+    * Removed remnants of maths question (removed in SimpleID 0.5) from user.inc
+- Included Simple Registration Extension by default
 
 
 SimpleID 0.5
 ------------
 
-- Numerous bug fixes
-
+- Bug fixes:
+    * Removed XSS vulnerabilities
+    * Fixed incorrect processing of Simple Registration Extension parameters
+    * Fixed URL for identifier selection.
 - The identifier variable is now optional in identity files.  SimpleID automatically
   assigns an identifier to all identities where this is not specified.
-
-- Improved compliance against OpenID specifications.
-
+- Log in security improvements:
+    * Removed requirement to complete a maths question to log in.
+    * Added nonce check into login page to detect repeat attacks.
+- Improved compliance against OpenID specifications:
+    * Enhanced support for OpenID 2.0.
+    * Enhanced checking of request parameters.
+    * Added support for discovery of SimpleID services via XRDS.
 - Support for SHA256 where this is compiled into PHP.
+- Added default profile page and XRDS document for each user.
 
 
 SimpleID 0.2.1
 --------------
 
-- Bug fixes
+- Bug fixes:
+    * Removed incorrect and legacy handling of nonce parameter in OpenID 1.1
+      authentication responses
 
 
 SimpleID 0.2
 ------------
 
-- Fixed bug in Simple Registration Extension support
+- Bug fixes:
+    * Fixed template compile error in Simple Registration Extension.
 
 
 SimpleID 0.1
