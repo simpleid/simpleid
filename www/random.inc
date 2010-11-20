@@ -25,6 +25,7 @@
  * Functions related to generating random bits and unique values.
  *
  * @package simpleid
+ * @since 0.8
  * @filesource
  */
 

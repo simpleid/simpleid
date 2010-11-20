@@ -157,6 +157,7 @@ function negotiate_content_type($content_types, $accept_header = NULL) {
  *
  * @param mixed $data the data to serialise
  * @return string serialised data
+ * @see unpickle()
  */
 function pickle($data) {
     return base64_encode(gzcompress(serialize($data)));
@@ -167,6 +168,7 @@ function pickle($data) {
  *
  * @param string $pickle the serialised data
  * @return mixed the deserialised data
+ * @see pickle()
  */
 function unpickle($pickle) {
     return unserialize(gzuncompress(base64_decode($pickle)));
