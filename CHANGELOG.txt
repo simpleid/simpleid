@@ -1,5 +1,13 @@
 // $Id$
 
+SimpleID 0.7.5
+--------------
+
+- Bug fixes:
+    * #61 PHP safe mode causing curl configuration issues
+    * #64 Issue with URL parsing under Simpleweb framework
+
+
 SimpleID 0.7.4
 --------------
 
