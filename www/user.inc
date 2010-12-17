@@ -323,6 +323,8 @@ function user_login_form($destination = '', $state = NULL) {
     $xtpl->assign('security_class', $security_class);
     
     extension_invoke_all('user_login_form', $destination, $state);
+    
+    header('X-Frame-Killer: DENY');
 
     $xtpl->assign('title', 'Log In');
     $xtpl->assign('page_class', 'dialog-page');
