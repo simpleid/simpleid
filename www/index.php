@@ -1013,7 +1013,7 @@ function simpleid_openid_consent_form($request, $response, $reason = CHECKID_APP
     $xtpl->parse('main.openid_consent');
     $xtpl->parse('main.framekiller');
     
-    header('X-Frame-Killer: DENY');
+    header('X-Frame-Options: DENY');
     
     $xtpl->assign('title', 'OpenID Login');
     $xtpl->assign('page_class', 'dialog-page');
