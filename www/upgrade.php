@@ -77,7 +77,6 @@ define('PRE_0_7_0_VERSION', '0.6.0 or earlier');
  * @global array $upgrade_functions
  */
 $upgrade_functions = array(
-    '0.8.0' => array('upgrade_reset_auto_release'),
     '0.7.0' => array('upgrade_rp_to_store', 'upgrade_token_to_store')
 );
 
@@ -342,35 +341,6 @@ function upgrade_access_denied() {
 }
 
 /* ------------------------------------------------------------------------------------------------------- */
-
-/**
- * Resets the user's auto_release preferences.
- *
- * @since 0.8
- */
-function upgrade_reset_auto_release() {
-    $dir = opendir(SIMPLEID_IDENTITIES_DIR);
-    
-    while (($file = readdir($dir)) !== false) {
-        $filename = SIMPLEID_IDENTITIES_DIR . '/' . $file;
-        
-        if ((filetype($filename) != "file") || (!preg_match('/^(.+)\.identity$/', $file, $matches))) continue;
-        
-        $uid = $matches[1];
-        
-        $user = user_load($uid);
-        $rps = isset($user['rp']) ? $user['rp'] : array();
-    
-        if ($rps) {
-            foreach ($rps as $realm => $rp) {
-                if (isset($rp['auto_release']) && $rp['auto_release']) $user['rp'][$realm]['auto_release'] = 0;
-            }
-        }
-        user_save($user);
-    }
-    
-    return '<p>Your preferences for automatically logging into web sites have been reset.</p>';
-}
 
 /**
  * Moves the user's site preferences from the cache to the store.
