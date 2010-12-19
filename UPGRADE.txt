@@ -16,6 +16,22 @@ General information on upgrading can be found at
 This document sets out the additional steps which may need to be performed to
 upgrade to a specific version of SimpleID.
 
+Upgrading to SimpleID 0.8
+-------------------------
+
+SimpleID 0.8 does not require any additional steps as part of the upgrade
+process.
+
+However, you will still need to run the upgrade script to complete the
+upgrade.  To run the script, use your web browser to go to
+
+http://www.exmaple.com/simpleid/upgrade.php
+
+where http://www.exmaple.com/simpleid/ is the URL of your SimpleID server
+(where you have moved the www directory).  You will need to be logged in as
+an administrator to proceed with the script.
+
+
 Upgrading to SimpleID 0.7
 -------------------------
 
