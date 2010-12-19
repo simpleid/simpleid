@@ -656,7 +656,7 @@ function simpleid_get_rp_info($realm, $allow_stale = FALSE) {
     
     $rp_info = cache_get('rp-info', $realm);
     
-    if (($rp_info == NULL) || (!$allow_stale && ($rp_info['updated'] < time() - 3600))) {
+    if (($rp_info == NULL) || (!isset($rp_info['updated'])) || (!$allow_stale && ($rp_info['updated'] < time() - 3600))) {
         log_info('OpenID 2 RP discovery: realm: ' . $realm . '; url: ' . $url);
         
         $rp_info = array(
@@ -680,6 +680,7 @@ function simpleid_get_rp_info($realm, $allow_stale = FALSE) {
  * @since 0.8
  */
 function simpleid_set_rp_info($realm, $rp_info) {
+    if (!isset($rp_info['updated'])) $rp_info['updated'] = time();
     cache_set('rp-info', $realm, $rp_info, $rp_info['updated']);
 }
 
