@@ -1,5 +1,23 @@
 // $Id$
 
+SimpleID 0.8
+------------
+
+- Improved OpenID specification compliance:
+    * Added read-only support for attribute exchange extension
+- Improvements to user interfaces:
+    * #14 Added support for clean URLs
+    * #18 Improved comformance to HTML specifications in user interface
+    * #19 For OpenID immediate requests, assertion will not fail simply because
+      return_to has not been verified
+    * #23 Optional support for browsers to save SimpleID passwords
+- Improvements to SimpleID internals:
+    * Refactored function names
+    * Refactored function layout in discovery.inc and openid.inc
+    * Opened up identity store code to allow support for non filesystem based
+      identity files
+    * Improved source code documentation
+
 SimpleID 0.7.5
 --------------
 
