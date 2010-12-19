@@ -472,7 +472,7 @@ function simpleid_checkid($request) {
         $results = extension_invoke_all('checkid', $request, $immediate);
         
         // Filter out nulls
-        $results = array_filter($results, 'is_null');
+        $results = array_merge(array_diff($results, array(NULL)));
         
         // If there are still results, it is the lowest value, otherwise, it is CHECKID_PROTOCOL_ERROR
         $result = ($results) ? min($results) : CHECKID_PROTOCOL_ERROR;
@@ -581,7 +581,7 @@ function simpleid_checkid_identity(&$request, $immediate) {
     
     // Pass the assertion to extensions
     $assertion_results = extension_invoke_all('checkid_identity', $request, $immediate);
-    $assertion_results = array_filter($assertion_results, 'is_null');
+    $assertion_results = array_merge(array_diff($assertion_results, array(NULL)));
     
     // Check 3: Discover the realm and match its return_to
     $user_rp = (isset($user['rp'][$realm])) ? $user['rp'][$realm] : NULL;
