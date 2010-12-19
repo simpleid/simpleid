@@ -216,9 +216,13 @@ function user_login() {
         return;
     }
     
+    // Set the current authentication time
     $test_user = user_load($_POST['name']);
     $test_user['auth_time'] = time();
     user_save($test_user);
+    
+    // Set user has been actively authenticated this session
+    $test_user['auth_active'] = true;
     
     _user_login($test_user);
     log_info('Login successful: ' . $test_user['uid'] . '['. gmstrftime('%Y-%m-%dT%H:%M:%SZ', $test_user['auth_time']) . ']');
