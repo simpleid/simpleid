@@ -162,7 +162,7 @@ function ax_consent_form($request, $response, $rp) {
         $fields = array_merge($required, $optional);
         
         foreach ($fields as $field) {
-            $type = $request['type_' . $field];
+            $type = $request['type.' . $field];
             $value = _ax_get_value($type);
             
             if (is_array($value)) {
