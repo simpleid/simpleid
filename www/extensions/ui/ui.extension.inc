@@ -79,6 +79,27 @@ function ui_response($assertion, $request) {
 }
 
 /**
+ * Returns an array of fields that need signing.
+ *
+ * @see hook_signed_fields()
+ */
+function ui_signed_fields($response) {
+    // We only respond if the extension is requested
+    if (!openid_extension_requested(OPENID_NS_UI, $response)) return array();
+    
+    $fields = array_keys(openid_extension_filter_request(OPENID_NS_UI, $response));
+    $alias = openid_extension_alias(OPENID_NS_UI);
+    $signed_fields = array();
+
+    if (isset($response['openid.ns.' . $alias])) $signed_fields[] = 'ns.' . $alias;
+    foreach ($fields as $field) {
+        if (isset($response['openid.' . $alias . '.' . $field])) $signed_fields[] = $alias . '.' . $field;
+    }
+    
+    return $signed_fields;
+}
+
+/**
  * Detects the presence of the UI extension and modifies the login form
  * accordingly.
  *
