@@ -132,6 +132,7 @@ function ax_signed_fields($response) {
     $alias = openid_extension_alias(OPENID_NS_AX);
     $signed_fields = array();
 
+    if (isset($response['openid.ns.' . $alias])) $signed_fields[] = 'ns.' . $alias;
     foreach ($fields as $field) {
         if (isset($response['openid.' . $alias . '.' . $field])) $signed_fields[] = $alias . '.' . $field;
     }
