@@ -73,6 +73,13 @@ function user_init($q = NULL) {
     
     if (isset($_SESSION['user']) && (cache_get('user', $_SESSION['user']) == session_id())) {
         $user = user_load($_SESSION['user']);
+        
+        // If user has just been actively been authenticated in the previous request, then we
+        // make it as actively authenticated in this request.
+        if (isset($_SESSION['user_auth_active']) && $_SESSION['user_auth_active']) {
+            $user['auth_active'] = true;
+            unset($_SESSION['user_auth_active']);
+        }
     } elseif (isset($_COOKIE[_user_autologin_cookie()])) {
         if (($q == 'login') || ($q == 'logout')) return;
         user_autologin_verify();
@@ -221,8 +228,9 @@ function user_login() {
     $test_user['auth_time'] = time();
     user_save($test_user);
     
-    // Set user has been actively authenticated this session
+    // Set user has been actively authenticated this and the next request only
     $test_user['auth_active'] = true;
+    $_SESSION['user_auth_active'] = true;
     
     _user_login($test_user);
     log_info('Login successful: ' . $test_user['uid'] . '['. gmstrftime('%Y-%m-%dT%H:%M:%SZ', $test_user['auth_time']) . ']');
