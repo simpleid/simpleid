@@ -147,7 +147,7 @@ function user_login() {
     // If the user is already logged in, return
     if (isset($user["uid"])) openid_indirect_response_redirect(simpleid_url(), '');
     
-    $destination = $GETPOST['destination'];
+    $destination = (isset($GETPOST['destination'])) ? $GETPOST['destination'] : '';
     $state = (isset($GETPOST['s'])) ? $GETPOST['s'] : '';
     $query = ($state) ? 's=' . rawurlencode($state) : '';
     
@@ -185,7 +185,7 @@ function user_login() {
             // User came from a log in form.
             set_message('You need to supply the user name and the password in order to log in.');
         }
-        cache_delete('user-nonce', $_POST['nonce']);
+        if (isset($_POST['nonce'])) cache_delete('user-nonce', $_POST['nonce']);
         user_login_form($destination, $state);
         return;
     }
