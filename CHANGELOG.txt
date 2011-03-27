@@ -5,6 +5,7 @@ SimpleID 0.8
 
 - Improved OpenID specification compliance:
     * Added read-only support for attribute exchange extension
+    * Addes support for provider authentication policy extension 
 - Improvements to user interfaces:
     * #14 Added support for clean URLs
     * #18 Improved comformance to HTML specifications in user interface
