@@ -148,7 +148,7 @@ function ui_consent_form($request, $response, $rp) {
         $icon_url = simpleid_url('ui/icon', 'realm=' . rawurlencode($realm) . '&tk=' . _ui_icon_token($realm));
         
         $xtpl->assign('icon_url', htmlspecialchars($icon_url, ENT_QUOTES, 'UTF-8'));
-        $xtpl->parse('main.consent.icon');
+        $xtpl->parse('main.openid_consent.icon');
     }
     
     return '';
