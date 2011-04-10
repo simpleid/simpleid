@@ -240,9 +240,9 @@ function store_set($name, $value) {
 function store_del($name) {
     global $simpleid_settings;
     
-    if (isset($simpleid_settings[$name])) unset($simpleid_settings[$name]);;
+    if (isset($simpleid_settings[$name])) unset($simpleid_settings[$name]);
     
-    $setting_file = SIMPLEID_STORE_DIR "/" . _store_basename($name) . ".setting";
+    $setting_file = SIMPLEID_STORE_DIR . "/" . _store_basename($name) . ".setting";
     if (file_exists($setting_file)) unlink($setting_file);
 }
 
