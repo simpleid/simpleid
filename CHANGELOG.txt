@@ -1,5 +1,11 @@
 // $Id$
 
+SimpleID 0.7.6
+--------------
+
+- Fixed directory traversal vulnerability SA-2011-1
+  (http://simpleid.sourceforge.net/advisories/sa-2011-1)
+
 SimpleID 0.7.5
 --------------
 
