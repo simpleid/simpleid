@@ -62,8 +62,12 @@ $settings = array();
  * @param bool whether the user name exists
  */
 function store_user_exists($uid) {
-    $identity_file = SIMPLEID_IDENTITIES_DIR . "/" . _store_basename($uid) . ".identity";
-    return (file_exists($identity_file));
+    if (_store_is_valid_name($uid)) {
+        $identity_file = SIMPLEID_IDENTITIES_DIR . "/$uid.identity";
+        return (file_exists($identity_file));
+    } else {
+        return false;
+    }
 }
 
 /**
@@ -76,7 +80,8 @@ function store_user_exists($uid) {
  * @return mixed data for the specified user
  */
 function store_user_load($uid) {
-    $store_file = SIMPLEID_STORE_DIR . "/" . _store_basename($uid) . ".usrstore";
+    if (!_store_is_valid_name($uid)) return array();
+    $store_file = SIMPLEID_STORE_DIR . "/$uid.usrstore";
     
     if (file_exists($store_file)) {
         $data = unserialize(file_get_contents($store_file));
@@ -84,7 +89,7 @@ function store_user_load($uid) {
         $data = array();
     }
     
-    $identity_file = SIMPLEID_IDENTITIES_DIR . "/" . _store_basename($uid) . ".identity";
+    $identity_file = SIMPLEID_IDENTITIES_DIR . "/$uid.identity";
     $data = array_merge($data, parse_ini_file($identity_file, TRUE));
     
     return $data;
@@ -142,7 +147,12 @@ function store_user_save($uid, $data, $exclude = array()) {
         if (isset($data[$key])) unset($data[$key]);
     }
     
-    $store_file = SIMPLEID_STORE_DIR . "/" . _store_basename($uid) . ".usrstore";
+    if (!_store_is_valid_name($uid)) {
+        trigger_error("Invalid user name for filesystem store", E_USER_ERROR);
+        return;
+    }
+    
+    $store_file = SIMPLEID_STORE_DIR . "/$uid.usrstore";
     $file = fopen($store_file, 'w');
     fwrite($file, serialize($data));
     fclose($file);
@@ -159,8 +169,10 @@ function store_user_save($uid, $data, $exclude = array()) {
 function store_get($name, $default = NULL) {
     global $settings;
     
+    if (!_store_is_valid_name($name)) return $default;
+    
     if (!isset($settings[$name])) {
-        $setting_file = SIMPLEID_STORE_DIR . "/" . _store_basename($name) . ".setting";
+        $setting_file = SIMPLEID_STORE_DIR . "/$name.setting";
         
         if (file_exists($setting_file)) {
             $settings[$name] = unserialize(file_get_contents($setting_file));
@@ -182,9 +194,14 @@ function store_get($name, $default = NULL) {
 function store_set($name, $value) {
     global $settings;
     
+    if (!_store_is_valid_name($uid)) {
+        trigger_error("Invalid setting name for filesystem store", E_USER_ERROR);
+        return;
+    }
+    
     $settings[$name] = $value;
     
-    $setting_file = SIMPLEID_STORE_DIR . "/" . _store_basename($name) . ".setting";
+    $setting_file = SIMPLEID_STORE_DIR . "/$name.setting";
     $file = fopen($setting_file, 'w');
     fwrite($file, serialize($value));
     fclose($file);
@@ -199,24 +216,28 @@ function store_set($name, $value) {
 function store_del($name) {
     global $settings;
     
+    if (!_store_is_valid_name($uid)) {
+        trigger_error("Invalid setting name for filesystem store", E_USER_ERROR);
+        return;
+    }
+    
     if (isset($settings[$name])) unset($settings[$name]);;
     
-    $setting_file = SIMPLEID_STORE_DIR . "/" . _store_basename($name) . ".setting";
+    $setting_file = SIMPLEID_STORE_DIR . "/$name.setting";
     if (file_exists($setting_file)) unlink($setting_file);
 }
 
 /**
- * Returns trailing name component of path.
+ * Determines whether a name is a valid name for use with this store.
  *
- * The PHP basename function is locale dependent.  This function should work
- * with more character sets.
+ * For file system storage, a name is not valid if it contains either a
+ * directory separator (i.e. / or \).
  *
- * @param string $path A path, with the directory separator character being either
- * / or \
- * @return string the base name of the given path 
+ * @param string $name the name to check
+ * @return boolean whether the name is valid for use with this store 
  *
  */
-function _store_basename($path) {
-    return end(preg_split('![/\\\]!', $path));
+function _store_is_valid_name($name) {
+    return preg_match('!\A[^/\\\\]*\z!', $name);
 }
 ?>
