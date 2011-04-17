@@ -127,9 +127,7 @@ function store_user_verify_credentials($uid, $credentials) {
     
     if ($test_user == NULL) return false;
     
-    if ($credentials['digest'] && !_user_verify_digest($credentials['digest'], $credentials['nonce'], $test_user)) {
-        return false;
-    } elseif ($allow_legacy_login && !$credentials['digest'] && (md5($credentials['pass']) != $test_user['pass'])) {
+    if (md5($credentials['pass']) != $test_user['pass']) {
         return false;
     }
     

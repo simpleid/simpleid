@@ -170,20 +170,10 @@ function user_login() {
         return;
     }
     
-    // We allow legacy login if the connection is via HTTPS or if SIMPLEID_ALLOW_LEGACY_LOGIN is true
-    $allow_legacy_login = (is_https() || SIMPLEID_ALLOW_LEGACY_LOGIN);
-    
     if (!isset($_POST['name'])) $_POST['name'] = '';
     if (!isset($_POST['pass'])) $_POST['pass'] = '';
-    if (!isset($_POST['digest'])) $_POST['digest'] = '';
     
-    if (
-        ($_POST['name'] == '')
-        || (
-            ($allow_legacy_login && ($_POST['pass'] == '') && ($_POST['digest'] == ''))
-            || (!$allow_legacy_login && ($_POST['digest'] == ''))
-        )
-    ) {
+    if (($_POST['name'] == '') || ($_POST['pass'] == '')) {
         if (isset($_POST['destination'])) {
             // User came from a log in form.
             set_message('You need to supply the user name and the password in order to log in.');
@@ -455,22 +445,6 @@ function user_header($state = NULL) {
         $xtpl->parse('main.user.logout');
         $xtpl->parse('main.user');
     }
-}
-
-/**
- * Verfies a log in name and digest using digest authentication.
- *
- * @param string $digest the digest supplied by the user
- * @param string $nonce the nonce supplied by SimpleID in the initial login
- * form
- * @param mixed $test_user the claimed user, against which to test the user's
- * credentials
- * @return bool true if the verification is successful
- */
-function _user_verify_digest($digest, $nonce, $test_user) {
-    $test_digest1 = md5($test_user['uid'] . ':' . $test_user['pass']);
-    $test_digest = md5($nonce . ':' . $test_digest1);
-    return ($digest == $test_digest);
 }
 
 /**
