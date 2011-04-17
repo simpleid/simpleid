@@ -89,16 +89,18 @@ function is_https() {
  *
  * 1. If $allow_override is true and {@link SIMPLEID_ALLOW_PLAINTEXT} is also true,
  * then the function will return successfully
- * 2. Otherwise, then it will either redirect to the same page (if $action is
+ * 2. Otherwise, then it will either redirect (if $action is
  * redirect) or return an error (if $action is error)
  *
  * @param string $action what to do if connection is not secure - either
  * 'redirect' or 'error'
  * @param boolean $allow_override whether SIMPLEID_ALLOW_PLAINTEXT is checked
  * to see if an unencrypted connection is allowed
+ * @param string $redirect_url if $action is redirect, what URL to redirect to.
+ * If null, this will redirect to the same page (albeit with an HTTPS connection)
  * @see SIMPLEID_ALLOW_PLAINTEXT
  */
-function check_https($action = 'redirect', $allow_override = false) {
+function check_https($action = 'redirect', $allow_override = false, $redirect_url = null) {
     if (is_https()) return;
     
     if ($allow_override && SIMPLEID_ALLOW_PLAINTEXT) return;
@@ -111,8 +113,10 @@ function check_https($action = 'redirect', $allow_override = false) {
         return;
     }
     
+    if ($redirect_url == null) $redirect_url = simpleid_url('', $_SERVER['QUERY_STRING'], false, 'https');
+    
     header('HTTP/1.1 301 Moved Permanently');
-    header('Location: ' . simpleid_url('', $_SERVER['QUERY_STRING'] , false, 'https'));
+    header('Location: ' . $redirect_url);
 }
 
 /**

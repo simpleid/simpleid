@@ -236,6 +236,8 @@ function simpleid_process_openid($request) {
             return;
         case 'checkid_immediate':
         case 'checkid_setup':
+            check_https('redirect', true, simpleid_url('continue', 's=' . rawurlencode(pickle($request)), false, 'https'));
+            
             return simpleid_checkid($request);
         case 'check_authentication':
             simpleid_check_authentication($request);

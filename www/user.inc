@@ -147,6 +147,9 @@ function user_login() {
     // If the user is already logged in, return
     if (isset($user["uid"])) openid_indirect_response_redirect(simpleid_url(), '');
     
+    // Require HTTPS or return an error
+    check_https('error', true);
+    
     $destination = (isset($GETPOST['destination'])) ? $GETPOST['destination'] : '';
     $state = (isset($GETPOST['s'])) ? $GETPOST['s'] : '';
     $query = ($state) ? 's=' . rawurlencode($state) : '';
@@ -264,6 +267,9 @@ function _user_login($login_user) {
 function user_logout($destination = NULL) {
     global $user, $GETPOST;
     
+    // Require HTTPS, redirect if necessary
+    check_https('redirect', true);
+    
     $state = (isset($GETPOST['s'])) ? $GETPOST['s'] : '';
     if ($destination == NULL) {
         if (isset($GETPOST['destination'])) {
@@ -303,6 +309,9 @@ function _user_logout() {
  */
 function user_login_form($destination = '', $state = NULL) {    
     global $xtpl;
+    
+    // Require HTTPS, redirect if necessary
+    check_https('redirect', true);
 
     if ($state) {
         $xtpl->assign('state', htmlspecialchars($state, ENT_QUOTES, 'UTF-8'));
@@ -322,15 +331,9 @@ function user_login_form($destination = '', $state = NULL) {
     if (is_https()) {
         $security_class .= 'secure';
         $xtpl->assign('security_message', 'Secure login using <strong>HTTPS</strong>.');
-    } else {
-        if (!SIMPLEID_ALLOW_LEGACY_LOGIN) {
-            $security_class .= 'unsecure login-digest';
-            $xtpl->assign('security_message', 'Your SimpleID configuration does not allow you to log in unsecurely.  Please enable JavaScript and try again, or see <a href="http://simpleid.sourceforge.net/documentation/using-simpleid/logging-simpleid">the SimpleID documentation</a> for more details.');
-            $xtpl->assign('security_disabled', 'disabled="disabled"');
-        } else {
-            $security_class .= 'unsecure login-digest';
-            $xtpl->assign('security_message', '<strong>WARNING:</strong>  Your password will be sent to SimpleID as plain text.');
-        }
+    } elseif (SIMPLEID_ALLOW_PLAINTEXT) {
+        $security_class .= 'unsecure';
+        $xtpl->assign('security_message', '<strong>WARNING:</strong>  Your password will be sent to SimpleID as plain text.');
     }
     $xtpl->assign('security_class', $security_class);
     

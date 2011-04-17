@@ -36,6 +36,9 @@ function page_dashboard() {
     global $user;
     global $xtpl;
     
+    // Require HTTPS, redirect if necessary
+    check_https('redirect', true);
+    
     if ($user == NULL) {
         user_login_form('');
         return;
@@ -64,6 +67,9 @@ function page_profile() {
     global $user;
     global $xtpl;
     
+    // Require HTTPS, redirect if necessary
+    check_https('redirect', true);
+    
     if ($user == NULL) {
         user_login_form('my/profile');
         return;
@@ -91,6 +97,9 @@ function page_profile() {
 function page_sites() {
     global $user;
     global $xtpl;
+    
+    // Require HTTPS, redirect if necessary
+    check_https('redirect', true);
     
     if ($user == NULL) {
         user_login_form('my/sites');

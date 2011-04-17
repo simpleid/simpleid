@@ -71,8 +71,3 @@ SimpleID uses the jQuery JavaScript library <http://jquery.com>, by John
 Resig and the jQuery team.  Licensing information for this library can be found
 at <http://docs.jquery.com/Licensing>.
 
-SimpleID uses a JavaScript MD5 message digest library
-<http://pajhome.org.uk/crypt/md5>, written by Paul Johnston, Greg Holt, Andrew
-Kepert, Ydnar, Lostinet.  Licensing information for this library can be found
-in COPYING-md5.js.txt.
-
