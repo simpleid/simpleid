@@ -47,7 +47,7 @@ function define_default($name, $value) {
 }
 
 define_default('SIMPLEID_CLEAN_URL', false);
-define_default('SIMPLEID_ALLOW_LEGACY_LOGIN', false);
+define_default('SIMPLEID_ALLOW_PLAINTEXT', false);
 define_default('SIMPLEID_ALLOW_AUTOCOMPLETE', false);
 define_default('SIMPLEID_EXTENSIONS', 'sreg');
 define_default('SIMPLEID_VERIFY_RETURN_URL_USING_REALM', true);

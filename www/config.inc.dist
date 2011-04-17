@@ -100,25 +100,24 @@ define('SIMPLEID_STORE', 'filesystem');
 define('SIMPLEID_STORE_DIR', '../store');
 
 /**
- * Allows legacy log-in system.
+ * Allows use of unencrypted connections.
  *
- * Prior to SimpleID 0.6, the login system utilised by SimpleID requires users'
- * passwords to be sent in plaintext to the web server for verification.  This is
- * an inherent security risk.
+ * Between versions 0.6 and 0.8 (inclusive), SimpleID uses either HTTPS or 
+ * a form of digest authentication for its login system.  This allows passwords
+ * and other secure information not to be sent to the server as plaintext.
  *
- * From version 0.6, SimpleID implemented a form of digest authentication, which
- * means that passwords are not sent in plaintext.  For backwards compatibility,
- * and to support browsers that do not have JavaScript installed, the legacy
- * method is still supported if the following configuration parameter is set
- * to true.  Otherwise, users must use a browser which supports JavaScript to
- * log into SimpleID.
+ * From version 0.9, SimpleID mandates the use of HTTPS for all connections
+ * (other than direct connections between SimpleID and an OpenID relying
+ * party).  However, for debug purposes, it may be necessary to allow
+ * unencrypted connections to SimpleID.
  *
- * The default is set to false for security reasons.  You should not change
- * this value unless it is absolutely necessary.
+ * It is strongly recommended that this is set to false.  Setting this to true
+ * will allow passwords to be sent as plaintext.  You should not change this
+ * value unless it is absolutely necessary.
  *
- * @since 0.6
+ * @since 0.9
  */
-define('SIMPLEID_ALLOW_LEGACY_LOGIN', false);
+define('SIMPLEID_ALLOW_PLAINTEXT', false);
 
 /**
  * Allows web browsers to save passwords.

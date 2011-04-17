@@ -80,6 +80,42 @@ function is_https() {
 }
 
 /**
+ * Ensure the current connection with the user agent is secure with HTTPS.
+ *
+ * This function uses {@link is_https()} to determine whether the connection
+ * is via HTTPS.  If it is, this function will return successfully.
+ *
+ * If it is not, what happens next is determined by the following steps.
+ *
+ * 1. If $allow_override is true and {@link SIMPLEID_ALLOW_PLAINTEXT} is also true,
+ * then the function will return successfully
+ * 2. Otherwise, then it will either redirect to the same page (if $action is
+ * redirect) or return an error (if $action is error)
+ *
+ * @param string $action what to do if connection is not secure - either
+ * 'redirect' or 'error'
+ * @param boolean $allow_override whether SIMPLEID_ALLOW_PLAINTEXT is checked
+ * to see if an unencrypted connection is allowed
+ * @see SIMPLEID_ALLOW_PLAINTEXT
+ */
+function check_https($action = 'redirect', $allow_override = false) {
+    if (is_https()) return;
+    
+    if ($allow_override && SIMPLEID_ALLOW_PLAINTEXT) return;
+    
+    if ($action == 'error') {
+        header('HTTP/1.1 426 Upgrade Required');
+        header('Upgrade: TLS/1.0, HTTP/1.1');
+        header('Connection: Upgrade');
+        indirect_fatal_error('An encrypted connection (HTTPS) is required for this page.');
+        return;
+    }
+    
+    header('HTTP/1.1 301 Moved Permanently');
+    header('Location: ' . simpleid_url('', $_SERVER['QUERY_STRING'] , false, 'https'));
+}
+
+/**
  * Content type negotiation using the Accept Header.
  *
  * Under HTTP, the user agent is able to negoatiate the content type returned with
@@ -189,7 +225,6 @@ function get_request_uri($base) {
     } else {
         return substr($base, 0, $i) . $_SERVER['REQUEST_URI'];
     }
-    
 }
 
 /**
@@ -225,12 +260,14 @@ function get_base_path() {
  *
  * @param string $q the q parameter
  * @param string $params a properly encoded query string
- * @param bool $relative whether a relative URL should be returns
+ * @param bool $relative whether a relative URL should be returned
+ * @param string $secure if $relative is false, either 'https' to force an HTTPS connection, 'http' to force
+ * an unencrypted HTTP connection, or NULL to vary based on SIMPLEID_BASE_URL
  * @return string the url
  *
  * @since 0.7
  */
-function simpleid_url($q = '', $params = '', $relative = false) {
+function simpleid_url($q = '', $params = '', $relative = false, $secure = null) {
     if ($relative) {
         $url = get_base_path();
     } else {
@@ -240,11 +277,21 @@ function simpleid_url($q = '', $params = '', $relative = false) {
         } else {
             $url = SIMPLEID_BASE_URL . '/';
         }
+        
+        if (($secure = 'https') && (stristr($url, 'http:') == 0)) {
+            $url = 'https:' . substr($url, 5);
+        }
+        if (($secure == 'http') && (stristr($url, 'https:') == 0)) {
+            $url = 'http:' . substr($url, 6);
+        }
     }
+    
     if (SIMPLEID_CLEAN_URL) {
         $url .= $q . (($params == '') ? '' : '?' . $params);
     } elseif (($q == '') && ($params == '')) {
         $url .= '';
+    } elseif ($q == '') {
+        $url .= 'index.php?' . $params;
     } else {
         $url .= 'index.php?q=' . $q . (($params == '') ? '' : '&' . $params);
     }
