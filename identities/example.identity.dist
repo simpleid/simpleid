@@ -32,24 +32,52 @@
 identity="http://example.com/"
 
 ;
-; The password associated with this identity.  This password is hashed using
-; the MD5 algorithm.
+; The password associated with this identity.  
 ;
-; There are various tools available which will give you the MD5 hash of any
-; given string.  If you have access to the command-line interface of PHP, you
-; can run the following command to give you the hash.
+; The password is encoded as follows:
 ;
-; php -r "print md5('example password');"
+;     pass="hash:algorithm:salt"
 ;
-; Alternatively, you can upload the following PHP code to your web server, then
-; read off the hash with your web browser.  (This is recommended only if your
-; web server supports secure uploads (e.g. SFTP) and HTTPS, you that your
-; password is not sent over the Internet as clear text.)
+; There are three components to the password string.  Only the first component
+; (the hash) is required, the other two are optional.
 ;
-; <?php header('Content-Type: text/plain'); print md5('example password'); ?>
+; 1. The hash of the password.  By default, the algorithm for hashing the
+;    password is MD5.
 ;
-; Alternatively, Wikipedia (http://en.wikipedia.org/wiki/MD5) has other resources
-; on generating this hash.
+;    There are various tools available which will give you the MD5 hash of any
+;    given string.  If you have access to the command-line interface of PHP, you
+;    can run the following command to give you the hash.
+;
+;    php -r "print md5('example password');"
+;
+;    Alternatively, you can upload the following PHP code to your web server, then
+;    read off the hash with your web browser.  (This is recommended only if your
+;    web server supports secure uploads (e.g. SFTP) and HTTPS, you that your
+;    password is not sent over the Internet as clear text.)
+;
+;    <?php header('Content-Type: text/plain'); print md5('example password'); ?>
+;
+;    Alternatively, Wikipedia (http://en.wikipedia.org/wiki/MD5) has other resources
+;    on generating this hash.
+;
+; 2. The algorithm used to hash the password.  If this is omitted, 'md5' is assumed.
+;
+;    Allowed algorithms are:
+;
+;    - md5
+;    - sha1
+;
+; 3. The salt that is used to hash the password.  If the salt is not an empty
+;    string, the password is appended by a colon character (:) then the salt
+;    before a hash is calculated, that is:
+;
+;    hash(password:salt)
+;
+; Examples (these contain the same password):
+;    ea07017619350413c8a0d604cffdbe50                   ; MD5 hash and no salt
+;    81059d819510280a9a14c3ace78226159c70e3cf:sha1      ; SHA1 hash and no salt
+;    5ed9216011934c1fecfe978c00c7aaf2::ideally-a-large-number-of-random-characters-to-use-as-salt                   ; MD5 hash with salt
+;    0f491332ba8fc76f6157da05a62ff6e45a622990:sha1:ideally-a-large-number-of-random-characters-to-use-as-salt       ; SHA1 hash with salt
 ;
 pass="c8e24ae844b7cb9381g722ae8209a19a"
 

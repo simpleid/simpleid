@@ -123,11 +123,20 @@ function store_user_load($uid) {
  * user
  */
 function store_user_verify_credentials($uid, $credentials) {
+    $allowed_algorithms = array('md5', 'sha1');
+    
     $test_user = user_load($uid);
     
     if ($test_user == NULL) return false;
     
-    if (md5($credentials['pass']) != $test_user['pass']) {
+    $hash_function_salt = explode(':', $test_user['pass'], 3);
+    
+    $hash = $hash_function_salt[0];
+    $function = (isset($hash_function_salt[1])) ? $hash_function_salt[1] : 'md5';    
+    if (!in_array($function, $allowed_algorithms)) $function = 'md5';
+    $salt_suffix = (isset($hash_function_salt[2])) ? ':' . $hash_function_salt[2] : '';
+
+    if (call_user_func($function, $credentials['pass'] . $salt_suffix) != $hash) {
         return false;
     }
     
