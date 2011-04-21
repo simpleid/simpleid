@@ -46,13 +46,7 @@ include_once "user.inc";
 include_once "cache.inc";
 include_once SIMPLEID_STORE . ".store.inc";
 include_once "page.inc";
-
-// Allow for PHP5 version of xtemplate
-if (version_compare(PHP_VERSION, '5.0.0') === 1) {
-    include "lib/xtemplate.class.php";
-} else {
-    include "lib/xtemplate-php4.class.php";
-}
+include "lib/xtemplate.class.php";
 
 define('CACHE_DIR', SIMPLEID_CACHE_DIR);
 

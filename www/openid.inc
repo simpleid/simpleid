@@ -1052,13 +1052,7 @@ function _openid_signature_base_string($data, $version) {
  * @return string the hash in binary representation
  */
 function _openid_sha1($text) {
-    if (version_compare(PHP_VERSION, '5.0.0', '>=')) {
-        return sha1($text, true);
-    } elseif (function_exists('hash') && function_exists('hash_algos') && (in_array('sha1', hash_algos()))) {
-        return hash('sha1', $text, true);
-    } else {
-        return pack('H*', sha1($text));
-    }
+    return sha1($text, true);
 }
 
 /**
