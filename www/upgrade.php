@@ -50,8 +50,13 @@ $upgrade_access_check = TRUE;
 /* ----- Do not modify anything following this line ------------------------- */
 
 include_once "version.inc";
-include_once "config.inc";
-include_once "config.default.inc";
+if (file_exists("config.php")) {
+    include_once "config.php";
+} elseif (file_exists("config.inc")) {
+    include_once "config.inc";
+    define('UPGRADE_LEGACY_CONFIG_INC', TRUE);
+}
+include_once "config.default.php";
 include_once "log.inc";
 include_once "common.inc";
 include_once "simpleweb.inc";
@@ -71,6 +76,7 @@ define('PRE_0_7_0_VERSION', '0.6.0 or earlier');
  * @global array $upgrade_functions
  */
 $upgrade_functions = array(
+    '0.9.0' => array('upgrade_config_inc_to_php'),
     '0.7.0' => array('upgrade_rp_to_store', 'upgrade_token_to_store')
 );
 
@@ -372,6 +378,17 @@ function upgrade_token_to_store() {
     if ($site_token != NULL) {
         store_set('site-token', $site_token);
         cache_delete('token', SIMPLEID_BASE_URL);
+    }
+}
+
+/**
+ * Checks that config.inc has been renamed to config.php
+ *
+ * @since 0.9
+ */
+function upgrade_config_inc_to_php() {
+    if (defined('UPGRADE_LEGACY_CONFIG_INC')) {
+        return '<p>You will need to rename <code>config.inc</code> to <code>config.php</code>.</p>';
     }
 }
 ?>

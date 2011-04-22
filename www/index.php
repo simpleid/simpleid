@@ -35,8 +35,8 @@
  */
  
 include_once "version.inc";
-include_once "config.inc";
-include_once "config.default.inc";
+include_once "config.php";
+include_once "config.default.php";
 include_once "log.inc";
 include_once "common.inc";
 include_once "simpleweb.inc";
