@@ -369,7 +369,7 @@ function extension_init() {
     $simpleid_extensions = preg_split('/,\s*/', SIMPLEID_EXTENSIONS);
     
     foreach ($simpleid_extensions as $extension) {
-        include_once 'extensions/' . $extension . '/' . $extension . '.extension.inc';
+        include_once 'extensions/' . $extension . '/' . $extension . '.extension.php';
     }
 }
 
