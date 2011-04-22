@@ -44,7 +44,7 @@ include_once "openid.inc";
 include_once "discovery.inc";
 include_once "user.inc";
 include_once "cache.inc";
-include_once SIMPLEID_STORE . ".store.inc";
+include_once SIMPLEID_STORE . ".store.php";
 include_once "page.inc";
 include "lib/xtemplate.class.php";
 

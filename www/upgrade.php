@@ -63,7 +63,7 @@ include_once "simpleweb.inc";
 include_once "openid.inc";
 include_once "user.inc";
 include_once "cache.inc";
-include_once SIMPLEID_STORE . ".store.inc";
+include_once SIMPLEID_STORE . ".store.php";
 include "lib/xtemplate.class.php";
 
 define('CACHE_DIR', SIMPLEID_CACHE_DIR);
