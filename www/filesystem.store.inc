@@ -242,7 +242,7 @@ function store_get($name, $default = NULL) {
 function store_set($name, $value) {
     global $simpleid_settings;
     
-    if (!_store_is_valid_name($uid)) {
+    if (!_store_is_valid_name($name)) {
         trigger_error("Invalid setting name for filesystem store", E_USER_ERROR);
         return;
     }
@@ -264,7 +264,7 @@ function store_set($name, $value) {
 function store_del($name) {
     global $simpleid_settings;
     
-    if (!_store_is_valid_name($uid)) {
+    if (!_store_is_valid_name($name)) {
         trigger_error("Invalid setting name for filesystem store", E_USER_ERROR);
         return;
     }
