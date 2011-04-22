@@ -34,8 +34,8 @@
  * @filesource
  */
  
-include_once "bignum.inc";
-include_once "random.inc";
+include_once "bignum.inc.php";
+include_once "random.inc.php";
  
 /**
  * OpenID default modulus for Diffie-Hellman key exchange.

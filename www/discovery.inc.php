@@ -32,7 +32,7 @@
  * @filesource
  */
  
-include_once "http.inc";
+include_once "http.inc.php";
 
 /**
  * The namespace identifier for an XRDS document.

@@ -49,7 +49,7 @@ $upgrade_access_check = TRUE;
 
 /* ----- Do not modify anything following this line ------------------------- */
 
-include_once "version.inc";
+include_once "version.inc.php";
 if (file_exists("config.php")) {
     include_once "config.php";
 } elseif (file_exists("config.inc")) {
@@ -57,12 +57,12 @@ if (file_exists("config.php")) {
     define('UPGRADE_LEGACY_CONFIG_INC', TRUE);
 }
 include_once "config.default.php";
-include_once "log.inc";
-include_once "common.inc";
-include_once "simpleweb.inc";
-include_once "openid.inc";
-include_once "user.inc";
-include_once "cache.inc";
+include_once "log.inc.php";
+include_once "common.inc.php";
+include_once "simpleweb.inc.php";
+include_once "openid.inc.php";
+include_once "user.inc.php";
+include_once "cache.inc.php";
 include_once SIMPLEID_STORE . ".store.php";
 include "lib/xtemplate.class.php";
 
