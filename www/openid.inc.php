@@ -626,6 +626,8 @@ function openid_verify_return_to($return_to, $actual_url) {
 function openid_extension_filter_request($ns, $request) {
     global $openid_ns_to_alias;
     
+    if (!isset($openid_ns_to_alias[$ns])) return array();
+    
     $alias = $openid_ns_to_alias[$ns];
     $return = array();
     
