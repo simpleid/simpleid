@@ -221,7 +221,7 @@ function _ui_insert_css_js() {
  * Attempts to obtain an icon from a RP
  *
  * @param string $realm the openid.realm parameter
- * @return array the response from {@link http_request()} with the discovered URL of the
+ * @return array the response from {@link http_make_request()} with the discovered URL of the
  * RP's icon
  */
 function _ui_get_icon($realm) {
@@ -234,7 +234,7 @@ function _ui_get_icon($realm) {
     if ($services) {
         $icon_url = $services[0]['uri'];
         
-        $icon_res = http_request($icon_url);
+        $icon_res = http_make_request($icon_url);
         if (isset($icon_res['http-error'])) {
             return NULL;
         }
