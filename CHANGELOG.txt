@@ -18,6 +18,8 @@ SimpleID 0.8
     * Opened up identity store code to allow support for non filesystem based
       identity files
     * Improved source code documentation
+- Bug fixes:
+    * #74 Function naming conflict with PECL http module within http.inc
     
 SimpleID 0.7.6
 --------------

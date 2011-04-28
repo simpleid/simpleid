@@ -149,7 +149,7 @@ function discovery_get_service_by_id($services, $id) {
 function discovery_get_xrds($url, $check = TRUE, $retries = 5) {
     if ($retries == 0) return NULL;
     
-    $response = http_request($url, array('Accept' => 'application/xrds+xml'));
+    $response = http_make_request($url, array('Accept' => 'application/xrds+xml'));
 
     if (isset($response['http-error'])) return NULL;
     if (($response['content-type'] == 'application/xrds+xml') || ($check == FALSE)) {
@@ -317,7 +317,7 @@ function discovery_parse_xrds($xrds) {
 function discovery_get_openid_services($url) {
     $services = array();
         
-    $response = http_request($url);
+    $response = http_make_request($url);
     $html = $response['data'];
         
     $uri = _discovery_link_rel('openid2.provider', $html);

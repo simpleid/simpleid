@@ -50,12 +50,12 @@ define('SIMPLEHTTP_USER_AGENT', 'SimpleHTTP/' . substr('$Rev$', 6, -2));
  * 'headers' (an array of return headers in lowercase),
  * 'content-type' (the HTTP content-type returned)
  */
-function http_request($url, $headers = array(), $method = 'GET', $retry = 3) {
+function http_make_request($url, $headers = array(), $method = 'GET', $retry = 3) {
     // If CURL is available, we use it
     if (extension_loaded('curl')) {
-        $response = _http_request_curl($url, $headers, $method, $retry);
+        $response = _http_make_request_curl($url, $headers, $method, $retry);
     } else {
-        $response = _http_request_fsock($url, $headers, $method, $retry);
+        $response = _http_make_request_fsock($url, $headers, $method, $retry);
     }
     
     if (!isset($response['error-code'])) {
@@ -112,7 +112,7 @@ function http_protocols() {
  * (if the HTTP status code is not 200 or 304), 'headers' (an array of return headers),
  * 'content-type' (the HTTP content-type returned)
  */
-function _http_request_curl($url, $headers = array(), $method = 'GET', $retry = 3) {
+function _http_make_request_curl($url, $headers = array(), $method = 'GET', $retry = 3) {
     // CURLOPT_FOLLOWLOCATION only works when safe mode is off or when open_basedir is set
     // In these instances we will need to follow redirects manually
     $manual_redirect = ((@ini_get('safe_mode') === 1)   // safe mode
@@ -181,7 +181,7 @@ function _http_request_curl($url, $headers = array(), $method = 'GET', $retry = 
                 $result['error'] = 'Too many redirects';
             } else {
                 curl_close($curl);
-                return _http_request_curl($result['headers']['location'], $headers, $method, $retry - 1);
+                return _http_make_request_curl($result['headers']['location'], $headers, $method, $retry - 1);
             }
         }
     }
@@ -203,7 +203,7 @@ function _http_request_curl($url, $headers = array(), $method = 'GET', $retry = 
  * (if the HTTP status code is not 200 or 304), 'headers' (an array of return headers),
  * 'content-type' (the HTTP content-type returned)
  */
-function _http_request_fsock($url, $headers = array(), $method = 'GET', $retry = 3) {
+function _http_make_request_fsock($url, $headers = array(), $method = 'GET', $retry = 3) {
     $result = array();
     
     $parts = parse_url($url);
@@ -284,7 +284,7 @@ function _http_request_fsock($url, $headers = array(), $method = 'GET', $retry =
             $result['error-code'] = 47;
             $result['error'] = 'Too many redirects';
         } else {
-            $result = _http_request_fsock($result['headers']['location'], $headers, $method, $retry - 1);
+            $result = _http_make_request_fsock($result['headers']['location'], $headers, $method, $retry - 1);
         }
     }
 
