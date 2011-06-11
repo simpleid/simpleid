@@ -488,7 +488,7 @@ function simpleid_checkid($request) {
         case CHECKID_RETURN_TO_SUSPECT:
             log_info('CHECKID_RETURN_TO_SUSPECT');
             if ($immediate) {
-                $response = simpleid_checkid_error($immediate);
+                $response = simpleid_checkid_error($request, $immediate);
                 simpleid_assertion_response($response, $request['openid.return_to']);
             } else {
                 $response = simpleid_checkid_ok($request);
@@ -514,7 +514,7 @@ function simpleid_checkid($request) {
         case CHECKID_IDENTITIES_NOT_MATCHING:
         case CHECKID_IDENTITY_NOT_EXIST:
             log_info('CHECKID_IDENTITIES_NOT_MATCHING | CHECKID_IDENTITY_NOT_EXIST');
-            $response = simpleid_checkid_error($immediate);
+            $response = simpleid_checkid_error($request, $immediate);
             if ($immediate) {                
                 simpleid_assertion_response($response, $request['openid.return_to']);
             } else {                
@@ -523,7 +523,7 @@ function simpleid_checkid($request) {
             break;
         case CHECKID_PROTOCOL_ERROR:
             if (isset($request['openid.return_to'])) {
-                $response = simpleid_checkid_error($immediate);
+                $response = simpleid_checkid_error($request, $immediate);
                 simpleid_assertion_response($response, $request['openid.return_to']);
             } else {
                 indirect_fatal_error('Unrecognised request.');
@@ -770,11 +770,12 @@ function simpleid_checkid_login_required($request) {
  * The content of the negative version depends on the OpenID version, and whether
  * the openid.mode of the request was checkid_immediate
  *
+ * @param array $request the OpenID request
  * @param bool $immediate true if openid.mode of the request was checkid_immediate
  * @return array an OpenID response with a negative assertion
  * @link http://openid.net/specs/openid-authentication-1_1.html#anchor17, http://openid.net/specs/openid-authentication-1_1.html#anchor23, http://openid.net/specs/openid-authentication-2_0.html#negative_assertions
  */
-function simpleid_checkid_error($immediate) {
+function simpleid_checkid_error($request, $immediate) {
     global $version;
     
     $message = array();
