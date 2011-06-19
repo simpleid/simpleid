@@ -130,7 +130,7 @@ function simpleid_start() {
         indirect_fatal_error('Store directory not found or not writeable.  See the <a href="http://simpleid.sourceforge.net/documentation/getting-started">manual</a> for instructions on how to set up SimpleID.');
     }
     
-    if ((@ini_get('register_globals') === 1) || (strtolower(@ini_get('register_globals')) == 'on')) {
+    if ((@ini_get('register_globals') === 1) || (@ini_get('register_globals') === '1') || (strtolower(@ini_get('register_globals')) == 'on')) {
         log_fatal('register_globals is enabled in PHP configuration.');
         indirect_fatal_error('register_globals is enabled in PHP configuration, which is not supported by SimpleID.  See the <a href="http://simpleid.sourceforge.net/documentation/getting-started/system-requirements">manual</a> for further information.');
     }
