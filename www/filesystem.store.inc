@@ -119,10 +119,12 @@ function store_user_load($uid) {
  *
  * @param string $uid the name of the user to verify
  * @param array $credentials the credentials supplied by the browser
+ * @param bool $allow_legacy_login true to verify using a plaintext password instead of
+ * digest
  * @return bool whether the credentials supplied matches those for the specified
  * user
  */
-function store_user_verify_credentials($uid, $credentials) {
+function store_user_verify_credentials($uid, $credentials, $allow_legacy_login = FALSE) {
     $test_user = user_load($uid);
     
     if ($test_user == NULL) return false;

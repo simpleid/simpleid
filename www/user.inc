@@ -217,7 +217,7 @@ function user_login() {
         cache_delete('user-nonce', $_POST['nonce']);
     }
     
-    if (store_user_verify_credentials($_POST['name'], $_POST) === false) {
+    if (store_user_verify_credentials($_POST['name'], $_POST, $allow_legacy_login) === false) {
         set_message('The user name or password is not correct.');
         user_login_form($destination, $state);
         return;
