@@ -1,5 +1,12 @@
 // $Id$
 
+SimpleID 0.8.1
+--------------
+
+- Bug fixes:
+    * #77 Incorrect detection of register_globals PHP configuration variable
+    * #86 PHP syntax warnings in filesystem.store.inc
+
 SimpleID 0.8
 ------------
 
