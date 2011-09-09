@@ -82,6 +82,34 @@ identity="http://example.com/"
 pass="c8e24ae844b7cb9381g722ae8209a19a"
 
 ;
+; Advanced users only: SSL client certificates associated with this identity.
+;
+; You can associate SSL client certificates to this identity, so that you can
+; log in using certificates instead of supplying a user name or password.
+;
+; The SSL certicate is identified using two parameters:
+;
+; - the certificate's serial number
+; - the distinguished name of the certificate's issuer
+;
+; You can find out these two values using OpenSSL by running the following
+; commands (replacing the file name of the certificate as required):
+; 
+;    openssl x509 -noout -serial -in certificate.crt
+;    openssl x509 -noout -issuer -in certificate.crt
+;
+; These two values are then joined together using a semicolon.
+;
+; This option is for advanced users only.  Please see the documentation at
+; http://simpleid.sourceforge.net/documentation/advanced-topics/logging-using-client-ssl-certificates
+; for details on how to set this up.
+;
+; Example:
+;
+;cert[]="02A97C;/C=XX/O=Example CA/OU=Example CA Certificate Signing/CN=Example Client CA"
+
+
+;
 ; Whether this user is given administrative privileges in SimpleID.
 ;
 ; This setting has no effect in the current version of SimpleID.  However,

@@ -179,6 +179,56 @@ function store_get_uid($identity) {
 }
 
 /**
+ * Finds the user name from a specified client SSL certificate string.
+ *
+ * The client SSL certificate string comprises the certificate's serial number
+ * (in capitals hex notation) and the distinguished name of the certificate's issuer
+ * (with components joined using slashes), joined using a semi-colon.
+ *
+ *
+ * @param string $identity the client SSL certificate string of the user to load
+ * @return string the user name matching the client SSL certificate string, or NULL if no user has
+ * client SSL certificate string
+ */
+function store_get_uid_from_cert($cert) {
+    $uid = cache_get('cert', $cert);
+    if ($uid !== NULL) return $uid;
+    
+    $r = NULL;
+    
+    $dir = opendir(SIMPLEID_IDENTITIES_DIR);
+    
+    while (($file = readdir($dir)) !== false) {
+        $filename = SIMPLEID_IDENTITIES_DIR . '/' . $file;
+        
+        if ((filetype($filename) != "file") || (!preg_match('/^(.+)\.identity$/', $file, $matches))) continue;
+        
+        $uid = $matches[1];
+        $test_user = store_user_load($uid);
+        
+        if (isset($test_user['cert'])) {
+            if (is_array($test_user['cert'])) {
+                foreach ($test_user['cert'] as $test_cert) {
+                    if (trim($test_cert) != '') cache_set('cert', $test_cert, $uid);
+                }
+                foreach ($test_user['cert'] as $test_cert) {
+                    if ((trim($test_cert) != '') && ($test_cert == $cert))  $r = $uid;
+                }
+            } else {
+                if (trim($test_cert) != '') {
+                    cache_set('cert', $test_user['cert'], $uid);
+                    if ($test_user['cert'] == $cert) $r = $uid;
+                }
+            }
+        }
+    }
+        
+    closedir($dir);
+    
+    return $r;
+}
+
+/**
  * Saves user data for a specific user name.
  *
  * This data is stored in the user store file.

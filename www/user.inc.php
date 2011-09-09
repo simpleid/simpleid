@@ -83,6 +83,9 @@ function user_init($q = NULL) {
     } elseif (isset($_COOKIE[_user_autologin_cookie()])) {
         if (($q == 'login') || ($q == 'logout')) return;
         user_autologin_verify();
+    } elseif (has_ssl_client_cert()) {
+        if ($q == 'logout') return;
+        user_cert_login();
     }
 }
 
@@ -548,4 +551,23 @@ function _user_autologin_cookie() {
     return "autologin-" . md5(SIMPLEID_BASE_URL);
 }
 
+/**
+ * Attempt to login using a SSL client certificate.
+ *
+ * Note that the web server must be set up to request a SSL client certificate
+ * and pass the certificate's details to PHP.
+ */
+function user_cert_login() {
+    $cert = trim($_SERVER['SSL_CLIENT_M_SERIAL']) . ';' . trim($_SERVER['SSL_CLIENT_I_DN']);
+    log_debug('Client SSL certificate: ' . $cert);
+    
+    $uid = store_get_uid_from_cert($cert);
+    if ($uid != NULL) {
+        log_debug('Client SSL certificate accepted for ' . $uid);
+        $user = user_load($uid);
+        _user_login($user);
+    } else {
+        log_warn('Client SSL certificate presented, but no user with that certificate exists.');
+    }
+}
 ?>
