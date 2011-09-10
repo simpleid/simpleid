@@ -123,6 +123,45 @@ pass="c8e24ae844b7cb9381g722ae8209a19a"
 ;
 ;administrator=1
 
+
+;
+; OpenID Connect user information.
+;
+; If you want to provide personal data to OpenID Connect clients, uncomment the
+; section below and fill in your details.
+;
+; Note that you will need to supply your data in this section again even if you
+; have uncommented and filled in the Simple Registration Extension and/or
+; Attribute Exchange Extension information in the sections below.  SimpleID
+; does not pick these up automatically.
+;
+; WARNING: The address fields below are only supported by PHP 5.3 or later.
+; Earlier versions of PHP are not able to read identity files with
+; associative arrays
+;
+;[user_info]
+;name="Example"
+;given_name="Example"
+;family_name="Example"
+;middle_name="Example"
+;nickname="Example"
+;profile="http://example.com/profile/example"
+;picture="http://example.com/profile/example.jpg"
+;website="http://example.com/blog/example"
+;email="example@example.com"
+;gender="male"
+;birthday="12/31/2000"
+;zoneinfo="Australia/Sydney"
+;locale="en-AU"
+;phone_number="+61400000000"
+;address["formatted"]="1 George Street, Sydney NSW 2000, Australia"
+;address["street_address"]="1 George Street"
+;address["locality"]="Sydney"
+;address["region"]="NSW"
+;address["postal_code"]="2000"
+;address["country"]="Australia"
+
+
 ;
 ; Simple Registration Extension data.
 ;
@@ -161,10 +200,10 @@ pass="c8e24ae844b7cb9381g722ae8209a19a"
 ;
 ; For a full list of attributes, see http://axschema.org/
 ;
-; Note if you have already uncommented and filled out the Simple Registration
-; Extension data above, you do not need to fill out the corresponding
-; attributes again in the section below.  SimpleID will pick these up
-; automatically, including:
+; Note if you have already uncommented and filled out the OpenID Connect user
+; information and/or Simple Registration Extension data above, you do not need
+; to fill out the corresponding attributes again in the section below.  SimpleID
+; will pick these up automatically, including:
 ;
 ;    http://axschema.org/namePerson/friendly
 ;    http://axschema.org/contact/email

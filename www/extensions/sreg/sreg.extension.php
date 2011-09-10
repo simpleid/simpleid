@@ -61,9 +61,9 @@ function sreg_response($assertion, $request) {
     if ($version == OPENID_VERSION_2) $response['openid.ns.' . $alias] = 'http://openid.net/extensions/sreg/1.1';
     
     foreach ($fields as $field) {
-        if (isset($user['sreg'][$field])) {
-            $response['openid.' . $alias . '.' .  $field] = $user['sreg'][$field];
-        }
+        $value = _sreg_get_value($field);
+        
+        if ($value != NULL) $response['openid.' . $alias . '.' .  $field] = $value;
     }
     
     return $response;
@@ -102,7 +102,7 @@ function sreg_consent_form($request, $response, $rp) {
     $request = openid_extension_filter_request('http://openid.net/extensions/sreg/1.1', $request);
     $required = (isset($request['required'])) ? explode(',', $request['required']) : array();
     $optional = (isset($request['optional'])) ? explode(',', $request['optional']) : array();
-    $keys = array_merge($required, $optional);
+    $fields = array_merge($required, $optional);
     
     if ((count($request)) && isset($user['sreg'])) {
         $xtpl2 = new XTemplate('extensions/sreg/sreg.xtpl');
@@ -113,10 +113,12 @@ function sreg_consent_form($request, $response, $rp) {
             $xtpl2->assign('policy', 'You can view the site\'s policy in relation to the use of this information at this URL: <a href="' . htmlspecialchars($request['policy_url'], ENT_QUOTES, 'UTF-8') . '">' . htmlspecialchars($request['policy_url'], ENT_QUOTES, 'UTF-8') . '</a>.');            
         }
         
-        foreach ($keys as $key) {
-            if (isset($user['sreg'][$key])) {
-                $xtpl2->assign('name', htmlspecialchars($key, ENT_QUOTES, 'UTF-8'));
-                $xtpl2->assign('value', htmlspecialchars($user['sreg'][$key], ENT_QUOTES, 'UTF-8'));
+        foreach ($fields as $field) {
+            $value = _sreg_get_value($field);
+        
+            if ($value != NULL) {
+                $xtpl2->assign('name', htmlspecialchars($field, ENT_QUOTES, 'UTF-8'));
+                $xtpl2->assign('value', htmlspecialchars($value, ENT_QUOTES, 'UTF-8'));
                 $xtpl2->parse('form.sreg');
             }
         }
@@ -149,5 +151,48 @@ function sreg_page_profile() {
         'content' => $xtpl2->text('user_page')
     ));
 }
+
+
+/**
+ * Looks up the value of a specified Simple Registration Extension field.
+ *
+ * This function looks up the sreg section of the user's identity file.  If the
+ * specified field cannot be found, it looks up the corresponding field in the
+ * OpenID Connect user information (user_info section).
+ *
+ * @param string $field the field to look up
+ * @return string the value or NULL if not found
+ */
+function _sreg_get_value($field) {
+    global $user;
+    
+    if (isset($user['sreg'][$field])) {
+        return $user['sreg'][$field];
+    } else {
+        switch ($field) {
+            case 'nickname':
+            case 'email':
+                if (isset($user['user_info'][$field])) return $user['user_info'][$field];
+                break;
+            case 'fullname':
+                if (isset($user['user_info']['name'])) return $user['user_info']['name'];
+                break;
+            case 'timezone':
+                if (isset($user['user_info']['zoneinfo'])) return $user['user_info']['zoneinfo'];
+                break;
+            case 'gender':
+                if (isset($user['user_info']['gender'])) return strtoupper(substr($user['user_info']['gender'], 0, 1));
+                break;
+            case 'postcode':
+                if (isset($user['user_info']['address']['postal_code'])) return $user['user_info']['address']['postcal_code'];
+                break;
+            default:
+                return NULL;
+        } 
+        return NULL;
+    }
+}
+
+
 
 ?>

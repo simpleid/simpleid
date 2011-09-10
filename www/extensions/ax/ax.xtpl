@@ -1,10 +1,11 @@
 <!-- BEGIN: user_page -->
 <!-- :mode=html: $Id$ -->
     <p>SimpleID will send the following information to sites which supports
-    the Attribute Exchange Extension.  If you also have the Simple Registration
+    the Attribute Exchange Extension.  If you have also supplied OpenID Connect
+    user information in your identity, or have the Simple Registration
     Extension installed, these may also be sent as part of this Extension.</p>
     
-    <p>To change these, or your password,
+    <p>To change these,
     <a href="http://simpleid.sourceforge.net/documentation/getting-started/setting-identity/identity-files">edit your identity file</a>.</p>
     
     <table>

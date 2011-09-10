@@ -210,16 +210,52 @@ function ax_page_profile() {
     ));
 }
 
+/**
+ * Looks up the value of a specified Attribute Exchange Extension type URI.
+ *
+ * This function looks up the ax section of the user's identity file.  If the
+ * specified type cannot be found, it looks up the corresponding field in the
+ * OpenID Connect user information (user_info section) and the Simple Registration
+ * Extension (sreg section).
+ *
+ * @param string $type the type URI to look up
+ * @return string the value or NULL if not found
+ */
 function _ax_get_value($type) {
     global $user;
     global $ax_sreg_map;
     
     if (isset($user['ax'][$type])) {
         return $user['ax'][$type];
-    } elseif (isset($ax_sreg_map[$type]) && isset($user['sreg'][$ax_sreg_map[$type]])) {
-        return $user['sreg'][$ax_sreg_map[$type]];
     } else {
-        return NULL;
+        // Look up OpenID Connect
+        switch ($type) {
+            case 'http://axschema.org/namePerson/friendly':
+                if (isset($user['user_info']['nickname'])) return $user['user_info']['nickname'];
+                break;
+            case 'http://axschema.org/contact/email':
+                if (isset($user['user_info']['email'])) return $user['user_info']['email'];
+                break;
+            case 'http://axschema.org/namePerson':
+                if (isset($user['user_info']['name'])) return $user['user_info']['name'];
+                break;
+            case 'http://axschema.org/pref/timezone':
+                if (isset($user['user_info']['zoneinfo'])) return $user['user_info']['zoneinfo'];
+                break;
+            case 'http://axschema.org/person/gender':
+                if (isset($user['user_info']['gender'])) return strtoupper(substr($user['user_info']['gender'], 0, 1));
+                break;
+            case 'http://axschema.org/contact/postalCode/home':
+                if (isset($user['user_info']['address']['postal_code'])) return $user['user_info']['address']['postcal_code'];
+                break;
+        } 
+        
+        // Look up sreg
+        if (isset($ax_sreg_map[$type]) && isset($user['sreg'][$ax_sreg_map[$type]])) {
+            return $user['sreg'][$ax_sreg_map[$type]];
+        } else {
+            return NULL;
+        }
     }
 }
 ?>
