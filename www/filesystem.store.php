@@ -96,6 +96,44 @@ function store_user_load($uid) {
 }
 
 /**
+ * Returns the time which a user's data has been updated.
+ *
+ * The user name must exist.  You should check whether the user name exists with
+ * the {@link store_user_exists()} function.
+ *
+ * The time returned can be based on the identity file,
+ * the user store file, or the latter of the two.
+ *
+ * @param string $uid the name of the user to obtain the update time
+ * @param string $type one of: 'identity' (identity file), 'usrstore' (user store
+ * file) or NULL (latter of the two)
+ * @return int the updated time
+ */ 
+function store_user_updated_time($uid, $type = NULL) {
+    if (!_store_is_valid_name($uid)) return NULL;
+    
+    $identity_file = SIMPLEID_IDENTITIES_DIR . "/$uid.identity";
+    $identity_time = filemtime($identity_file);
+    
+    $store_file = SIMPLEID_STORE_DIR . "/$uid.usrstore";
+    if (file_exists($store_file)) {
+        $store_time = filemtime($store_file);
+    } else {
+        $store_time = NULL;
+    }
+    
+    if ($type == 'identity') {
+        return $identity_time;
+    } elseif ($type == 'usrstore') {
+        return $store_time;
+    } elseif ($type == NULL) {
+        return ($identity_time > $store_time) ? $identity_time : $store_time;
+    } else {
+        return NULL;
+    }
+}
+
+/**
  * Verifies a set of credentials for a specified user.
  *
  * A set of credentials comprises:
