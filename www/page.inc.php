@@ -80,7 +80,7 @@ function page_profile() {
     
     $blocks = _page_discovery_block();
 
-    $blocks = array_merge($blocks, extension_invoke_all('page_profile'));
+    $blocks = array_merge($blocks, _user_page_profile(), extension_invoke_all('page_profile'));
     $blocks = array_map('page_render_block', $blocks); 
     $xtpl->assign('blocks', implode($blocks));
     $xtpl->parse('main.blocks');
@@ -234,6 +234,11 @@ function _page_welcome_block() {
     ));
 }
 
+/**
+ * Returns a block containing discovery information.
+ *
+ * @return array the discovery block
+ */
 function _page_discovery_block() {
     global $user;
     

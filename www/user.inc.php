@@ -426,6 +426,38 @@ function user_xrds($uid) {
 }
 
 /**
+ * Returns a block containing OpenID Connect user information.
+ *
+ * @return array the OpenID Connect user information block
+ */
+function _user_page_profile() {
+    global $user;
+    
+    $html = "<p>SimpleID may, with your consent, send the following information to sites which supports OpenID Connect.</p>";
+    $html .= "<p>To change these, <a href=\"http://simpleid.sourceforge.net/documentation/getting-started/setting-identity/identity-files\">edit your identity file</a>.</p>";
+    
+    $html .= "<table><tr><th>Member</th><th>Value</th></tr>";
+    
+    foreach ($user['user_info'] as $member => $value) {
+        if (is_array($value)) {
+            foreach ($value as $submember => $subvalue) {
+                $html .= "<tr><td>" . htmlspecialchars($member, ENT_QUOTES, 'UTF-8') . " (" .htmlspecialchars($submember, ENT_QUOTES, 'UTF-8') . ")</td><td>" . htmlspecialchars($subvalue, ENT_QUOTES, 'UTF-8') . "</td></tr>";
+            }
+        } else {
+            $html .= "<tr><td>" . htmlspecialchars($member, ENT_QUOTES, 'UTF-8') . "</td><td>" . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . "</td></tr>";
+        }
+    }
+    
+    $html .= "</table>";
+    
+    return array(array(
+        'id' => 'userinfo',
+        'title' => 'OpenID Connect',
+        'content' => $html
+    ));
+}
+
+/**
  * Set up the user section in the header, showing the currently logged in user.
  *
  * @param string $state the SimpleID state to retain once the user has logged out,
