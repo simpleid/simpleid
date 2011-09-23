@@ -91,6 +91,8 @@ function is_https() {
  * - the web server has been set up to pass the certificate details to PHP
  * - the certificate has not been revoked
  * - the certificate contains a serial number and a valid issuer
+ *
+ * @return true if the user agent has supplied a valid SSL certificate
  */
 function has_ssl_client_cert() {
     // False if we are not in HTTP
@@ -315,7 +317,7 @@ function simpleid_url($q = '', $params = '', $relative = false, $secure = null) 
             $url = SIMPLEID_BASE_URL . '/';
         }
         
-        if (($secure = 'https') && (stristr($url, 'http:') == 0)) {
+        if (($secure == 'https') && (stristr($url, 'http:') == 0)) {
             $url = 'https:' . substr($url, 5);
         }
         if (($secure == 'http') && (stristr($url, 'https:') == 0)) {
@@ -332,6 +334,37 @@ function simpleid_url($q = '', $params = '', $relative = false, $secure = null) 
     } else {
         $url .= 'index.php?q=' . $q . (($params == '') ? '' : '&' . $params);
     }
+    return $url;
+}
+
+/**
+ * Obtains the URL of the host of the SimpleID's installation.  The host is worked
+ * out based on SIMPLEID_BASE_URL
+ *
+ * @param string $secure if $relative is false, either 'https' to force an HTTPS connection, 'http' to force
+ * an unencrypted HTTP connection, or NULL to vary based on SIMPLEID_BASE_URL
+ * @return string the url
+ */
+function simpleid_host_url($secure = null) {
+    $parts = parse_url(SIMPLEID_BASE_URL);
+    
+    if ($secure == 'https') {
+        $scheme = 'https';
+    } elseif ($secure = 'http') {
+        $scheme = 'http';
+    } else {
+        $scheme = $parts['scheme'];
+    }
+    
+    $url = $scheme . '://';
+    if (isset($parts['user'])) {
+        $url .= $parts['user'];
+        if (isset($parts['pass'])) $url .= ':' . $parts['pass'];
+        $url .= '@';
+    }
+    $url .= $parts['host'];
+    if (isset($parts['port'])) $url .= ':' . $parts['port'];
+
     return $url;
 }
 
