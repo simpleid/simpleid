@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  -  SimpleID
+  - 
+  -  Copyright (C) Kelvin Mo 2011
+  - 
+  -  This program is free software; you can redistribute it and/or
+  -  modify it under the terms of the GNU General Public
+  -  License as published by the Free Software Foundation; either
+  -  version 2 of the License, or (at your option) any later version.
+  - 
+  -  This program is distributed in the hope that it will be useful,
+  -  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  -  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  -  General Public License for more details.
+  - 
+  -  You should have received a copy of the GNU General Public
+  -  License along with this program; if not, write to the Free
+  -  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  -  
+  -  $Id$
+  -->
+<project default="dist" basedir=".">
+    <taskdef name="d51pearpkg2" classname="phing.tasks.ext.d51PearPkg2Task"/>
+
+    <property file="build.properties" />
+    <property file="simpleid.properties" />
+    
+    <property name="dist.tar.dir" value="tar" />
+    <property name="dist.pear.dir" value="pear" />
+    
+    <target name="pear-package">
+        <d51pearpkg2 dir="${dist.dir}/${dist.sub.dir}/simpleid/" baseinstalldir="/">
+            <name>SimpleID</name>
+            <summary>SimpleID is a simple, personal OpenID provider</summary>
+            <description>SimpleID is a simple, personal OpenID provider written in PHP.</description>
+            <channel>simpleid.sourceforge.net</channel>
+            <lead user="kmo" name="Kelvin Mo" email="kmo@users.sourceforge.net"/>
+            <license>GPL</license>
+            <version release="${build.version}" api="${build.version}"/>
+            <stability release="${build.stability}" api="${build.stability}"/>
+            <notes>See README.txt</notes>
+            <dependencies>
+                <php minimum_version="5.1.2"/>
+                <pear minimum_version="1.8.1"/>
+                <extension name="bcmath"/>
+                <extension name="pcre"/>
+                <extension name="session"/>
+            </dependencies>
+            <!-- map directory (key) to role -->
+            <dirroles key="/">doc</dirroles>
+            <dirroles key="/www">www</dirroles>
+            <dirroles key="/cache">data</dirroles>
+            <dirroles key="/identities">data</dirroles>
+            <dirroles key="/store">data</dirroles>
+            <dirroles key="/extensions">doc</dirroles>
+            <!-- do not add the following files to the package. copied from excludes above -->
+            <ignore>**/.gitignore</ignore>
+            
+            <!-- replacement -->
+            <replacement path="www/config.php.dist" type="pear-config" from="@data_dir@" to="data_dir" />
+        </d51pearpkg2>
+        <!-- time to fix the package.xml file since the task does not
+        allow everything we need:
+        - strip the base directory names like src, data and www
+        - remove baseinstalldir from files
+        - md5sums are generated automatically when packaging
+        -->
+        <!-- yes, we need to generate a 2nd file and move it back -->
+        <copy file="${dist.dir}/${dist.sub.dir}/simpleid/package.xml" tofile="${dist.dir}/${dist.sub.dir}/simpleid/package2.xml" overwrite="true">
+            <filterchain>
+                <replaceregexp>
+                    <!-- remove md5sums -->
+                    <regexp pattern="md5sum=&quot;[a-z0-9]{32}&quot; " replace="" />
+                    <!-- remove baseinstalldir for files -->
+                    <regexp pattern="&lt;file baseinstalldir=&quot;/&quot;" replace="&lt;file"/>
+                    <!-- install-as for different directories -->
+                    <regexp pattern="(&lt;file name=&quot;/www/(.+?)&quot;)" replace="\1 install-as=&quot;SimpleID/\2&quot;"/>
+                </replaceregexp>
+            </filterchain>
+        </copy>
+        <move file="${dist.dir}/${dist.sub.dir}/simpleid/package2.xml" tofile="${dist.dir}/${dist.sub.dir}/simpleid/package.xml" overwrite="true"/>
+    </target>
+    
+    <target name="dist-clean">
+        <delete>
+            <fileset dir="${dist.dir}"></fileset>
+        </delete>
+    </target>
+    
+    <!-- Copies the source to the distribution directory -->
+    <target name="dist-copy">
+        <copy todir="${dist.dir}/${dist.sub.dir}/simpleid">
+            <fileset dir=".">
+                <exclude name="cache/*" />
+                <exclude name="store/*" />
+                <exclude name="www/.htaccess" />
+                <exclude name="www/config.inc" />
+                <exclude name="www/config.php" />
+                <exclude name="identities/*.identity" />
+                <exclude name="www/test/**" />
+                <exclude name="www/test-suite/**" />
+                <exclude name="tutorials/**" />
+                <exclude name="*.xml" />
+                <exclude name="*.properties" />
+            </fileset>
+            <filterchain>
+                <replacetokens begintoken="@@" endtoken="@@">
+                    <token key="BUILD_VERSION" value="${build.version}" />
+                    <token key="IDENTITIES_DIR" value="${config.identities.dir}" />
+                    <token key="CACHE_DIR" value="${config.cache.dir}" />
+                    <token key="STORE_DIR" value="${config.store.dir}" />
+                </replacetokens>
+            </filterchain>
+        </copy>
+    </target>
+    
+    <!-- Creates a tar file for non-PEAR distribution -->
+    <target name="dist-tar" depends="dist-clean">
+        <phingcall target="dist-copy">
+            <property name="dist.sub.dir" value="${dist.tar.dir}" />
+            <property name="config.identities.dir" value="../identities" />
+            <property name="config.cache.dir" value="../cache" />
+            <property name="config.store.dir" value="../store" />
+        </phingcall>
+    
+        <tar destfile="${dist.dir}/simpleid-${build.version}.tar.gz" compression="gzip">
+            <tarfileset dir="${dist.dir}/${dist.tar.dir}" includes="**/*" defaultexcludes="no" />
+        </tar>
+        <echo message="${build.version}" file="${dist.dir}/current-version.txt"/>
+    </target>
+    
+    <!-- Creates a tar file for PEAR distribution -->
+    <target name="dist-pear" depends="dist-clean">
+        <phingcall target="dist-copy">
+            <property name="dist.sub.dir" value="${dist.pear.dir}" />
+            <property name="config.identities.dir" value="@data_dir@/simpleid/identities" />
+            <property name="config.cache.dir" value="@data_dir@/simpleid/cache" />
+            <property name="config.store.dir" value="@data_dir@/simpleid/store" />
+        </phingcall>
+        
+        <phingcall target="pear-package">
+            <property name="dist.sub.dir" value="${dist.pear.dir}" />
+        </phingcall>
+        
+        <exec dir="${dist.dir}" executable="pear">
+            <arg line="package ${dist.pear.dir}/simpleid/package.xml" />
+        </exec>
+    </target>
+    
+    <target name="dist" depends="dist-tar,dist-pear">
+    </target>
+</project>
