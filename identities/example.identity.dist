@@ -170,7 +170,7 @@ pass="c8e24ae844b7cb9381g722ae8209a19a"
 ; in your details.
 ;
 ; Further information on the Simple Registration Extension can be found at
-; http://www.openidenabled.com/openid/simple-registration-extension
+; http://simpleid.sourceforge.net/documentation/using-simpleid/extensions/simple-registration-extension
 ;
 ; Note, you must also enable the Simple Registration Extension in SimpleID.  To
 ; do this, make sure the SIMPLEID_EXTENSIONS option in config.inc contains
@@ -198,7 +198,7 @@ pass="c8e24ae844b7cb9381g722ae8209a19a"
 ; The format of this section is attribute type URI=attribute value.  Examples
 ; are given below.
 ;
-; For a full list of attributes, see http://axschema.org/
+; For a full list of attributes, see http://openid.net/specs/openid-attribute-properties-list-1_0-01.html
 ;
 ; Note if you have already uncommented and filled out the OpenID Connect user
 ; information and/or Simple Registration Extension data above, you do not need
@@ -214,13 +214,20 @@ pass="c8e24ae844b7cb9381g722ae8209a19a"
 ;    http://axschema.org/contact/country/home
 ;    http://axschema.org/pref/language
 ;    http://axschema.org/pref/timezone
+;    http://openid.net/schema/namePerson/friendly
+;    http://openid.net/schema/contact/internet/email
+;    http://openid.net/schema/gender
+;    http://openid.net/schema/contact/postalCode/home
+;    http://openid.net/schema/contact/country/home
+;    http://openid.net/schema/language/pref
+;    http://openid.net/schema/timezone
 ;
 ; Note, you must also enable the Attribute Exchange Extension in SimpleID.  To
 ; do this, make sure the SIMPLEID_EXTENSIONS option in config.inc contains
 ; ax
 ;
 ;[ax]
-;http://axschema.org/company/name="Example Company Limited"
-;http://axschema.org/company/title="Managing Director"
-;http://axschema.org/contact/web/blog="http://simpleid.sourceforge.net/"
+;http://openid.net/schema/company/name="Example Company Limited"
+;http://openid.net/schema/company/title="Managing Director"
+;http://openid.net/schema/contact/web/blog="http://simpleid.sourceforge.net/"
 

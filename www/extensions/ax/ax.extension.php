@@ -52,7 +52,14 @@ $ax_sreg_map = array(
     'http://axschema.org/contact/postalCode/home' => 'postcode',
     'http://axschema.org/contact/country/home' => 'country',
     'http://axschema.org/pref/language' => 'language',
-    'http://axschema.org/pref/timezone' => 'timezone'
+    'http://axschema.org/pref/timezone' => 'timezone',
+    'http://openid.net/schema/namePerson/friendly' => 'nickname',
+    'http://openid.net/schema/contact/internet/email' => 'email',
+    'http://openid.net/schema/gender' => 'gender',
+    'http://openid.net/schema/contact/postalCode/home' => 'postcode',
+    'http://openid.net/schema/contact/country/home' => 'country',
+    'http://openid.net/schema/language/pref' => 'language',
+    'http://openid.net/schema/timezone' => 'timezone'
 );
 
 /**
