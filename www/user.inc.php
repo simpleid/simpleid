@@ -317,7 +317,7 @@ function user_login_form($destination = '', $state = NULL) {
     
     $base_path = get_base_path();
     
-    $xtpl->assign('javascript', '<script src="' . $base_path . 'html/md5.js" type="text/javascript"></script><script src="' . $base_path . 'html/user-login.js" type="text/javascript"></script>');
+    $xtpl->assign('javascript', '<script src="' . $base_path . 'html/user-login.js" type="text/javascript"></script>');
     
     $security_class = (SIMPLEID_ALLOW_AUTOCOMPLETE) ? 'allow-autocomplete ' : '';
     
