@@ -775,7 +775,7 @@ function simpleid_checkid_login_required($request) {
  * @return array an OpenID response with a negative assertion
  * @link http://openid.net/specs/openid-authentication-1_1.html#anchor17, http://openid.net/specs/openid-authentication-1_1.html#anchor23, http://openid.net/specs/openid-authentication-2_0.html#negative_assertions
  */
-function simpleid_checkid_error($request, $immediate) {
+function simpleid_checkid_error($request, $immediate = false) {
     global $version;
     
     $message = array();
