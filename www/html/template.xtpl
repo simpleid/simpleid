@@ -197,12 +197,6 @@
             </form>
             <!-- END: sites -->
             
-            <!-- BEGIN: redirect -->
-            <p>Redirecting...</p>
-            <noscript><p><a href="{redirect_url_link}">Click here to continue.</a></p></noscript>
-            <script type="text/javascript">document.location.href = '{redirect_url_js}';</script>
-            <!-- END: redirect -->
-            
             <!-- BEGIN: upgrade_access_denied -->
             <p>Access denied. You are not authorised to access this page. Please <a href="index.php?q=login">log in</a> as an
             administrator (a user whose identity file includes the line <code>administrator=1</code>).</p>
