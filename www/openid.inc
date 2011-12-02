@@ -182,29 +182,19 @@ function openid_indirect_message($data, $version = OPENID_VERSION_2) {
 /**
  * Sends an indirect response to a URL.
  *
+ * The indirect message is encoded in the URL and returned to the user agent using
+ * a HTTP redirect response.  The message can be encoded in either the query component
+ * or the fragment component of the URL.
+ *
  * @param string $url the URL to which the response is to be sent
- * @param array $message an OpenID message, which can either be an array of keys
+ * @param array|string $message an OpenID message, which can either be an array of keys
  * and values, or a URL-encoded query string
- * @param string $response_func the method by which the indirect response is to
- * be sent, either openid_indirect_response_form or openid_indirect_response_redirect
- */
-function openid_indirect_response($url, $message, $response_func = 'openid_indirect_response_form') {
-    call_user_func($response_func, $url, $message);
-}
-
-/**
- * Sends an indirect message via an HTTP redirect.
- *
- * The indirect message is encoded in the query of the URL.  This is because
- * user agent support for a HTTP redirect location containing a fragment is
- * undefined.
- *
- * @param string $url the URL to which the response is to be sent
- * @param mixed $message an OpenID message
+ * @param int $component the component of the URL in which the indirect message is
+ * encoded, either OPENID_RESPONSE_QUERY or OPENID_RESPONSE_FRAGMENT
  */ 
-function openid_indirect_response_redirect($url, $message) {    
+function openid_indirect_response($url, $message, $component = OPENID_RESPONSE_QUERY) {
     header('Status: 303 See Other');
-    header('Location: ' . openid_indirect_response_url($url, $message, OPENID_RESPONSE_QUERY));
+    header('Location: ' . openid_indirect_response_url($url, $message, $component));
     exit;
 }
 
@@ -282,27 +272,6 @@ function openid_urlencode_message($message) {
 }
 
 /**
- * Sends an indirect message via an HTML form
- *
- * @param string $url the URL to which the response is to be sent
- * @param array $message an OpenID message
- */
-function openid_indirect_response_form($url, $message) {
-    $redirect_url = openid_indirect_response_url($url, $message);
-    $redirect_url_js = addcslashes($redirect_url, "\\\'\"&\n\r<>");
-    $redirect_url_link = htmlspecialchars($redirect_url, ENT_QUOTES, 'UTF-8');
-    
-    $html = '<!DOCTYPE html><html lang="en"><head><title>Redirecting...</title></head><body>';
-    $html .= '<p>Redirecting...</p>';
-    $html .= '<noscript><p><a href="' . $redirect_url_link . '">Click here to continue.</a></p></noscript>';
-    $html .= '<script type="text/javascript">document.location.href = \'' . $redirect_url_js . '\';</script></body></html>';
-            
-    print $html;
-    
-    exit;
-}
-
-/**
  * Sends a direct message indicating an error.  This is a convenience function
  * for {@link openid_direct_response()}.
  *
@@ -325,12 +294,12 @@ function openid_direct_error($error, $additional = array(), $version = OPENID_VE
  * @param array $additional any additional data to be sent with the error
  * message
  * @param float $version the message version
- * @param string $response_func the method by which the indirect response is to
- * be sent, either openid_indirect_response_form or openid_indirect_response_redirect
+ * @param int $component the component of the URL in which the indirect message is
+ * encoded, either OPENID_RESPONSE_QUERY or OPENID_RESPONSE_FRAGMENT
  */
-function openid_indirect_error($url, $error, $additional = array(), $version = OPENID_VERSION_2, $response_func = 'openid_indirect_response_form') {
+function openid_indirect_error($url, $error, $additional = array(), $version = OPENID_VERSION_2, $component = OPENID_RESPONSE_QUERY) {
     $message = openid_indirect_message(array_merge(array('openid.mode'=> 'error', 'openid.error' => $error), $additional), $version);
-    openid_indirect_response($url, $message, $response_func);
+    openid_indirect_response($url, $message, $component);
 }
 
 /**

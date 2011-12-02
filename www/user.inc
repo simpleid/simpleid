@@ -145,7 +145,7 @@ function user_login() {
     global $user, $GETPOST;
     
     // If the user is already logged in, return
-    if (isset($user["uid"])) openid_indirect_response_redirect(simpleid_url(), '');
+    if (isset($user["uid"])) openid_indirect_response(simpleid_url(), '');
     
     $destination = (isset($GETPOST['destination'])) ? $GETPOST['destination'] : '';
     $state = (isset($GETPOST['s'])) ? $GETPOST['s'] : '';
@@ -238,7 +238,7 @@ function user_login() {
     
     if (isset($_POST['autologin']) && ($_POST['autologin'] == 1)) user_autologin_create();
 
-    openid_indirect_response_redirect(simpleid_url($destination, $query), '');
+    openid_indirect_response(simpleid_url($destination, $query), '');
 }
 
 /**

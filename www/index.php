@@ -1106,19 +1106,7 @@ function simpleid_assertion_response($response, $indirect_url = NULL) {
         $results = array_filter($results, 'is_null');
         $component = ($results) ? max($results) : OPENID_RESPONSE_QUERY;
         
-        $redirect_url = openid_indirect_response_url($indirect_url, $response, $component);
-    
-        $xtpl->assign('redirect_url_js', addcslashes($redirect_url, "\\\'\"&\n\r<>"));
-        $xtpl->assign('redirect_url_link', htmlspecialchars($redirect_url, ENT_QUOTES, 'UTF-8'));
-        $xtpl->assign('title', 'Redirecting...');
-        $xtpl->assign('page_class', 'dialog-page');
-    
-        $xtpl->parse('main.redirect');
-        $xtpl->parse('main');
-    
-        $xtpl->out('main');
-    
-        exit;
+        openid_indirect_response($indirect_url, $response, $component);
     } else {
         openid_direct_response(openid_direct_message($response, $version));
     }
