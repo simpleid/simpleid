@@ -397,6 +397,20 @@ function user_public_page($uid = NULL) {
 }
 
 /**
+ * Returns the public page for a private personal ID.
+ */
+function user_ppid_page() {
+    global $xtpl;
+    
+    $xtpl->assign('title', 'Private Personal Identifier');
+                
+    set_message('This is a private personal identifier.');
+                
+    $xtpl->parse('main');
+    $xtpl->out('main');
+}
+
+/**
  * Returns the user's public XRDS page.
  * 
  * @param string $uid the user ID
