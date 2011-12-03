@@ -74,12 +74,13 @@ function hook_checkid($request, $immediate) {
  * is negative.
  *
  * @param array $request the OpenID request
+ * @param string $identity the identity to be checked against
  * @param bool $immediate true if openid.mode is checkid_immediate
  * @return int a return value from the list of possible values returned by
  * {@link simpleid_checkid_identity()} or NULL
  * @see simpleid_checkid_identity()
  */
-function hook_checkid_identity($request, $immediate) {
+function hook_checkid_identity($request, $identity, $immediate) {
 }
 
 /**

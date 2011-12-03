@@ -161,6 +161,7 @@ function simpleid_route($q) {
         'my/sites' => 'page_sites',
         'my/profile' => 'page_profile',
         'openid/consent' => 'simpleid_openid_consent',
+        'ppid/(.*)' => 'user_ppid_page',
         'user' => 'user_public_page',
         'user/(.+)' => 'user_public_page',
         'xrds/(.*)' => 'user_xrds',
@@ -561,8 +562,6 @@ function simpleid_checkid_identity(&$request, $immediate) {
     if ($request['openid.identity'] == OPENID_IDENTIFIER_SELECT) {
         $test_user = user_load($uid);
         $identity = $test_user['identity'];
-        $request['openid.claimed_id'] = $identity;
-        $request['openid.identity'] = $identity;
         
         log_info('OpenID identifier selection: Selected ' . $uid . ' [' . $identity . ']');
     } else {
@@ -576,8 +575,14 @@ function simpleid_checkid_identity(&$request, $immediate) {
     }
     
     // Pass the assertion to extensions
-    $assertion_results = extension_invoke_all('checkid_identity', $request, $immediate);
+    $assertion_results = extension_invoke_all('checkid_identity', $request, $identity, $immediate);
     $assertion_results = array_merge(array_diff($assertion_results, array(NULL)));
+    
+    // Populate the request with the selected identity
+    if ($request['openid.identity'] == OPENID_IDENTIFIER_SELECT) {
+        $request['openid.claimed_id'] = $identity;
+        $request['openid.identity'] = $identity;
+    }
     
     // Check 3: Discover the realm and match its return_to
     $user_rp = (isset($user['rp'][$realm])) ? $user['rp'][$realm] : NULL;
