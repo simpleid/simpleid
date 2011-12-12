@@ -84,7 +84,7 @@ function simpleweb_run($routes, $request_path = NULL, $not_found_route = NULL) {
     
     foreach ($routes as $pattern => $route) {
         
-        if (!isset($route)) return array($pattern, null);
+        if (!isset($route)) return _simpleweb_not_found();
         $regex = '#^' . trim($pattern, '/') . '$#i';
         
         if (!preg_match($regex, $request_path, $args) > 0) continue;
@@ -95,7 +95,7 @@ function simpleweb_run($routes, $request_path = NULL, $not_found_route = NULL) {
     
     if ($not_found_route) return _simpleweb_invoke($not_found_route, array($request_path));
     
-    header('Status: 404');
+    return _simpleweb_not_found();
 }
 
 /**
@@ -116,5 +116,17 @@ function _simpleweb_invoke($route, $args = array()) {
     } else {
         return call_user_func_array($route, $args);
     }
+}
+
+/**
+ * Displays a HTTP 404 Not Found error and exits.
+ */
+function _simpleweb_not_found() {
+    header('Status: 404');
+    header('Content-Type: text/plain');
+    
+    print 'Not Found';
+    
+    exit;
 }
 ?>
