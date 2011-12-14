@@ -1131,7 +1131,7 @@ function simpleid_xrds() {
         $xtpl->parse('xrds.op_xrds.type');
     }
     
-    $xtpl->assign('simpleid_base_url', htmlspecialchars(simpleid_url(), ENT_QUOTES, 'UTF-8'));
+    $xtpl->assign('simpleid_base_url', htmlspecialchars(simpleid_url(), ENT_QUOTES, 'UTF-8'), false, 'detect');
     $xtpl->parse('xrds.op_xrds');
     $xtpl->parse('xrds');
     $xtpl->out('xrds');

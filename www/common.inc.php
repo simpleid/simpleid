@@ -301,7 +301,7 @@ function get_base_path() {
  * @param string $params a properly encoded query string
  * @param bool $relative whether a relative URL should be returned
  * @param string $secure if $relative is false, either 'https' to force an HTTPS connection, 'http' to force
- * an unencrypted HTTP connection, or NULL to vary based on SIMPLEID_BASE_URL
+ * an unencrypted HTTP connection, 'detect' to base on the current connection, or NULL to vary based on SIMPLEID_BASE_URL
  * @return string the url
  *
  * @since 0.7
@@ -321,6 +321,12 @@ function simpleid_url($q = '', $params = '', $relative = false, $secure = null) 
             $url = 'https:' . substr($url, 5);
         }
         if (($secure == 'http') && (stristr($url, 'https:') == 0)) {
+            $url = 'http:' . substr($url, 6);
+        }
+        if (($secure == 'detect') && (is_https()) && (stristr($url, 'http:') == 0)) {
+            $url = 'https:' . substr($url, 5);
+        }
+        if (($secure == 'detect') && (!is_https()) && (stristr($url, 'https:') == 0)) {
             $url = 'http:' . substr($url, 6);
         }
     }
