@@ -399,15 +399,32 @@ function user_public_page($uid = NULL) {
 /**
  * Returns the public page for a private personal ID.
  */
-function user_ppid_page() {
+function user_ppid_page($ppid = NULL) {
     global $xtpl;
     
-    $xtpl->assign('title', 'Private Personal Identifier');
+    header('Vary: Accept');
+            
+    $content_type = negotiate_content_type(array('text/html', 'application/xml', 'application/xhtml+xml', 'application/xrds+xml'));
+            
+    if (($content_type == 'application/xrds+xml') || ($_GET['format'] == 'xrds')) {
+        header('Content-Type: application/xrds+xml');
+        header('Content-Disposition: inline; filename=yadis.xml');
+    
+        $xtpl->assign('simpleid_base_url', htmlspecialchars(simpleid_url(), ENT_QUOTES, 'UTF-8'));
+        $xtpl->parse('xrds.user_xrds');
+        $xtpl->parse('xrds');
+        $xtpl->out('xrds');
+        return;
+    } else {
+        header('X-XRDS-Location: ' . simpleid_url('ppid/' . rawurlencode($ppid), 'format=xrds'));
                 
-    set_message('This is a private personal identifier.');
+        $xtpl->assign('title', 'Private Personal Identifier');
                 
-    $xtpl->parse('main');
-    $xtpl->out('main');
+        set_message('This is a private personal identifier.');
+        
+        $xtpl->parse('main');
+        $xtpl->out('main');
+    }   
 }
 
 /**
