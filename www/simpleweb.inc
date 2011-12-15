@@ -84,7 +84,7 @@ function simpleweb_run($routes, $request_path = NULL, $not_found_route = NULL) {
     
     foreach ($routes as $pattern => $route) {
         
-        if (!isset($route)) return _simpleweb_not_found();
+        if (!isset($route)) continue;
         $regex = '#^' . trim($pattern, '/') . '$#i';
         
         if (!preg_match($regex, $request_path, $args) > 0) continue;
