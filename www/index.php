@@ -1038,7 +1038,7 @@ function simpleid_openid_consent_form($request, $response, $reason = CHECKID_APP
  *
  */
 function simpleid_openid_consent() {
-    global $user, $version, $GETPOST;
+    global $xtpl, $user, $version, $GETPOST;
     
     if ($user == NULL) {
         user_login_form('');
