@@ -469,13 +469,15 @@ function _user_page_profile() {
     
     $html .= "<table><tr><th>Member</th><th>Value</th></tr>";
     
-    foreach ($user['user_info'] as $member => $value) {
-        if (is_array($value)) {
-            foreach ($value as $submember => $subvalue) {
-                $html .= "<tr><td>" . htmlspecialchars($member, ENT_QUOTES, 'UTF-8') . " (" .htmlspecialchars($submember, ENT_QUOTES, 'UTF-8') . ")</td><td>" . htmlspecialchars($subvalue, ENT_QUOTES, 'UTF-8') . "</td></tr>";
+    if (isset($user['user_info'])) {
+        foreach ($user['user_info'] as $member => $value) {
+            if (is_array($value)) {
+                foreach ($value as $submember => $subvalue) {
+                    $html .= "<tr><td>" . htmlspecialchars($member, ENT_QUOTES, 'UTF-8') . " (" .htmlspecialchars($submember, ENT_QUOTES, 'UTF-8') . ")</td><td>" . htmlspecialchars($subvalue, ENT_QUOTES, 'UTF-8') . "</td></tr>";
+                }
+            } else {
+                $html .= "<tr><td>" . htmlspecialchars($member, ENT_QUOTES, 'UTF-8') . "</td><td>" . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . "</td></tr>";
             }
-        } else {
-            $html .= "<tr><td>" . htmlspecialchars($member, ENT_QUOTES, 'UTF-8') . "</td><td>" . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . "</td></tr>";
         }
     }
     
