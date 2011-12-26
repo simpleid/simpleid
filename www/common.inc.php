@@ -317,16 +317,16 @@ function simpleid_url($q = '', $params = '', $relative = false, $secure = null) 
             $url = SIMPLEID_BASE_URL . '/';
         }
         
-        if (($secure == 'https') && (stristr($url, 'http:') == 0)) {
+        if (($secure == 'https') && (stristr($url, 'http:') === 0)) {
             $url = 'https:' . substr($url, 5);
         }
-        if (($secure == 'http') && (stristr($url, 'https:') == 0)) {
+        if (($secure == 'http') && (stristr($url, 'https:') === 0)) {
             $url = 'http:' . substr($url, 6);
         }
-        if (($secure == 'detect') && (is_https()) && (stristr($url, 'http:') == 0)) {
+        if (($secure == 'detect') && (is_https()) && (stristr($url, 'http:') === 0)) {
             $url = 'https:' . substr($url, 5);
         }
-        if (($secure == 'detect') && (!is_https()) && (stristr($url, 'https:') == 0)) {
+        if (($secure == 'detect') && (!is_https()) && (stristr($url, 'https:') === 0)) {
             $url = 'http:' . substr($url, 6);
         }
     }
