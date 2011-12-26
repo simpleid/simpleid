@@ -356,7 +356,7 @@ function simpleid_host_url($secure = null) {
     
     if ($secure == 'https') {
         $scheme = 'https';
-    } elseif ($secure = 'http') {
+    } elseif ($secure == 'http') {
         $scheme = 'http';
     } else {
         $scheme = $parts['scheme'];
