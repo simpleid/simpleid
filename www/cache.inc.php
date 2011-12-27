@@ -108,10 +108,13 @@ function cache_delete($type, $key) {
 
 /**
  * Garbage collects data stored the cache.  Data is deleted if it was stored
- * for longer than the specified expiry
+ * for longer than the specified expiry.
+ *
+ * This function is deprecated, use {@link cache_expire()}.
  *
  * @param int $expiry the expiry time, in seconds, after which data will be deleted
  * @param string $type the type of data in the cache
+ * @deprecated
  */
 function cache_gc($expiry, $type = NULL) {
     $dir = opendir(CACHE_DIR);
@@ -122,6 +125,47 @@ function cache_gc($expiry, $type = NULL) {
         if (($type != NULL) && (strpos($file, $type . '-') !== 0)) continue;
         
         if ((filetype($filename) == "file") && (filectime($filename) < time() - $expiry)) {
+            unlink($filename);
+        }
+    }
+    
+    closedir($dir);
+}
+
+/**
+ * Garbage collects data stored the cache.  Data is deleted if it was stored
+ * for longer than the specified expiry.
+ *
+ * The parameter to this function takes either an integer or an array.  If the
+ * parameter is an integer, everything in the cache older than the specified
+ * time (in seconds) will be deleted.  If the parameter is an array, 
+ * cache items of the type specified in the key to the array, older than the
+ * corresponding value will be deleted.
+ *
+ * This function is deprecated, use {@link cache_expire()}.
+ *
+ * @param int|array $params the expiry time, in seconds, after which data will be deleted,
+ * or an array specifiying the expiry time for each type
+ */
+function cache_expire($params) {
+    $dir = opendir(CACHE_DIR);
+    
+    while (($file = readdir($dir)) !== false) {
+        $expiry = NULL;
+        $filename = CACHE_DIR . '/' . $file;
+        
+        if (is_int($params)) {
+            $expiry = $params;
+        } elseif (is_array($params)) {
+            foreach ($params as $type => $param) {
+                if (strpos($file, $type . '-') === 0) {
+                    $expiry = $param;
+                    break;
+                }
+            }
+        }
+        
+        if (!is_null($expiry) && (filetype($filename) == "file") && (filectime($filename) < time() - $expiry)) {
             unlink($filename);
         }
     }

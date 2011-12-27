@@ -311,7 +311,7 @@ function user_login_form($destination = '', $state = NULL) {
         $xtpl->parse('main.login.state');
     }
     
-    cache_gc(SIMPLEID_LOGIN_NONCE_EXPIRES_IN, 'user-nonce');
+    cache_expire(array('user-nonce' => SIMPLEID_LOGIN_NONCE_EXPIRES_IN));
     $nonce = openid_nonce();
     cache_set('user-nonce', $nonce, 1);
     
@@ -554,7 +554,7 @@ function user_autologin_verify() {
     list($uid, $id, $token) = explode(':', $cookie);
     log_debug('Automatic login token detected for ' . $uid);
     
-    cache_gc(SIMPLEID_USER_AUTOLOGIN_EXPIRES_IN, 'autologin-' . md5($uid));
+    cache_expire(array('autologin-' . md5($uid) => SIMPLEID_USER_AUTOLOGIN_EXPIRES_IN));
     $cache = cache_get('autologin-' . md5($uid), $id);
     
     if (!$cache) {  // Cookie doesn't exist
@@ -570,7 +570,7 @@ function user_autologin_verify() {
     if ($cache['token'] != $token) {
         log_warn('Automatic login: Token on server does not match');
         // Token not the same - panic
-        cache_gc(0, 'autologin-' . md5($uid));
+        cache_expire(array('autologin-' . md5($uid) => 0));
         user_autologin_invalidate();
         return;
     }

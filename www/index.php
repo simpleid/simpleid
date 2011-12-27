@@ -139,8 +139,10 @@ function simpleid_start() {
     log_info('Session opened for "' . $q . '" [' . $_SERVER['REMOTE_ADDR'] . ', ' . gethostbyaddr($_SERVER['REMOTE_ADDR']) . ']');
     
     // Clean stale assocations
-    cache_gc(SIMPLEID_ASSOC_EXPIRES_IN, 'association');
-    cache_gc(300, 'stateless');
+    cache_expire(array(
+        'association' => SIMPLEID_ASSOC_EXPIRES_IN,
+        'stateless' => 300)
+    );
     
     simpleid_route($q);
 }

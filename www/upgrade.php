@@ -171,7 +171,7 @@ function upgrade_info() {
 function upgrade_selection() {
     global $xtpl, $upgrade_access_check;
     
-    cache_gc(0, 'upgrade');
+    cache_expire(array('upgrade' => 0));
     
     if (!validate_form_token($_POST['tk'], 'upgrade_info')) {
         set_message('SimpleID detected a potential security attack.  Please try again.');
@@ -226,7 +226,7 @@ function upgrade_apply() {
     $xtpl->assign('results', $results);
     $xtpl->parse('main.upgrade_results');
     
-    cache_gc(0, 'upgrade');
+    cache_expire(array('upgrade' => 0));
     
     $xtpl->assign('title', 'Upgrade');
     $xtpl->parse('main');
