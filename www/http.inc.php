@@ -40,8 +40,13 @@ define('SIMPLEHTTP_USER_AGENT', 'SimpleHTTP/' . substr('$Rev$', 6, -2));
  * Communication with the web server is conducted using libcurl where possible.
  * Where libcurl does not exist, then sockets will be used.
  *
+ * Note that the request must be properly prepared before passing onto this function.
+ * For example, for POST requests, the Content-Type and Content-Length headers must be
+ * included in $headers.
+ *
  * @param string $url the URL
  * @param array $headers HTTP headers containing name => value pairs
+ * @param string $body the request body
  * @param string $method the HTTP request method
  * @param int $retry the maximum number of redirects allowed
  * @return array containing keys 'error-code' (for communication errors), 'error'
@@ -50,12 +55,12 @@ define('SIMPLEHTTP_USER_AGENT', 'SimpleHTTP/' . substr('$Rev$', 6, -2));
  * 'headers' (an array of return headers in lowercase),
  * 'content-type' (the HTTP content-type returned)
  */
-function http_make_request($url, $headers = array(), $method = 'GET', $retry = 3) {
+function http_make_request($url, $headers = array(), $body = NULL, $method = 'GET', $retry = 3) {
     // If CURL is available, we use it
     if (extension_loaded('curl')) {
-        $response = _http_make_request_curl($url, $headers, $method, $retry);
+        $response = _http_make_request_curl($url, $headers, $body, $method, $retry);
     } else {
-        $response = _http_make_request_fsock($url, $headers, $method, $retry);
+        $response = _http_make_request_fsock($url, $headers, $body, $method, $retry);
     }
     
     if (!isset($response['error-code'])) {
@@ -105,6 +110,7 @@ function http_protocols() {
  *
  * @param string $url the URL
  * @param array $headers HTTP headers containing name => value pairs
+ * @param string $body the request body
  * @param string $method the HTTP request method
  * @param int $retry the maximum number of redirects allowed
  * @return array containing keys 'error-code' (for communication errors), 'error'
@@ -112,7 +118,7 @@ function http_protocols() {
  * (if the HTTP status code is not 200 or 304), 'headers' (an array of return headers),
  * 'content-type' (the HTTP content-type returned)
  */
-function _http_make_request_curl($url, $headers = array(), $method = 'GET', $retry = 3) {
+function _http_make_request_curl($url, $headers = array(), $body = NULL, $method = 'GET', $retry = 3) {
     // CURLOPT_FOLLOWLOCATION only works when safe mode is off or when open_basedir is set
     // In these instances we will need to follow redirects manually
     $manual_redirect = ((@ini_get('safe_mode') === 1)   // safe mode
@@ -142,6 +148,8 @@ function _http_make_request_curl($url, $headers = array(), $method = 'GET', $ret
     
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+    
+    if ($body != NULL) curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
     
     $response = curl_exec($curl);
     
@@ -181,7 +189,7 @@ function _http_make_request_curl($url, $headers = array(), $method = 'GET', $ret
                 $result['error'] = 'Too many redirects';
             } else {
                 curl_close($curl);
-                return _http_make_request_curl($result['headers']['location'], $headers, $method, $retry - 1);
+                return _http_make_request_curl($result['headers']['location'], $headers, $body, $method, $retry - 1);
             }
         }
     }
@@ -196,6 +204,7 @@ function _http_make_request_curl($url, $headers = array(), $method = 'GET', $ret
  *
  * @param string $url the URL
  * @param array $headers HTTP headers containing name => value pairs
+ * @param string $body the request body
  * @param string $method the HTTP request method
  * @param int $retry the maximum number of redirects allowed
  * @return array containing keys 'error-code' (for communication errors), 'error'
@@ -203,7 +212,7 @@ function _http_make_request_curl($url, $headers = array(), $method = 'GET', $ret
  * (if the HTTP status code is not 200 or 304), 'headers' (an array of return headers),
  * 'content-type' (the HTTP content-type returned)
  */
-function _http_make_request_fsock($url, $headers = array(), $method = 'GET', $retry = 3) {
+function _http_make_request_fsock($url, $headers = array(), $body = NULL, $method = 'GET', $retry = 3) {
     $result = array();
     
     $parts = parse_url($url);
@@ -252,7 +261,7 @@ function _http_make_request_fsock($url, $headers = array(), $method = 'GET', $re
     if (isset($parts['user']) && isset($parts['pass'])) {
         $headers['Authorization'] = 'Basic '. base64_encode($uri['user'] . (!empty($uri['pass']) ? ":". $uri['pass'] : ''));
     }
-  
+    
     $request = $method . ' '. $path ." HTTP/1.0\r\n";
     
     $keys = array_keys($headers);
@@ -262,6 +271,8 @@ function _http_make_request_fsock($url, $headers = array(), $method = 'GET', $re
     
     // End of headers - separator
     $request .= "\r\n";
+    
+    if ($body != NULL) $request .= $body;
     
     fwrite($fp, $request);
 
@@ -284,7 +295,7 @@ function _http_make_request_fsock($url, $headers = array(), $method = 'GET', $re
             $result['error-code'] = 47;
             $result['error'] = 'Too many redirects';
         } else {
-            $result = _http_make_request_fsock($result['headers']['location'], $headers, $method, $retry - 1);
+            $result = _http_make_request_fsock($result['headers']['location'], $headers, $body, $method, $retry - 1);
         }
     }
 
