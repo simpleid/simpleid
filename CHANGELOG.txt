@@ -6,6 +6,16 @@ SimpleID 0.8.1
 - Bug fixes:
     * #77 Incorrect detection of register_globals PHP configuration variable
     * #86 PHP syntax warnings in filesystem.store.inc
+    * #88 Updated URL to Simple Registration Extension specification in
+      example.identity.dist
+    * #91 Missing parameters in simpleid_checkid_error()
+    * #92 Corrected path handling in simpleweb
+    * #98 Missing global variable in simpleid_openid_consent()
+- Improvements to user interface:
+    * #94 Switch redirects from form-based to HTTP header-based
+- Improvements to the PAPE extension
+    * #95 Added private personal identifiers
+    
 
 SimpleID 0.8
 ------------
