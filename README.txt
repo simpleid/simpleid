@@ -58,6 +58,9 @@ SimpleID includes code from the Drupal OpenID module
 <http://drupal.org/project/openid>, written by Rowan Kerr
 <rowan@standardinteractive.com> and James Walker <james@bryght.com>.
 
+SimpleID includes code from php-gettext <https://launchpad.net/php-gettext>,
+written by Danilo Segan <danilo@kvota.net> and Nico Kaiser <nico@siriux.net>.
+
 SimpleID uses the XTemplate PHP templating engine
 <http://www.phpxtemplate.org>, written by Barnabas Debreceni and Jeremy Coates.
 Licensing information for this library can be found in COPYING-xtemplate.txt.
