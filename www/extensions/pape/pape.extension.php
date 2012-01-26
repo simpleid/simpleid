@@ -78,7 +78,7 @@ function pape_checkid_identity($request, $identity, $immediate) {
         // max_auth_age, we then require the user to log in again
         if ((!isset($user['auth_active']) || !$user['auth_active']) 
             && ((time() - $user['auth_time']) > $pape_request['max_auth_age'])) {
-            set_message('This web site\'s policy requires you to log in again to confirm your identity.');
+            set_message(t('This web site\'s policy requires you to log in again to confirm your identity.'));
             
             _user_logout();
             return CHECKID_LOGIN_REQUIRED;

@@ -1,18 +1,15 @@
 <!-- BEGIN: user_page -->
 <!-- :mode=html: $Id$ -->
-    <p>SimpleID will send the following information to sites which supports
-    the Simple Registration Extension.</p>
+    <p>{sreg_data}</p>
     
-    <p>If you have also supplied OpenID Connect user information in your identity
-    file, these may also be sent as part of this Extension.</p>
+    <p>{connect_data}</p>
     
-    <p>To change these,
-    <a href="http://simpleid.sourceforge.net/documentation/getting-started/setting-identity/identity-files">edit your identity file</a>.</p>
+    <p>{edit_identity_file}</p>
     
     <table>
         <tr>
-            <th>Name</th>
-            <th>Value</th>
+            <th>{name_label}</th>
+            <th>{value_label}</th>
         </tr>
         <!-- BEGIN: sreg -->
         <tr>
@@ -24,13 +21,12 @@
 <!-- END: user_page -->
             
 <!-- BEGIN: form -->
-    <p>SimpleID will also be sending the following registration information to the site.
-    {policy}</p>
+    <p>{sreg_data} {policy}</p>
     
     <table>
         <tr>
-            <th>Name</th>
-            <th>Value</th>
+            <th>{name_label}</th>
+            <th>{value_label}</th>
         </tr>
         <!-- BEGIN: sreg -->
         <tr>

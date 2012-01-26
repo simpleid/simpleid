@@ -183,11 +183,16 @@ function ax_consent_form($request, $response, $rp) {
                 $xtpl2->parse('fetch_request.ax');
             }
         }
+
+        $xtpl2->assign('ax_data', t('SimpleID will also be sending the following information to the site.'));
+        $xtpl2->assign('name_label', t('Type URL'));
+        $xtpl2->assign('value_label', t('Value'));
         
         $xtpl2->parse('fetch_request');
         return $xtpl2->text('fetch_request');
     } elseif ($mode == 'store_request') {
         // Sadly, we don't support storage at this stage
+        $xtpl2->assign('store_request_message', t('This web site requested to store information about you on SimpleID. Sadly, SimpleID does not support this feature.'));
         $xtpl2->parse('store_request');
         return $xtpl2->text('store_request');
     }
@@ -206,13 +211,18 @@ function ax_page_profile() {
             $xtpl2->assign('value', htmlspecialchars($value, ENT_QUOTES, 'UTF-8'));
             $xtpl2->parse('user_page.ax');
         }
-    }    
+    }
+    
+    $xtpl2->assign('ax_data', t('SimpleID will send the following information to sites which supports the Attribute Exchange Extension.  If you have also supplied OpenID Connect user information in your identity, or have the Simple Registration Extension installed, these may also be sent as part of this Extension.'));
+    $xtpl2->assign('edit_identity_file', t('To change these, <a href="!url">edit your identity file</a>.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started/setting-identity/identity-files')));
+    $xtpl2->assign('name_label', t('Type URL'));
+    $xtpl2->assign('value_label', t('Value'));
     
     $xtpl2->parse('user_page');
     
     return array(array(
         'id' => 'ax',
-        'title' => 'Attribute Exchange Extension',
+        'title' => t('Attribute Exchange Extension'),
         'content' => $xtpl2->text('user_page')
     ));
 }

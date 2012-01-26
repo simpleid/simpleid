@@ -185,7 +185,7 @@ function ui_routes() {
 function ui_icon() {
     if (!isset($_GET['realm']) || !isset($_GET['tk']) || ($_GET['tk'] != _ui_icon_token($_GET['realm']))) {
         header('HTTP/1.1 404 Not Found');
-        indirect_fatal_error('Invalid UI icon parameters.');
+        indirect_fatal_error(t('Invalid UI icon parameters.'));
     }
     
     $realm = $_GET['realm'];
@@ -193,7 +193,7 @@ function ui_icon() {
     
     if ($icon_res === NULL) {
         header('HTTP/1.1 404 Not Found');
-        indirect_fatal_error('Unable to get icon.');
+        indirect_fatal_error(t('Unable to get icon.'));
     }
     
     header('Via: ' . $icon_res['protocol'] . ' simpleid-ui-icon-' . md5($realm));

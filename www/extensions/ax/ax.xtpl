@@ -1,17 +1,13 @@
 <!-- BEGIN: user_page -->
 <!-- :mode=html: $Id$ -->
-    <p>SimpleID will send the following information to sites which supports
-    the Attribute Exchange Extension.  If you have also supplied OpenID Connect
-    user information in your identity, or have the Simple Registration
-    Extension installed, these may also be sent as part of this Extension.</p>
+    <p>{ax_data}</p>
     
-    <p>To change these,
-    <a href="http://simpleid.sourceforge.net/documentation/getting-started/setting-identity/identity-files">edit your identity file</a>.</p>
+    <p>{edit_identity_file}</p>
     
     <table>
         <tr>
-            <th>Type URL</th>
-            <th>Value</th>
+            <th>{name_label}</th>
+            <th>{value_label}</th>
         </tr>
         <!-- BEGIN: ax -->
         <tr>
@@ -23,12 +19,12 @@
 <!-- END: user_page -->
             
 <!-- BEGIN: fetch_request -->
-    <p>SimpleID will also be sending the following information to the site.</p>
+    <p>{ax_data}</p>
     
     <table>
         <tr>
-            <th>Type URL</th>
-            <th>Value</th>
+            <th>{name_label}</th>
+            <th>{value_label}</th>
         </tr>
         <!-- BEGIN: ax -->
         <tr>
@@ -41,7 +37,6 @@
 
 <!-- BEGIN: store_request -->
 <div class="message">
-    <p>This web site requested to store information about you on SimpleID.
-    Sadly, SimpleID does not support this feature.</p>
+    <p>{store_request_message}</p>
 </div>
 <!-- END: store_request -->

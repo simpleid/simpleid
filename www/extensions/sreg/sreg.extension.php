@@ -110,7 +110,7 @@ function sreg_consent_form($request, $response, $rp) {
         $xtpl2->assign('alias', openid_extension_alias('http://openid.net/extensions/sreg/1.1'));
         
         if (isset($request['policy_url'])) {            
-            $xtpl2->assign('policy', 'You can view the site\'s policy in relation to the use of this information at this URL: <a href="' . htmlspecialchars($request['policy_url'], ENT_QUOTES, 'UTF-8') . '">' . htmlspecialchars($request['policy_url'], ENT_QUOTES, 'UTF-8') . '</a>.');            
+            $xtpl2->assign('policy', t('You can view the site\'s policy in relation to the use of this information at this URL: <a href="@url">@url</a>.', array('@url' => $request['policy_url'])));            
         }
         
         foreach ($fields as $field) {
@@ -122,6 +122,10 @@ function sreg_consent_form($request, $response, $rp) {
                 $xtpl2->parse('form.sreg');
             }
         }
+        
+        $xtpl2->assign('sreg_data', t('SimpleID will also be sending the following registration information to the site.'));
+        $xtpl2->assign('name_label', t('Name'));
+        $xtpl2->assign('value_label', t('Value'));
         
         $xtpl2->parse('form');
         return $xtpl2->text('form');
@@ -141,13 +145,19 @@ function sreg_page_profile() {
             $xtpl2->assign('value', htmlspecialchars($value, ENT_QUOTES, 'UTF-8'));
             $xtpl2->parse('user_page.sreg');
         }
-    }    
+    }
+    
+    $xtpl2->assign('sreg_data', t('SimpleID will send the following information to sites which supports the Simple Registration Extension.'));
+    $xtpl2->assign('connect_data', t('If you have also supplied OpenID Connect user information in your identity file, these may also be sent as part of this Extension.'));
+    $xtpl2->assign('edit_identity_file', t('To change these, <a href="!url">edit your identity file</a>.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started/setting-identity/identity-files')));
+    $xtpl2->assign('name_label', t('Name'));
+    $xtpl2->assign('value_label', t('Value'));
     
     $xtpl2->parse('user_page');
     
     return array(array(
         'id' => 'sreg',
-        'title' => 'Simple Registration Extension',
+        'title' => t('Simple Registration Extension'),
         'content' => $xtpl2->text('user_page')
     ));
 }
