@@ -30,6 +30,24 @@
     <property name="dist.tar.dir" value="tar" />
     <property name="dist.pear.dir" value="pear" />
     
+    <target name="gettext">
+        <echo file="gettext-filelist-orig.txt">
+            <fileset dir="www">
+                <include name="**/*.php" />
+            </fileset>
+        </echo>
+        <copy file="gettext-filelist-orig.txt" tofile="gettext-filelist.txt" overwrite="true">
+            <filterchain>
+                <striplinecomments>
+                    <comment value="Directory: " />
+                </striplinecomments>
+            </filterchain>
+        </copy>
+        <exec command="&quot;${xgettext.path}&quot; -kt --from-code utf-8 -o www/locale/messages.pot -L PHP --no-wrap -f gettext-filelist.txt"/>
+        <delete file="gettext-filelist-orig.txt"/>
+        <delete file="gettext-filelist.txt"/>
+    </target>
+    
     <target name="pear-package">
         <d51pearpkg2 dir="${dist.dir}/${dist.sub.dir}/simpleid/" baseinstalldir="/">
             <name>SimpleID</name>

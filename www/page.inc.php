@@ -54,7 +54,7 @@ function page_dashboard() {
     $xtpl->assign('blocks', implode($blocks));
     $xtpl->parse('main.blocks');
     
-    $xtpl->assign('title', 'Dashboard');
+    $xtpl->assign('title', t('Dashboard'));
     $xtpl->parse('main');
     $xtpl->out('main');
 
@@ -86,7 +86,7 @@ function page_profile() {
     $xtpl->parse('main.blocks');
     
     $xtpl->assign('javascript', '<script src="' . get_base_path() . 'html/page-profile.js" type="text/javascript"></script>');
-    $xtpl->assign('title', 'My Profile');
+    $xtpl->assign('title', t('My Profile'));
     $xtpl->parse('main');
     $xtpl->out('main');
 }
@@ -117,7 +117,7 @@ function page_sites() {
     
     if (isset($_POST['tk'])) {
         if (!validate_form_token($_POST['tk'], 'autorelease')) {
-            set_message('SimpleID detected a potential security attack.  Please try again.');
+            set_message(t('SimpleID detected a potential security attack.  Please try again.'));
         } else {
             if (isset($_POST['autorelease'])) {
                 foreach ($_POST['autorelease'] as $realm => $autorelease) {
@@ -143,7 +143,7 @@ function page_sites() {
             
             user_save($user);
     
-            set_message('Your preferences have been saved.');
+            set_message(t('Your preferences have been saved.'));
         }
     }
     
@@ -169,10 +169,16 @@ function page_sites() {
     }
     
     $xtpl->assign('token', get_form_token('autorelease'));
-        
+    
+    $xtpl->assign('realm_label', t('Site'));
+    $xtpl->assign('last_time_label', t('Last access'));
+    $xtpl->assign('auto_release_label', t('Automatic'));
+    $xtpl->assign('remove_label', t('Automatic'));
+    $xtpl->assign('submit_button', t('Submit'));    
+    
     $xtpl->parse('main.sites');
     
-    $xtpl->assign('title', 'My Sites');
+    $xtpl->assign('title', t('My Sites'));
     $xtpl->assign('javascript', '<script src="' . get_base_path() . 'html/consent.js" type="text/javascript"></script>');
     $xtpl->parse('main');
     $xtpl->out('main');
@@ -186,6 +192,10 @@ function page_nav() {
     global $xtpl;
     
     $xtpl->assign('nav_base', trim(simpleid_url(' ', '', true)));
+    
+    $xtpl->assign('nav_dashboard_label', t('Dashboard'));
+    $xtpl->assign('nav_profile_label', t('My Profile'));
+    $xtpl->assign('nav_sites_label', t('My Sites'));
     
     if ($user != NULL) {
         if (isset($user['administrator']) && ($user['administrator'] == 1)) $xtpl->parse('main.nav.nav_admin');
@@ -229,8 +239,8 @@ function _page_welcome_block() {
     
     return array(array(
         'id' => 'welcome',
-        'title' => 'Welcome',
-        'content' => 'You are logged in as <strong>' . htmlspecialchars($user['uid'], ENT_QUOTES, 'UTF-8') . '</strong> (<strong>' . htmlspecialchars($user['identity'], ENT_QUOTES, 'UTF-8') . '</strong>).'
+        'title' => t('Welcome'),
+        'content' => t('You are logged in as %uid (%identity).', array('%uid' => $user['uid'], '%identity' => $user['identity']))
     ));
 }
 
@@ -242,11 +252,11 @@ function _page_welcome_block() {
 function _page_discovery_block() {
     global $user;
     
-    $html = "<h3>&lt;link&gt; tags</h3>";
+    $html = "<h3>" . t('&lt;link&gt; tags') . "</h3>";
     
-    $html .= "<div><label><input type=\"checkbox\" name=\"openid1\" value=\"1\" id=\"discovery-openid1\" class=\"discovery-checkbox\" />OpenID 1.x</label>";
-    $html .= "<label><input type=\"checkbox\" name=\"openid2\" value=\"1\" id=\"discovery-openid2\" class=\"discovery-checkbox\" />OpenID 2.0</label>";
-    $html .= "<label><input type=\"checkbox\" name=\"local-id\" value=\"1\" id=\"discovery-local-id\" class=\"discovery-checkbox\" />Claim a different identifier</label></div>";
+    $html .= "<div><label><input type=\"checkbox\" name=\"openid1\" value=\"1\" id=\"discovery-openid1\" class=\"discovery-checkbox\" />" . t('OpenID 1.x') . "</label>";
+    $html .= "<label><input type=\"checkbox\" name=\"openid2\" value=\"1\" id=\"discovery-openid2\" class=\"discovery-checkbox\" />" . t('OpenID 2.0') . "</label>";
+    $html .= "<label><input type=\"checkbox\" name=\"local-id\" value=\"1\" id=\"discovery-local-id\" class=\"discovery-checkbox\" />" . t('Claim a different identifier') . "</label></div>";
     $html .= "<pre id=\"discovery-link-tags\">";
     $html .= "</pre>";
     $html .= "<ul id=\"discovery-templates\"><li class=\"openid1\">&lt;link rel=&quot;openid.server&quot; href=&quot;" . htmlspecialchars(simpleid_url(), ENT_QUOTES, 'UTF-8') . "&quot; /&gt;</li>\n";
@@ -254,14 +264,14 @@ function _page_discovery_block() {
     $html .= "<li class=\"openid1-local-id\">&lt;link rel=&quot;openid.delegate&quot; href=&quot;" . htmlspecialchars($user['identity'], ENT_QUOTES, 'UTF-8') . "&quot; /&gt;</li>\n";
     $html .= "<li class=\"openid2-local-id\">&lt;link rel=&quot;openid2.local_id&quot; href=&quot;" . htmlspecialchars($user['identity'], ENT_QUOTES, 'UTF-8') ."&quot; /&gt;</li></ul>\n";
 
-    $html .= "<h3>YADIS</h3>";
-    $html .= "<ol><li>Write your own or <a href=\"" . htmlspecialchars(simpleid_url('xrds/'. $user['uid'], '', true), ENT_QUOTES, 'UTF-8') . "\">download</a> your YADIS document</li>";
-    $html .= "<li><div>Add HTTP headers or &lt;meta&gt; tag, e.g.:<div><pre>&lt;meta http-equiv=&quot;X-XRDS-Location&quot; content=&quot;" . htmlspecialchars(simpleid_url('xrds/'. $user['uid']), ENT_QUOTES, 'UTF-8') . "&quot; /></pre>";
+    $html .= "<h3>" . t('YADIS') . "</h3>";
+    $html .= "<ol><li>" . t('Write your own or <a href=\"!url">download</a> your YADIS document', array('!url' => simpleid_url('xrds/'. $user['uid'], '', true))) . "</li>";
+    $html .= "<li><div>" . t('Add HTTP headers or &lt;meta&gt; tag, e.g.:') . "<div><pre>&lt;meta http-equiv=&quot;X-XRDS-Location&quot; content=&quot;" . htmlspecialchars(simpleid_url('xrds/'. $user['uid']), ENT_QUOTES, 'UTF-8') . "&quot; /></pre>";
     $html .= "</li></ol>";
     
     return array(array(
         'id' => 'discovery',
-        'title' => 'Claim your Identifier',
+        'title' => t('Claim your Identifier'),
         'content' => $html,
         'links' => '<a href="http://simpleid.sourceforge.net/documentation/getting-started/setting-identity/claim-your-identifier">More information</a>'
     ));

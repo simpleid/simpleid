@@ -38,6 +38,7 @@ include_once "version.inc.php";
 include_once "config.php";
 include_once "config.default.php";
 include_once "log.inc.php";
+include_once "locale.inc.php";
 include_once "common.inc.php";
 include_once "simpleweb.inc.php";
 include_once "openid.inc.php";
@@ -105,28 +106,28 @@ function simpleid_start() {
     // Check if the configuration file has been defined
     if (!defined('SIMPLEID_BASE_URL')) {
         log_fatal('No configuration file found.');
-        indirect_fatal_error('No configuration file found.  See the <a href="http://simpleid.sourceforge.net/documentation/getting-started">manual</a> for instructions on how to set up a configuration file.');
+        indirect_fatal_error(t('No configuration file found.  See the <a href="!url">manual</a> for instructions on how to set up a configuration file.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started')));
     }
     
     if (!is_dir(SIMPLEID_IDENTITIES_DIR)) {
         log_fatal('Identities directory not found.');
-        indirect_fatal_error('Identities directory not found.  See the <a href="http://simpleid.sourceforge.net/documentation/getting-started">manual</a> for instructions on how to set up SimpleID.');
+        indirect_fatal_error(t('Identities directory not found.  See the <a href="!url">manual</a> for instructions on how to set up SimpleID.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started')));
     }
     
     if (!is_dir(SIMPLEID_CACHE_DIR) || !is_writeable(SIMPLEID_CACHE_DIR)) {
         log_fatal('Cache directory not found or not writeable.');
-        indirect_fatal_error('Cache directory not found or not writeable.  See the <a href="http://simpleid.sourceforge.net/documentation/getting-started">manual</a> for instructions on how to set up SimpleID.');
+        indirect_fatal_error(t('Cache directory not found or not writeable.  See the <a href="!url">manual</a> for instructions on how to set up SimpleID.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started')));
     }
     
     
     if (!is_dir(SIMPLEID_STORE_DIR) || !is_writeable(SIMPLEID_STORE_DIR)) {
         log_fatal('Store directory not found or not writeable.');
-        indirect_fatal_error('Store directory not found or not writeable.  See the <a href="http://simpleid.sourceforge.net/documentation/getting-started">manual</a> for instructions on how to set up SimpleID.');
+        indirect_fatal_error(t('Store directory not found or not writeable.  See the <a href="!url">manual</a> for instructions on how to set up SimpleID.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started')));
     }
     
     if ((@ini_get('register_globals') === 1) || (@ini_get('register_globals') === '1') || (strtolower(@ini_get('register_globals')) == 'on')) {
         log_fatal('register_globals is enabled in PHP configuration.');
-        indirect_fatal_error('register_globals is enabled in PHP configuration, which is not supported by SimpleID.  See the <a href="http://simpleid.sourceforge.net/documentation/getting-started/system-requirements">manual</a> for further information.');
+        indirect_fatal_error(t('register_globals is enabled in PHP configuration, which is not supported by SimpleID.  See the <a href="!url">manual</a> for further information.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started/system-requirements')));
     }
 
     openid_fix_request();
@@ -243,7 +244,7 @@ function simpleid_process_openid($request) {
             if (isset($request['openid.return_to'])) {
                 // Indirect communication - send error via indirect communication.
                 header('HTTP/1.1 400 Bad Request');
-                set_message('Invalid OpenID message.');
+                set_message(t('Invalid OpenID message.'));
                 page_dashboard();
             } else {
                 // Direct communication
@@ -427,12 +428,12 @@ function simpleid_checkid($request) {
     if ($version == OPENID_VERSION_1_1) {
         if (!isset($request['openid.return_to'])) {
             log_error('Protocol Error: openid.return_to not set.');
-            indirect_fatal_error('Protocol Error: openid.return_to not set.');
+            indirect_fatal_error(t('Protocol Error: openid.return_to not set.'));
             return;
         }
         if (!isset($request['openid.identity'])) {
             log_error('Protocol Error: openid.identity not set.');
-            indirect_fatal_error('Protocol Error: openid.identity not set.');
+            indirect_fatal_error(t('Protocol Error: openid.identity not set.'));
             return;
         }
     }
@@ -440,13 +441,13 @@ function simpleid_checkid($request) {
     if ($version >= OPENID_VERSION_2) {
         if (isset($request['openid.identity']) && !isset($request['openid.claimed_id'])) {
             log_error('Protocol Error: openid.identity set, but not openid.claimed_id.');
-            indirect_fatal_error('Protocol Error: openid.identity set, but not openid.claimed_id.');
+            indirect_fatal_error(t('Protocol Error: openid.identity set, but not openid.claimed_id.'));
             return;
         }
         
         if (!isset($request['openid.realm']) && !isset($request['openid.return_to'])) {
             log_error('Protocol Error: openid.return_to not set when openid.realm is not set.');
-            indirect_fatal_error('Protocol Error: openid.return_to not set when openid.realm is not set.');
+            indirect_fatal_error(t('Protocol Error: openid.return_to not set when openid.realm is not set.'));
             return;
         }
     }
@@ -994,11 +995,16 @@ function simpleid_openid_consent_form($request, $response, $reason = CHECKID_APP
     $xtpl->assign('token', get_form_token('rp'));
     $xtpl->assign('state', pickle($response));
     $xtpl->assign('realm', htmlspecialchars($realm, ENT_QUOTES, 'UTF-8'));
+    
+    $xtpl->assign('cancel_button', t('Cancel'));
 
     if ($response['openid.mode'] == 'cancel') {
-        $xtpl->assign('switch_user_url', htmlspecialchars(simpleid_url('logout', 'destination=continue&s=' . rawurlencode($request_state), true)));
         $xtpl->assign('return_to', htmlspecialchars($request['openid.return_to'], ENT_QUOTES, 'UTF-8'));
-        $xtpl->assign('identity', htmlspecialchars($request['openid.identity'], ENT_QUOTES, 'UTF-8'));
+        
+        $xtpl->assign('unable_label', t('Unable to log into <strong class="realm">@realm</strong>.', array('@realm' => $realm)));
+        $xtpl->assign('identity_not_matching_label', t('Your current identity does not match the requested identity %identity.', array('%identity' => $request['openid.identity'])));
+        $xtpl->assign('switch_user_label', t('<a href="{switch_user_url}">Switch to a different user</a> and try again.', array('!url' => simpleid_url('logout', 'destination=continue&s=' . rawurlencode($request_state), true))));
+        
         $xtpl->parse('main.openid_consent.cancel');
     } else {
         $xtpl->assign('javascript', '<script src="' . get_base_path() . 'html/openid-consent.js" type="text/javascript"></script>');
@@ -1009,9 +1015,17 @@ function simpleid_openid_consent_form($request, $response, $reason = CHECKID_APP
         $xtpl->assign('extensions', implode($extensions));
         
         if ($reason == CHECKID_RETURN_TO_SUSPECT) {
+            $xtpl->assign('suspect_label', t('Warning: This web site has not confirmed its identity and might be fraudulent.  Do not share any personal information with this web site unless you are sure it is legitimate. See the <a href="!url" class="popup">SimpleID documentation for details</a> (OpenID version 2.0 return_to discovery failure)',
+                array('!url' => 'http://simpleid.sourceforge.net/documentation/troubleshooting/returnto-discovery-failure')));
+            
             $xtpl->parse('main.openid_consent.setup.suspect');
             $xtpl->assign('realm_class', 'return-to-suspect');
         }
+        
+        $xtpl->assign('realm_label', t('You are being logged into <strong class="realm">@realm</strong>.', array('@realm' => $realm)));
+        $xtpl->assign('auto_release_label', t('Automatically send my information to this site for any future requests.'));
+        $xtpl->assign('ok_button', t('OK'));
+        
         $xtpl->parse('main.openid_consent.setup');
     }
     
@@ -1020,7 +1034,7 @@ function simpleid_openid_consent_form($request, $response, $reason = CHECKID_APP
     
     header('X-Frame-Options: DENY');
     
-    $xtpl->assign('title', 'OpenID Login');
+    $xtpl->assign('title', t('OpenID Login'));
     $xtpl->assign('page_class', 'dialog-page');
     $xtpl->parse('main');
     
@@ -1044,8 +1058,8 @@ function simpleid_openid_consent() {
     }
     
     if (!validate_form_token($GETPOST['tk'], 'rp')) {
-        set_message('SimpleID detected a potential security attack.  Please try again.');
-        $xtpl->assign('title', 'OpenID Login');
+        set_message(t('SimpleID detected a potential security attack.  Please try again.'));
+        $xtpl->assign('title', t('OpenID Login'));
         $xtpl->parse('main');
         $xtpl->out('main');
         return;
@@ -1058,9 +1072,9 @@ function simpleid_openid_consent() {
     $return_to = $response['openid.return_to'];
     if (!$return_to) $return_to = $GETPOST['openid.return_to'];
     
-    if ($GETPOST['op'] == 'Cancel') {
+    if ($GETPOST['op'] == t('Cancel')) {
         $response = simpleid_checkid_error(false);
-        if (!$return_to) set_message('Log in cancelled.');
+        if (!$return_to) set_message(t('Log in cancelled.'));
     } else {
         $now = time();
         $realm = $GETPOST['openid.realm'];
@@ -1079,7 +1093,7 @@ function simpleid_openid_consent() {
         user_save($user);
         
         $response = simpleid_sign($response, isset($response['openid.assoc_handle']) ? $response['openid.assoc_handle'] : NULL);
-        if (!$return_to) set_message('You were logged in successfully.');
+        if (!$return_to) set_message(t('You were logged in successfully.'));
     }
 
     if ($return_to) {

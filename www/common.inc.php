@@ -144,7 +144,7 @@ function check_https($action = 'redirect', $allow_override = false, $redirect_ur
         header('HTTP/1.1 426 Upgrade Required');
         header('Upgrade: TLS/1.2, HTTP/1.1');
         header('Connection: Upgrade');
-        indirect_fatal_error('An encrypted connection (HTTPS) is required for this page.');
+        indirect_fatal_error(t('An encrypted connection (HTTPS) is required for this page.'));
         return;
     }
     

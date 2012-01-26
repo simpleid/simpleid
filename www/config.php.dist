@@ -151,6 +151,14 @@ define('SIMPLEID_ALLOW_AUTOCOMPLETE', false);
  */
 define('SIMPLEID_VERIFY_RETURN_URL_USING_REALM', true);
 
+
+/**
+ * The locale for the SimpleID user interface.
+ *
+ * @since 0.9
+ */
+define('SIMPLEID_LOCALE', 'en');
+
 /**
  * Date and time format.
  *

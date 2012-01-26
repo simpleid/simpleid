@@ -157,7 +157,7 @@ function user_login() {
     $state = (isset($GETPOST['s'])) ? $GETPOST['s'] : '';
     $query = ($state) ? 's=' . rawurlencode($state) : '';
     
-    if (isset($_POST['op']) && $_POST['op'] == 'Cancel') {
+    if (isset($_POST['op']) && $_POST['op'] == t('Cancel')) {
         global $version;
         
         $request = unpickle($state);
@@ -168,7 +168,7 @@ function user_login() {
             $response = simpleid_checkid_error(FALSE);
             simpleid_assertion_response($response, $return_to);
         } else {
-            indirect_fatal_error('Login cancelled without a proper OpenID request.');
+            indirect_fatal_error(t('Login cancelled without a proper OpenID request.'));
         }
         return;
     }
@@ -179,7 +179,7 @@ function user_login() {
     if (($_POST['name'] == '') || ($_POST['pass'] == '')) {
         if (isset($_POST['destination'])) {
             // User came from a log in form.
-            set_message('You need to supply the user name and the password in order to log in.');
+            set_message(t('You need to supply the user name and the password in order to log in.'));
         }
         if (isset($_POST['nonce'])) cache_delete('user-nonce', $_POST['nonce']);
         user_login_form($destination, $state);
@@ -189,7 +189,7 @@ function user_login() {
     if (!isset($_POST['nonce'])) {
         if (isset($_POST['destination'])) {
             // User came from a log in form.
-            set_message('You seem to be attempting to log in from another web page.  You must use this page to log in.');
+            set_message(t('You seem to be attempting to log in from another web page.  You must use this page to log in.'));
         }
         user_login_form($destination, $state);
         return;
@@ -201,12 +201,12 @@ function user_login() {
     
     if (!cache_get('user-nonce', $_POST['nonce'])) {
         log_warn('Login attempt: Nonce ' . $_POST['nonce'] . ' not issued or is being reused.');
-        set_message('SimpleID detected a potential security attack on your log in.  Please log in again.');
+        set_message(t('SimpleID detected a potential security attack on your log in.  Please log in again.'));
         user_login_form($destination, $state);
         return;
     } elseif ($time < time() - SIMPLEID_LOGIN_NONCE_EXPIRES_IN) {
         log_notice('Login attempt: Nonce ' . $_POST['nonce'] . ' expired.');
-        set_message('The log in page has expired.  Please log in again.');
+        set_message(t('The log in page has expired.  Please log in again.'));
         user_login_form($destination, $state);
         return;
     } else {
@@ -214,7 +214,7 @@ function user_login() {
     }
     
     if (store_user_verify_credentials($_POST['name'], $_POST) === false) {
-        set_message('The user name or password is not correct.');
+        set_message(t('The user name or password is not correct.'));
         user_login_form($destination, $state);
         return;
     }
@@ -274,7 +274,7 @@ function user_logout($destination = NULL) {
     
     _user_logout();
     
-    set_message('You have been logged out.');
+    set_message(t('You have been logged out.'));
     
     user_login_form($destination, $state);
 }
@@ -308,6 +308,7 @@ function user_login_form($destination = '', $state = NULL) {
 
     if ($state) {
         $xtpl->assign('state', htmlspecialchars($state, ENT_QUOTES, 'UTF-8'));
+        $xtpl->assgin('cancel_button', t('Cancel'));
         $xtpl->parse('main.login.state');
     }
     
@@ -323,10 +324,10 @@ function user_login_form($destination = '', $state = NULL) {
     
     if (is_https()) {
         $security_class .= 'secure';
-        $xtpl->assign('security_message', 'Secure login using <strong>HTTPS</strong>.');
+        $xtpl->assign('security_message', t('Secure login using <strong>HTTPS</strong>.'));
     } elseif (SIMPLEID_ALLOW_PLAINTEXT) {
         $security_class .= 'unsecure';
-        $xtpl->assign('security_message', '<strong>WARNING:</strong>  Your password will be sent to SimpleID as plain text.');
+        $xtpl->assign('security_message', t('<strong>WARNING:</strong>  Your password will be sent to SimpleID as plain text.'));
     }
     $xtpl->assign('security_class', $security_class);
     
@@ -334,7 +335,12 @@ function user_login_form($destination = '', $state = NULL) {
     
     header('X-Frame-Options: DENY');
 
-    $xtpl->assign('title', 'Log In');
+    $xtpl->assign('name_label', t('User name:'));
+    $xtpl->assign('pass_label', t('Password'));
+    $xtpl->assign('autologin_label', t('Remember me on this computer for two weeks.'));
+    $xtpl->assign('login_button', t('Log in'));
+    
+    $xtpl->assign('title', t('Log In'));
     $xtpl->assign('page_class', 'dialog-page');
     $xtpl->assign('destination', htmlspecialchars($destination, ENT_QUOTES, 'UTF-8'));
     $xtpl->assign('nonce', htmlspecialchars($nonce, ENT_QUOTES, 'UTF-8'));
@@ -353,16 +359,16 @@ function user_login_form($destination = '', $state = NULL) {
 function user_public_page($uid = NULL) {
     global $xtpl, $user;
     
-    $xtpl->assign('title', 'User Page');
+    $xtpl->assign('title', t('User Page'));
     if ($uid == NULL) {
         header('HTTP/1.1 400 Bad Request');
-        set_message('No user specified.');
+        set_message(t('No user specified.'));
     } else {
         $user = user_load($uid);
         
         if ($user == NULL) {
             header('HTTP/1.1 404 Not Found');
-            set_message('User <strong>' . htmlspecialchars($uid, ENT_QUOTES, 'UTF-8') . '</strong> not found.');
+            set_message(t('User %uid not found.', array('%uid' => $uid)));
         } else {
             header('Vary: Accept');
             
@@ -374,7 +380,7 @@ function user_public_page($uid = NULL) {
             } else {
                 header('X-XRDS-Location: ' . simpleid_url('xrds/' . rawurlencode($uid)));
                 
-                set_message('This is the user <strong>' . htmlspecialchars($uid, ENT_QUOTES, 'UTF-8') . '</strong>\'s SimpleID page.  It contains hidden information for the use by OpenID consumers.');
+                set_message(t('This is the user %uid\'s SimpleID page.  It contains hidden information for the use by OpenID consumers.', array('%uid' => $uid)));
                 
                 $xtpl->assign('title', htmlspecialchars($uid, ENT_QUOTES, 'UTF-8'));
                 $xtpl->assign('provider', htmlspecialchars(simpleid_url(), ENT_QUOTES, 'UTF-8'));
@@ -414,9 +420,9 @@ function user_ppid_page($ppid = NULL) {
     } else {
         header('X-XRDS-Location: ' . simpleid_url('ppid/' . rawurlencode($ppid), 'format=xrds'));
                 
-        $xtpl->assign('title', 'Private Personal Identifier');
+        $xtpl->assign('title', t('Private Personal Identifier'));
                 
-        set_message('This is a private personal identifier.');
+        set_message(t('This is a private personal identifier.'));
         
         $xtpl->parse('main');
         $xtpl->out('main');
@@ -464,10 +470,10 @@ function user_xrds($uid) {
 function _user_page_profile() {
     global $user;
     
-    $html = "<p>SimpleID may, with your consent, send the following information to sites which supports OpenID Connect.</p>";
-    $html .= "<p>To change these, <a href=\"http://simpleid.sourceforge.net/documentation/getting-started/setting-identity/identity-files\">edit your identity file</a>.</p>";
+    $html = '<p>' . t('SimpleID may, with your consent, send the following information to sites which supports OpenID Connect.') . '</p>';    
+    $html .= '<p>' . t('To change these, <a href="!url">edit your identity file</a>.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started/setting-identity/identity-files')) . '</p>';
     
-    $html .= "<table><tr><th>Member</th><th>Value</th></tr>";
+    $html .= "<table><tr><th>" . t('Member') . "</th><th>" . t('Value') . "</th></tr>";
     
     if (isset($user['user_info'])) {
         foreach ($user['user_info'] as $member => $value) {
@@ -485,7 +491,7 @@ function _user_page_profile() {
     
     return array(array(
         'id' => 'userinfo',
-        'title' => 'OpenID Connect',
+        'title' => t('OpenID Connect'),
         'content' => $html
     ));
 }
@@ -505,10 +511,10 @@ function user_header($state = NULL) {
         $xtpl->assign('identity', htmlspecialchars($user['identity'], ENT_QUOTES, 'UTF-8'));
         if ($state != NULL) {
             $xtpl->assign('url', htmlspecialchars(simpleid_url('logout', 'destination=continue&s=' . rawurlencode($state), true)));
-            $xtpl->assign('logout', 'Log out and log in as a different user');
+            $xtpl->assign('logout', t('Log out and log in as a different user'));
         } else {
             $xtpl->assign('url', htmlspecialchars(simpleid_url('logout', '', true)));
-            $xtpl->assign('logout', 'Log out');
+            $xtpl->assign('logout', t('Log out'));
         }
         $xtpl->parse('main.user.logout');
         $xtpl->parse('main.user');

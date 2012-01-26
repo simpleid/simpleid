@@ -57,9 +57,9 @@
         <!-- BEGIN: nav -->
         <div id="nav">
             <ul id="nav-left">
-                <li><a href="{nav_base}">Dashboard</a></li>
-                <li><a href="{nav_base}my/profile">My Profile</a></li>
-                <li><a href="{nav_base}my/sites">My Sites</a></li>
+                <li><a href="{nav_base}">{nav_dashboard_label}</a></li>
+                <li><a href="{nav_base}my/profile">{nav_profile_label}</a></li>
+                <li><a href="{nav_base}my/sites">{nav_sites_label}</a></li>
             </ul>
             <!-- BEGIN: nav_admin -->
             <!--ul id="nav-right">
@@ -90,22 +90,22 @@
                 <input type="hidden" name="digest" id="edit-digest" value="" />
                 
                 <div class="form-item">
-                    <label for="edit-name">User name:</label>
+                    <label for="edit-name">{name_label}:</label>
                     <input type="text" maxlength="60" name="name" id="edit-name"  size="60" value="" autocapitalize="off" autocorrect="off" class="form-text required" {security_disabled} />
                 </div>
                 <div class="form-item">
-                    <label for="edit-pass">Password:</label>
+                    <label for="edit-pass">{pass_label}:</label>
                     <input type="password" name="pass" id="edit-pass"  size="60"  class="form-text required" {security_disabled} />
                 </div>                
                 <div class="form-item">
                     <label class="option">
                         <input type="checkbox" name="autologin" value="1" />
-                        Remember me on this computer for two weeks.
+                        {autologin_label}
                     </label>
                 </div>                
-                <input type="submit" name="op" id="edit-submit" value="Log in" class="form-submit" {security_disabled} />
+                <input type="submit" name="op" id="edit-submit" value="{login_button}" class="form-submit" {security_disabled} />
                 <!-- BEGIN: state -->
-                    <input type="submit" name="op" id="edit-cancel" value="Cancel" class="form-submit" />
+                    <input type="submit" name="op" id="edit-cancel" value="{cancel_button}" class="form-submit" />
                     <input type="hidden" name="s" value="{state}"/>
                 <!-- END: state -->
             </form>
@@ -126,41 +126,37 @@
                 <!-- BEGIN: setup -->
                 <input type="hidden" name="openid.realm" value="{realm}" />
                 
-                <p>You are being logged into <strong class="realm">{realm}</strong>.</p>
+                <p>{realm_label}</p>
                 
                 <!-- BEGIN: suspect -->
                 <div class="message unsecure">
-                    <p>Warning: This web site has not confirmed its identity and might be
-                    fraudulent.  Do not share any personal information with this web
-                    site unless you are sure it is legitimate.  
-                    See the <a href="http://simpleid.sourceforge.net/documentation/troubleshooting/returnto-discovery-failure" class="popup">SimpleID documentation for details</a>
-                    (OpenID version 2.0 return_to discovery failure)</p>
+                    <p>{suspect_label}</p>
                 </div>
                 <!-- END: suspect -->
                 
                 <div class="form-item">
                     <label class="option">
                         <input class="{realm_class}" type="checkbox" name="autorelease" {auto_release} value="1" />
-                        Automatically send my information to this site for any future requests.
+                        {auto_release_label}
                     </label>
                 </div>
 
                 {extensions}
                 
-                <input type="submit" name="op" id="edit-submit" value="OK" class="form-submit" />
-                <input type="submit" name="op" id="edit-cancel" value="Cancel" class="form-submit" />
+                <input type="submit" name="op" id="edit-submit" value="{ok_button}" class="form-submit" />
+                <input type="submit" name="op" id="edit-cancel" value="{cancel_button}" class="form-submit" />
                 <!-- END: setup -->
 
                 <!-- BEGIN: cancel -->
                 <input type="hidden" name="openid.return_to" value="{return_to}" />
                 
-                <p>Unable to log into <strong class="realm">{realm}</strong>.</p>
+                <p>{unable_label}</p>
                 
-                <p>Your current identity does not match the requested identity <strong>{identity}</strong>.</p>
+                <p>{identity_not_matching_label}</p>
                 
-                <p><a href="{switch_user_url}">Switch to a different user</a> and try again.</p>
+                <p>{switch_user_label}</p>
                 
-                <input type="submit" name="op" id="edit-cancel" value="Cancel" class="form-submit" />
+                <input type="submit" name="op" id="edit-cancel" value="{cancel_button}" class="form-submit" />
                 <!-- END: cancel -->                
             </form>
             <!-- END: openid_consent -->
@@ -177,10 +173,10 @@
             <table id="sites">
                 <thead>
                     <tr>
-                        <th>Site</th>
-                        <th>Last access</th>
-                        <th>Automatic</th>
-                        <th>Remove</th>
+                        <th>{realm_label}</th>
+                        <th>{last_time_label}</th>
+                        <th>{auto_release_label}</th>
+                        <th>{remove_label}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -194,85 +190,78 @@
                     <!-- END: realm -->
                 </tbody>
             </table>
-            <input type="submit" name="op" id="edit-submit" value="Submit" class="form-submit" {disabled} />
+            <input type="submit" name="op" id="edit-submit" value="{submit_button}" class="form-submit" {disabled} />
             </form>
             <!-- END: sites -->
             
             <!-- BEGIN: upgrade_access_denied -->
-            <p>Access denied. You are not authorised to access this page. Please <a href="index.php?q=login">log in</a> as an
-            administrator (a user whose identity file includes the line <code>administrator=1</code>).</p>
+            <p>{login_required}</p>
             
-            <p>If you cannot log in, you will have to edit <code>upgrade.php</code> to bypass this access check. To do this:</p>
+            <p>{edit_upgrade_php}</p>
             
             <ol>
-                <li>With a text editor find the upgrade.php file.</li>
-                <li>There is a line inside your upgrade.php file that says <code>$upgrade_access_check = TRUE;</code>. Change it to <code>$upgrade_access_check = FALSE;</code>.</li>
-                <li>As soon as the upgrade.php script is done, you must change the file back to its original form with <code>$upgrade_access_check = TRUE;</code>.</li>
-                <li>To avoid having this problem in future, remember to log in to SimpleID as an administrator before you run this script.</li>
+                <li>{edit_upgrade_php1}</li>
+                <li>{edit_upgrade_php2}</li>
+                <li>{edit_upgrade_php3}</li>
+                <li>{edit_upgrade_php4}</li>
             </ol>
             
-            <p>For more detailed information, see the
-            <a href="http://simpleid.sourceforge.net/documentation/getting-started/upgrading/running-upgradephp">SimpleID documentation</a>.</p>
+            <p>{simpleid_docs}</p>
             <!-- END: upgrade_access_denied -->
 
             <!-- BEGIN: upgrade_info -->
-            <p>Use this script to update your installation whenever you upgrade to a new version
-            of SimpleID.</p>
+            <p>{intro}</p>
             
-            <p>For more detailed information, see the
-            <a href="http://simpleid.sourceforge.net/documentation/getting-started/upgrading">SimpleID documentation</a>.</p>
+            <p>{simpleid_docs}</p>
             
             <ol>
-                <li><strong>Back up your installation</strong>. This process will change various files within your
-                SimpleID installationand in case of emergency you may need to revert to a backup.</li>
-                
-                <li>Install your new files in the appropriate location, as described in the
-                <a href="http://simpleid.sourceforge.net/documentation/getting-started/installing-simpleid">SimpleID documentation</a>.</li>
+                <li>{step1}</li>
+                <li>{step2}</li>
             </ol>
   
-            <p>When you have performed the steps above, click <strong>Continue</strong>.</p>
+            <p>{click_continue}</p>
 
             <form method="post" action="{base_path}upgrade.php">
                 <input type="hidden" name="q" value="upgrade-selection" />
                 <input type="hidden" name="tk" value="{token}" />
-                <input type="submit" value="Continue" />
+                <input type="submit" value="{continue_button}" />
             </form>
             <!-- END: upgrade_info -->
             
             <!-- BEGIN: upgrade_selection -->
-            <p>The version of SimpleID you are updating from has been automatically detected.</p>
+            <p>{version_detected}</p>
             
-            <p>Original version: <strong class="upgrade-version original-version">{original_version}</strong></p>
+            <p>{original_version_label}: <strong class="upgrade-version original-version">{original_version}</strong></p>
             
-            <p>Upgrade version: <strong class="upgrade-version this-version">{this_version}</strong></p>
+            <p>{this_version_label}: <strong class="upgrade-version this-version">{this_version}</strong></p>
             
                 <!-- BEGIN: selection_complete -->
-                    <p>Your SimpleID installation is up-to-date.  This script is complete</p>
+                    <p>{script_complete}</p>
                     <!-- BEGIN: upgrade_access_check -->
                     <div class="message unsecure">
-                        <p>Remember to edit upgrade.php to check <code>$upgrade_access_check</code> back to <code>FALSE</code>.</p>
+                        <p>{edit_upgrade_php}</p>
                     </div>
                     <!-- END: upgrade_access_check -->
                 <!-- END: selection_complete -->
                 
                 <!-- BEGIN: selection_continue -->
-                <p>Click <strong>Continue</strong> to proceed with the upgrade.</p>
+                <p>{click_continue}</p>
 
                 <form method="post" action="{base_path}upgrade.php">
                     <input type="hidden" name="q" value="upgrade-apply" />
                     <input type="hidden" name="tk" value="{token}" />
                     <input type="hidden" name="handle" value="{handle}" />
-                    <input type="submit" value="Continue" />
+                    <input type="submit" value="{continue_button}" />
                 </form>
                 <!-- END: selection_continue -->
                 
             <!-- END: upgrade_selection -->
             
             <!-- BEGIN: upgrade_results -->
-            <p>Your SimpleID installation has been upgraded.  Please check the results below for any errors.</p>
+            <p>{upgrade_complete}</p>
             <!-- BEGIN: upgrade_access_check -->
             <div class="message unsecure">
-                <p>Remember to edit upgrade.php to check <code>$upgrade_access_check</code> back to <code>FALSE</code>.</p>
+                <p>{edit_upgrade_php}</p>
             </div>
             <!-- END: upgrade_access_check -->
             
@@ -285,8 +274,8 @@
         <div id="footer">
             <address>
                 SimpleID {version} &copy; Kelvin Mo 2007-9 &middot;
-                <a href="http://simpleid.sourceforge.net/documentation">Documentation</a> &middot;
-                <a href="http://sourceforge.net/apps/trac/simpleid">Support</a>
+                <a href="http://simpleid.sourceforge.net/documentation">{footer_doc}</a> &middot;
+                <a href="http://sourceforge.net/apps/trac/simpleid">{footer_support}</a>
             </address>
         </div>
     </body>

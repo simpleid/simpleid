@@ -58,6 +58,7 @@ if (file_exists("config.php")) {
 }
 include_once "config.default.php";
 include_once "log.inc.php";
+include_once "locale.inc.php";
 include_once "common.inc.php";
 include_once "simpleweb.inc.php";
 include_once "openid.inc.php";
@@ -110,26 +111,28 @@ function upgrade_start() {
     $xtpl->assign('version', SIMPLEID_VERSION);
     $xtpl->assign('base_path', get_base_path());
     $xtpl->assign('css', '@import url(' . get_base_path() . 'html/upgrade.css);');
+    $xtpl->assign('footer_doc', t('Documentation'));
+    $xtpl->assign('footer_support', t('Support'));
     
     // Check if the configuration file has been defined
     if (!defined('SIMPLEID_BASE_URL')) {
-        indirect_fatal_error('No configuration file found.  See the <a href="http://simpleid.sourceforge.net/documentation/getting-started">manual</a> for instructions on how to set up a configuration file.');
+        indirect_fatal_error(t('No configuration file found.  See the <a href="!url">manual</a> for instructions on how to set up a configuration file.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started')));
     }
     
     if (!is_dir(SIMPLEID_IDENTITIES_DIR)) {
-        indirect_fatal_error('Identities directory not found.  See the <a href="http://simpleid.sourceforge.net/documentation/getting-started">manual</a> for instructions on how to set up SimpleID.');
+        indirect_fatal_error(t('Identities directory not found.  See the <a href="!url">manual</a> for instructions on how to set up SimpleID.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started')));
     }
     
     if (!is_dir(SIMPLEID_CACHE_DIR) || !is_writeable(SIMPLEID_CACHE_DIR)) {
-        indirect_fatal_error('Cache directory not found or not writeable.  See the <a href="http://simpleid.sourceforge.net/documentation/getting-started">manual</a> for instructions on how to set up SimpleID.');
+        indirect_fatal_error(t('Cache directory not found or not writeable.  See the <a href="!url">manual</a> for instructions on how to set up SimpleID.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started')));
     }
     
     if (!is_dir(SIMPLEID_STORE_DIR) || !is_writeable(SIMPLEID_STORE_DIR)) {
-        indirect_fatal_error('Store directory not found or not writeable.  See the <a href="http://simpleid.sourceforge.net/documentation/getting-started">manual</a> for instructions on how to set up SimpleID.');
+        indirect_fatal_error(t('Store directory not found or not writeable.  See the <a href="!url">manual</a> for instructions on how to set up SimpleID.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started')));
     }
 
     if ((@ini_get('register_globals') === 1) || (@ini_get('register_globals') === '1') || (strtolower(@ini_get('register_globals')) == 'on')) {
-        indirect_fatal_error('register_globals is enabled in PHP configuration, which is not supported by SimpleID.  See the <a href="http://simpleid.sourceforge.net/documentation/getting-started/system-requirements">manual</a> for further information.');
+        indirect_fatal_error(t('register_globals is enabled in PHP configuration, which is not supported by SimpleID.  See the <a href="!url">manual</a> for further information.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started/system-requirements')));
     }    
 
     $q = (isset($GETPOST['q'])) ? $GETPOST['q'] : '';
@@ -155,9 +158,17 @@ function upgrade_info() {
     global $xtpl;
     
     $xtpl->assign('token', get_form_token('upgrade_info'));
+    
+    $xtpl->assign('intro', t('Use this script to update your installation whenever you upgrade to a new version of SimpleID.'));
+    $xtpl->assign('simpleid_docs', t('For more detailed information, see the <a href="!url">SimpleID documentation</a>.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started/upgrading')));
+    $xtpl->assign('step1', t('<strong>Back up your installation</strong>. This process will change various files within your SimpleID installationand in case of emergency you may need to revert to a backup.'));
+    $xtpl->assign('step2', t('Install your new files in the appropriate location, as described in the <a href="!url">SimpleID documentation</a>.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started/installing-simpleid')));
+    $xtpl->assign('click_continue', t('When you have performed the steps above, click <strong>Continue</strong>.'));
+    $xtpl->assign('continue_button', t('Continue'));
+    
     $xtpl->parse('main.upgrade_info');
     
-    $xtpl->assign('title', 'Upgrade');
+    $xtpl->assign('title', t('Upgrade'));
     $xtpl->parse('main');
     
     $xtpl->out('main');
@@ -174,7 +185,7 @@ function upgrade_selection() {
     cache_expire(array('upgrade' => 0));
     
     if (!validate_form_token($_POST['tk'], 'upgrade_info')) {
-        set_message('SimpleID detected a potential security attack.  Please try again.');
+        set_message(t('SimpleID detected a potential security attack.  Please try again.'));
         upgrade_info();
         return;
     }
@@ -182,7 +193,13 @@ function upgrade_selection() {
     $functions = upgrade_get_functions();
     
     if (count($functions) == 0) {
-        if (!$upgrade_access_check) $xtpl->parse('main.selection.selection_complete.upgrade_access_check');
+        if (!$upgrade_access_check) {
+            $xtpl->assign('edit_upgrade_php', t('Remember to edit upgrade.php to check <code>$upgrade_access_check</code> back to <code>FALSE</code>.'));
+            $xtpl->parse('main.selection.selection_complete.upgrade_access_check');
+        }
+        
+        $xtpl->assign('script_complete', t('Your SimpleID installation is up-to-date.  This script is complete.'));
+        
         $xtpl->parse('main.upgrade_selection.selection_complete');
     } else {
         $handle = random_id();
@@ -190,14 +207,23 @@ function upgrade_selection() {
         
         $xtpl->assign('handle', $handle);
         $xtpl->assign('token', get_form_token('upgrade_selection'));
+        
+        $xtpl->assign('click_continue', t('Click <strong>Continue</strong> to proceed with the upgrade.'));
+        $xtpl->assign('continue_button', t('Continue'));
+        
         $xtpl->parse('main.upgrade_selection.selection_continue');
     }
     
     $xtpl->assign('original_version', upgrade_get_version());
     $xtpl->assign('this_version', SIMPLEID_VERSION);
+    
+    $xtpl->assign('version_detected', t('The version of SimpleID you are updating from has been automatically detected.'));
+    $xtpl->assign('original_version_label', t('Original version'));
+    $xtpl->assign('this_version_label', t('Upgrade version'));
+    
     $xtpl->parse('main.upgrade_selection');
     
-    $xtpl->assign('title', 'Upgrade');
+    $xtpl->assign('title', t('Upgrade'));
     $xtpl->parse('main');
     
     $xtpl->out('main');
@@ -210,7 +236,7 @@ function upgrade_apply() {
     global $xtpl, $upgrade_access_check;
     
     if (!validate_form_token($_POST['tk'], 'upgrade_selection')) {
-        set_message('SimpleID detected a potential security attack.  Please try again.');
+        set_message(t('SimpleID detected a potential security attack.  Please try again.'));
         upgrade_selection();
         return;
     }
@@ -222,13 +248,19 @@ function upgrade_apply() {
         $results .= call_user_func($function);
     }
     
-    if (!$upgrade_access_check) $xtpl->parse('main.upgrade_results.upgrade_access_check');
+    if (!$upgrade_access_check) {
+        $xtpl->assign('edit_upgrade_php', t('Remember to edit upgrade.php to check <code>$upgrade_access_check</code> back to <code>FALSE</code>.'));
+        $xtpl->parse('main.upgrade_results.upgrade_access_check');
+    }
     $xtpl->assign('results', $results);
+    
+    $xtpl->assign('upgrade_complete', t('Your SimpleID installation has been upgraded.  Please check the results below for any errors.'));
+    
     $xtpl->parse('main.upgrade_results');
     
     cache_expire(array('upgrade' => 0));
     
-    $xtpl->assign('title', 'Upgrade');
+    $xtpl->assign('title', t('Upgrade'));
     $xtpl->parse('main');
     
     $xtpl->out('main');
@@ -331,9 +363,17 @@ function upgrade_user_init() {
 function upgrade_access_denied() {
     global $xtpl;
     
+    $xtpl->assign('login_required', t('Access denied. You are not authorised to access this page. Please <a href="index.php?q=login">log in</a> as an administrator (a user whose identity file includes the line <code>administrator=1</code>).'));    
+    $xtpl->assign('edit_upgrade_php', t('If you cannot log in, you will have to edit <code>upgrade.php</code> to bypass this access check. To do this:'));
+    $xtpl->assign('edit_upgrade_php1', t('With a text editor find the upgrade.php file.'));
+    $xtpl->assign('edit_upgrade_php2', t('There is a line inside your upgrade.php file that says <code>$upgrade_access_check = TRUE;</code>. Change it to <code>$upgrade_access_check = FALSE;</code>.'));
+    $xtpl->assign('edit_upgrade_php3', t('As soon as the upgrade.php script is done, you must change the file back to its original form with <code>$upgrade_access_check = TRUE;</code>.'));
+    $xtpl->assign('edit_upgrade_php4', t('To avoid having this problem in future, remember to log in to SimpleID as an administrator before you run this script.'));
+    $xtpl->assign('simpleid_docs', t('For more detailed information, see the <a href="!url">SimpleID documentation</a>.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started/upgrading/running-upgradephp')));
+    
     $xtpl->parse('main.upgrade_access_denied');
     
-    $xtpl->assign('title', 'Access Denied');
+    $xtpl->assign('title', t('Access Denied'));
     $xtpl->parse('main');
     
     $xtpl->out('main');
