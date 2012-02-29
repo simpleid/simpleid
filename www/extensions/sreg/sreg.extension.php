@@ -119,6 +119,11 @@ function sreg_consent_form($request, $response, $rp) {
             if ($value != NULL) {
                 $xtpl2->assign('name', htmlspecialchars($field, ENT_QUOTES, 'UTF-8'));
                 $xtpl2->assign('value', htmlspecialchars($value, ENT_QUOTES, 'UTF-8'));
+                
+                $xtpl2->assign('checked', (in_array($field, $required) || !isset($rp['sreg_consents']) || in_array($field, $rp['sreg_consents'])) ? 'checked="checked"' : '');
+                $xtpl2->assign('disabled', (in_array($field, $required)) ? 'disabled="disabled"' : '');
+                if (in_array($field, $required)) $xtpl2->parse('form.sreg.required');
+                
                 $xtpl2->parse('form.sreg');
             }
         }
@@ -130,6 +135,27 @@ function sreg_consent_form($request, $response, $rp) {
         $xtpl2->parse('form');
         return $xtpl2->text('form');
     }
+}
+
+/**
+ * @see hook_consent()
+ */
+function sreg_consent($form_request, &$response, &$rp) {
+    // We only respond if the extension is requested
+    if (!openid_extension_requested('http://openid.net/extensions/sreg/1.1', $response)) return;
+    
+    $fields = array_keys(openid_extension_filter_request('http://openid.net/extensions/sreg/1.1', $response));
+    $alias = openid_extension_alias('http://openid.net/extensions/sreg/1.1');
+    
+    foreach ($fields as $field) {
+        if (isset($response['openid.' . $alias . '.' . $field])) {
+            if (!in_array($field, $form_request['sreg_consents'])) {
+                unset($response['openid.' . $alias . '.' . $field]);
+            }
+        }
+    }
+    
+    $rp['sreg_consents'] = $form_request['sreg_consents'];
 }
 
 /**

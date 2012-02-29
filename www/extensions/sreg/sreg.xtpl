@@ -25,12 +25,14 @@
     
     <table>
         <tr>
+            <th></th>
             <th>{name_label}</th>
             <th>{value_label}</th>
         </tr>
         <!-- BEGIN: sreg -->
         <tr>
-            <td><input type="hidden" name="openid.{alias}.{name}" value="{value}" /> {name}</td>
+            <td><input name="sreg_consents[]" type="checkbox" value="{name}" id="sreg-consents-{name}" {checked} {disabled} /><!-- BEGIN: required --><input name="sreg_consents[]" type="hidden" value="{name}" /><!-- END: required --></td>
+            <td><input type="hidden" name="openid.{alias}.{name}" value="{value}" /><label for="sreg-consents-{name}">{name}</label></td>
             <td>{value}</td>
         </tr>
         <!-- END: sreg -->

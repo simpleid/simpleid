@@ -168,20 +168,28 @@ function ax_consent_form($request, $response, $rp) {
         $required = (isset($request['required'])) ? explode(',', $request['required']) : array();
         $optional = (isset($request['if_available'])) ? explode(',', $request['if_available']) : array();
         $fields = array_merge($required, $optional);
+        $i = 1;
         
         foreach ($fields as $field) {
             $type = $request['type.' . $field];
             $value = _ax_get_value($type);
             
+            $xtpl2->assign('name', htmlspecialchars($type, ENT_QUOTES, 'UTF-8'));
+            $xtpl2->assign('id', $i);
+            
             if (is_array($value)) {
-                $xtpl2->assign('name', htmlspecialchars($type, ENT_QUOTES, 'UTF-8'));
                 $xtpl2->assign('value', htmlspecialchars(implode(',', $value), ENT_QUOTES, 'UTF-8'));
-                $xtpl2->parse('fetch_request.ax');
             } elseif ($value != NULL) {
-                $xtpl2->assign('name', htmlspecialchars($type, ENT_QUOTES, 'UTF-8'));
                 $xtpl2->assign('value', htmlspecialchars($value, ENT_QUOTES, 'UTF-8'));
-                $xtpl2->parse('fetch_request.ax');
             }
+            
+            $xtpl2->assign('checked', (in_array($field, $required) || !isset($rp['ax_consents']) || in_array($field, $rp['ax_consents'])) ? 'checked="checked"' : '');
+            $xtpl2->assign('disabled', (in_array($field, $required)) ? 'disabled="disabled"' : '');
+            if (in_array($field, $required)) $xtpl2->parse('fetch_request.ax.required');
+            
+            $xtpl2->parse('fetch_request.ax');
+            
+            $i++;
         }
 
         $xtpl2->assign('ax_data', t('SimpleID will also be sending the following information to the site.'));
@@ -196,6 +204,42 @@ function ax_consent_form($request, $response, $rp) {
         $xtpl2->parse('store_request');
         return $xtpl2->text('store_request');
     }
+}
+
+/**
+ * @see hook_consent()
+ */
+function ax_consent($form_request, &$response, &$rp) {
+    // We only respond if the extension is requested
+    if (!openid_extension_requested(OPENID_NS_AX, $response)) return array();
+    
+    $fields = array_keys(openid_extension_filter_request(OPENID_NS_AX, $response));
+    $alias = openid_extension_alias(OPENID_NS_AX);
+    
+    foreach ($fields as $field) {
+        if ((strpos($field, 'value.') !== 0) && (strpos($field, 'count.') !== 0)) continue;
+        
+        $type_alias = (strpos($field, '.', 6) === FALSE) ? substr($field, 6) : substr($field, strpos($field, '.', 6) - 6);
+        $type = $response['openid.' . $alias . '.type.' . $type_alias];
+        
+        if (isset($response['openid.' . $alias . '.' . $field])) {
+            if (!in_array($type, $form_request['ax_consents'])) {
+                unset($response['openid.' . $alias . '.' . $field]);
+            }
+        }
+    }
+    foreach ($fields as $field) {
+        if (strpos($field, 'type.') !== 0) continue;
+        $type = $response['openid.' . $alias . '.' . $field];
+        
+        if (isset($response['openid.' . $alias . '.' . $field])) {
+            if (!in_array($type, $form_request['ax_consents'])) {
+                unset($response['openid.' . $alias . '.' . $field]);
+            }
+        }
+    }
+    
+    $rp['ax_consents'] = $form_request['ax_consents'];
 }
 
 /**

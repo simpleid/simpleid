@@ -1069,6 +1069,7 @@ function simpleid_openid_consent() {
     
     $response = unpickle($GETPOST['s']);
     $version = openid_get_version($response);
+    openid_parse_request($response);
     $return_to = $response['openid.return_to'];
     if (!$return_to) $return_to = $GETPOST['openid.return_to'];
     
@@ -1087,7 +1088,16 @@ function simpleid_openid_consent() {
         $rp['last_time'] = $now;
         $rp['auto_release'] = (isset($GETPOST['autorelease']) && $GETPOST['autorelease']) ? 1 : 0;
         
-        extension_invoke_all('consent', $GETPOST, $response, $rp);
+        // Mimic extension_invoke_all, but allow for passing by reference {{
+        global $simpleid_extensions;
+    
+        foreach ($simpleid_extensions as $extension) {
+            $consent_function = $extension . '_consent';
+            if (function_exists($consent_function)) {
+                $consent_function($GETPOST, $response, $rp);
+            }
+        }
+        // }}
         
         $user['rp'][$realm] = $rp;
         user_save($user);

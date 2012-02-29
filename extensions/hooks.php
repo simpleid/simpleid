@@ -208,6 +208,9 @@ function hook_consent_form($request, $response, $rp) {
  *   $response
  * - save the user's preferences by editing $rp
  *
+ * <strong>WARNING</strong> Because this function requires parameters to be
+ * passed by reference, this does not work with {@link extension_invoke_all()}.
+ *
  * @param array $form_request the data submitted by the user in the relying
  * party verification form
  * @param array &$response pointer to the proposed OpenID response
@@ -226,6 +229,9 @@ function hook_send($form_request, &$response, &$rp) {
  * - modify the OpenID response based on the user's preferences by editing
  *   $response
  * - save the user's preferences by editing $rp
+ *
+ * <strong>WARNING</strong> Because this function requires parameters to be
+ * passed by reference, this does not work with {@link extension_invoke_all()}.
  *
  * @param array $form_request the data submitted by the user in the relying
  * party verification form

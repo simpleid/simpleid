@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-02-29 21:36+1100\n"
+"POT-Creation-Date: 2012-02-29 23:00+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,36 +20,36 @@ msgstr ""
 msgid "An encrypted connection (HTTPS) is required for this page."
 msgstr ""
 
-#: www/extensions/ax/ax.extension.php:187
+#: www/extensions/ax/ax.extension.php:195
 msgid "SimpleID will also be sending the following information to the site."
 msgstr ""
 
-#: www/extensions/ax/ax.extension.php:188
-#: www/extensions/ax/ax.extension.php:218
+#: www/extensions/ax/ax.extension.php:196
+#: www/extensions/ax/ax.extension.php:262
 msgid "Type URL"
 msgstr ""
 
-#: www/extensions/ax/ax.extension.php:189
-#: www/extensions/ax/ax.extension.php:219
-#: www/extensions/sreg/sreg.extension.php:128
-#: www/extensions/sreg/sreg.extension.php:154 www/user.inc.php:476
+#: www/extensions/ax/ax.extension.php:197
+#: www/extensions/ax/ax.extension.php:263
+#: www/extensions/sreg/sreg.extension.php:133
+#: www/extensions/sreg/sreg.extension.php:180 www/user.inc.php:476
 msgid "Value"
 msgstr ""
 
-#: www/extensions/ax/ax.extension.php:195
+#: www/extensions/ax/ax.extension.php:203
 msgid "This web site requested to store information about you on SimpleID. Sadly, SimpleID does not support this feature."
 msgstr ""
 
-#: www/extensions/ax/ax.extension.php:216
+#: www/extensions/ax/ax.extension.php:260
 msgid "SimpleID will send the following information to sites which supports the Attribute Exchange Extension.  If you have also supplied OpenID Connect user information in your identity, or have the Simple Registration Extension installed, these may also be sent as part of this Extension."
 msgstr ""
 
-#: www/extensions/ax/ax.extension.php:217
-#: www/extensions/sreg/sreg.extension.php:152 www/user.inc.php:474
+#: www/extensions/ax/ax.extension.php:261
+#: www/extensions/sreg/sreg.extension.php:178 www/user.inc.php:474
 msgid "To change these, <a href=\"!url\">edit your identity file</a>."
 msgstr ""
 
-#: www/extensions/ax/ax.extension.php:225
+#: www/extensions/ax/ax.extension.php:269
 msgid "Attribute Exchange Extension"
 msgstr ""
 
@@ -61,24 +61,24 @@ msgstr ""
 msgid "You can view the site's policy in relation to the use of this information at this URL: <a href=\"@url\">@url</a>."
 msgstr ""
 
-#: www/extensions/sreg/sreg.extension.php:126
+#: www/extensions/sreg/sreg.extension.php:131
 msgid "SimpleID will also be sending the following registration information to the site."
 msgstr ""
 
-#: www/extensions/sreg/sreg.extension.php:127
-#: www/extensions/sreg/sreg.extension.php:153
+#: www/extensions/sreg/sreg.extension.php:132
+#: www/extensions/sreg/sreg.extension.php:179
 msgid "Name"
 msgstr ""
 
-#: www/extensions/sreg/sreg.extension.php:150
+#: www/extensions/sreg/sreg.extension.php:176
 msgid "SimpleID will send the following information to sites which supports the Simple Registration Extension."
 msgstr ""
 
-#: www/extensions/sreg/sreg.extension.php:151
+#: www/extensions/sreg/sreg.extension.php:177
 msgid "If you have also supplied OpenID Connect user information in your identity file, these may also be sent as part of this Extension."
 msgstr ""
 
-#: www/extensions/sreg/sreg.extension.php:160
+#: www/extensions/sreg/sreg.extension.php:186
 msgid "Simple Registration Extension"
 msgstr ""
 
@@ -130,7 +130,7 @@ msgstr ""
 msgid "Protocol Error: openid.return_to not set when openid.realm is not set."
 msgstr ""
 
-#: www/index.php:999 www/index.php:1075 www/user.inc.php:160
+#: www/index.php:999 www/index.php:1076 www/user.inc.php:160
 #: www/user.inc.php:311
 msgid "Cancel"
 msgstr ""
@@ -172,11 +172,11 @@ msgstr ""
 msgid "SimpleID detected a potential security attack.  Please try again."
 msgstr ""
 
-#: www/index.php:1077
+#: www/index.php:1078
 msgid "Log in cancelled."
 msgstr ""
 
-#: www/index.php:1096
+#: www/index.php:1106
 msgid "You were logged in successfully."
 msgstr ""
 
