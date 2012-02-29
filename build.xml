@@ -41,6 +41,9 @@
                 <striplinecomments>
                     <comment value="Directory: " />
                 </striplinecomments>
+                <replaceregexp>
+                    <regexp pattern="\\" replace="/"/>
+	            </replaceregexp>
             </filterchain>
         </copy>
         <exec command="&quot;${xgettext.path}&quot; -kt --from-code utf-8 -o www/locale/messages.pot -L PHP --no-wrap -f gettext-filelist.txt"/>

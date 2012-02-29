@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-01-26 23:32+1100\n"
+"POT-Creation-Date: 2012-02-29 21:36+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,432 +16,432 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: www\common.inc.php:147
+#: www/common.inc.php:147
 msgid "An encrypted connection (HTTPS) is required for this page."
 msgstr ""
 
-#: www\extensions\ax\ax.extension.php:187
+#: www/extensions/ax/ax.extension.php:187
 msgid "SimpleID will also be sending the following information to the site."
 msgstr ""
 
-#: www\extensions\ax\ax.extension.php:188
-#: www\extensions\ax\ax.extension.php:218
+#: www/extensions/ax/ax.extension.php:188
+#: www/extensions/ax/ax.extension.php:218
 msgid "Type URL"
 msgstr ""
 
-#: www\extensions\ax\ax.extension.php:189
-#: www\extensions\ax\ax.extension.php:219
-#: www\extensions\sreg\sreg.extension.php:128
-#: www\extensions\sreg\sreg.extension.php:154 www\user.inc.php:476
+#: www/extensions/ax/ax.extension.php:189
+#: www/extensions/ax/ax.extension.php:219
+#: www/extensions/sreg/sreg.extension.php:128
+#: www/extensions/sreg/sreg.extension.php:154 www/user.inc.php:476
 msgid "Value"
 msgstr ""
 
-#: www\extensions\ax\ax.extension.php:195
+#: www/extensions/ax/ax.extension.php:195
 msgid "This web site requested to store information about you on SimpleID. Sadly, SimpleID does not support this feature."
 msgstr ""
 
-#: www\extensions\ax\ax.extension.php:216
+#: www/extensions/ax/ax.extension.php:216
 msgid "SimpleID will send the following information to sites which supports the Attribute Exchange Extension.  If you have also supplied OpenID Connect user information in your identity, or have the Simple Registration Extension installed, these may also be sent as part of this Extension."
 msgstr ""
 
-#: www\extensions\ax\ax.extension.php:217
-#: www\extensions\sreg\sreg.extension.php:152 www\user.inc.php:474
+#: www/extensions/ax/ax.extension.php:217
+#: www/extensions/sreg/sreg.extension.php:152 www/user.inc.php:474
 msgid "To change these, <a href=\"!url\">edit your identity file</a>."
 msgstr ""
 
-#: www\extensions\ax\ax.extension.php:225
+#: www/extensions/ax/ax.extension.php:225
 msgid "Attribute Exchange Extension"
 msgstr ""
 
-#: www\extensions\pape\pape.extension.php:81
+#: www/extensions/pape/pape.extension.php:81
 msgid "This web site's policy requires you to log in again to confirm your identity."
 msgstr ""
 
-#: www\extensions\sreg\sreg.extension.php:113
+#: www/extensions/sreg/sreg.extension.php:113
 msgid "You can view the site's policy in relation to the use of this information at this URL: <a href=\"@url\">@url</a>."
 msgstr ""
 
-#: www\extensions\sreg\sreg.extension.php:126
+#: www/extensions/sreg/sreg.extension.php:126
 msgid "SimpleID will also be sending the following registration information to the site."
 msgstr ""
 
-#: www\extensions\sreg\sreg.extension.php:127
-#: www\extensions\sreg\sreg.extension.php:153
+#: www/extensions/sreg/sreg.extension.php:127
+#: www/extensions/sreg/sreg.extension.php:153
 msgid "Name"
 msgstr ""
 
-#: www\extensions\sreg\sreg.extension.php:150
+#: www/extensions/sreg/sreg.extension.php:150
 msgid "SimpleID will send the following information to sites which supports the Simple Registration Extension."
 msgstr ""
 
-#: www\extensions\sreg\sreg.extension.php:151
+#: www/extensions/sreg/sreg.extension.php:151
 msgid "If you have also supplied OpenID Connect user information in your identity file, these may also be sent as part of this Extension."
 msgstr ""
 
-#: www\extensions\sreg\sreg.extension.php:160
+#: www/extensions/sreg/sreg.extension.php:160
 msgid "Simple Registration Extension"
 msgstr ""
 
-#: www\extensions\ui\ui.extension.php:188
+#: www/extensions/ui/ui.extension.php:188
 msgid "Invalid UI icon parameters."
 msgstr ""
 
-#: www\extensions\ui\ui.extension.php:196
+#: www/extensions/ui/ui.extension.php:196
 msgid "Unable to get icon."
 msgstr ""
 
-#: www\index.php:109 www\upgrade.php:119
+#: www/index.php:109 www/upgrade.php:119
 msgid "No configuration file found.  See the <a href=\"!url\">manual</a> for instructions on how to set up a configuration file."
 msgstr ""
 
-#: www\index.php:114 www\upgrade.php:123
+#: www/index.php:114 www/upgrade.php:123
 msgid "Identities directory not found.  See the <a href=\"!url\">manual</a> for instructions on how to set up SimpleID."
 msgstr ""
 
-#: www\index.php:119 www\upgrade.php:127
+#: www/index.php:119 www/upgrade.php:127
 msgid "Cache directory not found or not writeable.  See the <a href=\"!url\">manual</a> for instructions on how to set up SimpleID."
 msgstr ""
 
-#: www\index.php:125 www\upgrade.php:131
+#: www/index.php:125 www/upgrade.php:131
 msgid "Store directory not found or not writeable.  See the <a href=\"!url\">manual</a> for instructions on how to set up SimpleID."
 msgstr ""
 
-#: www\index.php:130 www\upgrade.php:135
+#: www/index.php:130 www/upgrade.php:135
 msgid "register_globals is enabled in PHP configuration, which is not supported by SimpleID.  See the <a href=\"!url\">manual</a> for further information."
 msgstr ""
 
-#: www\index.php:247
+#: www/index.php:247
 msgid "Invalid OpenID message."
 msgstr ""
 
-#: www\index.php:431
+#: www/index.php:431
 msgid "Protocol Error: openid.return_to not set."
 msgstr ""
 
-#: www\index.php:436
+#: www/index.php:436
 msgid "Protocol Error: openid.identity not set."
 msgstr ""
 
-#: www\index.php:444
+#: www/index.php:444
 msgid "Protocol Error: openid.identity set, but not openid.claimed_id."
 msgstr ""
 
-#: www\index.php:450
+#: www/index.php:450
 msgid "Protocol Error: openid.return_to not set when openid.realm is not set."
 msgstr ""
 
-#: www\index.php:999 www\index.php:1075 www\user.inc.php:160
-#: www\user.inc.php:311
+#: www/index.php:999 www/index.php:1075 www/user.inc.php:160
+#: www/user.inc.php:311
 msgid "Cancel"
 msgstr ""
 
-#: www\index.php:1004
+#: www/index.php:1004
 msgid "Unable to log into <strong class=\"realm\">@realm</strong>."
 msgstr ""
 
-#: www\index.php:1005
+#: www/index.php:1005
 msgid "Your current identity does not match the requested identity %identity."
 msgstr ""
 
-#: www\index.php:1006
+#: www/index.php:1006
 msgid "<a href=\"{switch_user_url}\">Switch to a different user</a> and try again."
 msgstr ""
 
-#: www\index.php:1018
+#: www/index.php:1018
 msgid "Warning: This web site has not confirmed its identity and might be fraudulent.  Do not share any personal information with this web site unless you are sure it is legitimate. See the <a href=\"!url\" class=\"popup\">SimpleID documentation for details</a> (OpenID version 2.0 return_to discovery failure)"
 msgstr ""
 
-#: www\index.php:1025
+#: www/index.php:1025
 msgid "You are being logged into <strong class=\"realm\">@realm</strong>."
 msgstr ""
 
-#: www\index.php:1026
+#: www/index.php:1026
 msgid "Automatically send my information to this site for any future requests."
 msgstr ""
 
-#: www\index.php:1027
+#: www/index.php:1027
 msgid "OK"
 msgstr ""
 
-#: www\index.php:1037 www\index.php:1062
+#: www/index.php:1037 www/index.php:1062
 msgid "OpenID Login"
 msgstr ""
 
-#: www\index.php:1061 www\page.inc.php:120 www\upgrade.php:188
-#: www\upgrade.php:239
+#: www/index.php:1061 www/page.inc.php:120 www/upgrade.php:188
+#: www/upgrade.php:239
 msgid "SimpleID detected a potential security attack.  Please try again."
 msgstr ""
 
-#: www\index.php:1077
+#: www/index.php:1077
 msgid "Log in cancelled."
 msgstr ""
 
-#: www\index.php:1096
+#: www/index.php:1096
 msgid "You were logged in successfully."
 msgstr ""
 
-#: www\page.inc.php:57 www\page.inc.php:196
+#: www/page.inc.php:57 www/page.inc.php:196
 msgid "Dashboard"
 msgstr ""
 
-#: www\page.inc.php:89 www\page.inc.php:197
+#: www/page.inc.php:89 www/page.inc.php:197
 msgid "My Profile"
 msgstr ""
 
-#: www\page.inc.php:146
+#: www/page.inc.php:146
 msgid "Your preferences have been saved."
 msgstr ""
 
-#: www\page.inc.php:173
+#: www/page.inc.php:173
 msgid "Site"
 msgstr ""
 
-#: www\page.inc.php:174
+#: www/page.inc.php:174
 msgid "Last access"
 msgstr ""
 
-#: www\page.inc.php:175 www\page.inc.php:176
+#: www/page.inc.php:175 www/page.inc.php:176
 msgid "Automatic"
 msgstr ""
 
-#: www\page.inc.php:177
+#: www/page.inc.php:177
 msgid "Submit"
 msgstr ""
 
-#: www\page.inc.php:181 www\page.inc.php:198
+#: www/page.inc.php:181 www/page.inc.php:198
 msgid "My Sites"
 msgstr ""
 
-#: www\page.inc.php:242
+#: www/page.inc.php:242
 msgid "Welcome"
 msgstr ""
 
-#: www\page.inc.php:243
+#: www/page.inc.php:243
 msgid "You are logged in as %uid (%identity)."
 msgstr ""
 
-#: www\page.inc.php:255
+#: www/page.inc.php:255
 msgid "&lt;link&gt; tags"
 msgstr ""
 
-#: www\page.inc.php:257
+#: www/page.inc.php:257
 msgid "OpenID 1.x"
 msgstr ""
 
-#: www\page.inc.php:258
+#: www/page.inc.php:258
 msgid "OpenID 2.0"
 msgstr ""
 
-#: www\page.inc.php:259
+#: www/page.inc.php:259
 msgid "Claim a different identifier"
 msgstr ""
 
-#: www\page.inc.php:267
+#: www/page.inc.php:267
 msgid "YADIS"
 msgstr ""
 
-#: www\page.inc.php:268
+#: www/page.inc.php:268
 msgid "Write your own or <a href=\\\"!url\">download</a> your YADIS document"
 msgstr ""
 
-#: www\page.inc.php:269
+#: www/page.inc.php:269
 msgid "Add HTTP headers or &lt;meta&gt; tag, e.g.:"
 msgstr ""
 
-#: www\page.inc.php:274
+#: www/page.inc.php:274
 msgid "Claim your Identifier"
 msgstr ""
 
-#: www\upgrade.php:114
+#: www/upgrade.php:114
 msgid "Documentation"
 msgstr ""
 
-#: www\upgrade.php:115
+#: www/upgrade.php:115
 msgid "Support"
 msgstr ""
 
-#: www\upgrade.php:162
+#: www/upgrade.php:162
 msgid "Use this script to update your installation whenever you upgrade to a new version of SimpleID."
 msgstr ""
 
-#: www\upgrade.php:163 www\upgrade.php:372
+#: www/upgrade.php:163 www/upgrade.php:372
 msgid "For more detailed information, see the <a href=\"!url\">SimpleID documentation</a>."
 msgstr ""
 
-#: www\upgrade.php:164
+#: www/upgrade.php:164
 msgid "<strong>Back up your installation</strong>. This process will change various files within your SimpleID installationand in case of emergency you may need to revert to a backup."
 msgstr ""
 
-#: www\upgrade.php:165
+#: www/upgrade.php:165
 msgid "Install your new files in the appropriate location, as described in the <a href=\"!url\">SimpleID documentation</a>."
 msgstr ""
 
-#: www\upgrade.php:166
+#: www/upgrade.php:166
 msgid "When you have performed the steps above, click <strong>Continue</strong>."
 msgstr ""
 
-#: www\upgrade.php:167 www\upgrade.php:212
+#: www/upgrade.php:167 www/upgrade.php:212
 msgid "Continue"
 msgstr ""
 
-#: www\upgrade.php:171 www\upgrade.php:226 www\upgrade.php:263
+#: www/upgrade.php:171 www/upgrade.php:226 www/upgrade.php:263
 msgid "Upgrade"
 msgstr ""
 
-#: www\upgrade.php:197 www\upgrade.php:252
+#: www/upgrade.php:197 www/upgrade.php:252
 msgid "Remember to edit upgrade.php to check <code>$upgrade_access_check</code> back to <code>FALSE</code>."
 msgstr ""
 
-#: www\upgrade.php:201
+#: www/upgrade.php:201
 msgid "Your SimpleID installation is up-to-date.  This script is complete."
 msgstr ""
 
-#: www\upgrade.php:211
+#: www/upgrade.php:211
 msgid "Click <strong>Continue</strong> to proceed with the upgrade."
 msgstr ""
 
-#: www\upgrade.php:220
+#: www/upgrade.php:220
 msgid "The version of SimpleID you are updating from has been automatically detected."
 msgstr ""
 
-#: www\upgrade.php:221
+#: www/upgrade.php:221
 msgid "Original version"
 msgstr ""
 
-#: www\upgrade.php:222
+#: www/upgrade.php:222
 msgid "Upgrade version"
 msgstr ""
 
-#: www\upgrade.php:257
+#: www/upgrade.php:257
 msgid "Your SimpleID installation has been upgraded.  Please check the results below for any errors."
 msgstr ""
 
-#: www\upgrade.php:366
+#: www/upgrade.php:366
 msgid "Access denied. You are not authorised to access this page. Please <a href=\"index.php?q=login\">log in</a> as an administrator (a user whose identity file includes the line <code>administrator=1</code>)."
 msgstr ""
 
-#: www\upgrade.php:367
+#: www/upgrade.php:367
 msgid "If you cannot log in, you will have to edit <code>upgrade.php</code> to bypass this access check. To do this:"
 msgstr ""
 
-#: www\upgrade.php:368
+#: www/upgrade.php:368
 msgid "With a text editor find the upgrade.php file."
 msgstr ""
 
-#: www\upgrade.php:369
+#: www/upgrade.php:369
 msgid "There is a line inside your upgrade.php file that says <code>$upgrade_access_check = TRUE;</code>. Change it to <code>$upgrade_access_check = FALSE;</code>."
 msgstr ""
 
-#: www\upgrade.php:370
+#: www/upgrade.php:370
 msgid "As soon as the upgrade.php script is done, you must change the file back to its original form with <code>$upgrade_access_check = TRUE;</code>."
 msgstr ""
 
-#: www\upgrade.php:371
+#: www/upgrade.php:371
 msgid "To avoid having this problem in future, remember to log in to SimpleID as an administrator before you run this script."
 msgstr ""
 
-#: www\upgrade.php:376
+#: www/upgrade.php:376
 msgid "Access Denied"
 msgstr ""
 
-#: www\user.inc.php:171
+#: www/user.inc.php:171
 msgid "Login cancelled without a proper OpenID request."
 msgstr ""
 
-#: www\user.inc.php:182
+#: www/user.inc.php:182
 msgid "You need to supply the user name and the password in order to log in."
 msgstr ""
 
-#: www\user.inc.php:192
+#: www/user.inc.php:192
 msgid "You seem to be attempting to log in from another web page.  You must use this page to log in."
 msgstr ""
 
-#: www\user.inc.php:204
+#: www/user.inc.php:204
 msgid "SimpleID detected a potential security attack on your log in.  Please log in again."
 msgstr ""
 
-#: www\user.inc.php:209
+#: www/user.inc.php:209
 msgid "The log in page has expired.  Please log in again."
 msgstr ""
 
-#: www\user.inc.php:217
+#: www/user.inc.php:217
 msgid "The user name or password is not correct."
 msgstr ""
 
-#: www\user.inc.php:277
+#: www/user.inc.php:277
 msgid "You have been logged out."
 msgstr ""
 
-#: www\user.inc.php:327
+#: www/user.inc.php:327
 msgid "Secure login using <strong>HTTPS</strong>."
 msgstr ""
 
-#: www\user.inc.php:330
+#: www/user.inc.php:330
 msgid "<strong>WARNING:</strong>  Your password will be sent to SimpleID as plain text."
 msgstr ""
 
-#: www\user.inc.php:338
+#: www/user.inc.php:338
 msgid "User name:"
 msgstr ""
 
-#: www\user.inc.php:339
+#: www/user.inc.php:339
 msgid "Password"
 msgstr ""
 
-#: www\user.inc.php:340
+#: www/user.inc.php:340
 msgid "Remember me on this computer for two weeks."
 msgstr ""
 
-#: www\user.inc.php:341
+#: www/user.inc.php:341
 msgid "Log in"
 msgstr ""
 
-#: www\user.inc.php:343
+#: www/user.inc.php:343
 msgid "Log In"
 msgstr ""
 
-#: www\user.inc.php:362
+#: www/user.inc.php:362
 msgid "User Page"
 msgstr ""
 
-#: www\user.inc.php:365
+#: www/user.inc.php:365
 msgid "No user specified."
 msgstr ""
 
-#: www\user.inc.php:371
+#: www/user.inc.php:371
 #, php-format
 msgid "User %uid not found."
 msgstr ""
 
-#: www\user.inc.php:383
+#: www/user.inc.php:383
 #, php-format
 msgid "This is the user %uid's SimpleID page.  It contains hidden information for the use by OpenID consumers."
 msgstr ""
 
-#: www\user.inc.php:423
+#: www/user.inc.php:423
 msgid "Private Personal Identifier"
 msgstr ""
 
-#: www\user.inc.php:425
+#: www/user.inc.php:425
 msgid "This is a private personal identifier."
 msgstr ""
 
-#: www\user.inc.php:473
+#: www/user.inc.php:473
 msgid "SimpleID may, with your consent, send the following information to sites which supports OpenID Connect."
 msgstr ""
 
-#: www\user.inc.php:476
+#: www/user.inc.php:476
 msgid "Member"
 msgstr ""
 
-#: www\user.inc.php:494
+#: www/user.inc.php:494
 msgid "OpenID Connect"
 msgstr ""
 
-#: www\user.inc.php:514
+#: www/user.inc.php:514
 msgid "Log out and log in as a different user"
 msgstr ""
 
-#: www\user.inc.php:517
+#: www/user.inc.php:517
 msgid "Log out"
 msgstr ""
