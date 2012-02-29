@@ -308,7 +308,7 @@ function user_login_form($destination = '', $state = NULL) {
 
     if ($state) {
         $xtpl->assign('state', htmlspecialchars($state, ENT_QUOTES, 'UTF-8'));
-        $xtpl->assgin('cancel_button', t('Cancel'));
+        $xtpl->assign('cancel_button', t('Cancel'));
         $xtpl->parse('main.login.state');
     }
     
