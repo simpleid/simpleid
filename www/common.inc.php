@@ -133,10 +133,14 @@ function has_ssl_client_cert() {
  * to see if an unencrypted connection is allowed
  * @param string $redirect_url if $action is redirect, what URL to redirect to.
  * If null, this will redirect to the same page (albeit with an HTTPS connection)
+ * @param boolean $strict whether HTTP Strict Transport Security is active
  * @see SIMPLEID_ALLOW_PLAINTEXT
  */
-function check_https($action = 'redirect', $allow_override = false, $redirect_url = null) {
-    if (is_https()) return;
+function check_https($action = 'redirect', $allow_override = false, $redirect_url = null, $strict = true) {
+    if (is_https()) {
+        if ($strict) header('Strict-Transport-Security: max-age=3600');
+        return;
+    }
     
     if ($allow_override && SIMPLEID_ALLOW_PLAINTEXT) return;
     
