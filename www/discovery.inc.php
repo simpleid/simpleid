@@ -342,48 +342,6 @@ function discovery_get_openid_services($url) {
 }
 
 /**
- * Generates a URI from a URI template and another URI.
- *
- * The URI must be able to be parsed by PHP's parse_url function.
- *
- * @param string $template the URI template
- * @param string $uri the input URI
- * @return string the generated URI
- *
- */
-function discovery_uri_template($template, $uri) {
-    $parts = @parse_url($uri);
-    
-    // The {uri} template variable excludes the fragment
-    $short_uri = array_shift(explode('#', $uri, 2));
-    
-    // The {userinfo} template variable is the user and the pass
-    $userinfo = (isset($parts['user'])) ? $parts['user'] . ((isset($parts['pass'])) ? ':' . $parts['pass'] : '') : '';
-    
-    // The {authority] tempalte is the userinfo, host and port
-    $authority = $userinfo . ((isset($parts['host'])) ? '@' . $parts['host'] . ((isset($parts['port'])) ? ':' . $parts['port'] : '') : '');
-    
-    $args = array(
-        'uri' => $short_uri,
-        'scheme' => (isset($parts['scheme'])) ? $parts['scheme'] : '',
-        'authority' => $authority,
-        'path' => (isset($parts['path'])) ? $parts['path'] : '',
-        'query' => (isset($parts['query'])) ? $parts['query'] : '',
-        'fragment' => (isset($parts['fragment'])) ? $parts['fragment'] : '',
-        'userinfo' => $userinfo,
-        'host' => (isset($parts['host'])) ? $parts['host'] : '',
-        'port' => (isset($parts['port'])) ? $parts['port'] : ''
-    );
-    
-    // Define the % encoded versions
-    foreach ($args as $key => $value) {
-        $args['%' . $key] = rfc3986_urlencode($value);
-    }
-    
-    return strtr($template, $args);
-}
-
-/**
  * Searches through an HTML document to obtain the value of a meta
  * element with a specified http-equiv attribute.
  *
