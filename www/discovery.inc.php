@@ -22,7 +22,7 @@
  */
 
 /**
- * Support for XRDS and XRD based discovery.
+ * Support for XRDS based discovery.
  *
  * The functions for this file supports HTTP-based identifiers.  For XRIs, the
  * resolution service xri.net is used to resolve to HTTP-based URLs.
@@ -55,16 +55,6 @@ define('XRDS_SIMPLE_NS', 'http://xrds-simple.net/core/1.0');
 define('XRDS_SIMPLE_TYPE', 'xri://$xrds*simple');
 
 /**
- * The namespace identifier for an XRD document.
- */
-define('XRD_NS', 'http://docs.oasis-open.org/ns/xri/xrd-1.0');
-
-/**
- * The namespace identifier for an host metadata.
- */
-define('HOST_META_NS', 'http://host-meta.net/ns/1.0');
-
-/**
  * The namespace identifier for OpenID services.
  */
 define('XRD_OPENID_NS', 'http://openid.net/xmlns/1.0');
@@ -86,16 +76,16 @@ define('XRD_OPENID_NS', 'http://openid.net/xmlns/1.0');
  * @return array an array of discovered services, or an empty array if no services
  * are found
  */
-function discovery_get_services($identifier, $openid = FALSE) {
-    $identifier = discovery_normalize($identifier);
-    $url = discovery_get_url($identifier);
+function discovery_xrds_discover($identifier, $openid = FALSE) {
+    $identifier = discovery_xrds_normalize($identifier);
+    $url = discovery_xrds_url($identifier);
     
-    $xrds = discovery_get_xrds($url);
+    $xrds = discovery_xrds_get($url);
 
     if ($xrds) {
-        return discovery_parse_xrds($xrds);
+        return discovery_xrds_parse($xrds);
     } else {
-        if ($openid) return discovery_get_openid_services($url);
+        if ($openid) return discovery_html_get_services($url);
         return array();
     }
 }
@@ -109,7 +99,7 @@ function discovery_get_services($identifier, $openid = FALSE) {
  * @return array an array of matching services, or an empty array of no services
  * match
  */
-function discovery_get_service_by_type($services, $type) {
+function discovery_xrds_services_by_type($services, $type) {
     $matches = array();
     
     foreach ($services as $service) {
@@ -129,7 +119,7 @@ function discovery_get_service_by_type($services, $type) {
  * @return array the matching service, or NULL of no services
  * are found
  */
-function discovery_get_service_by_id($services, $id) {
+function discovery_xrds_service_by_id($services, $id) {
     foreach ($services as $service) {
         if ($service['#id'] == $id) return $service;
     }
@@ -146,7 +136,7 @@ function discovery_get_service_by_id($services, $id) {
  * @param int $retries the number of tries to make
  * @return string the contents of the XRDS document
  */
-function discovery_get_xrds($url, $check = TRUE, $retries = 5) {
+function discovery_xrds_get($url, $check = TRUE, $retries = 5) {
     if ($retries == 0) return NULL;
     
     $response = http_make_request($url, array('Accept' => 'application/xrds+xml'));
@@ -155,11 +145,11 @@ function discovery_get_xrds($url, $check = TRUE, $retries = 5) {
     if (($response['content-type'] == 'application/xrds+xml') || ($check == FALSE)) {
         return $response['data'];
     } elseif (isset($response['headers']['x-xrds-location'])) {
-        return discovery_get_xrds($response['headers']['x-xrds-location'], false, $retries - 1);
+        return discovery_xrds_get($response['headers']['x-xrds-location'], false, $retries - 1);
     } else {
         $location = _discovery_meta_httpequiv('X-XRDS-Location', $response['data']);
         if ($location) {
-            return discovery_get_xrds($location, false, $retries - 1);
+            return discovery_xrds_get($location, false, $retries - 1);
         }
         return NULL;
     }
@@ -175,7 +165,7 @@ function discovery_get_xrds($url, $check = TRUE, $retries = 5) {
  * @param string $identifier the identifier to normalise
  * @return string the normalised identifier
  */
-function discovery_normalize($identifier) {
+function discovery_xrds_normalize($identifier) {
     $normalized = $identifier;
     
     if (discovery_is_xri($identifier)) {
@@ -198,7 +188,7 @@ function discovery_normalize($identifier) {
  * @param string $identifier the identifier
  * @return string the URL
  */
-function discovery_get_url($identifier) {
+function discovery_xrds_url($identifier) {
     if (discovery_is_xri($identifier)) {
         return 'http://xri.net/' . $identifier;
     } elseif (discovery_is_email($identifier)) {
@@ -268,7 +258,7 @@ function discovery_is_email($identifier) {
  * @param array $b
  * @return int
  */
-function discovery_priority_sort($a, $b) {
+function discovery_xrds_priority_sort($a, $b) {
     if (!isset($a['#priority']) && !isset($b['#priority'])) return 0;
     
     // if #priority is missing, #priority is assumed to be infinity
@@ -287,12 +277,12 @@ function discovery_priority_sort($a, $b) {
  *
  * @see XRDSParser
  */
-function discovery_parse_xrds($xrds) {
+function discovery_xrds_parse($xrds) {
     $parser = new XRDSParser();
     $parser->parse($xrds);
     $parser->free();
     $services = $parser->services();
-    uasort($services, 'discovery_priority_sort');
+    uasort($services, 'discovery_xrds_priority_sort');
 
     return $services;
 }
@@ -308,7 +298,7 @@ function discovery_parse_xrds($xrds) {
  * @return array an array of discovered services, or an empty array if no services
  * are found
  */
-function discovery_get_openid_services($url) {
+function discovery_html_get_services($url) {
     $services = array();
         
     $response = http_make_request($url);
@@ -445,44 +435,6 @@ class XRDSParser {
     var $service = array();
     
     /**
-     * The canonical identifier for the resource described.  Used in XRD
-     * documents only.
-     * @var string
-     * @access private
-     * @since 0.8
-     */
-    var $subject = NULL;
-    
-    /**
-     * Additional identifies for the resource described.  Used in XRD
-     * documents only.
-     * @var array
-     * @access private
-     * @since 0.8
-     */
-    var $aliases = array();
-    
-    /**
-     * Additional properties for the resource described.  Used in XRD
-     * documents only.
-     * @var array
-     * @access private
-     * @since 0.8
-     */
-    var $properties = array();
-
-    /**
-     * Mapping between XRDS elements and XRD attributes
-     * @var array
-     * @access private
-     * @since 0.8
-     */
-    var $xrds_map = array(
-        'rel' => 'type',
-        'href' => 'uri'
-    );
-    
-    /**
      * Creates an instance of the XRDS parser.
      *
      * This constructor also initialises the underlying XML parser.
@@ -532,39 +484,6 @@ class XRDSParser {
     }
     
     /**
-     * Returns the canonical identifier.
-     *
-     * @return string the canonical identifier
-     * @access public
-     * @since 0.8
-     */
-    function subject() {
-        return $this->subject;
-    }
-    
-    /**
-     * Returns additional identifiers.
-     *
-     * @return array the additional identifiers
-     * @access public
-     * @since 0.8
-     */
-    function aliases() {
-        return $this->aliases;
-    }
-
-    /**
-     * Returns additional properties.
-     *
-     * @return array the additional properties
-     * @access public
-     * @since 0.8
-     */
-    function properties() {
-        return $this->properties;
-    }
-    
-    /**
      * XML parser callback
      *
      * @access private
@@ -588,14 +507,6 @@ class XRDSParser {
                 $this->service['#id'] = $attribs['id'];
             }
         }
-        if (($ns == XRD_NS) && ($name == 'Link')) {
-            $this->in_service = TRUE;
-            $this->service = array();
-            
-            foreach ($attribs as $name => $value) {
-                $this->service[(in_array($name, $this->xrds_map)) ? $this->xrds_map[$name] : $name] = $value;
-            }
-        }
         
         if ((strtolower($ns) == strtolower(XRD2_NS)) && ($this->in_service)) {
             switch ($name) {
@@ -609,9 +520,6 @@ class XRDSParser {
                     }
             }
         }
-        if (strtolower($ns) == strtolower(XRD_NS)) {
-            $this->priority = NULL;
-        }
         
         $this->_buffer = '';
         $this->_attribs = $attribs;
@@ -624,20 +532,6 @@ class XRDSParser {
      */
     function element_end(&$parser, $qualified) {
         list($ns, $name) = $this->parse_namespace($qualified);
-        
-        if (($ns == XRD_NS) && !$this->in_service) {
-            switch ($name) {
-                case 'Subject':
-                    $this->subject = trim($this->_buffer);
-                    break;
-                case 'Alias':
-                    $this->aliases[] = trim($this->_buffer);
-                    break;
-                case 'Property':
-                    $this->properties[$this->_attribs['type']] = trim($this->_buffer);
-                    break;
-            }
-        }
         
         if ((strtolower($ns) == strtolower(XRD2_NS)) && ($this->in_service)) {
             switch ($name) {
@@ -664,20 +558,6 @@ class XRDSParser {
                         $this->service[$key][] = array('#uri' => trim($this->_buffer));
                     }
                     $this->priority = NULL;
-                    break;
-            }
-        }
-        if (($ns == XRD_NS) && ($this->in_service)) {
-            switch ($name) {
-                case 'Link':
-                    $this->services[] = $this->service;
-                    $this->in_service = FALSE;
-                    break;
-                case 'Property':
-                    if (!isset($this->service['properties'])) $this->service['properties'] = array();
-                    $this->service['properties'][$this->_attribs['type']] = trim($this->_buffer);
-                case 'Title':
-                    $this->service['title'] = trim($this->_buffer);
                     break;
             }
         }
@@ -736,7 +616,7 @@ class XRDSParser {
     function flatten_uris($array, $sort = TRUE) {
         $result = array();
         
-        if ($sort) uasort($array, 'discovery_priority_sort');
+        if ($sort) uasort($array, 'discovery_xrds_priority_sort');
         
         for ($i = 0; $i < count($array); $i++) {
             $result[] = $array[$i]['#uri'];

@@ -229,7 +229,7 @@ function _ui_get_icon($realm) {
     
     if (isset($rp_info['ui_icon'])) return $rp_info['ui_icon'];
     
-    $services = discovery_get_service_by_type($rp_info['services'], 'http://specs.openid.net/extensions/ui/icon');
+    $services = discovery_xrds_services_by_type($rp_info['services'], 'http://specs.openid.net/extensions/ui/icon');
         
     if ($services) {
         $icon_url = $services[0]['uri'];

@@ -594,7 +594,7 @@ function simpleid_checkid_identity(&$request, $immediate) {
         $verified = FALSE;
         
         $rp_info = simpleid_get_rp_info($realm);
-        $services = discovery_get_service_by_type($rp_info['services'], OPENID_RETURN_TO);
+        $services = discovery_xrds_services_by_type($rp_info['services'], OPENID_RETURN_TO);
         
         log_info('OpenID 2 discovery: ' . count($services) . ' matching services');
         
@@ -665,7 +665,7 @@ function simpleid_get_rp_info($realm, $allow_stale = FALSE) {
         
         $rp_info = array(
             'url' => $url,
-            'services' => discovery_get_services($url),
+            'services' => discovery_xrds_discover($url),
             'updated' => time()
         );
         
