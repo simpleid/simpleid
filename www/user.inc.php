@@ -67,8 +67,9 @@ function user_init($q = NULL) {
     
     $user = NULL;
     
-    session_set_cookie_params(0);
+    // session_name() has to be called before session_set_cookie_params()
     session_name('SESS' . md5(SIMPLEID_BASE_URL));
+    session_set_cookie_params(0, get_base_path());
     session_start();
     
     if (isset($_SESSION['user']) && (cache_get('user', $_SESSION['user']) == session_id())) {
@@ -548,7 +549,7 @@ function user_autologin_create($id = NULL, $expires = NULL) {
     
     cache_set('autologin-'. md5($user['uid']), $id, array('token' => $token, 'expires' => $expires, 'ip' => $_SERVER['REMOTE_ADDR']));
     
-    setcookie(_user_autologin_cookie(), $user['uid'] . ':' . $id . ':' . $token, $expires);
+    setcookie(_user_autologin_cookie(), $user['uid'] . ':' . $id . ':' . $token, $expires, get_base_path());
 }
 
 /**
