@@ -149,13 +149,15 @@ function user_login() {
     global $user, $GETPOST;
     
     // If the user is already logged in, return
-    if (isset($user["uid"])) openid_indirect_response(simpleid_url(), '');
+    if (isset($user['uid'])) openid_indirect_response(simpleid_url(), '');
     
     // Require HTTPS or return an error
     check_https('error', true);
     
     $destination = (isset($GETPOST['destination'])) ? $GETPOST['destination'] : '';
     $state = (isset($GETPOST['s'])) ? $GETPOST['s'] : '';
+    $fixed_uid = (isset($_POST['fixed_uid'])) ? $_POST['name'] : NULL;
+    
     $query = ($state) ? 's=' . rawurlencode($state) : '';
     
     if (isset($_POST['op']) && $_POST['op'] == t('Cancel')) {
@@ -183,7 +185,7 @@ function user_login() {
             set_message(t('You need to supply the user name and the password in order to log in.'));
         }
         if (isset($_POST['nonce'])) cache_delete('user-nonce', $_POST['nonce']);
-        user_login_form($destination, $state);
+        user_login_form($destination, $state, $fixed_uid);
         return;
     }
     
@@ -192,7 +194,7 @@ function user_login() {
             // User came from a log in form.
             set_message(t('You seem to be attempting to log in from another web page.  You must use this page to log in.'));
         }
-        user_login_form($destination, $state);
+        user_login_form($destination, $state, $fixed_uid);
         return;
     }
     
@@ -203,12 +205,12 @@ function user_login() {
     if (!cache_get('user-nonce', $_POST['nonce'])) {
         log_warn('Login attempt: Nonce ' . $_POST['nonce'] . ' not issued or is being reused.');
         set_message(t('SimpleID detected a potential security attack on your log in.  Please log in again.'));
-        user_login_form($destination, $state);
+        user_login_form($destination, $state, $fixed_uid);
         return;
     } elseif ($time < time() - SIMPLEID_LOGIN_NONCE_EXPIRES_IN) {
         log_notice('Login attempt: Nonce ' . $_POST['nonce'] . ' expired.');
         set_message(t('The log in page has expired.  Please log in again.'));
-        user_login_form($destination, $state);
+        user_login_form($destination, $state, $fixed_uid);
         return;
     } else {
         cache_delete('user-nonce', $_POST['nonce']);
@@ -216,7 +218,7 @@ function user_login() {
     
     if (store_user_verify_credentials($_POST['name'], $_POST) === false) {
         set_message(t('The user name or password is not correct.'));
-        user_login_form($destination, $state);
+        user_login_form($destination, $state, $fixed_uid);
         return;
     }
     
@@ -301,7 +303,7 @@ function _user_logout() {
  * if login is successful
  * @param string $state the current SimpleID state, if required by the location
  */
-function user_login_form($destination = '', $state = NULL) {    
+function user_login_form($destination = '', $state = NULL, $fixed_uid = NULL) {    
     global $xtpl;
     
     // Require HTTPS, redirect if necessary
@@ -337,7 +339,7 @@ function user_login_form($destination = '', $state = NULL) {
     header('X-Frame-Options: DENY');
 
     $xtpl->assign('name_label', t('User name:'));
-    $xtpl->assign('pass_label', t('Password'));
+    $xtpl->assign('pass_label', t('Password:'));
     $xtpl->assign('autologin_label', t('Remember me on this computer for two weeks.'));
     $xtpl->assign('login_button', t('Log in'));
     
@@ -345,6 +347,13 @@ function user_login_form($destination = '', $state = NULL) {
     $xtpl->assign('page_class', 'dialog-page');
     $xtpl->assign('destination', htmlspecialchars($destination, ENT_QUOTES, 'UTF-8'));
     $xtpl->assign('nonce', htmlspecialchars($nonce, ENT_QUOTES, 'UTF-8'));
+    
+    if ($fixed_uid == NULL) {
+        $xtpl->parse('main.login.input_uid');
+    } else {
+        $xtpl->assign('uid', htmlspecialchars($fixed_uid, ENT_QUOTES, 'UTF-8'));
+        $xtpl->parse('main.login.fixed_uid');
+    }
     
     $xtpl->parse('main.login');
     $xtpl->parse('main.framekiller');
