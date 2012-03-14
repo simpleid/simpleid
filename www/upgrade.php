@@ -161,7 +161,7 @@ function upgrade_info() {
     
     $xtpl->assign('intro', t('Use this script to update your installation whenever you upgrade to a new version of SimpleID.'));
     $xtpl->assign('simpleid_docs', t('For more detailed information, see the <a href="!url">SimpleID documentation</a>.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started/upgrading')));
-    $xtpl->assign('step1', t('<strong>Back up your installation</strong>. This process will change various files within your SimpleID installationand in case of emergency you may need to revert to a backup.'));
+    $xtpl->assign('step1', t('<strong>Back up your installation</strong>. This process will change various files within your SimpleID installation and in case of emergency you may need to revert to a backup.'));
     $xtpl->assign('step2', t('Install your new files in the appropriate location, as described in the <a href="!url">SimpleID documentation</a>.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started/installing-simpleid')));
     $xtpl->assign('click_continue', t('When you have performed the steps above, click <strong>Continue</strong>.'));
     $xtpl->assign('continue_button', t('Continue'));

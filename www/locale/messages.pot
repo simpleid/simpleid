@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 22:45+1100\n"
+"POT-Creation-Date: 2012-03-14 22:50+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -241,7 +241,7 @@ msgid "YADIS"
 msgstr ""
 
 #: www/page.inc.php:268
-msgid "Write your own or <a href=\\\"!url\">download</a> your YADIS document"
+msgid "Write your own or <a href=\"!url\">download</a> your YADIS document"
 msgstr ""
 
 #: www/page.inc.php:269
@@ -269,7 +269,7 @@ msgid "For more detailed information, see the <a href=\"!url\">SimpleID document
 msgstr ""
 
 #: www/upgrade.php:164
-msgid "<strong>Back up your installation</strong>. This process will change various files within your SimpleID installationand in case of emergency you may need to revert to a backup."
+msgid "<strong>Back up your installation</strong>. This process will change various files within your SimpleID installation and in case of emergency you may need to revert to a backup."
 msgstr ""
 
 #: www/upgrade.php:165

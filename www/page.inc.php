@@ -265,7 +265,7 @@ function _page_discovery_block() {
     $html .= "<li class=\"openid2-local-id\">&lt;link rel=&quot;openid2.local_id&quot; href=&quot;" . htmlspecialchars($user['identity'], ENT_QUOTES, 'UTF-8') ."&quot; /&gt;</li></ul>\n";
 
     $html .= "<h3>" . t('YADIS') . "</h3>";
-    $html .= "<ol><li>" . t('Write your own or <a href=\"!url">download</a> your YADIS document', array('!url' => simpleid_url('xrds/'. $user['uid'], '', true))) . "</li>";
+    $html .= "<ol><li>" . t('Write your own or <a href="!url">download</a> your YADIS document', array('!url' => simpleid_url('xrds/'. $user['uid'], '', true))) . "</li>";
     $html .= "<li><div>" . t('Add HTTP headers or &lt;meta&gt; tag, e.g.:') . "<div><pre>&lt;meta http-equiv=&quot;X-XRDS-Location&quot; content=&quot;" . htmlspecialchars(simpleid_url('xrds/'. $user['uid']), ENT_QUOTES, 'UTF-8') . "&quot; /></pre>";
     $html .= "</li></ol>";
     
