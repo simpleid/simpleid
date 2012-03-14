@@ -1003,7 +1003,7 @@ function simpleid_openid_consent_form($request, $response, $reason = CHECKID_APP
         
         $xtpl->assign('unable_label', t('Unable to log into <strong class="realm">@realm</strong>.', array('@realm' => $realm)));
         $xtpl->assign('identity_not_matching_label', t('Your current identity does not match the requested identity %identity.', array('%identity' => $request['openid.identity'])));
-        $xtpl->assign('switch_user_label', t('<a href="{switch_user_url}">Switch to a different user</a> and try again.', array('!url' => simpleid_url('logout', 'destination=continue&s=' . rawurlencode($request_state), true))));
+        $xtpl->assign('switch_user_label', t('<a href="!url">Switch to a different user</a> and try again.', array('!url' => simpleid_url('logout', 'destination=continue&s=' . rawurlencode($request_state), true))));
         
         $xtpl->parse('main.openid_consent.cancel');
     } else {
