@@ -42,7 +42,7 @@ function locale_init($locale) {
     bindtextdomain($domain, 'locale');
     // bind_textdomain_codeset is supported only in PHP 4.2.0+
     if (function_exists('bind_textdomain_codeset')) 
-        bind_textdomain_codeset($domain, $encoding);
+        bind_textdomain_codeset($domain, 'UTF-8');
     textdomain($domain);
 }
 

@@ -103,6 +103,8 @@ function simpleid_start() {
     $xtpl->assign('version', SIMPLEID_VERSION);
     $xtpl->assign('base_path', get_base_path());
     
+    locale_init(SIMPLEID_LOCALE);
+    
     // Check if the configuration file has been defined
     if (!defined('SIMPLEID_BASE_URL')) {
         log_fatal('No configuration file found.');

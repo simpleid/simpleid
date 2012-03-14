@@ -114,6 +114,8 @@ function upgrade_start() {
     $xtpl->assign('footer_doc', t('Documentation'));
     $xtpl->assign('footer_support', t('Support'));
     
+    locale_init(SIMPLEID_LOCALE);
+    
     // Check if the configuration file has been defined
     if (!defined('SIMPLEID_BASE_URL')) {
         indirect_fatal_error(t('No configuration file found.  See the <a href="!url">manual</a> for instructions on how to set up a configuration file.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started')));
