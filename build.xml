@@ -31,12 +31,12 @@
     <property name="dist.pear.dir" value="pear" />
     
     <target name="gettext">
-        <echo file="gettext-filelist-orig.txt">
+        <echo file="gettext-filelist.txt">
             <fileset dir="www">
                 <include name="**/*.php" />
             </fileset>
         </echo>
-        <copy file="gettext-filelist-orig.txt" tofile="gettext-filelist.txt" overwrite="true">
+        <reflexive file="gettext-filelist.txt">
             <filterchain>
                 <striplinecomments>
                     <comment value="Directory: " />
@@ -45,10 +45,20 @@
                     <regexp pattern="\\" replace="/"/>
 	            </replaceregexp>
             </filterchain>
-        </copy>
+        </reflexive>
         <exec command="&quot;${xgettext.path}&quot; -kt --from-code utf-8 -o www/locale/messages.pot -L PHP --no-wrap -f gettext-filelist.txt"/>
-        <delete file="gettext-filelist-orig.txt"/>
         <delete file="gettext-filelist.txt"/>
+    </target>
+    
+    <target name="msgfmt-exec">
+        <exec command="&quot;${msgfmt.path}&quot; -kt --from-code utf-8 -o www/locale/messages.pot -L PHP --no-wrap -f gettext-filelist.txt"/>
+    </target>
+
+    <target name="msgfmt">
+        <foreach param="po" target="msgfmt-exec">
+            <fileset>
+            </fileset>
+        </foreach>
     </target>
     
     <target name="pear-package">
@@ -56,18 +66,23 @@
             <name>SimpleID</name>
             <summary>SimpleID is a simple, personal OpenID provider</summary>
             <description>SimpleID is a simple, personal OpenID provider written in PHP.</description>
-            <channel>simpleid.sourceforge.net</channel>
+            <!-- We use the default PEAR channel here to avoid annoying channel validation errors.
+            We change it later in the reflexive task below. -->
+            <channel>pear.php.net</channel>
             <lead user="kmo" name="Kelvin Mo" email="kmo@users.sourceforge.net"/>
             <license>GPL</license>
             <version release="${build.version}" api="${build.version}"/>
             <stability release="${build.stability}" api="${build.stability}"/>
             <notes>See README.txt</notes>
             <dependencies>
-                <php minimum_version="5.1.2"/>
+                <php minimum_version="5.2.0"/>
                 <pear minimum_version="1.8.1"/>
                 <extension name="bcmath"/>
                 <extension name="pcre"/>
                 <extension name="session"/>
+                <extension name="xml"/>
+                <extension name="hash"/>
+                <extension name="openssl"/>
             </dependencies>
             <!-- map directory (key) to role -->
             <dirroles key="/">doc</dirroles>
@@ -84,24 +99,28 @@
         </d51pearpkg2>
         <!-- time to fix the package.xml file since the task does not
         allow everything we need:
+        - change the channel so that it validates
         - strip the base directory names like src, data and www
         - remove baseinstalldir from files
         - md5sums are generated automatically when packaging
         -->
         <!-- yes, we need to generate a 2nd file and move it back -->
-        <copy file="${dist.dir}/${dist.sub.dir}/simpleid/package.xml" tofile="${dist.dir}/${dist.sub.dir}/simpleid/package2.xml" overwrite="true">
+        <reflexive file="${dist.dir}/${dist.sub.dir}/simpleid/package.xml">
             <filterchain>
                 <replaceregexp>
+                    <!-- change the channel -->
+                    <regexp pattern="&lt;channel&gt;pear.php.net&lt;/channel&gt;" replace="&lt;channel&gt;pear.php.net&lt;/channel&gt;" />
                     <!-- remove md5sums -->
                     <regexp pattern="md5sum=&quot;[a-z0-9]{32}&quot; " replace="" />
                     <!-- remove baseinstalldir for files -->
                     <regexp pattern="&lt;file baseinstalldir=&quot;/&quot;" replace="&lt;file"/>
                     <!-- install-as for different directories -->
-                    <regexp pattern="(&lt;file name=&quot;/www/(.+?)&quot;)" replace="\1 install-as=&quot;SimpleID/\2&quot;"/>
+                    <regexp pattern="(&lt;file name=&quot;/www/(.+?)&quot;)" replace="\1 install-as=&quot;simpleid/\2&quot;"/>
+                    <!-- replace -->
+                    <regexp pattern="(&lt;file name=&quot;/www/config.php.dist&quot;[^&gt;]+)/&gt;" replace="\1&gt;&lt;tasks:replace type=&quot;pear-config&quot; from=&quot;@data_dir@&quot; to=&quot;data_dir&quot; /&gt;&lt;/file&gt;"/>
                 </replaceregexp>
             </filterchain>
-        </copy>
-        <move file="${dist.dir}/${dist.sub.dir}/simpleid/package2.xml" tofile="${dist.dir}/${dist.sub.dir}/simpleid/package.xml" overwrite="true"/>
+        </reflexive>
     </target>
     
     <target name="dist-clean">
@@ -124,6 +143,7 @@
                 <exclude name="www/test-suite/**" />
                 <exclude name="tutorials/**" />
                 <exclude name="*.xml" />
+                <exclude name="*.xsl" />
                 <exclude name="*.properties" />
             </fileset>
             <filterchain>
@@ -160,6 +180,10 @@
             <property name="config.cache.dir" value="@data_dir@/simpleid/cache" />
             <property name="config.store.dir" value="@data_dir@/simpleid/store" />
         </phingcall>
+        
+        <!-- Creates files in empty directories so that they get packaged up -->
+        <echo file="${dist.dir}/${dist.pear.dir}/simpleid/cache/README">This is the SimpleID cache directory.</echo>
+        <echo file="${dist.dir}/${dist.pear.dir}/simpleid/store/README">This is the SimpleID store directory.</echo>
         
         <phingcall target="pear-package">
             <property name="dist.sub.dir" value="${dist.pear.dir}" />
