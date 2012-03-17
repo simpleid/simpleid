@@ -61,7 +61,11 @@
         </foreach>
     </target>
     
-    <target name="pear-package">
+    <target name="check-dist-dir">
+        <fail unless="dist.dir" message="Property dist.dir is not defined" />
+    </target>
+    
+    <target name="pear-package" depends="check-dist-dir">
         <d51pearpkg2 dir="${dist.dir}/${dist.sub.dir}/simpleid/" baseinstalldir="/">
             <name>SimpleID</name>
             <summary>SimpleID is a simple, personal OpenID provider</summary>
@@ -123,14 +127,14 @@
         </reflexive>
     </target>
     
-    <target name="dist-clean">
+    <target name="dist-clean" depends="check-dist-dir">
         <delete>
             <fileset dir="${dist.dir}"></fileset>
         </delete>
     </target>
     
     <!-- Copies the source to the distribution directory -->
-    <target name="dist-copy">
+    <target name="dist-copy" depends="check-dist-dir">
         <copy todir="${dist.dir}/${dist.sub.dir}/simpleid">
             <fileset dir=".">
                 <exclude name="cache/*" />
