@@ -57,7 +57,7 @@ define('SIMPLEID_CLEAN_URL', false);
  * that it is not visible to user agents.
  *
  */
-define('SIMPLEID_IDENTITIES_DIR', '../identities');
+define('SIMPLEID_IDENTITIES_DIR', '@@IDENTITIES_DIR@@');
 
 /**
  * Directory to store cache data.
@@ -70,7 +70,7 @@ define('SIMPLEID_IDENTITIES_DIR', '../identities');
  * that it is not visible to user agents.
  *
  */
-define('SIMPLEID_CACHE_DIR', '../cache');
+define('SIMPLEID_CACHE_DIR', '@@CACHE_DIR@@');
 
 /**
  * Persistent data storage mechanism.
@@ -97,7 +97,7 @@ define('SIMPLEID_STORE', 'filesystem');
  * that it is not visible to user agents.
  *
  */
-define('SIMPLEID_STORE_DIR', '../store');
+define('SIMPLEID_STORE_DIR', '@@STORE_DIR@@');
 
 /**
  * Allows legacy log-in system.
