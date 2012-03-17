@@ -113,7 +113,7 @@
             <filterchain>
                 <replaceregexp>
                     <!-- change the channel -->
-                    <regexp pattern="&lt;channel&gt;pear.php.net&lt;/channel&gt;" replace="&lt;channel&gt;pear.php.net&lt;/channel&gt;" />
+                    <regexp pattern="&lt;channel&gt;pear.php.net&lt;/channel&gt;" replace="&lt;channel&gt;simpleid.sourceforge.net&lt;/channel&gt;" />
                     <!-- remove md5sums -->
                     <regexp pattern="md5sum=&quot;[a-z0-9]{32}&quot; " replace="" />
                     <!-- remove baseinstalldir for files -->
