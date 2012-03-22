@@ -238,7 +238,7 @@ span.last-time { display: none }
 }
 .block-header-links {
     float: right;
-    font-size: 0.9px;
+    font-size: 0.9em;
     text-align: right;
     white-space: nowrap;
 }
