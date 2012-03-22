@@ -42,6 +42,16 @@ if (function_exists('gmp_init')) {
 }
 
 /**
+ * Returns whether either the GMP or the BCMath library is installed.  If neither
+ * of these libraries are installed, the functions in this file will not work.
+ *
+ * @return bool true if either GMP or BCMath is installed.
+ */ 
+function bignum_loaded() {
+    return (function_exists('gmp_init') || function_exists('bcadd'));
+}
+
+/**
  * Creates a bignum.
  *
  * @param mixed $str An integer, a string in base 10, or a byte stream in base 256
