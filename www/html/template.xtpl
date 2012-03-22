@@ -279,7 +279,7 @@
 
         <div id="footer">
             <address>
-                SimpleID {version} &copy; Kelvin Mo 2007-9 &middot;
+                SimpleID {version} &copy; Kelvin Mo &middot;
                 <a href="http://simpleid.sourceforge.net/documentation">{footer_doc}</a> &middot;
                 <a href="http://sourceforge.net/apps/trac/simpleid">{footer_support}</a>
             </address>

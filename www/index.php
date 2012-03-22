@@ -99,11 +99,13 @@ simpleid_start();
 function simpleid_start() {
     global $xtpl, $GETPOST;
     
+    locale_init(SIMPLEID_LOCALE);
+
     $xtpl = new XTemplate('html/template.xtpl');
     $xtpl->assign('version', SIMPLEID_VERSION);
     $xtpl->assign('base_path', get_base_path());
-    
-    locale_init(SIMPLEID_LOCALE);
+    $xtpl->assign('footer_doc', t('Documentation'));
+    $xtpl->assign('footer_support', t('Support'));
     
     // Check if the configuration file has been defined
     if (!defined('SIMPLEID_BASE_URL')) {

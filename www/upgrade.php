@@ -106,6 +106,8 @@ upgrade_start();
  */
 function upgrade_start() {
     global $xtpl, $GETPOST;
+    
+    locale_init(SIMPLEID_LOCALE);
         
     $xtpl = new XTemplate('html/template.xtpl');
     $xtpl->assign('version', SIMPLEID_VERSION);
@@ -113,8 +115,6 @@ function upgrade_start() {
     $xtpl->assign('css', '@import url(' . get_base_path() . 'html/upgrade.css);');
     $xtpl->assign('footer_doc', t('Documentation'));
     $xtpl->assign('footer_support', t('Support'));
-    
-    locale_init(SIMPLEID_LOCALE);
     
     // Check if the configuration file has been defined
     if (!defined('SIMPLEID_BASE_URL')) {
