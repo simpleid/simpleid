@@ -1053,6 +1053,10 @@ function simpleid_openid_consent_form($request, $response, $reason = CHECKID_APP
     }
     
     $xtpl->parse('main.openid_consent');
+    
+    $xtpl->assign(array('js_locale_label' => 'openid_suspect', 'js_locale_text' => addslashes(t('This web site has not confirmed its identity and might be fraudulent.')) . '\n\n' . addslashes(t('Are you sure you wish to automatically send your information to this site for any future requests?'))));
+    $xtpl->parse('main.js_locale');
+    
     $xtpl->parse('main.framekiller');
     
     header('X-Frame-Options: DENY');

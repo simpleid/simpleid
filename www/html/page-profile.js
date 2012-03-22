@@ -10,7 +10,7 @@ var discovery_refresh = function() {
         if ($('#discovery-local-id')[0].checked) code += $('.openid2-local-id').html() + '\n';
     }
     
-    if (code == '') code = '<em>You need to set at least one of OpenID 1.x or OpenID 2 to generate the code.</em>';
+    if (code == '') code = l.code;
     
     $('#discovery-link-tags').html(code);
 }

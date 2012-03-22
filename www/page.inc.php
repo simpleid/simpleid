@@ -85,6 +85,9 @@ function page_profile() {
     $xtpl->assign('blocks', implode($blocks));
     $xtpl->parse('main.blocks');
     
+    $xtpl->assign(array('js_locale_label' => 'code', 'js_locale_text' => addslashes(t('<em>You need to set at least one of OpenID 1.x or OpenID 2 to generate the code.</em>'))));
+    $xtpl->parse('main.js_locale');
+    
     $xtpl->assign('javascript', '<script src="' . get_base_path() . 'html/page-profile.js" type="text/javascript"></script>');
     $xtpl->assign('title', t('My Profile'));
     $xtpl->parse('main');
@@ -178,8 +181,11 @@ function page_sites() {
     
     $xtpl->parse('main.sites');
     
+    $xtpl->assign(array('js_locale_label' => 'openid_suspect', 'js_locale_text' => addslashes(t('This web site has not confirmed its identity and might be fraudulent.')) . '\n\n' . addslashes(t('Are you sure you wish to automatically send your information to this site for any future requests?'))));
+    $xtpl->parse('main.js_locale');
+    
     $xtpl->assign('title', t('My Sites'));
-    $xtpl->assign('javascript', '<script src="' . get_base_path() . 'html/consent.js" type="text/javascript"></script>');
+    $xtpl->assign('javascript', '<script src="' . get_base_path() . 'html/openid-consent.js" type="text/javascript"></script>');
     $xtpl->parse('main');
     $xtpl->out('main');
 }
