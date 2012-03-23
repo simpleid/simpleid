@@ -150,7 +150,7 @@ function openid_direct_message($data, $version = OPENID_VERSION_2) {
  * @param string $status the HTTP status to send
  */
 function openid_direct_response($message, $status = '200 OK') {
-    header("HTTP/1.1 $status");
+    header("Status: $status");
     header("Content-Type: text/plain");
     print $message;
 }

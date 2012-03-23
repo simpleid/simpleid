@@ -122,7 +122,7 @@ function _simpleweb_invoke($route, $args = array()) {
  * Displays a HTTP 404 Not Found error and exits.
  */
 function _simpleweb_not_found() {
-    header('Status: 404');
+    header('Status: 404 Not Found');
     header('Content-Type: text/plain');
     
     print 'Not Found';
