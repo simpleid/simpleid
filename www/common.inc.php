@@ -299,6 +299,16 @@ function get_base_path() {
 }
 
 /**
+ * Determines whether the {@link SIMPLEID_BASE_URL} configuration option is a
+ * HTTPS URL.
+ *
+ * @return true if SIMPLEID_BASE_URL is a HTTPS URL
+ */
+function is_base_https() {
+    return (stripos(SIMPLEID_BASE_URL, 'https:') === 0));
+}
+
+/**
  * Obtains a SimpleID URL.  URLs produced by SimpleID should use this function.
  *
  * @param string $q the q parameter
