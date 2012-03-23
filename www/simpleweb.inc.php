@@ -75,12 +75,23 @@ function simpleweb_run($routes, $request_path = NULL, $not_found_route = NULL) {
         // We take the request path from the request URI
         $request_path = $_SERVER['REQUEST_URI'];
         
-        // Strip off all parts to the script file name
+        // Strip off all parts to the script file name.  Sadly, PHP is historically
+        // buggy in its treatment of SCRIPT_NAME, so we need to try a few methods
+        // to strip them
         $script_name = basename($_SERVER['SCRIPT_NAME']);
-        $request_path = substr($request_path, strpos($request_path, $script_name) + strlen($script_name));
+        $script_dir = dirname($_SERVER['SCRIPT_NAME']);
+        
+        if (strpos($request_path, $script_name) !== false) {
+            $request_path = substr($request_path, strpos($request_path, $script_name) + strlen($script_name));
+        } elseif ($script_dir != '/') {
+            $request_path = str_replace($script_dir, '', $request_path);
+        }
         
         $request_path = trim($request_path, '/');
     }
+    
+    // Strip off GET parameters when passed in SAPI CGI mode
+    $request_path = strtok($request_path, '?');
     
     foreach ($routes as $pattern => $route) {
         
