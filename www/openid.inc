@@ -150,7 +150,12 @@ function openid_direct_message($data, $version = OPENID_VERSION_2) {
  * @param string $status the HTTP status to send
  */
 function openid_direct_response($message, $status = '200 OK') {
-    header("HTTP/1.1 $status");
+    if (substr(PHP_SAPI, 0, 3) === "cgi") {
+        header("Status: $status");
+    } else {
+        header($_SERVER['SERVER_PROTOCOL'] . ' ' . $status);
+    }
+    
     header("Content-Type: text/plain");
     print $message;
 }
@@ -193,7 +198,12 @@ function openid_indirect_message($data, $version = OPENID_VERSION_2) {
  * encoded, either OPENID_RESPONSE_QUERY or OPENID_RESPONSE_FRAGMENT
  */ 
 function openid_indirect_response($url, $message, $component = OPENID_RESPONSE_QUERY) {
-    header('Status: 303 See Other');
+    if (substr(PHP_SAPI, 0,3) === "cgi") {
+        header('Status: 303 See Other');
+    } else {
+        header($_SERVER['SERVER_PROTOCOL'] . ' 303 See Other');
+    }
+    
     header('Location: ' . openid_indirect_response_url($url, $message, $component));
     exit;
 }

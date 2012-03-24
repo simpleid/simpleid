@@ -257,7 +257,7 @@ function simpleid_process_openid($request) {
         default:
             if (isset($request['openid.return_to'])) {
                 // Indirect communication - send error via indirect communication.
-                header('HTTP/1.1 400 Bad Request');
+                header_response_code('404 Bad Request');
                 set_message('Invalid OpenID message.');
                 page_dashboard();
             } else {

@@ -122,7 +122,11 @@ function _simpleweb_invoke($route, $args = array()) {
  * Displays a HTTP 404 Not Found error and exits.
  */
 function _simpleweb_not_found() {
-    header('Status: 404');
+    if (substr(PHP_SAPI, 0, 3) === 'cgi') {
+        header('Status: 404 Not Found');
+    } else {
+        header($_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found');
+    }
     header('Content-Type: text/plain');
     
     print 'Not Found';

@@ -359,13 +359,13 @@ function user_public_page($uid = NULL) {
     
     $xtpl->assign('title', 'User Page');
     if ($uid == NULL) {
-        header('HTTP/1.1 400 Bad Request');
+        header_response_code('400 Bad Request');
         set_message('No user specified.');
     } else {
         $user = user_load($uid);
         
         if ($user == NULL) {
-            header('HTTP/1.1 404 Not Found');
+            header_response_code('404 Not Found');
             set_message('User <strong>' . htmlspecialchars($uid, ENT_QUOTES, 'UTF-8') . '</strong> not found.');
         } else {
             header('Vary: Accept');
@@ -452,7 +452,7 @@ function user_xrds($uid) {
         $xtpl->parse('xrds');
         $xtpl->out('xrds');
     } else {
-        header('HTTP/1.1 404 Not Found');
+        header_response_code('HTTP/1.1 404 Not Found');
         
         set_message('User <strong>' . htmlspecialchars($uid, ENT_QUOTES, 'UTF-8') . '</strong> not found.');
         $xtpl->parse('main');
