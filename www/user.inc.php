@@ -373,13 +373,23 @@ function user_public_page($uid = NULL) {
     
     $xtpl->assign('title', t('User Page'));
     if ($uid == NULL) {
-        header('HTTP/1.1 400 Bad Request');
+        if (substr(PHP_SAPI, 0,3) === 'cgi') {
+            header('Status: 400 Bad Request');
+        } else {
+            header('HTTP/1.1 400 Bad Request');
+        }
+        
         set_message(t('No user specified.'));
     } else {
         $user = user_load($uid);
         
         if ($user == NULL) {
-            header('HTTP/1.1 404 Not Found');
+            if (substr(PHP_SAPI, 0,3) === 'cgi') {
+                header('Status: 404 Not Found');
+            } else {
+                header('HTTP/1.1 404 Not Found');
+            }
+
             set_message(t('User %uid not found.', array('%uid' => $uid)));
         } else {
             header('Vary: Accept');
@@ -466,7 +476,11 @@ function user_xrds($uid) {
         $xtpl->parse('xrds');
         $xtpl->out('xrds');
     } else {
-        header('HTTP/1.1 404 Not Found');
+        if (substr(PHP_SAPI, 0,3) === 'cgi') {
+            header('Status: 404 Not Found');
+        } else {
+            header('HTTP/1.1 404 Not Found');
+        }
         
         set_message('User <strong>' . htmlspecialchars($uid, ENT_QUOTES, 'UTF-8') . '</strong> not found.');
         $xtpl->parse('main');
