@@ -136,7 +136,7 @@ function _simpleweb_not_found() {
     if (substr(PHP_SAPI, 0, 3) === 'cgi') {
         header('Status: 404 Not Found');
     } else {
-        header('HTTP/1.1 404 Not Found');
+        header($_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found');
     }
     header('Content-Type: text/plain');
     

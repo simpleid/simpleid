@@ -62,6 +62,24 @@ function indirect_fatal_error($error) {
 }
 
 /**
+ * Send a HTTP response code to the user agent.
+ *
+ * The format of the HTTP response code depends on the way PHP is run.
+ * When run as an Apache module, a properly formatted HTTP response
+ * string is sent.  When run via CGI, the response code is sent via the
+ * Status response header.
+ *
+ * @param string $code the response code along
+ */
+function header_response_code($code) {
+    if (substr(PHP_SAPI, 0,3) === 'cgi') {
+        header('Status: ' . $code);
+    } else {
+        header($_SERVER['SERVER_PROTOCOL'] . ' ' . $code);
+    }
+}
+
+/**
  * Determines whether the current connection with the user agent is via
  * HTTPS.
  *
@@ -148,7 +166,7 @@ function check_https($action = 'redirect', $allow_override = false, $redirect_ur
         if (substr(PHP_SAPI, 0,3) === 'cgi') {
             header('Status: 426 Upgrade Required');
         } else {
-            header('HTTP/1.1 426 Upgrade Required');
+            header($_SERVER['SERVER_PROTOCOL'] . ' 426 Upgrade Required');
         }
 
         header('Upgrade: TLS/1.2, HTTP/1.1');
@@ -162,7 +180,7 @@ function check_https($action = 'redirect', $allow_override = false, $redirect_ur
     if (substr(PHP_SAPI, 0,3) === 'cgi') {
         header('Status: 301 Moved Permanently');
     } else {
-        header('HTTP/1.1 301 Moved Permanently');
+        header($_SERVER['SERVER_PROTOCOL'] . ' 301 Moved Permanently');
     }
         
     header('Location: ' . $redirect_url);

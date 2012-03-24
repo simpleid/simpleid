@@ -153,7 +153,7 @@ function openid_direct_response($message, $status = '200 OK') {
     if (substr(PHP_SAPI, 0, 3) === 'cgi') {
         header("Status: $status");
     } else {
-        header("HTTP/1.1 $status");
+        header($_SERVER['SERVER_PROTOCOL'] . ' ' . $status);
     }
     
     header("Content-Type: text/plain");
@@ -201,7 +201,7 @@ function openid_indirect_response($url, $message, $component = OPENID_RESPONSE_Q
     if (substr(PHP_SAPI, 0,3) === 'cgi') {
         header('Status: 303 See Other');
     } else {
-        header('HTTP/1.1 303 See Other');
+        header($_SERVER['SERVER_PROTOCOL'] . ' 303 See Other');
     }
 
     header('Location: ' . openid_indirect_response_url($url, $message, $component));

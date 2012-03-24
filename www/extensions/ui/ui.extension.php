@@ -184,12 +184,7 @@ function ui_routes() {
  */
 function ui_icon() {
     if (!isset($_GET['realm']) || !isset($_GET['tk']) || ($_GET['tk'] != _ui_icon_token($_GET['realm']))) {
-        if (substr(PHP_SAPI, 0,3) === 'cgi') {
-            header('Status: 404 Not Found');
-        } else {
-            header('HTTP/1.1 404 Not Found');
-        }
-            
+        header_response_code('404 Not Found');
         indirect_fatal_error(t('Invalid UI icon parameters.'));
     }
     
@@ -197,12 +192,7 @@ function ui_icon() {
     $icon_res = _ui_get_icon($realm);
     
     if ($icon_res === NULL) {
-        if (substr(PHP_SAPI, 0,3) === 'cgi') {
-            header('Status: 404 Not Found');
-        } else {
-            header('HTTP/1.1 404 Not Found');
-        }
-        
+        header_response_code('404 Not Found');
         indirect_fatal_error(t('Unable to get icon.'));
     }
     
