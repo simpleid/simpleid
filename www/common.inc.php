@@ -99,40 +99,6 @@ function is_https() {
 
 
 /**
- * Determines whether the user agent supplied valid a certificate identifying the
- * user.
- *
- * A valid certificate is supplied if all of the following occurs:
- *
- * - the connection is done using HTTPS (i.e. {@link is_https()} is true)
- * - the web server has been set up to request a certificate from the user agent
- * - the web server has been set up to pass the certificate details to PHP
- * - the certificate has not been revoked
- * - the certificate contains a serial number and a valid issuer
- *
- * @return true if the user agent has supplied a valid SSL certificate
- */
-function has_ssl_client_cert() {
-    // False if we are not in HTTP
-    if (!is_https()) return false;
-    
-    // False if certificate is not valid
-    if (!isset($_SERVER['SSL_CLIENT_VERIFY']) || ($_SERVER['SSL_CLIENT_VERIFY'] !== 'SUCCESS')) return false;
-    
-    // False if certificate is expired or has no expiry date
-    if (!isset($_SERVER['SSL_CLIENT_V_REMAIN']) || ($_SERVER['SSL_CLIENT_V_REMAIN'] < 0)) return false;
-    if (!isset($_SERVER['SSL_CLIENT_V_END'])) return false;
-    
-    // False if no serial number
-    if (!isset($_SERVER['SSL_CLIENT_M_SERIAL'])) return false;
-    
-    // False if no issuer
-    if (!isset($_SERVER['SSL_CLIENT_I_DN'])) return false;
-    
-    return true;
-}
-
-/**
  * Ensure the current connection with the user agent is secure with HTTPS.
  *
  * This function uses {@link is_https()} to determine whether the connection
@@ -333,7 +299,7 @@ function get_base_path() {
  * @return true if SIMPLEID_BASE_URL is a HTTPS URL
  */
 function is_base_https() {
-    return (stripos(SIMPLEID_BASE_URL, 'https:') === 0));
+    return (stripos(SIMPLEID_BASE_URL, 'https:') === 0);
 }
 
 /**

@@ -83,12 +83,32 @@ function user_init($q = NULL) {
             $user['auth_active'] = true;
             unset($_SESSION['user_auth_active']);
         }
-    } elseif (isset($_COOKIE[_user_autologin_cookie()])) {
+    } else {
         if (($q == 'login') || ($q == 'logout')) return;
-        user_autologin_verify();
-    } elseif (has_ssl_client_cert()) {
-        if ($q == 'logout') return;
-        user_cert_login();
+        user_auto_login();
+    }
+}
+
+/**
+ * Attempts to automatically login using credentials presented by the user agent.
+ *
+ * The user agent may present various credentials as part of its request.  These
+ * may include cookies and SSL client certificates.  This function calls the
+ * {@link hook_user_auto_login()} hook of enabled extensions to see if any
+ * of these credentials can be used to automatically login a user.
+ */
+function user_auto_login() {
+    global $simpleid_extensions;
+    
+    $extensions = $simpleid_extensions;
+    
+    if (!in_array('user_cookieauth', $extensions)) $extensions[] = 'user_cookieauth';
+    
+    foreach ($extensions as $extension) {
+        $test_user = extension_invoke($extension, 'user_auto_login');
+        if ($test_user != NULL) {
+            _user_login($test_user);
+        }
     }
 }
 
@@ -218,7 +238,7 @@ function user_login() {
         cache_delete('user-nonce', $_POST['nonce']);
     }
     
-    if (store_user_verify_credentials($_POST['name'], $_POST) === false) {
+    if (user_verify_credentials($_POST['name'], $_POST) === false) {
         set_message(t('The user name or password is not correct.'));
         user_login_form($destination, $state, $fixed_uid);
         return;
@@ -237,9 +257,53 @@ function user_login() {
     log_info('Login successful: ' . $test_user['uid'] . '['. gmstrftime('%Y-%m-%dT%H:%M:%SZ', $test_user['auth_time']) . ']');
     
     
-    if (isset($_POST['autologin']) && ($_POST['autologin'] == 1)) user_autologin_create();
+    if (isset($_POST['autologin']) && ($_POST['autologin'] == 1)) user_cookieauth_create_cookie();
 
     openid_indirect_response(simpleid_url($destination, $query), '');
+}
+
+/**
+ * Verifies a set of credentials for a specified user.
+ *
+ * A set of credentials comprises:
+ *
+ * - A user name
+ * - Some kind of verifying information, such as a plaintext password, a hashed
+ *   password (e.g. digest) or some other kind of identifying information.
+ *
+ * The user name is passed to this function using the $uid parameter.  The user
+ * name may or may not exist.  If the user name does not exist, this function
+ * <strong>must</strong> return false.
+ *
+ * The credentials are supplied as an array using the $credentials parameter.
+ * Typically this array will be a subset of the $_POST superglobal passed to the
+ * {@link user_login()} function.  Thus it will generally contain the keys 'pass' and
+ * 'digest'.
+ *
+ * This function calls the {@link hook_user_verify_credentials()} hook to 
+ * check whether the credentials supplied matches the credentials
+ * for the specified user in the store.
+ *
+ * @param string $uid the name of the user to verify
+ * @param array $credentials the credentials supplied by the browser
+ * @return bool whether the credentials supplied matches those for the specified
+ * user
+ */
+function user_verify_credentials($uid, $credentials) {
+    global $simpleid_extensions;
+    
+    $extensions = $simpleid_extensions;
+    
+    if (!in_array('user_passauth', $extensions)) $extensions[] = 'user_passauth';
+    
+    foreach ($extensions as $extension) {
+        $result = extension_invoke($extension, 'user_verify_credentials', $uid, $credentials);
+        if ($result === true) {
+            return true;
+        }
+    }
+    
+    return false;
 }
 
 /**
@@ -290,7 +354,7 @@ function user_logout($destination = NULL) {
 function _user_logout() {
     global $user;
     
-    user_autologin_invalidate();
+    user_cookieauth_invalidate();
     session_destroy();
     
     cache_delete('user', $user['uid']);
@@ -538,6 +602,36 @@ function user_header($state = NULL) {
 }
 
 /**
+ * Verifies a set of credentials using the default user name-password authentication
+ * method.
+ *
+ * @param string $uid the name of the user to verify
+ * @param array $credentials the credentials supplied by the browser
+ * @return bool whether the credentials supplied matches those for the specified
+ * user
+ */
+function user_passauth_user_verify_credentials($uid, $credentials) {
+    $allowed_algorithms = array('md5', 'sha1');
+    
+    $test_user = user_load($uid);
+    
+    if ($test_user == NULL) return false;
+    
+    $hash_function_salt = explode(':', $test_user['pass'], 3);
+    
+    $hash = $hash_function_salt[0];
+    $function = (isset($hash_function_salt[1])) ? $hash_function_salt[1] : 'md5';    
+    if (!in_array($function, $allowed_algorithms)) $function = 'md5';
+    $salt_suffix = (isset($hash_function_salt[2])) ? ':' . $hash_function_salt[2] : '';
+
+    if (call_user_func($function, $credentials['pass'] . $salt_suffix) != $hash) {
+        return false;
+    }
+    
+    return true;
+}
+
+/**
  * Creates a auto login cookie.  The login cookie will be based on the
  * current log in user.
  *
@@ -549,7 +643,7 @@ function user_header($state = NULL) {
  * used
  *
  */
-function user_autologin_create($id = NULL, $expires = NULL) {
+function user_cookieauth_create_cookie($id = NULL, $expires = NULL) {
     global $user;
     
     if ($expires == NULL) {
@@ -565,52 +659,56 @@ function user_autologin_create($id = NULL, $expires = NULL) {
     cache_set('autologin-'. md5($user['uid']), $id, array('token' => $token, 'expires' => $expires, 'ip' => $_SERVER['REMOTE_ADDR']));
     
     // Note the last parameter (httponly) requires PHP 5.2
-    setcookie(_user_autologin_cookie(), $user['uid'] . ':' . $id . ':' . $token, $expires, get_base_path(), is_base_https(), true);
+    setcookie(_user_cookieauth_get_name(), $user['uid'] . ':' . $id . ':' . $token, $expires, get_base_path(), is_base_https(), true);
 }
 
 /**
  * Verifies a auto login cookie.  If valid, log in the user automatically.
  */
-function user_autologin_verify() {
-    $cookie = $_COOKIE[_user_autologin_cookie()];
+function user_cookieauth_user_auto_login() {
+    if (!isset($_COOKIE[_user_cookieauth_get_name()])) return NULL;
+        
+    $cookie = $_COOKIE[_user_cookieauth_get_name()];
     
-    list($uid, $id, $token) = explode(':', $cookie);
-    log_debug('Automatic login token detected for ' . $uid);
+    list($test_uid, $id, $token) = explode(':', $cookie);
+    log_debug('Automatic login token detected for ' . $test_uid);
     
-    cache_expire(array('autologin-' . md5($uid) => SIMPLEID_USER_AUTOLOGIN_EXPIRES_IN));
-    $cache = cache_get('autologin-' . md5($uid), $id);
+    cache_expire(array('autologin-' . md5($test_uid) => SIMPLEID_USER_AUTOLOGIN_EXPIRES_IN));
+    $cache = cache_get('autologin-' . md5($test_uid), $id);
     
     if (!$cache) {  // Cookie doesn't exist
         log_notice('Automatic login: Token does not exist on server');
-        return;
+        return NULL;
     }
     
     if ($cache['expires'] < time()) {  // Cookie expired
         log_notice('Automatic login: Token on server expired');
-        return;
+        return NULL;
     }
     
     if ($cache['token'] != $token) {
         log_warn('Automatic login: Token on server does not match');
         // Token not the same - panic
-        cache_expire(array('autologin-' . md5($uid) => 0));
-        user_autologin_invalidate();
-        return;
+        cache_expire(array('autologin-' . md5($test_uid) => 0));
+        user_cookieauth_invalidate();
+        return NULL;
     }
     
     // Load the user, tag it as an auto log in
-    $user = user_load($uid);
+    $test_user = user_load($test_uid);
     
-    if ($user != NULL) {
-        log_debug('Automatic login token accepted for ' . $uid);
+    if ($test_user != NULL) {
+        log_debug('Automatic login token accepted for ' . $test_uid);
         
-        $user['autologin'] = TRUE;
-        _user_login($user);
+        $test_user['autologin'] = TRUE;
     
         // Renew the token
-        user_autologin_create($id, $cache['expires']);
+        user_cookieauth_create_cookie($id, $cache['expires']);
+        
+        return $test_user;
     } else {
-        log_warn('Automatic login token accepted for ' . $uid . ', but no such user exists');
+        log_warn('Automatic login token accepted for ' . $test_uid . ', but no such user exists');
+        return NULL;
     }
 }
 
@@ -618,15 +716,15 @@ function user_autologin_verify() {
  * Removes the auto login cookie from the user agent and the SimpleID
  * cache.
  */
-function user_autologin_invalidate() {
-    if (isset($_COOKIE[_user_autologin_cookie()])) {
-        $cookie = $_COOKIE[_user_autologin_cookie()];
+function user_cookieauth_invalidate() {
+    if (isset($_COOKIE[_user_cookieauth_get_name()])) {
+        $cookie = $_COOKIE[_user_cookieauth_get_name()];
         
         list($uid, $id, $token) = explode(':', $cookie);
         
         cache_delete('autologin-' . md5($uid), $id);
         
-        setcookie(_user_autologin_cookie(), "", time() - 3600);
+        setcookie(_user_cookieauth_get_name(), "", time() - 3600);
     }
 }
 
@@ -635,27 +733,8 @@ function user_autologin_invalidate() {
  *
  * @return string the name of the persistent login cookie.
  */
-function _user_autologin_cookie() {
+function _user_cookieauth_get_name() {
     return "autologin-" . md5(SIMPLEID_BASE_URL);
 }
 
-/**
- * Attempt to login using a SSL client certificate.
- *
- * Note that the web server must be set up to request a SSL client certificate
- * and pass the certificate's details to PHP.
- */
-function user_cert_login() {
-    $cert = trim($_SERVER['SSL_CLIENT_M_SERIAL']) . ';' . trim($_SERVER['SSL_CLIENT_I_DN']);
-    log_debug('Client SSL certificate: ' . $cert);
-    
-    $uid = store_get_uid_from_cert($cert);
-    if ($uid != NULL) {
-        log_debug('Client SSL certificate accepted for ' . $uid);
-        $user = user_load($uid);
-        _user_login($user);
-    } else {
-        log_warn('Client SSL certificate presented, but no user with that certificate exists.');
-    }
-}
 ?>

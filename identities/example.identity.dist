@@ -82,6 +82,20 @@ identity="http://example.com/"
 pass="c8e24ae844b7cb9381g722ae8209a19a"
 
 ;
+; Whether this user is given administrative privileges in SimpleID.
+;
+; This setting has no effect in the current version of SimpleID.  However,
+; more functionality may be added to SimpleID in future versions which will
+; be restricted to SimpleID administrators.
+;
+; You should grant administrative privileges to at least one user.
+;
+; If you wish this user to be given administrative privileges, uncomment the
+; line below.
+;
+;administrator=1
+
+;
 ; Advanced users only: SSL client certificates associated with this identity.
 ;
 ; You can associate SSL client certificates to this identity, so that you can
@@ -104,24 +118,14 @@ pass="c8e24ae844b7cb9381g722ae8209a19a"
 ; http://simpleid.sourceforge.net/documentation/advanced-topics/logging-using-client-ssl-certificates
 ; for details on how to set this up.
 ;
+; Note, you must also enable the certauth extension in SimpleID.  To
+; do this, make sure the SIMPLEID_EXTENSIONS option in config.php contains
+; certauth
+
 ; Example:
 ;
+;[certauth]
 ;cert[]="02A97C;/C=XX/O=Example CA/OU=Example CA Certificate Signing/CN=Example Client CA"
-
-
-;
-; Whether this user is given administrative privileges in SimpleID.
-;
-; This setting has no effect in the current version of SimpleID.  However,
-; more functionality may be added to SimpleID in future versions which will
-; be restricted to SimpleID administrators.
-;
-; You should grant administrative privileges to at least one user.
-;
-; If you wish this user to be given administrative privileges, uncomment the
-; line below.
-;
-;administrator=1
 
 
 ;
@@ -173,7 +177,7 @@ pass="c8e24ae844b7cb9381g722ae8209a19a"
 ; http://simpleid.sourceforge.net/documentation/using-simpleid/extensions/simple-registration-extension
 ;
 ; Note, you must also enable the Simple Registration Extension in SimpleID.  To
-; do this, make sure the SIMPLEID_EXTENSIONS option in config.inc contains
+; do this, make sure the SIMPLEID_EXTENSIONS option in config.php contains
 ; sreg
 ;
 ;[sreg]
@@ -223,7 +227,7 @@ pass="c8e24ae844b7cb9381g722ae8209a19a"
 ;    http://openid.net/schema/timezone
 ;
 ; Note, you must also enable the Attribute Exchange Extension in SimpleID.  To
-; do this, make sure the SIMPLEID_EXTENSIONS option in config.inc contains
+; do this, make sure the SIMPLEID_EXTENSIONS option in config.php contains
 ; ax
 ;
 ;[ax]

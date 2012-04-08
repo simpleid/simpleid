@@ -158,18 +158,6 @@ function hook_indirect_response($url, $response) {
 }
 
 /**
- * Provides additional form items when displaying the login form
- * 
- * @param string $destination he SimpleID location to which the user is directed
- * if login is successful
- * @param string $state the current SimpleID state, if required by the location
- * @see user_login_form()
- */
-function hook_user_login_form($destination, $state) {
-}
-
-
-/**
  * Provides additional form items when displaying the relying party consent
  * form
  * 
@@ -254,6 +242,65 @@ function hook_consent($form_request, &$response, &$rp) {
  */
 function hook_routes() {
 }
+
+/**
+ * Provides additional form items when displaying the login form
+ * 
+ * @param string $destination he SimpleID location to which the user is directed
+ * if login is successful
+ * @param string $state the current SimpleID state, if required by the location
+ * @see user_login_form()
+ */
+function hook_user_login_form($destination, $state) {
+}
+
+/**
+ * Attempts to automatically login using credentials presented by the user agent.
+ *
+ * This hook is called by the {@link user_auto_login()} function.  The hook
+ * should detect any credentials present in the request and return a $user array
+ * (loaded using the {@link user_load()} function) if credentials identifying
+ * the user is present.
+ *
+ * If no credentials are present, or the credentials are invalid, this hook
+ * should return NULL.
+ * 
+ * @return array the user array, or NULL
+ */
+function hook_user_auto_login() {
+}
+
+/**
+ * Verifies a set of credentials for a specified user.
+ *
+ * A set of credentials comprises:
+ *
+ * - A user name
+ * - Some kind of verifying information, such as a plaintext password, a hashed
+ *   password (e.g. digest) or some other kind of identifying information.
+ *
+ * The user name is passed to this function using the $uid parameter.  The user
+ * name may or may not exist.  If the user name does not exist, this function
+ * <strong>must</strong> return false.
+ *
+ * The credentials are supplied as an array using the $credentials parameter.
+ * Typically this array will be a subset of the $_POST superglobal passed to the
+ * {@link user_login()} function.  Thus it will generally contain the keys 'pass' and
+ * 'digest'.
+ *
+ * This hook must check whether the credentials supplied matches the credentials
+ * for the specified user in the store.  If for any reason that credentials
+ * do not match, this function <strong>must</strong> return false.
+ *
+ * @param string $uid the name of the user to verify
+ * @param array $credentials the credentials supplied by the browser
+ * @return bool whether the credentials supplied matches those for the specified
+ * user
+ */
+function hook_user_verify_credentials($uid, $credentials) {
+}
+
+
 
 /**
  * Returns additional blocks to be displayed in the user's dashboard.
