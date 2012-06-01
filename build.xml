@@ -67,7 +67,7 @@
     </target>
     
     <target name="pear-package" depends="check-dist-dir">
-        <d51pearpkg2 dir="${dist.dir}/${dist.sub.dir}/simpleid/" baseinstalldir="/">
+        <d51pearpkg2 dir="${dist.dir}/${dist.sub.dir}/simpleid/" baseinstalldir="/" addhiddenfiles="true">
             <name>SimpleID</name>
             <summary>SimpleID is a simple, personal OpenID provider</summary>
             <description>SimpleID is a simple, personal OpenID provider written in PHP.</description>
@@ -121,8 +121,11 @@
                     <regexp pattern="&lt;file baseinstalldir=&quot;/&quot;" replace="&lt;file"/>
                     <!-- install-as for different directories -->
                     <regexp pattern="(&lt;file name=&quot;/www/(.+?)&quot;)" replace="\1 install-as=&quot;simpleid/\2&quot;"/>
-                    <!-- replace -->
-                    <regexp pattern="(&lt;file name=&quot;/www/config.php.dist&quot;[^&gt;]+)/&gt;" replace="\1&gt;&lt;tasks:replace type=&quot;pear-config&quot; from=&quot;@data_dir@&quot; to=&quot;data_dir&quot; /&gt;&lt;/file&gt;"/>
+                    <!-- install-as for .htaccess -->
+                    <regexp pattern="(install-as=&quot;simpleid/.htaccess.dist&quot;)" replace="install-as=&quot;simpleid/.htaccess&quot;"/>
+                    <!-- replace configuration files -->
+                    <regexp pattern="(install-as=&quot;simpleid/config.pear.php&quot;)" replace="install-as=&quot;simpleid/config.php&quot;"/>
+                    <regexp pattern="(&lt;file name=&quot;/www/config.php.dist&quot;) install-as=&quot;simpleid/config.php.dist&quot; role=&quot;www&quot;[^&gt;]+/&gt;" replace="\1 install-as=&quot;simpleid/config.php.dist&quot; role=&quot;cfg&quot;&gt;&lt;tasks:replace type=&quot;pear-config&quot; from=&quot;@data_dir@&quot; to=&quot;data_dir&quot; /&gt;&lt;/file&gt;"/>
                 </replaceregexp>
             </filterchain>
         </reflexive>
@@ -170,6 +173,8 @@
             <property name="config.cache.dir" value="../cache" />
             <property name="config.store.dir" value="../store" />
         </phingcall>
+        
+        <delete file="${dist.dir}/${dist.tar.dir}/simpleid/www/config.pear.php"/>
     
         <tar destfile="${dist.dir}/simpleid-${build.version}.tar.gz" compression="gzip">
             <tarfileset dir="${dist.dir}/${dist.tar.dir}" includes="**/*" defaultexcludes="no" />
