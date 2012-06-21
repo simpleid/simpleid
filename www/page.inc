@@ -164,7 +164,7 @@ function page_sites() {
     $xtpl->parse('main.sites');
     
     $xtpl->assign('title', 'My Sites');
-    $xtpl->assign('javascript', '<script src="' . get_base_path() . 'html/consent.js" type="text/javascript"></script>');
+    $xtpl->assign('javascript', '<script src="' . get_base_path() . 'html/openid-consent.js" type="text/javascript"></script>');
     $xtpl->parse('main');
     $xtpl->out('main');
 }
