@@ -292,3 +292,20 @@ label.option { font-weight: normal; }
 .dialog-page .form-text {
     width: 100%;
 }
+
+@media only screen and (max-width: 800px) {
+    .dialog-page {
+        background: #FFFFFF;
+    }
+
+    .dialog-page #content {
+        margin: 20px auto;
+        width: auto;
+        padding: 20px;
+        border-width: 0px;
+        background: #FFFFFF;
+    }
+    
+    
+}
+
