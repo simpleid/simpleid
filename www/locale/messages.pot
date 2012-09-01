@@ -1,5 +1,5 @@
 # SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR Kelvin Mo
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
@@ -7,8 +7,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: kmo@users.sourceforge.net\n"
-"POT-Creation-Date: 2012-03-22 22:26+1100\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-09-02 00:10+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: www/common.inc.php:151
+#: www/common.inc.php:140
 msgid "An encrypted connection (HTTPS) is required for this page."
 msgstr ""
 
@@ -32,7 +32,7 @@ msgstr ""
 #: www/extensions/ax/ax.extension.php:197
 #: www/extensions/ax/ax.extension.php:263
 #: www/extensions/sreg/sreg.extension.php:133
-#: www/extensions/sreg/sreg.extension.php:180 www/user.inc.php:486
+#: www/extensions/sreg/sreg.extension.php:180 www/user.inc.php:556
 msgid "Value"
 msgstr ""
 
@@ -45,7 +45,7 @@ msgid "SimpleID will send the following information to sites which supports the 
 msgstr ""
 
 #: www/extensions/ax/ax.extension.php:261
-#: www/extensions/sreg/sreg.extension.php:178 www/user.inc.php:484
+#: www/extensions/sreg/sreg.extension.php:178 www/user.inc.php:554
 msgid "To change these, <a href=\"!url\">edit your identity file</a>."
 msgstr ""
 
@@ -145,8 +145,8 @@ msgstr ""
 msgid "Protocol Error: openid.return_to not set when openid.realm is not set."
 msgstr ""
 
-#: www/index.php:1024 www/index.php:1105 www/user.inc.php:163
-#: www/user.inc.php:314
+#: www/index.php:1024 www/index.php:1105 www/user.inc.php:185
+#: www/user.inc.php:380
 msgid "Cancel"
 msgstr ""
 
@@ -227,8 +227,12 @@ msgstr ""
 msgid "Last access"
 msgstr ""
 
-#: www/page.inc.php:178 www/page.inc.php:179
+#: www/page.inc.php:178
 msgid "Automatic"
+msgstr ""
+
+#: www/page.inc.php:179
+msgid "Remove"
 msgstr ""
 
 #: www/page.inc.php:180
@@ -363,104 +367,104 @@ msgstr ""
 msgid "Access Denied"
 msgstr ""
 
-#: www/user.inc.php:174
+#: www/user.inc.php:196
 msgid "Login cancelled without a proper OpenID request."
 msgstr ""
 
-#: www/user.inc.php:185
+#: www/user.inc.php:207
 msgid "You need to supply the user name and the password in order to log in."
 msgstr ""
 
-#: www/user.inc.php:195
+#: www/user.inc.php:217
 msgid "You seem to be attempting to log in from another web page.  You must use this page to log in."
 msgstr ""
 
-#: www/user.inc.php:207
+#: www/user.inc.php:229
 msgid "SimpleID detected a potential security attack on your log in.  Please log in again."
 msgstr ""
 
-#: www/user.inc.php:212
+#: www/user.inc.php:234
 msgid "The log in page has expired.  Please log in again."
 msgstr ""
 
-#: www/user.inc.php:220
+#: www/user.inc.php:242
 msgid "The user name or password is not correct."
 msgstr ""
 
-#: www/user.inc.php:280
+#: www/user.inc.php:346
 msgid "You have been logged out."
 msgstr ""
 
-#: www/user.inc.php:330
+#: www/user.inc.php:396
 msgid "Secure login using <strong>HTTPS</strong>."
 msgstr ""
 
-#: www/user.inc.php:333
+#: www/user.inc.php:399
 msgid "<strong>WARNING:</strong>  Your password will be sent to SimpleID as plain text."
 msgstr ""
 
-#: www/user.inc.php:341
+#: www/user.inc.php:407
 msgid "User name:"
 msgstr ""
 
-#: www/user.inc.php:342
+#: www/user.inc.php:408
 msgid "Password:"
 msgstr ""
 
-#: www/user.inc.php:343
+#: www/user.inc.php:409
 msgid "Remember me on this computer for two weeks."
 msgstr ""
 
-#: www/user.inc.php:344
+#: www/user.inc.php:410
 msgid "Log in"
 msgstr ""
 
-#: www/user.inc.php:346
+#: www/user.inc.php:412
 msgid "Log In"
 msgstr ""
 
-#: www/user.inc.php:372
+#: www/user.inc.php:438
 msgid "User Page"
 msgstr ""
 
-#: www/user.inc.php:375
+#: www/user.inc.php:441
 msgid "No user specified."
 msgstr ""
 
-#: www/user.inc.php:381
+#: www/user.inc.php:447
 #, php-format
 msgid "User %uid not found."
 msgstr ""
 
-#: www/user.inc.php:393
+#: www/user.inc.php:459
 #, php-format
 msgid "This is the user %uid's SimpleID page.  It contains hidden information for the use by OpenID consumers."
 msgstr ""
 
-#: www/user.inc.php:433
+#: www/user.inc.php:499
 msgid "Private Personal Identifier"
 msgstr ""
 
-#: www/user.inc.php:435
+#: www/user.inc.php:501
 msgid "This is a private personal identifier."
 msgstr ""
 
-#: www/user.inc.php:483
+#: www/user.inc.php:553
 msgid "SimpleID may, with your consent, send the following information to sites which supports OpenID Connect."
 msgstr ""
 
-#: www/user.inc.php:486
+#: www/user.inc.php:556
 msgid "Member"
 msgstr ""
 
-#: www/user.inc.php:504
+#: www/user.inc.php:574
 msgid "OpenID Connect"
 msgstr ""
 
-#: www/user.inc.php:524
+#: www/user.inc.php:594
 msgid "Log out and log in as a different user"
 msgstr ""
 
-#: www/user.inc.php:527
+#: www/user.inc.php:597
 msgid "Log out"
 msgstr ""

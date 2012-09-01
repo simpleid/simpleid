@@ -176,7 +176,7 @@ function page_sites() {
     $xtpl->assign('realm_label', t('Site'));
     $xtpl->assign('last_time_label', t('Last access'));
     $xtpl->assign('auto_release_label', t('Automatic'));
-    $xtpl->assign('remove_label', t('Automatic'));
+    $xtpl->assign('remove_label', t('Remove'));
     $xtpl->assign('submit_button', t('Submit'));    
     
     $xtpl->parse('main.sites');
