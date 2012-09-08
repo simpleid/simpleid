@@ -551,7 +551,7 @@ function _user_page_profile() {
     global $user;
     
     $html = '<p>' . t('SimpleID may, with your consent, send the following information to sites which supports OpenID Connect.') . '</p>';    
-    $html .= '<p>' . t('To change these, <a href="!url">edit your identity file</a>.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started/setting-identity/identity-files')) . '</p>';
+    $html .= '<p>' . t('To change these, <a href="!url">edit your identity file</a>.', array('!url' => 'http://simpleid.koinic.net/documentation/getting-started/setting-identity/identity-files')) . '</p>';
     
     $html .= "<table><tr><th>" . t('Member') . "</th><th>" . t('Value') . "</th></tr>";
     

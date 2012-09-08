@@ -9,7 +9,7 @@ Latest Version
 --------------
 
 The latest version of SimpleID can be found in the SimpleID web page at
-<http://simpleid.sourceforge.net/>
+<http://simpleid.koinic.net/>
 
 Upgrading
 ---------
@@ -29,13 +29,13 @@ Installation
 ------------
 
 For installation instructions, please see the SimpleID Getting Started Guide at
-<http://simpleid.sourceforge.net/documentation/getting-started>.
+<http://simpleid.koinic.net/documentation/getting-started>.
 
 Documentation
 -------------
 
 Documentation for SimpleID can be found at
-<http://simpleid.sourceforge.net/documentation>.
+<http://simpleid.koinic.net/documentation>.
 
 Licensing
 ---------
@@ -47,7 +47,7 @@ Donate
 
 If you enjoy using SimpleID, please consider making a donation to support the
 ongoing development work.  To find out more on how to donate, visit
-<http://simpleid.sourceforge.net/donate>.
+<http://simpleid.koinic.net/donate>.
 
 Your donation is very much appreciated.
 

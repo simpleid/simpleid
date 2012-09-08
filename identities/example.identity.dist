@@ -115,7 +115,7 @@ pass="c8e24ae844b7cb9381g722ae8209a19a"
 ; These two values are then joined together using a semicolon.
 ;
 ; This option is for advanced users only.  Please see the documentation at
-; http://simpleid.sourceforge.net/documentation/advanced-topics/logging-using-client-ssl-certificates
+; http://simpleid.koinic.net/documentation/advanced-topics/logging-using-client-ssl-certificates
 ; for details on how to set this up.
 ;
 ; Note, you must also enable the certauth extension in SimpleID.  To
@@ -174,7 +174,7 @@ pass="c8e24ae844b7cb9381g722ae8209a19a"
 ; in your details.
 ;
 ; Further information on the Simple Registration Extension can be found at
-; http://simpleid.sourceforge.net/documentation/using-simpleid/extensions/simple-registration-extension
+; http://simpleid.koinic.net/documentation/using-simpleid/extensions/simple-registration-extension
 ;
 ; Note, you must also enable the Simple Registration Extension in SimpleID.  To
 ; do this, make sure the SIMPLEID_EXTENSIONS option in config.php contains
@@ -233,5 +233,5 @@ pass="c8e24ae844b7cb9381g722ae8209a19a"
 ;[ax]
 ;http://openid.net/schema/company/name="Example Company Limited"
 ;http://openid.net/schema/company/title="Managing Director"
-;http://openid.net/schema/contact/web/blog="http://simpleid.sourceforge.net/"
+;http://openid.net/schema/contact/web/blog="http://simpleid.koinic.net/"
 

@@ -110,49 +110,49 @@ function simpleid_start() {
     // Check if the configuration file has been defined
     if (!defined('SIMPLEID_BASE_URL')) {
         log_fatal('No configuration file found.');
-        indirect_fatal_error(t('No configuration file found.  See the <a href="!url">manual</a> for instructions on how to set up a configuration file.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started')));
+        indirect_fatal_error(t('No configuration file found.  See the <a href="!url">manual</a> for instructions on how to set up a configuration file.', array('!url' => 'http://simpleid.koinic.net/documentation/getting-started')));
     }
     
     if (!is_dir(SIMPLEID_IDENTITIES_DIR)) {
         log_fatal('Identities directory not found.');
-        indirect_fatal_error(t('Identities directory not found.  See the <a href="!url">manual</a> for instructions on how to set up SimpleID.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started')));
+        indirect_fatal_error(t('Identities directory not found.  See the <a href="!url">manual</a> for instructions on how to set up SimpleID.', array('!url' => 'http://simpleid.koinic.net/documentation/getting-started')));
     }
     
     if (!is_dir(SIMPLEID_CACHE_DIR) || !is_writeable(SIMPLEID_CACHE_DIR)) {
         log_fatal('Cache directory not found or not writeable.');
-        indirect_fatal_error(t('Cache directory not found or not writeable.  See the <a href="!url">manual</a> for instructions on how to set up SimpleID.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started')));
+        indirect_fatal_error(t('Cache directory not found or not writeable.  See the <a href="!url">manual</a> for instructions on how to set up SimpleID.', array('!url' => 'http://simpleid.koinic.net/documentation/getting-started')));
     }
     
     
     if (!is_dir(SIMPLEID_STORE_DIR) || !is_writeable(SIMPLEID_STORE_DIR)) {
         log_fatal('Store directory not found or not writeable.');
-        indirect_fatal_error(t('Store directory not found or not writeable.  See the <a href="!url">manual</a> for instructions on how to set up SimpleID.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started')));
+        indirect_fatal_error(t('Store directory not found or not writeable.  See the <a href="!url">manual</a> for instructions on how to set up SimpleID.', array('!url' => 'http://simpleid.koinic.net/documentation/getting-started')));
     }
     
     if ((@ini_get('register_globals') === 1) || (@ini_get('register_globals') === '1') || (strtolower(@ini_get('register_globals')) == 'on')) {
         log_fatal('register_globals is enabled in PHP configuration.');
-        indirect_fatal_error(t('register_globals is enabled in PHP configuration, which is not supported by SimpleID.  See the <a href="!url">manual</a> for further information.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started/system-requirements')));
+        indirect_fatal_error(t('register_globals is enabled in PHP configuration, which is not supported by SimpleID.  See the <a href="!url">manual</a> for further information.', array('!url' => 'http://simpleid.koinic.net/documentation/getting-started/system-requirements')));
     }
     
     if (!bignum_loaded()) {
         log_fatal('gmp/bcmath PHP extension not loaded.');
-        indirect_fatal_error(t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'gmp/bcmath', '!url' => 'http://simpleid.sourceforge.net/documentation/getting-started/system-requirements')));
+        indirect_fatal_error(t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'gmp/bcmath', '!url' => 'http://simpleid.koinic.net/documentation/getting-started/system-requirements')));
     }
     if (!function_exists('preg_match')) {
         log_fatal('pcre PHP extension not loaded.');
-        indirect_fatal_error(t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'pcre', '!url' => 'http://simpleid.sourceforge.net/documentation/getting-started/system-requirements')));
+        indirect_fatal_error(t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'pcre', '!url' => 'http://simpleid.koinic.net/documentation/getting-started/system-requirements')));
     }
     if (!function_exists('session_start')) {
         log_fatal('session PHP extension not loaded.');
-        indirect_fatal_error(t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'session', '!url' => 'http://simpleid.sourceforge.net/documentation/getting-started/system-requirements')));
+        indirect_fatal_error(t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'session', '!url' => 'http://simpleid.koinic.net/documentation/getting-started/system-requirements')));
     }
     if (!function_exists('xml_parser_create_ns')) {
         log_fatal('xml PHP extension not loaded.');
-        indirect_fatal_error(t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'xml', '!url' => 'http://simpleid.sourceforge.net/documentation/getting-started/system-requirements')));
+        indirect_fatal_error(t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'xml', '!url' => 'http://simpleid.koinic.net/documentation/getting-started/system-requirements')));
     }
     if (!function_exists('hash')) {
         log_fatal('hash PHP extension not loaded.');
-        indirect_fatal_error(t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'hash', '!url' => 'http://simpleid.sourceforge.net/documentation/getting-started/system-requirements')));
+        indirect_fatal_error(t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'hash', '!url' => 'http://simpleid.koinic.net/documentation/getting-started/system-requirements')));
     }
 
     openid_fix_request();
@@ -1041,7 +1041,7 @@ function simpleid_openid_consent_form($request, $response, $reason = CHECKID_APP
         
         if ($reason == CHECKID_RETURN_TO_SUSPECT) {
             $xtpl->assign('suspect_label', t('Warning: This web site has not confirmed its identity and might be fraudulent.  Do not share any personal information with this web site unless you are sure it is legitimate. See the <a href="!url" class="popup">SimpleID documentation for details</a> (OpenID version 2.0 return_to discovery failure)',
-                array('!url' => 'http://simpleid.sourceforge.net/documentation/troubleshooting/returnto-discovery-failure')));
+                array('!url' => 'http://simpleid.koinic.net/documentation/troubleshooting/returnto-discovery-failure')));
             
             $xtpl->parse('main.openid_consent.setup.suspect');
             $xtpl->assign('realm_class', 'return-to-suspect');
