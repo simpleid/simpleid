@@ -118,44 +118,44 @@ function upgrade_start() {
     
     // Check if the configuration file has been defined
     if (!defined('SIMPLEID_BASE_URL')) {
-        indirect_fatal_error(t('No configuration file found.  See the <a href="!url">manual</a> for instructions on how to set up a configuration file.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started')));
+        indirect_fatal_error(t('No configuration file found.  See the <a href="!url">manual</a> for instructions on how to set up a configuration file.', array('!url' => 'http://simpleid.koinic.net/documentation/getting-started')));
     }
     
     if (!is_dir(SIMPLEID_IDENTITIES_DIR)) {
-        indirect_fatal_error(t('Identities directory not found.  See the <a href="!url">manual</a> for instructions on how to set up SimpleID.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started')));
+        indirect_fatal_error(t('Identities directory not found.  See the <a href="!url">manual</a> for instructions on how to set up SimpleID.', array('!url' => 'http://simpleid.koinic.net/documentation/getting-started')));
     }
     
     if (!is_dir(SIMPLEID_CACHE_DIR) || !is_writeable(SIMPLEID_CACHE_DIR)) {
-        indirect_fatal_error(t('Cache directory not found or not writeable.  See the <a href="!url">manual</a> for instructions on how to set up SimpleID.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started')));
+        indirect_fatal_error(t('Cache directory not found or not writeable.  See the <a href="!url">manual</a> for instructions on how to set up SimpleID.', array('!url' => 'http://simpleid.koinic.net/documentation/getting-started')));
     }
     
     if (!is_dir(SIMPLEID_STORE_DIR) || !is_writeable(SIMPLEID_STORE_DIR)) {
-        indirect_fatal_error(t('Store directory not found or not writeable.  See the <a href="!url">manual</a> for instructions on how to set up SimpleID.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started')));
+        indirect_fatal_error(t('Store directory not found or not writeable.  See the <a href="!url">manual</a> for instructions on how to set up SimpleID.', array('!url' => 'http://simpleid.koinic.net/documentation/getting-started')));
     }
 
     if ((@ini_get('register_globals') === 1) || (@ini_get('register_globals') === '1') || (strtolower(@ini_get('register_globals')) == 'on')) {
-        indirect_fatal_error(t('register_globals is enabled in PHP configuration, which is not supported by SimpleID.  See the <a href="!url">manual</a> for further information.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started/system-requirements')));
+        indirect_fatal_error(t('register_globals is enabled in PHP configuration, which is not supported by SimpleID.  See the <a href="!url">manual</a> for further information.', array('!url' => 'http://simpleid.koinic.net/documentation/getting-started/system-requirements')));
     }
     
     if (!bignum_loaded()) {
         log_fatal('gmp/bcmath PHP extension not loaded.');
-        indirect_fatal_error(t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'gmp/bcmath', '!url' => 'http://simpleid.sourceforge.net/documentation/getting-started/system-requirements')));
+        indirect_fatal_error(t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'gmp/bcmath', '!url' => 'http://simpleid.koinic.net/documentation/getting-started/system-requirements')));
     }
     if (!function_exists('preg_match')) {
         log_fatal('pcre PHP extension not loaded.');
-        indirect_fatal_error(t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'pcre', '!url' => 'http://simpleid.sourceforge.net/documentation/getting-started/system-requirements')));
+        indirect_fatal_error(t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'pcre', '!url' => 'http://simpleid.koinic.net/documentation/getting-started/system-requirements')));
     }
     if (!function_exists('session_start')) {
         log_fatal('session PHP extension not loaded.');
-        indirect_fatal_error(t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'session', '!url' => 'http://simpleid.sourceforge.net/documentation/getting-started/system-requirements')));
+        indirect_fatal_error(t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'session', '!url' => 'http://simpleid.koinic.net/documentation/getting-started/system-requirements')));
     }
     if (!function_exists('xml_parser_create_ns')) {
         log_fatal('xml PHP extension not loaded.');
-        indirect_fatal_error(t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'xml', '!url' => 'http://simpleid.sourceforge.net/documentation/getting-started/system-requirements')));
+        indirect_fatal_error(t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'xml', '!url' => 'http://simpleid.koinic.net/documentation/getting-started/system-requirements')));
     }
     if (!function_exists('hash')) {
         log_fatal('hash PHP extension not loaded.');
-        indirect_fatal_error(t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'hash', '!url' => 'http://simpleid.sourceforge.net/documentation/getting-started/system-requirements')));
+        indirect_fatal_error(t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'hash', '!url' => 'http://simpleid.koinic.net/documentation/getting-started/system-requirements')));
     }
 
 
@@ -184,9 +184,9 @@ function upgrade_info() {
     $xtpl->assign('token', get_form_token('upgrade_info'));
     
     $xtpl->assign('intro', t('Use this script to update your installation whenever you upgrade to a new version of SimpleID.'));
-    $xtpl->assign('simpleid_docs', t('For more detailed information, see the <a href="!url">SimpleID documentation</a>.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started/upgrading')));
+    $xtpl->assign('simpleid_docs', t('For more detailed information, see the <a href="!url">SimpleID documentation</a>.', array('!url' => 'http://simpleid.koinic.net/documentation/getting-started/upgrading')));
     $xtpl->assign('step1', t('<strong>Back up your installation</strong>. This process will change various files within your SimpleID installation and in case of emergency you may need to revert to a backup.'));
-    $xtpl->assign('step2', t('Install your new files in the appropriate location, as described in the <a href="!url">SimpleID documentation</a>.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started/installing-simpleid')));
+    $xtpl->assign('step2', t('Install your new files in the appropriate location, as described in the <a href="!url">SimpleID documentation</a>.', array('!url' => 'http://simpleid.koinic.net/documentation/getting-started/installing-simpleid')));
     $xtpl->assign('click_continue', t('When you have performed the steps above, click <strong>Continue</strong>.'));
     $xtpl->assign('continue_button', t('Continue'));
     
@@ -393,7 +393,7 @@ function upgrade_access_denied() {
     $xtpl->assign('edit_upgrade_php2', t('There is a line inside your upgrade.php file that says <code>$upgrade_access_check = TRUE;</code>. Change it to <code>$upgrade_access_check = FALSE;</code>.'));
     $xtpl->assign('edit_upgrade_php3', t('As soon as the upgrade.php script is done, you must change the file back to its original form with <code>$upgrade_access_check = TRUE;</code>.'));
     $xtpl->assign('edit_upgrade_php4', t('To avoid having this problem in future, remember to log in to SimpleID as an administrator before you run this script.'));
-    $xtpl->assign('simpleid_docs', t('For more detailed information, see the <a href="!url">SimpleID documentation</a>.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started/upgrading/running-upgradephp')));
+    $xtpl->assign('simpleid_docs', t('For more detailed information, see the <a href="!url">SimpleID documentation</a>.', array('!url' => 'http://simpleid.koinic.net/documentation/getting-started/upgrading/running-upgradephp')));
     
     $xtpl->parse('main.upgrade_access_denied');
     

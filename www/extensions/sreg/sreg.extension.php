@@ -175,7 +175,7 @@ function sreg_page_profile() {
     
     $xtpl2->assign('sreg_data', t('SimpleID will send the following information to sites which supports the Simple Registration Extension.'));
     $xtpl2->assign('connect_data', t('If you have also supplied OpenID Connect user information in your identity file, these may also be sent as part of this Extension.'));
-    $xtpl2->assign('edit_identity_file', t('To change these, <a href="!url">edit your identity file</a>.', array('!url' => 'http://simpleid.sourceforge.net/documentation/getting-started/setting-identity/identity-files')));
+    $xtpl2->assign('edit_identity_file', t('To change these, <a href="!url">edit your identity file</a>.', array('!url' => 'http://simpleid.koinic.net/documentation/getting-started/setting-identity/identity-files')));
     $xtpl2->assign('name_label', t('Name'));
     $xtpl2->assign('value_label', t('Value'));
     
