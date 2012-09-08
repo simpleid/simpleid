@@ -239,6 +239,11 @@ function ax_consent($form_request, &$response, &$rp) {
         }
     }
     
+    if (count(array_keys(openid_extension_filter_request(OPENID_NS_AX, $response))) == 0) {
+        // We have removed all the responses, so we remove the namespace as well
+        unset($response['openid.ns.' . $alias]);
+    }
+    
     $rp['ax_consents'] = $form_request['ax_consents'];
 }
 

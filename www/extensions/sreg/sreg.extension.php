@@ -36,7 +36,8 @@
  * @filesource
  */
  
-
+/** Namespace for the Simple Registration extension */
+define('OPENID_NS_SREG', OPENID_NS_SREG);
 
 /**
  * @see hook_response()
@@ -49,16 +50,16 @@ function sreg_response($assertion, $request) {
     if (!$assertion) return array();
     
     // We only respond if the extension is requested
-    if (!openid_extension_requested('http://openid.net/extensions/sreg/1.1', $request)) return array();
+    if (!openid_extension_requested(OPENID_NS_SREG, $request)) return array();
     
-    $request = openid_extension_filter_request('http://openid.net/extensions/sreg/1.1', $request);
+    $request = openid_extension_filter_request(OPENID_NS_SREG, $request);
     $required = (isset($request['required'])) ? explode(',', $request['required']) : array();
     $optional = (isset($request['optional'])) ? explode(',', $request['optional']) : array();
     $fields = array_merge($required, $optional);
-    $alias = openid_extension_alias('http://openid.net/extensions/sreg/1.1');
+    $alias = openid_extension_alias(OPENID_NS_SREG);
     $response = array();
     
-    if ($version == OPENID_VERSION_2) $response['openid.ns.' . $alias] = 'http://openid.net/extensions/sreg/1.1';
+    if ($version == OPENID_VERSION_2) $response['openid.ns.' . $alias] = OPENID_NS_SREG;
     
     foreach ($fields as $field) {
         $value = _sreg_get_value($field);
@@ -76,10 +77,10 @@ function sreg_response($assertion, $request) {
  */
 function sreg_signed_fields($response) {
     // We only respond if the extension is requested
-    if (!openid_extension_requested('http://openid.net/extensions/sreg/1.1', $response)) return array();
+    if (!openid_extension_requested(OPENID_NS_SREG, $response)) return array();
     
-    $fields = array_keys(openid_extension_filter_request('http://openid.net/extensions/sreg/1.1', $response));
-    $alias = openid_extension_alias('http://openid.net/extensions/sreg/1.1');
+    $fields = array_keys(openid_extension_filter_request(OPENID_NS_SREG, $response));
+    $alias = openid_extension_alias(OPENID_NS_SREG);
     $signed_fields = array();
 
     if (isset($response['openid.ns.' . $alias])) $signed_fields[] = 'ns.' . $alias;
@@ -97,9 +98,9 @@ function sreg_consent_form($request, $response, $rp) {
     global $user;
     
     // We only respond if the extension is requested
-    if (!openid_extension_requested('http://openid.net/extensions/sreg/1.1', $request)) return '';
+    if (!openid_extension_requested(OPENID_NS_SREG, $request)) return '';
     
-    $request = openid_extension_filter_request('http://openid.net/extensions/sreg/1.1', $request);
+    $request = openid_extension_filter_request(OPENID_NS_SREG, $request);
     $required = (isset($request['required'])) ? explode(',', $request['required']) : array();
     $optional = (isset($request['optional'])) ? explode(',', $request['optional']) : array();
     $fields = array_merge($required, $optional);
@@ -107,7 +108,7 @@ function sreg_consent_form($request, $response, $rp) {
     if ((count($request)) && isset($user['sreg'])) {
         $xtpl2 = new XTemplate('extensions/sreg/sreg.xtpl');
         
-        $xtpl2->assign('alias', openid_extension_alias('http://openid.net/extensions/sreg/1.1'));
+        $xtpl2->assign('alias', openid_extension_alias(OPENID_NS_SREG));
         
         if (isset($request['policy_url'])) {            
             $xtpl2->assign('policy', t('You can view the site\'s policy in relation to the use of this information at this URL: <a href="@url">@url</a>.', array('@url' => $request['policy_url'])));            
@@ -142,10 +143,10 @@ function sreg_consent_form($request, $response, $rp) {
  */
 function sreg_consent($form_request, &$response, &$rp) {
     // We only respond if the extension is requested
-    if (!openid_extension_requested('http://openid.net/extensions/sreg/1.1', $response)) return;
+    if (!openid_extension_requested(OPENID_NS_SREG, $response)) return;
     
-    $fields = array_keys(openid_extension_filter_request('http://openid.net/extensions/sreg/1.1', $response));
-    $alias = openid_extension_alias('http://openid.net/extensions/sreg/1.1');
+    $fields = array_keys(openid_extension_filter_request(OPENID_NS_SREG, $response));
+    $alias = openid_extension_alias(OPENID_NS_SREG);
     
     foreach ($fields as $field) {
         if (isset($response['openid.' . $alias . '.' . $field])) {
@@ -153,6 +154,11 @@ function sreg_consent($form_request, &$response, &$rp) {
                 unset($response['openid.' . $alias . '.' . $field]);
             }
         }
+    }
+    
+    if (count(array_keys(openid_extension_filter_request(OPENID_NS_SREG, $response))) == 0) {
+        // We have removed all the responses, so we remove the namespace as well
+        unset($response['openid.ns.' . $alias]);
     }
     
     $rp['sreg_consents'] = $form_request['sreg_consents'];
