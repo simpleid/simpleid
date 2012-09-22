@@ -3,10 +3,10 @@
     <!-- :mode=html: $Id$ -->
     <head>
         <title>{title} - SimpleID</title>
-        <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
-        <meta content="{version}" name="SimpleID-Version" />
-        <meta content="noindex,nofollow" name="robots" />
-        <meta content="width=460, maximum-scale=1" name="viewport" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="SimpleID-Version" content="{version}" />
+        <meta name="robots" content="noindex,nofollow" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
         <link rel="shortcut icon" href="{base_path}html/simpleid.ico" type="image/x-icon" />
         
         <!-- BEGIN: provider -->
@@ -18,9 +18,9 @@
             <link rel="openid.delegate" href="{local_id}" />
             <link rel="openid2.local_id" href="{local_id}" />
         <!-- END: local_id -->
-                
+        
+        <link rel="stylesheet" href="{base_path}html/simpleid.css" />
         <style type="text/css" media="screen">
-            @import url({base_path}html/simpleid.css);
             {css}
         </style>
         
