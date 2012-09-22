@@ -37,7 +37,7 @@
  */
  
 /** Namespace for the Simple Registration extension */
-define('OPENID_NS_SREG', OPENID_NS_SREG);
+define('OPENID_NS_SREG', 'http://openid.net/extensions/sreg/1.1');
 
 /**
  * @see hook_response()
