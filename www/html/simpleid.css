@@ -19,6 +19,12 @@
  * 
  * $Id$
  */
+ 
+html {
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
 
 body {
 	margin: 0;
@@ -52,7 +58,7 @@ body {
 
 #header h1 {
     font-weight: bold;
-    font-size: 1.2em;
+    font-size: 14px;
     text-transform: uppercase;
     margin: 0.5em 0;
     color: #CCCCCC;
@@ -110,7 +116,7 @@ body {
 h1 {
     margin: 1em 0;
     font-weight: normal;
-    font-size: 1.8em;
+    font-size: 22px;
     color: #666666;
 }
 
@@ -118,7 +124,7 @@ h2 {
     margin: 2em 0;
     padding-top: 1em;
     font-weight: normal;
-    font-size: 1.5em;
+    font-size: 18px;
     color: #666666;    
     border-top: 2px dotted #BBBBBB;
 }
@@ -276,6 +282,18 @@ label {
 }
 label.option { font-weight: normal; }
 
+select, textarea, input[type="text"], input[type="password"] {
+    display: inline-block;
+    padding: 2px;
+    height: 16px;
+}
+
+input[type="submit"], input[type="button"] {
+  padding: auto 14px;
+  /*font-size: 14px;*/
+  vertical-align: middle;
+}
+
 /* Dialogs and dialog pages */
 .dialog-page {
     background: #EEEEEE;
@@ -290,22 +308,34 @@ label.option { font-weight: normal; }
 }
 
 .dialog-page .form-text {
-    width: 100%;
+    width: 98%; /* Reduced as width does not include padding and chrome for input elements */ 
 }
 
 @media only screen and (max-width: 800px) {
+    body { font-size: 14px; }
+    
+    select, textarea, input[type="text"], input[type="password"] {
+        height: 18px;
+        font-size: 14px;
+    }
+    
+    input[type="submit"], input[type="button"] {
+        padding: 2px 14px;
+        font-size: 14px;
+    }
+    
     .dialog-page {
         background: #FFFFFF;
     }
 
     .dialog-page #content {
-        margin: 20px auto;
+        margin: 10px auto 20px auto;
         width: auto;
         padding: 20px;
         border-width: 0px;
         background: #FFFFFF;
     }
     
-    
+    .dialog-page #content h1 { margin-top: 0; }
 }
 
