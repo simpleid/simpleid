@@ -35,10 +35,16 @@
  */
  
 include_once "version.inc.php";
+include_once "locale.inc.php";
+
+// Check if the configuration file has been defined
+if (!file_exists('config.php')) {
+    die(t('No configuration file found.  See the <a href="!url">manual</a> for instructions on how to set up a configuration file.', array('!url' => 'http://simpleid.koinic.net/documentation/getting-started')));
+}
+
 include_once "config.php";
 include_once "config.default.php";
 include_once "log.inc.php";
-include_once "locale.inc.php";
 include_once "common.inc.php";
 include_once "simpleweb.inc.php";
 include_once "openid.inc.php";
@@ -47,7 +53,7 @@ include_once "user.inc.php";
 include_once "cache.inc.php";
 include_once SIMPLEID_STORE . ".store.php";
 include_once "page.inc.php";
-include "lib/xtemplate.class.php";
+include_once "lib/xtemplate.class.php";
 
 define('CACHE_DIR', SIMPLEID_CACHE_DIR);
 
@@ -106,12 +112,6 @@ function simpleid_start() {
     $xtpl->assign('base_path', get_base_path());
     $xtpl->assign('footer_doc', t('Documentation'));
     $xtpl->assign('footer_support', t('Support'));
-    
-    // Check if the configuration file has been defined
-    if (!defined('SIMPLEID_BASE_URL')) {
-        log_fatal('No configuration file found.');
-        indirect_fatal_error(t('No configuration file found.  See the <a href="!url">manual</a> for instructions on how to set up a configuration file.', array('!url' => 'http://simpleid.koinic.net/documentation/getting-started')));
-    }
     
     if (!is_dir(SIMPLEID_IDENTITIES_DIR)) {
         log_fatal('Identities directory not found.');
