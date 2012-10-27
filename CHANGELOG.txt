@@ -1,4 +1,15 @@
-// $Id$
+SimpleID 0.8.2
+--------------
+
+- Bug fixes:
+    * #104 Detect missing PHP extensions
+    * #105 Incorrect CSS property in simpleid.css
+    * #108 Incorrect footer links
+    * #109 Incorrect processing of HTTP requests and responses when used with
+      SAPI CGI
+    * #112 Incorrect reference to html/consent.js in page.inc
+- Improvements to user interface:      
+    * #111 Replaced packaged version of jQuery with CDN version
 
 SimpleID 0.8.1
 --------------
