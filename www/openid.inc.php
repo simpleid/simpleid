@@ -118,26 +118,16 @@ function openid_direct_message($data, $version = OPENID_VERSION_2) {
     $message = '';
     $ns = '';
     
-    switch ($version) {
-        case OPENID_VERSION_2:
-            $ns = OPENID_NS_2_0;
-            break;
-    }
-
+    // Add namespace for OpenID 2
+    if ($version == OPENID_VERSION_2) $ns = OPENID_NS_2_0;
     if (($ns != '') && !isset($data['ns'])) $data['ns'] = $ns;
     
     foreach ($data as $key => $value) {
-        if (strpos($key, ':') !== false) {
-            return null;
-        }
-    
-        if (strpos($key, "\n") !== false) {
-            return null;
-        }
-    
-        if (strpos($value, "\n") !== false) {
-            return null;
-        }
+        // Filter out invalid characters
+        if (strpos($key, ':') !== false) return null;
+        if (strpos($key, "\n") !== false) return null;
+        if (strpos($value, "\n") !== false) return null;
+        
         $message .= "$key:$value\n";
     }
     return $message;
@@ -173,12 +163,8 @@ function openid_direct_response($message, $status = '200 OK') {
 function openid_indirect_message($data, $version = OPENID_VERSION_2) {
     $ns = '';
     
-    switch ($version) {
-        case OPENID_VERSION_2:
-            $ns = OPENID_NS_2_0;
-            break;
-    }
-    
+    // Add namespace for OpenID 2
+    if ($version == OPENID_VERSION_2) $ns = OPENID_NS_2_0;
     if (($ns != '') && !isset($data['openid.ns'])) $data['openid.ns'] = $ns;
     
     return $data;
