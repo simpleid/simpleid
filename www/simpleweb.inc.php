@@ -133,14 +133,24 @@ function _simpleweb_invoke($route, $args = array()) {
  * Displays a HTTP 404 Not Found error and exits.
  */
 function _simpleweb_not_found() {
-    if (substr(PHP_SAPI, 0, 3) === 'cgi') {
-        header('Status: 404 Not Found');
-    } else {
-        header($_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found');
-    }
-    header('Content-Type: text/plain');
+    switch ($_SERVER['REDIRECT_STATUS']) { 
+ 	    case '403':
+ 	        $status = '403 Forbidden';  
+ 	        break;
+ 	    case '404':
+ 		default: 
+ 		    $status = '404 Not Found'; 
+ 		    break; 
+    } 
     
-    print 'Not Found';
+    if (substr(PHP_SAPI, 0, 3) === 'cgi') {
+        header('Status: ' . $status);
+    } else {
+        header($_SERVER['SERVER_PROTOCOL'] . ' ' . $status);
+    }
+    header('Content-Type: text/html');
+    
+    print '<!doctype html><html><head><title>' . $status . '</title></head><body><h1>' . $status . '</h1></body></html>';
     
     exit;
 }
