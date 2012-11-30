@@ -115,6 +115,7 @@
                 <exclude name="www/test/**" />
                 <exclude name="www/test-suite/**" />
                 <exclude name="tutorials/**" />
+                <exclude name=".git/**" />
                 <exclude name="*.xml" />
                 <exclude name="*.xsl" />
                 <exclude name="*.properties" />
