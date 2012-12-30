@@ -1,3 +1,10 @@
+SimpleID 0.8.3
+--------------
+
+- Bug fixes:
+    * #119 Remove XRDS-Simple Type element from template.xtpl for Blogger
+      interoperability
+
 SimpleID 0.8.2
 --------------
 
