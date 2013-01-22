@@ -26,6 +26,9 @@
  *
  * @package pear
  */
+ 
+include_once 'PEAR/Config.php';
+ 
 $pear_cfg_dir = PEAR_Config::singleton()->get('cfg_dir');
 include_once $pear_cfg_dir . '/simpleid/config.inc';
 ?>
