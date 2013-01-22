@@ -249,7 +249,7 @@ function _page_discovery_block() {
         'id' => 'discovery',
         'title' => 'Claim your Identifier',
         'content' => $html,
-        'links' => '<a href="http://simpleid.sourceforge.net/documentation/getting-started/setting-identity/claim-your-identifier">More information</a>'
+        'links' => '<a href="http://simpleid.koinic.net/documentation/getting-started/setting-identity/claim-your-identifier">More information</a>'
     ));
 }
 ?>

@@ -11,7 +11,7 @@ As a result, it is very important to upgrade SimpleID when a new version is
 released.
 
 General information on upgrading can be found at
-<http://simpleid.sourceforge.net/documentation/getting-started/upgrading>.
+<http://simpleid.koinic.net/documentation/getting-started/upgrading>.
 
 This document sets out the additional steps which may need to be performed to
 upgrade to a specific version of SimpleID.

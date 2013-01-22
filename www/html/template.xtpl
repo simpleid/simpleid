@@ -40,7 +40,7 @@
         <!-- END: upgrade_check -->
         <div id="header">
             <div id="logo">
-                <h1><a href="http://simpleid.sourceforge.net/">SimpleID</a> {version}</h1>
+                <h1><a href="http://simpleid.koinic.net/">SimpleID</a> {version}</h1>
             </div>
             <!-- BEGIN: user -->
             <div class="user">
@@ -283,9 +283,9 @@
 
         <div id="footer">
             <address>
-                SimpleID {version} &copy; Kelvin Mo 2007-9 &middot;
-                <a href="http://simpleid.sourceforge.net/documentation">Documentation</a> &middot;
-                <a href="http://sourceforge.net/apps/trac/simpleid">Support</a>
+                SimpleID {version} &copy; Kelvin Mo &middot;
+                <a href="http://simpleid.koinic.net/documentation">{footer_doc}</a> &middot;
+                <a href="http://simpleid.koinic.net/trac/">{footer_support}</a>
             </address>
         </div>
     </body>
@@ -314,7 +314,7 @@
         <!-- BEGIN: op_xrds -->
         <Service>
             <Type>http://specs.openid.net/auth/2.0/server</Type>
-            <Type>http://simpleid.sourceforge.net/type/version#{version}</Type>
+            <Type>http://simpleid.koinic.net/type/version#{version}</Type>
             <!-- BEGIN: type --><Type>{uri}</Type><!-- END: type -->
             <URI>{simpleid_base_url}</URI>
         </Service>
