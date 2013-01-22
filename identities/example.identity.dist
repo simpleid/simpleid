@@ -75,7 +75,7 @@ pass="c8e24ae844b7cb9381g722ae8209a19a"
 ; in your details.
 ;
 ; Further information on the Simple Registration Extension can be found at
-; http://simpleid.sourceforge.net/documentation/using-simpleid/extensions/simple-registration-extension
+; http://simpleid.koinic.net/documentation/using-simpleid/extensions/simple-registration-extension
 ;
 ; Note, you must also enable the Simple Registration Extension in SimpleID.  To
 ; do this, make sure the SIMPLEID_EXTENSIONS option in config.inc contains
@@ -134,5 +134,5 @@ pass="c8e24ae844b7cb9381g722ae8209a19a"
 ;[ax]
 ;http://openid.net/schema/company/name="Example Company Limited"
 ;http://openid.net/schema/company/title="Managing Director"
-;http://openid.net/schema/contact/web/blog="http://simpleid.sourceforge.net/"
+;http://openid.net/schema/contact/web/blog="http://simpleid.koinic.net/"
 
