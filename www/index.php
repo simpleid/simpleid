@@ -89,7 +89,7 @@ $xtpl = NULL;
 
 /**
  * This variable holds the combined $_GET and $_POST superglobal arrays.
- * This is then passed through {@link openid_fix_request()}.
+ * This is then passed through {@link fix_http_request()}.
  *
  * @global array $GETPOST
  */
@@ -155,8 +155,9 @@ function simpleid_start() {
         indirect_fatal_error(t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'hash', '!url' => 'http://simpleid.koinic.net/documentation/getting-started/system-requirements')));
     }
 
-    openid_fix_request();
+    fix_http_request();
     $GETPOST = array_merge($_GET, $_POST);
+    openid_parse_request($GETPOST);
     
     $q = (isset($GETPOST['q'])) ? $GETPOST['q'] : '';
     

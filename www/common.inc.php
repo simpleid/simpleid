@@ -153,6 +153,82 @@ function check_https($action = 'redirect', $allow_override = false, $redirect_ur
 }
 
 /**
+ * Fix PHP's handling of request data.  PHP changes dots in all request parameters
+ * to underscores when creating the $_GET, $_POST and $_REQUEST arrays.
+ *
+ * This function scans the original query string and POST parameters and fixes
+ * them.
+ */
+function fix_http_request() {
+    // Fix GET parameters
+    if (isset($_SERVER['QUERY_STRING'])) {
+        $get = parse_http_query($_SERVER['QUERY_STRING']);
+        
+        foreach ($get as $key => $value) {
+            // We strip out array-like identifiers - PHP uses special processing for these
+            if ((strpos($key, '[') !== FALSE) && (strpos($key, ']') !== FALSE)) $key = substr($key, 0, strpos($key, '['));
+            
+            // Replace special characters with underscore as per PHP processing
+            $php_key = preg_replace('/[ .[\x80-\x9F]/', '_', $key);
+            
+            // See if the PHP key is present; if so, copy and delete
+            if (($key != $php_key) && isset($_GET[$php_key])) {
+                $_GET[$key] = $_GET[$php_key];
+                $_REQUEST[$key] = $_REQUEST[$php_key];
+                unset($_GET[$php_key]);
+                unset($_REQUEST[$php_key]);
+            }
+        }
+    }
+    
+    // Fix POST parameters
+    $input = file_get_contents('php://input');
+    if ($input !== FALSE) {
+        $post = parse_http_query($input);
+        
+        foreach ($post as $key => $value) {
+            // We strip out array-like identifiers - PHP uses special processing for these
+            if ((strpos($key, '[') !== FALSE) && (strpos($key, ']') !== FALSE)) $key = substr($key, 0, strpos($key, '['));
+            
+            // Replace special characters with underscore as per PHP processing
+            $php_key = preg_replace('/[ .[\x80-\x9F]/', '_', $key);
+            
+            // See if the PHP key is present; if so, copy and delete
+            if (($key != $php_key) && isset($_POST[$php_key])) {
+                $_POST[$key] = $_POST[$php_key];
+                $_REQUEST[$key] = $_REQUEST[$php_key];
+                unset($_POST[$php_key]);
+                unset($_REQUEST[$php_key]);
+            }
+        }
+    }
+}
+
+/**
+ * Parses a query string.
+ *
+ * @param string $query the query string to parse
+ * @return array an array containing the parsed key-value pairs
+ *
+ * @since 0.7
+ */
+function parse_http_query($query) {
+    $data = array();
+    
+    if ($query === NULL) return array();
+    if ($query === '') return array();
+    
+    $pairs = explode('&', $query);
+    
+    foreach ($pairs as $pair) {
+        list ($key, $value) = explode('=', $pair, 2);
+        $data[$key] = urldecode($value);
+    }
+
+    return $data;
+}
+
+/**
  * Content type negotiation using the Accept Header.
  *
  * Under HTTP, the user agent is able to negoatiate the content type returned with

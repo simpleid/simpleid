@@ -93,7 +93,6 @@ $xtpl = NULL;
 
 /**
  * This variable holds the combined $_GET and $_POST superglobal arrays.
- * This is then passed through {@link openid_fix_request()}.
  *
  * @global array $GETPOST
  */

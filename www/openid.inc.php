@@ -369,60 +369,6 @@ function openid_parse_query($query) {
 }
 
 /**
- * Fix PHP's handling of request data.  PHP changes dots in all request parameters
- * to underscores when creating the $_GET, $_POST and $_REQUEST arrays.
- *
- * This function scans the original query string and POST parameters and fixes
- * them.
- */
-function openid_fix_request() {
-    // Fix GET parameters
-    if (isset($_SERVER['QUERY_STRING'])) {
-        $get = openid_parse_query($_SERVER['QUERY_STRING']);
-        
-        foreach ($get as $key => $value) {
-            // We strip out array-like identifiers - PHP uses special processing for these
-            if ((strpos($key, '[') !== FALSE) && (strpos($key, ']') !== FALSE)) $key = substr($key, 0, strpos($key, '['));
-            
-            // Replace special characters with underscore as per PHP processing
-            $php_key = preg_replace('/[ .[\x80-\x9F]/', '_', $key);
-            
-            // See if the PHP key is present; if so, copy and delete
-            if (($key != $php_key) && isset($_GET[$php_key])) {
-                $_GET[$key] = $_GET[$php_key];
-                $_REQUEST[$key] = $_REQUEST[$php_key];
-                unset($_GET[$php_key]);
-                unset($_REQUEST[$php_key]);
-            }
-        }
-    }
-    
-    // Fix POST parameters
-    $input = file_get_contents('php://input');
-    if ($input !== FALSE) {
-        $post = openid_parse_query($input);
-        
-        foreach ($post as $key => $value) {
-            // We strip out array-like identifiers - PHP uses special processing for these
-            if ((strpos($key, '[') !== FALSE) && (strpos($key, ']') !== FALSE)) $key = substr($key, 0, strpos($key, '['));
-            
-            // Replace special characters with underscore as per PHP processing
-            $php_key = preg_replace('/[ .[\x80-\x9F]/', '_', $key);
-            
-            // See if the PHP key is present; if so, copy and delete
-            if (($key != $php_key) && isset($_POST[$php_key])) {
-                $_POST[$key] = $_POST[$php_key];
-                $_REQUEST[$key] = $_REQUEST[$php_key];
-                unset($_POST[$php_key]);
-                unset($_REQUEST[$php_key]);
-            }
-        }
-    }
-    
-    openid_parse_request(array_merge($_GET, $_POST));
-}
-
-/**
  * Parses the OpenID request to extract namespace information.
  *
  * This function builds a map between namespace aliases and their Type URIs.
