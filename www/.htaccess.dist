@@ -37,6 +37,10 @@ Options -Indexes
     # the rewrite rules are not working properly.
     #RewriteBase /simpleid
 
+    # Pass Authorization header to PHP
+    RewriteCond %{HTTP:Authorization} ^(.*)
+    RewriteRule ^(.*) - [E=HTTP_AUTHORIZATION:%1]
+
     # Rewrite URLs
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
