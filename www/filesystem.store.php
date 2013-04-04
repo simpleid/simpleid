@@ -197,18 +197,18 @@ function store_get_uid_from_cert($cert) {
         $uid = $matches[1];
         $test_user = store_user_load($uid);
         
-        if (isset($test_user['cert'])) {
-            if (is_array($test_user['cert'])) {
-                foreach ($test_user['cert'] as $test_cert) {
+        if (isset($test_user['certauth']['cert'])) {
+            if (is_array($test_user['certauth']['cert'])) {
+                foreach ($test_user['certauth']['cert'] as $test_cert) {
                     if (trim($test_cert) != '') cache_set('cert', $test_cert, $uid);
                 }
-                foreach ($test_user['cert'] as $test_cert) {
+                foreach ($test_user['certauth']['cert'] as $test_cert) {
                     if ((trim($test_cert) != '') && ($test_cert == $cert))  $r = $uid;
                 }
             } else {
                 if (trim($test_cert) != '') {
-                    cache_set('cert', $test_user['cert'], $uid);
-                    if ($test_user['cert'] == $cert) $r = $uid;
+                    cache_set('cert', $test_user['certauth']['cert'], $uid);
+                    if ($test_user['certauth']['cert'] == $cert) $r = $uid;
                 }
             }
         }
