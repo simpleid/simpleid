@@ -54,75 +54,115 @@ function bignum_loaded() {
 /**
  * Creates a bignum.
  *
- * @param mixed $str An integer, a string in base 10, or a byte stream in base 256
- * @param int $base either 10 or 256
+ * @param mixed $str An integer, a string in base 2 to 36, or a byte stream in base 256
+ * @param int $base an integer between 2 and 36, or 256
  * @return resource a bignum
  */
 function bignum_new($str, $base = 10) {
-    if ($base == 10) {
-        if (BIGNUM_GMP) {
-            return gmp_init($str, 10);
-        } else {
-            return $str;
-        }
-    } elseif ($base == 256) {
-        $bytes = array_merge(unpack('C*', $str));
+    switch ($base) {
+        case 10:
+            if (BIGNUM_GMP) {
+                return gmp_init($str, 10);
+            } else {
+                return $str;
+            }
+            break;
+        case 256:
+            $bytes = array_merge(unpack('C*', $str));
 
-        $num = bignum_new(0);
-  
-        foreach ($bytes as $byte) {
-            $num = bignum_mul($num, 256);
-            $num = bignum_add($num, bignum_new($byte));
-        }
-        return $num;
+            $num = bignum_new(0);
+      
+            foreach ($bytes as $byte) {
+                $num = bignum_mul($num, 256);
+                $num = bignum_add($num, bignum_new($byte));
+            }
+            return $num;
+            break;
+        default:
+            if (!is_integer($base) || ($base < 2) || ($base > 36)) return FALSE;
+
+            $num = bignum_new(0);
+
+            for ($i = 0; $i < strlen($str); $i++) {
+                $num = bignum_mul($num, $base);
+                $num = bignum_add($num, bignum_new(base_convert($str[$i], $base, 10)));
+            }
+            return $num;
     }
-    return $false;
+
+    return FALSE;
 }
 
 /**
- * Converts a bignum into a string representation (base 10) or a byte stream
+ * Converts a bignum into a string representation (base 2 to 36) or a byte stream
  * (base 256)
  *
  * @param resource $num the bignum
- * @param int $base either 10 or 256
+ * @param int $base an integer between 2 and 36, or 256
  * @return string the converted bignum
  */
 function bignum_val($num, $base = 10) {
-    if (BIGNUM_GMP) {
-        $base10 = gmp_strval($num, 10);
-    } else {
-        $base10 = $num;
-    }
+    switch ($base) {
+        case 10:
+            if (BIGNUM_GMP) {
+                $base10 = gmp_strval($num, 10);
+            } else {
+                $base10 = $num;
+            }
 
-    if ($base == 10) return $base10;
-    if ($base == 256) {
-        $cmp = bignum_cmp($num, 0);
-        if ($cmp < 0) {
-            return FALSE;
-        }
+            return $base10;
+            break;
     
-        if ($cmp == 0) {
-            return "\x00";
-        }
+        case 256:
+            $cmp = bignum_cmp($num, 0);
+            if ($cmp < 0) {
+                return FALSE;
+            }
     
-        $bytes = array();
+            if ($cmp == 0) {
+                return "\x00";
+            }
+    
+            $bytes = array();
       
-        while (bignum_cmp($num, 0) > 0) {
-            array_unshift($bytes, bignum_mod($num, 256));
-            $num = bignum_div($num, 256);
-        }
+            while (bignum_cmp($num, 0) > 0) {
+                array_unshift($bytes, bignum_mod($num, 256));
+                $num = bignum_div($num, 256);
+            }
       
-        if ($bytes && ($bytes[0] > 127)) {
-            array_unshift($bytes, 0);
-        }
+            if ($bytes && ($bytes[0] > 127)) {
+                array_unshift($bytes, 0);
+            }
       
-        $byte_stream = '';
-        foreach ($bytes as $byte) {
-            $byte_stream .= pack('C', $byte);
-        }
+            $byte_stream = '';
+            foreach ($bytes as $byte) {
+                $byte_stream .= pack('C', $byte);
+            }
       
-        return $byte_stream;
+            return $byte_stream;
+            break;
+        default:
+            if (!is_integer($base) || ($base < 2) || ($base > 36)) return FALSE;
+
+            $cmp = bignum_cmp($num, 0);
+            if ($cmp < 0) {
+                return FALSE;
+            }
+    
+            if ($cmp == 0) {
+                return "0";
+            }
+
+            $str = '';
+            while (bignum_cmp($num, 0) > 0) {
+                $r = intval(bignum_val(bignum_mod($num, $base)));
+                $str = base_convert($r, 10, $base) . $str;
+                $num = bignum_div($num, $base);
+            }
+ 
+            return $str;
     }
+    
     return FALSE;
 }
 
