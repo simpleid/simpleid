@@ -244,17 +244,9 @@ function user_login() {
         return;
     }
     
-    // Set the current authentication time
     $test_user = user_load($_POST['name']);
-    $test_user['auth_time'] = time();
-    user_save($test_user);
-    
-    // Set user has been actively authenticated this and the next request only
-    $test_user['auth_active'] = true;
-    $_SESSION['user_auth_active'] = true;
-    
     _user_login($test_user);
-    log_info('Login successful: ' . $test_user['uid'] . '['. gmstrftime('%Y-%m-%dT%H:%M:%SZ', $test_user['auth_time']) . ']');
+    
     
     
     if (isset($_POST['autologin']) && ($_POST['autologin'] == 1)) user_cookieauth_create_cookie();
@@ -310,10 +302,23 @@ function user_verify_credentials($uid, $credentials) {
  * Sets the user specified by the parameter as the active user.
  *
  * @param array $login_user the user to log in
+ * @param bool $auth_active whether the user has been actively authenticated
+ * in this session
  *
  */
-function _user_login($login_user) {
+function _user_login($login_user, $auth_active = false) {
     global $user;
+
+    if ($auth_active) {
+        // Set the current authentication time
+        $login_user['auth_time'] = time();
+        user_save($login_user);
+    
+        // Set user has been actively authenticated this and the next request only
+        $login_user['auth_active'] = true;
+        $_SESSION['user_auth_active'] = true;
+        log_info('Login successful: ' . $login_user['uid'] . '['. gmstrftime('%Y-%m-%dT%H:%M:%SZ', $login_user['auth_time']) . ']');
+    }
 
     $user = $login_user;
     $_SESSION['user'] = $login_user['uid'];
@@ -353,13 +358,17 @@ function user_logout($destination = NULL) {
  */
 function _user_logout() {
     global $user;
+
+    $uid = $user['uid'];
     
     user_cookieauth_invalidate();
     session_destroy();
     
-    cache_delete('user', $user['uid']);
+    cache_delete('user', $uid);
     unset($_SESSION['user']);
     $user = NULL;
+
+    log_info('Logout successful: ' . $uid);
 }
 
 /**
