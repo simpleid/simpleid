@@ -270,6 +270,15 @@ span.last-time { display: none }
 #discovery label { display: inline; }
 #discovery-templates { display: none; }
 
+.otp-key {
+    font-size: 18px;
+    font-family: "Bitstream Vera Sans Mono","Courier New",monospace;
+    margin: 5px;
+}
+.otp-letters {
+    padding: 0 2px;
+}
+
 /* Forms */
 .form-item {
     margin: 1em 0;

@@ -84,14 +84,17 @@
             <!-- END: message -->
             
             <!-- BEGIN: login -->
+            <!-- BEGIN: login_security -->
             <div class="login-security {security_class}">
                 <p>{security_message}</p>
             </div>
+            <!-- END: login_security -->
             
             <form action="{base_path}index.php" method="post" enctype="application/x-www-form-urlencoded" id="login-form">
                 <input type="hidden" name="q" value="login"/><input name="destination" type="hidden" value="{destination}"/>
-                <input type="hidden" name="nonce" id="edit-nonce" value="{nonce}" />
-                
+                <input type="hidden" name="mode" value="{mode}"/><input type="hidden" name="nonce" value="{nonce}" />
+
+                <!-- BEGIN: credentials -->
                 <input type="hidden" name="digest" id="edit-digest" value="" />
                 
                 <div class="form-item">
@@ -108,8 +111,29 @@
                         <input type="checkbox" name="autologin" value="1" />
                         {autologin_label}
                     </label>
-                </div>                
-                <input type="submit" name="op" id="edit-submit" value="{login_button}" class="form-submit" {security_disabled} />
+                </div>
+                <!-- END: credentials -->
+
+                <!-- BEGIN: otp -->
+                <input type="hidden" name="autologin" value="{autologin}" />
+                
+                <p>{otp_instructions_label}</p>
+
+                <p>{otp_recovery_label}</p>
+                
+                <div class="form-item">
+                    <label for="edit-otp">{otp_label}</label>
+                    <input type="number" maxlength="6" name="otp" id="edit-otp" size="10" value="" autocapitalize="off" autocorrect="off" class="form-text required" />
+                </div>
+                <!--div class="form-item">
+                    <label class="option">
+                        <input type="checkbox" name="autoverify" value="1" />
+                        {autologin_label}
+                    </label>
+                </div-->
+                <!-- END: otp -->
+
+                <input type="submit" name="op" id="edit-submit" value="{submit_button}" class="form-submit" {security_disabled} />
                 <!-- BEGIN: state -->
                     <input type="submit" name="op" id="edit-cancel" value="{cancel_button}" class="form-submit" />
                     <input type="hidden" name="s" value="{state}"/>
@@ -199,6 +223,33 @@
             <input type="submit" name="op" id="edit-submit" value="{submit_button}" class="form-submit" {disabled} />
             </form>
             <!-- END: sites -->
+
+            <!-- BEGIN: otp -->
+            <p>{about_otp}</p>
+
+            <p>{otp_warning}</p>
+            
+            <p>{setup_otp}</p>
+
+            <ol>
+                <li>{download_app}</li>
+                <li>{add_account}
+                    <div class="otp-key"><span class="otp-letters">{secret1}</span><span class="otp-letters">{secret5}</span><span class="otp-letters">{secret9}</span><span class="otp-letters">{secret13}</span></div>
+                </li>
+                <li>{verify_code}</li>
+            </ol>
+
+            <form action="{base_path}index.php" method="post" enctype="application/x-www-form-urlencoded">
+                <input type="hidden" name="q" value="otp"/>
+                
+                <div class="form-item">
+                    <label for="edit-otp">{otp_label}</label>
+                    <input type="number" maxlength="6" name="otp" id="edit-otp" size="10" value="" autocapitalize="off" autocorrect="off" class="form-text required" />
+                </div>
+                <input type="submit" name="op" id="edit-submit" value="{submit_button}" class="form-submit" />
+            </form>
+
+            <!-- END: otp -->
             
             <!-- BEGIN: upgrade_access_denied -->
             <p>{login_required}</p>
