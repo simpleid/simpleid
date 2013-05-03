@@ -193,6 +193,7 @@ function simpleid_route($q) {
         'my/dashboard' => 'page_dashboard',
         'my/sites' => 'page_sites',
         'my/profile' => 'page_profile',
+        'otp' => 'user_otp_page',
         'openid/consent' => 'simpleid_openid_consent',
         'ppid/(.*)' => 'user_ppid_page',
         'user' => 'user_public_page',

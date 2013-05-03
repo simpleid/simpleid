@@ -49,7 +49,7 @@ function page_dashboard() {
     
     $blocks = _page_welcome_block();
     
-    $blocks = array_merge($blocks, extension_invoke_all('page_dashboard'));
+    $blocks = array_merge($blocks, _page_dashboard_otp_block(), extension_invoke_all('page_dashboard'));
     $blocks = array_map('page_render_block', $blocks);
     $xtpl->assign('blocks', implode($blocks));
     $xtpl->parse('main.blocks');
@@ -247,6 +247,35 @@ function _page_welcome_block() {
         'id' => 'welcome',
         'title' => t('Welcome'),
         'content' => t('You are logged in as %uid (%identity).', array('%uid' => $user['uid'], '%identity' => $user['identity']))
+    ));
+}
+
+/**
+ * Returns the dashboard OTP block.
+ *
+ * @return array the dashboard OTP block
+ */
+function _page_dashboard_otp_block() {
+    global $user;
+
+    $base_path = get_base_path();
+
+    $html = '<p>' . t('Login verification adds an extra layer of protection to your account. When enabled, you will need to enter an additional security code whenever you log into SimpleID.') . '</p>';
+
+    if (isset($user['otp'])) {
+        $html .= '<p>' . t('Login verification is <strong>enabled</strong>.') . '</p>';
+        $html .= '<form action="' . $base_path . 'index.php" method="post" enctype="application/x-www-form-urlencoded">';
+        $html .= '<input type="hidden" name="q" value="otp"/><input type="submit" name="op" value="' . t('Disable') . '" /></form>';
+    } else {
+        $html .= '<p>' . t('Login verification is <strong>disabled</strong>. To enable login verification, click the button below.') . '</p>';
+        $html .= '<form action="' . $base_path . 'index.php" method="post" enctype="application/x-www-form-urlencoded">';
+        $html .= '<input type="hidden" name="q" value="otp"/><input type="submit" name="op" value="' . t('Enable') . '" /></form>';
+    }
+    
+    return array(array(
+        'id' => 'otp',
+        'title' => t('Login Verification'),
+        'content' => $html
     ));
 }
 

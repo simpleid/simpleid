@@ -179,6 +179,7 @@ function user_login() {
     $destination = (isset($GETPOST['destination'])) ? $GETPOST['destination'] : '';
     $state = (isset($GETPOST['s'])) ? $GETPOST['s'] : '';
     $fixed_uid = (isset($_POST['fixed_uid'])) ? $_POST['name'] : NULL;
+    $mode = $_POST['mode'];
     
     $query = ($state) ? 's=' . rawurlencode($state) : '';
     
@@ -197,60 +198,95 @@ function user_login() {
         }
         return;
     }
-    
-    if (!isset($_POST['name'])) $_POST['name'] = '';
-    if (!isset($_POST['pass'])) $_POST['pass'] = '';
-    
-    if (($_POST['name'] == '') || ($_POST['pass'] == '')) {
-        if (isset($_POST['destination'])) {
-            // User came from a log in form.
-            set_message(t('You need to supply the user name and the password in order to log in.'));
-        }
-        if (isset($_POST['nonce'])) cache_delete('user-nonce', $_POST['nonce']);
+
+    if (!isset($_POST['mode']) || !in_array($_POST['mode'], array('credentials', 'otp'))) {
+        set_message(t('SimpleID detected a potential security attack on your log in.  Please log in again.'));
         user_login_form($destination, $state, $fixed_uid);
         return;
     }
-    
+
     if (!isset($_POST['nonce'])) {
         if (isset($_POST['destination'])) {
             // User came from a log in form.
             set_message(t('You seem to be attempting to log in from another web page.  You must use this page to log in.'));
         }
-        user_login_form($destination, $state, $fixed_uid);
+        user_login_form($destination, $state, $fixed_uid, $mode);
         return;
     }
-    
+
     $time = strtotime(substr($_POST['nonce'], 0, 20));
     // Some old versions of PHP does not recognise the T in the ISO 8601 date.  We may need to convert the T to a space
     if (($time == -1) || ($time === FALSE)) $time = strtotime(strtr(substr($_POST['nonce'], 0, 20), 'T', ' '));
+    $nonce = cache_get('user-nonce', $_POST['nonce']);
     
-    if (!cache_get('user-nonce', $_POST['nonce'])) {
+    if (!$nonce) {
         log_warn('Login attempt: Nonce ' . $_POST['nonce'] . ' not issued or is being reused.');
         set_message(t('SimpleID detected a potential security attack on your log in.  Please log in again.'));
-        user_login_form($destination, $state, $fixed_uid);
+        user_login_form($destination, $state, $fixed_uid, $mode);
         return;
     } elseif ($time < time() - SIMPLEID_LOGIN_NONCE_EXPIRES_IN) {
         log_notice('Login attempt: Nonce ' . $_POST['nonce'] . ' expired.');
         set_message(t('The log in page has expired.  Please log in again.'));
-        user_login_form($destination, $state, $fixed_uid);
+        user_login_form($destination, $state, $fixed_uid, $mode);
         return;
+    } elseif ($nonce['mode'] != $mode) {
+        log_warn('Login attempt: Mode saved with nonce ' . $_POST['nonce'] . ' (' . $nonce['mode'] . ') does not match ' . $mode);
+        set_message(t('SimpleID detected a potential security attack on your log in.  Please log in again.'));
+        user_login_form($destination, $state, $fixed_uid, $mode);
     } else {
         cache_delete('user-nonce', $_POST['nonce']);
     }
-    
-    if (user_verify_credentials($_POST['name'], $_POST) === false) {
-        set_message(t('The user name or password is not correct.'));
-        user_login_form($destination, $state, $fixed_uid);
-        return;
+
+    switch ($mode) {
+        case 'credentials':
+            if (!isset($_POST['name'])) $_POST['name'] = '';
+            if (!isset($_POST['pass'])) $_POST['pass'] = '';
+            
+            if (($_POST['name'] == '') || ($_POST['pass'] == '')) {
+                if (isset($_POST['destination'])) {
+                    // User came from a log in form.
+                    set_message(t('You need to supply the user name and the password in order to log in.'));
+                }
+                if (isset($_POST['nonce'])) cache_delete('user-nonce', $_POST['nonce']);
+                user_login_form($destination, $state, $fixed_uid);
+                return;
+            }
+
+            if (user_verify_credentials($_POST['name'], $_POST) === false) {
+                set_message(t('The user name or password is not correct.'));
+                user_login_form($destination, $state, $fixed_uid);
+                return;
+            }
+
+            $test_user = user_load($_POST['name']);
+            if (isset($test_user['otp']) && ($test_user['otp']['type'] != 'recovery')) {
+                log_info('One time password required');
+                user_login_form($destination, $state, $test_user['uid'], 'otp');
+                return;
+            }
+            break;
+        case 'otp':
+            if (!isset($_POST['otp']) || ($_POST['otp'] == '')) {
+                set_message(t('You need to enter the verification code in order to log in.'));
+                if (isset($_POST['nonce'])) cache_delete('user-nonce', $_POST['nonce']);
+                user_login_form($destination, $state, $nonce['uid'], 'otp');
+                return;
+            }
+
+            $test_user = user_load($nonce['uid']);
+
+            if (user_verify_otp($test_user['otp'], $_POST['otp']) === false) {
+                set_message(t('The verification code is not correct.'));
+                user_login_form($destination, $state, $nonce['uid'], 'otp');
+                return;
+            }
+            user_save($test_user); // Save the drift
+
+            break;
     }
     
-    $test_user = user_load($_POST['name']);
     _user_login($test_user);
     
-    
-    
-    if (isset($_POST['autologin']) && ($_POST['autologin'] == 1)) user_cookieauth_create_cookie();
-
     openid_indirect_response(simpleid_url($destination, $query), '');
 }
 
@@ -298,6 +334,31 @@ function user_verify_credentials($uid, $credentials) {
     return false;
 }
 
+
+function user_verify_otp(&$params, $code, $max_drift = 1) {
+    switch ($params['type']) {
+        case 'totp':
+            $time = time();
+
+            $test_code = user_totp($params['secret'], $time, $params['period'], $params['drift'], $params['algorithm'], $params['digits']);
+            
+            if ($test_code == $code) return true;
+
+            for ($i = -$max_drift; $i <= $max_drift; $i++) {
+                $test_code = user_totp($params['secret'], $time, $params['period'], $params['drift'] + $i, $params['algorithm'], $params['digits']);
+                if ($test_code == $code) {
+                    $params['drift'] = $i;
+                    return true;
+                }
+            }
+            return false;
+            break;
+        default:
+            return false;
+    }
+}
+
+
 /**
  * Sets the user specified by the parameter as the active user.
  *
@@ -318,11 +379,17 @@ function _user_login($login_user, $auth_active = false) {
         $login_user['auth_active'] = true;
         $_SESSION['user_auth_active'] = true;
         log_info('Login successful: ' . $login_user['uid'] . '['. gmstrftime('%Y-%m-%dT%H:%M:%SZ', $login_user['auth_time']) . ']');
+
     }
 
     $user = $login_user;
     $_SESSION['user'] = $login_user['uid'];
     cache_set('user', $login_user['uid'], session_id());
+
+
+    if ($auth_active) {
+        if (isset($_POST['autologin']) && ($_POST['autologin'] == 1)) user_cookieauth_create_cookie();
+    }
 }
 
 /**
@@ -377,8 +444,11 @@ function _user_logout() {
  * @param string $destination the SimpleID location to which the user is directed
  * if login is successful
  * @param string $state the current SimpleID state, if required by the location
+ * @param string $fixed_uid the user name to be included in the login form; if NULL, the user
+ * is asked to supply the user name.  If $mode is otp this cannot be null
+ * @param string $mode either credentials or otp
  */
-function user_login_form($destination = '', $state = NULL, $fixed_uid = NULL) {    
+function user_login_form($destination = '', $state = NULL, $fixed_uid = NULL, $mode = 'credentials') {
     global $xtpl;
     
     // Require HTTPS, redirect if necessary
@@ -392,49 +462,150 @@ function user_login_form($destination = '', $state = NULL, $fixed_uid = NULL) {
     
     cache_expire(array('user-nonce' => SIMPLEID_LOGIN_NONCE_EXPIRES_IN));
     $nonce = openid_nonce();
-    cache_set('user-nonce', $nonce, 1);
+    cache_set('user-nonce', $nonce, array('mode' => $mode, 'uid' => $fixed_uid));
     
     $base_path = get_base_path();
-    
     $xtpl->assign('javascript', '<script src="' . $base_path . 'html/user-login.js" type="text/javascript"></script>');
-    
-    $security_class = (SIMPLEID_ALLOW_AUTOCOMPLETE) ? 'allow-autocomplete ' : '';
-    
-    if (is_https()) {
-        $security_class .= 'secure';
-        $xtpl->assign('security_message', t('Secure login using <strong>HTTPS</strong>.'));
-    } elseif (SIMPLEID_ALLOW_PLAINTEXT) {
-        $security_class .= 'unsecure';
-        $xtpl->assign('security_message', t('<strong>WARNING:</strong>  Your password will be sent to SimpleID as plain text.'));
-    }
-    $xtpl->assign('security_class', $security_class);
-    
-    extension_invoke_all('user_login_form', $destination, $state);
-    
+
     header('X-Frame-Options: DENY');
 
-    $xtpl->assign('name_label', t('User name:'));
-    $xtpl->assign('pass_label', t('Password:'));
-    $xtpl->assign('autologin_label', t('Remember me on this computer for two weeks.'));
-    $xtpl->assign('login_button', t('Log in'));
-    
-    $xtpl->assign('title', t('Log In'));
+    switch ($mode) {
+        case 'credentials':
+            $security_class = (SIMPLEID_ALLOW_AUTOCOMPLETE) ? 'allow-autocomplete ' : '';
+            if (is_https()) {
+                $security_class .= 'secure';
+                $xtpl->assign('security_message', t('Secure login using <strong>HTTPS</strong>.'));
+            } elseif (SIMPLEID_ALLOW_PLAINTEXT) {
+                $security_class .= 'unsecure';
+                $xtpl->assign('security_message', t('<strong>WARNING:</strong>  Your password will be sent to SimpleID as plain text.'));
+            }
+            $xtpl->assign('security_class', $security_class);
+            $xtpl->parse('main.login.login_security');
+
+            extension_invoke_all('user_login_form', $destination, $state);
+
+            $xtpl->assign('name_label', t('User name:'));
+            $xtpl->assign('pass_label', t('Password:'));
+            $xtpl->assign('autologin_label', t('Remember me on this computer for two weeks.'));
+
+            if ($fixed_uid == NULL) {
+                $xtpl->parse('main.login.credentials.input_uid');
+            } else {
+                $xtpl->assign('uid', htmlspecialchars($fixed_uid, ENT_QUOTES, 'UTF-8'));
+                $xtpl->parse('main.login.credentials.fixed_uid');
+            }
+
+            $xtpl->parse('main.login.credentials');
+            $xtpl->assign('submit_button', t('Log in'));
+            $xtpl->assign('title', t('Log In'));
+            break;
+        case 'otp':
+            // Note this is called from user_login(), so $_POST is always filled
+            $xtpl->assign('otp_instructions_label', t('To verify your identity, enter the verification code.'));
+            $xtpl->assign('otp_recovery_label', t('If you have lost your verification code, you can <a href="!url">recover your account</a>.',
+                array('!url' => 'http://simpleid.koinic.net/documentation/troubleshooting/login-verification-recovery')
+            ));
+
+            $xtpl->assign('otp_label', t('Verification code:'));
+            $xtpl->assign('autologin', (isset($_POST['autologin']) && ($_POST['autologin'] == 1)) ? '1' : '0');
+            $xtpl->parse('main.login.otp');
+            
+            $xtpl->assign('submit_button', t('Verify'));
+            $xtpl->assign('title', t('Enter Verification Code'));
+        default:
+    }
+
+
+    $xtpl->assign('mode', $mode);
     $xtpl->assign('page_class', 'dialog-page');
     $xtpl->assign('destination', htmlspecialchars($destination, ENT_QUOTES, 'UTF-8'));
     $xtpl->assign('nonce', htmlspecialchars($nonce, ENT_QUOTES, 'UTF-8'));
-    
-    if ($fixed_uid == NULL) {
-        $xtpl->parse('main.login.input_uid');
-    } else {
-        $xtpl->assign('uid', htmlspecialchars($fixed_uid, ENT_QUOTES, 'UTF-8'));
-        $xtpl->parse('main.login.fixed_uid');
-    }
     
     $xtpl->parse('main.login');
     $xtpl->parse('main.framekiller');
     $xtpl->parse('main');
     $xtpl->out('main');
 }
+
+
+function user_otp_page() {
+    global $xtpl, $user;
+
+    // Require HTTPS, redirect if necessary
+    check_https('redirect', true);
+    
+    if ($user == NULL) {
+        user_login_form('my/profile');
+        return;
+    }
+
+    if ($_POST['op'] == t('Disable')) {
+        if (isset($user['otp'])) {
+            unset($user['otp']);
+            user_save($user);
+        }
+        set_message('Login verification has been disabled.');
+        page_dashboard();
+        return;
+    } elseif ($_POST['op'] == t('Verify')) {
+        $params = $_SESSION['otp_setup'];
+
+        if (!isset($_POST['otp']) || ($_POST['otp'] == '')) {
+            set_message(t('You need to enter the verification code to complete enabling login verification.'));
+        } elseif (user_verify_otp($params, $_POST['otp'], 10) === false) {
+            set_message(t('The verification code is not correct.'));
+        } else {
+            unset($_SESSION['otp_setup']);
+            $user['otp'] = $params;
+            user_save($user);
+
+            set_message('Login verification has been enabled.');
+            page_dashboard();
+            return;
+        }
+    } else {
+        $params = array(
+            'type' => 'totp',
+            'secret' => random_bytes(10),
+            'algorithm' => 'sha1',
+            'digits' => 6,
+            'period' => 30,
+            'drift' => 0,
+        );
+        $_SESSION['otp_setup'] = $params;
+    }
+
+    $code = strtr(bignum_val(bignum_new($params['secret'], 256), 32), '0123456789abcdefghijklmnopqrstuv', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567');
+    for ($i = 0; $i < strlen($code); $i += 4) {
+        $xtpl->assign('secret' . ($i + 1), substr($code, $i, 4));
+    }
+
+    $xtpl->assign('about_otp', t('Login verification adds an extra layer of protection to your account. When enabled, you will need to enter an additional security code whenever you log into SimpleID.'));
+    $xtpl->assign('otp_warning', t('<strong>WARNING:</strong> If you enable login verification and lose your authenticator app, you will need to <a href="!url">edit your identity file manually</a> before you can log in again.',
+        array('!url' => 'http://simpleid.koinic.net/documentation/troubleshooting/login-verification-recovery')
+    ));
+
+    $xtpl->assign('setup_otp', t('To set up login verification, following these steps.'));
+    $xtpl->assign('download_app', t('Download an authenticator app that supports TOTP for your smartphone, such as Google Authenticator.'));
+    $xtpl->assign('add_account', t('Add your SimpleID account to authenticator app using this key.  If you are viewing this page on your smartphone you can use <a href="!url">this link</a> to add your account.',
+        array('!url' => 'otpauth://totp/SimpleID?secret=' . $code . '&digits=' . $params['digits'] . '&period=' . $params['period'])
+    ));
+    $xtpl->assign('verify_code', t('To check that your account has been added properly, enter the verification code from your phone into the box below, and click Verify.'));
+
+    $xtpl->assign('otp_label', t('Verification code:'));
+    $xtpl->assign('submit_button', t('Verify'));
+
+    $xtpl->assign('page_class', 'dialog-page');
+    $xtpl->assign('title', t('Login Verification'));
+
+    $xtpl->parse('main.otp');
+    $xtpl->parse('main.framekiller');
+    
+    $xtpl->parse('main');
+    $xtpl->out('main');
+    
+}
+
 
 /**
  * Returns the user's public page.
@@ -745,5 +916,27 @@ function user_cookieauth_invalidate() {
 function _user_cookieauth_get_name() {
     return "autologin-" . md5(SIMPLEID_BASE_URL);
 }
+
+function user_totp($secret, $time = NULL, $period = 30, $drift = 0, $algorithm = 'sha1', $digits = 6) {
+    if ($time == NULL) $time = time();
+    $counter = floor($time / $period) + $drift;
+    $data = pack('NN', 0, $counter);
+    return user_hotp($secret, $data, $algorithm, $digits);
+}
+
+/**
+ * @param string $data a 64 bit bigendian number!
+ */
+function user_hotp($secret, $data, $algorithm = 'sha1', $digits = 6) {
+    // unpack produces a 1-based array, we use array_merge to convert it to 0-based
+    $hmac = array_merge(unpack('C*', hash_hmac(strtolower($algorithm), $data, $secret, true)));
+    $offset = $hmac[19] & 0xf;
+    $code = ($hmac[$offset + 0] & 0x7F) << 24 |
+        ($hmac[$offset + 1] & 0xFF) << 16 |
+        ($hmac[$offset + 2] & 0xFF) << 8 |
+        ($hmac[$offset + 3] & 0xFF);
+    return $code % pow(10, $digits);
+}
+
 
 ?>
