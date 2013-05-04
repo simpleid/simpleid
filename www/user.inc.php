@@ -285,7 +285,7 @@ function user_login() {
             break;
     }
     
-    _user_login($test_user);
+    _user_login($test_user, true);
     
     openid_indirect_response(simpleid_url($destination, $query), '');
 }
