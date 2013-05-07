@@ -540,6 +540,12 @@ function user_otp_page() {
     }
 
     if ($_POST['op'] == t('Disable')) {
+        if (!isset($_POST['tk']) || !validate_form_token($_POST['tk'], 'dashboard_otp')) {
+            set_message(t('SimpleID detected a potential security attack.  Please try again.'));
+            page_dashboard();
+            return;
+        }
+
         if (isset($user['otp'])) {
             unset($user['otp']);
             user_save($user);
@@ -550,7 +556,11 @@ function user_otp_page() {
     } elseif ($_POST['op'] == t('Verify')) {
         $params = $_SESSION['otp_setup'];
 
-        if (!isset($_POST['otp']) || ($_POST['otp'] == '')) {
+        if (!isset($_POST['tk']) || !validate_form_token($_POST['tk'], 'otp')) {
+            set_message(t('SimpleID detected a potential security attack.  Please try again.'));
+            page_dashboard();
+            return;
+        } elseif (!isset($_POST['otp']) || ($_POST['otp'] == '')) {
             set_message(t('You need to enter the verification code to complete enabling login verification.'));
         } elseif (user_verify_otp($params, $_POST['otp'], 10) === false) {
             set_message(t('The verification code is not correct.'));
@@ -592,6 +602,7 @@ function user_otp_page() {
     ));
     $xtpl->assign('verify_code', t('To check that your account has been added properly, enter the verification code from your phone into the box below, and click Verify.'));
 
+    $xtpl->assign('token', get_form_token('otp'));
     $xtpl->assign('otp_label', t('Verification code:'));
     $xtpl->assign('submit_button', t('Verify'));
 

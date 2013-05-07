@@ -264,11 +264,11 @@ function _page_dashboard_otp_block() {
 
     if (isset($user['otp'])) {
         $html .= '<p>' . t('Login verification is <strong>enabled</strong>.') . '</p>';
-        $html .= '<form action="' . $base_path . 'index.php" method="post" enctype="application/x-www-form-urlencoded">';
+        $html .= '<form action="' . $base_path . 'index.php" method="post" enctype="application/x-www-form-urlencoded"><input type="hidden" name="q" value="'. get_form_token('dashboard_otp') . '"/>';
         $html .= '<input type="hidden" name="q" value="otp"/><input type="submit" name="op" value="' . t('Disable') . '" /></form>';
     } else {
         $html .= '<p>' . t('Login verification is <strong>disabled</strong>. To enable login verification, click the button below.') . '</p>';
-        $html .= '<form action="' . $base_path . 'index.php" method="post" enctype="application/x-www-form-urlencoded">';
+        $html .= '<form action="' . $base_path . 'index.php" method="post" enctype="application/x-www-form-urlencoded"><input type="hidden" name="q" value="'. get_form_token('dashboard_otp') . '"/>';
         $html .= '<input type="hidden" name="q" value="otp"/><input type="submit" name="op" value="' . t('Enable') . '" /></form>';
     }
     
