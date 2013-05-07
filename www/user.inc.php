@@ -342,11 +342,11 @@ function user_verify_otp(&$params, $code, $max_drift = 1) {
 
             $test_code = user_totp($params['secret'], $time, $params['period'], $params['drift'], $params['algorithm'], $params['digits']);
             
-            if ($test_code == $code) return true;
+            if ($test_code == intval($code)) return true;
 
             for ($i = -$max_drift; $i <= $max_drift; $i++) {
                 $test_code = user_totp($params['secret'], $time, $params['period'], $params['drift'] + $i, $params['algorithm'], $params['digits']);
-                if ($test_code == $code) {
+                if ($test_code == intval($code)) {
                     $params['drift'] = $i;
                     return true;
                 }
