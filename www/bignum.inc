@@ -76,7 +76,7 @@ function bignum_new($str, $base = 10) {
         }
         return $num;
     }
-    return $false;
+    return FALSE;
 }
 
 /**
