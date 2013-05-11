@@ -79,7 +79,7 @@ define('PRE_0_7_0_VERSION', '0.6.0 or earlier');
  * @global array $upgrade_functions
  */
 $upgrade_functions = array(
-    '0.9.0' => array('upgrade_config_inc_to_php'),
+    '0.9.0' => array('upgrade_config_inc_to_php', 'upgrade_delete_token'),
     '0.7.0' => array('upgrade_rp_to_store', 'upgrade_token_to_store')
 );
 
@@ -453,5 +453,14 @@ function upgrade_config_inc_to_php() {
     if (defined('UPGRADE_LEGACY_CONFIG_INC')) {
         return '<p>You will need to rename <code>config.inc</code> to <code>config.php</code>.</p>';
     }
+}
+
+/**
+ * Deletes the site-token setting for a more secure version
+ *
+ * @since 0.9
+ */
+function upgrade_delete_token() {
+    store_del('site-token');
 }
 ?>
