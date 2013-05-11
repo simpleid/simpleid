@@ -165,9 +165,10 @@ function simpleid_start() {
     
     $q = (isset($GETPOST['q'])) ? $GETPOST['q'] : '';
     
+    $uaid = get_user_agent_id();
     extension_init();
     user_init($q);
-    log_info('Session opened for "' . $q . '" [' . $_SERVER['REMOTE_ADDR'] . ', ' . gethostbyaddr($_SERVER['REMOTE_ADDR']) . ']');
+    log_info('Session opened for "' . $q . '" from ' . $uaid . ' [' . $_SERVER['REMOTE_ADDR'] . ', ' . gethostbyaddr($_SERVER['REMOTE_ADDR']) . ']');
     
     // Clean stale assocations
     cache_expire(array(

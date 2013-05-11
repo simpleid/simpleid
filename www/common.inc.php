@@ -229,6 +229,29 @@ function parse_http_query($query) {
 }
 
 /**
+ * Assigns and returns a unique ID for the user agent (UAID).
+ *
+ * A UAID uniquely identifies the user agent (e.g. browser) used to
+ * make the HTTP request.  The UAID is stored in a long-dated
+ * cookie.  Therefore, the UAID may be useful for security purposes.
+ *
+ * This function will look for a cookie sent by the user agent with
+ * the name returned by {@link simpleid_cookie_name()} with a suffix
+ * of uaid.  If the cookie does not exist, it will generate a
+ * random UAID and return it to the user agent with a Set-Cookie
+ * response header.
+ *
+ * @return string the UAID
+ */
+function get_user_agent_id() {
+    if (isset($_COOKIE[simpleid_cookie_name('uaid')])) return $_COOKIE[simpleid_cookie_name('uaid')];
+
+    $uaid = bin2hex(pack('LLLL', mt_rand(), mt_rand(), mt_rand(), mt_rand()));
+    setcookie(simpleid_cookie_name('uaid'), $uaid, time() + 315360000, get_base_path(), '', false, true);
+    return $uaid;
+}
+
+/**
  * Content type negotiation using the Accept Header.
  *
  * Under HTTP, the user agent is able to negoatiate the content type returned with
@@ -459,29 +482,42 @@ function simpleid_host_url($secure = null) {
 }
 
 /**
+ * Returns a relatively unique cookie name based on a specified suffix and
+ * SIMPLEID_BASE_URL.
+ *
+ * @param string $suffix the cookie name suffix
+ * @return string the cookie name
+ */
+function simpleid_cookie_name($suffix) {
+    static $prefix = NULL;
+
+    if ($prefix == NULL) {
+        $prefix = substr(get_form_token('cookie', FALSE), 0, 7) . '_';
+    }
+    return $prefix . $suffix;
+}
+
+/**
  * Obtains a form token given a form ID.
  *
  * Form tokens are used in SimpleID forms to guard against cross-site forgery
  * attacks.
  *
  * @param string $id the form ID
+ * @param bool $bind_session whether to bind the form token to the current session
  * @return string a form token
  */
-function get_form_token($id) {
+function get_form_token($id, $bind_session = TRUE) {
     global $user;
 
     if (store_get('site-token') == NULL) {
-        $site_token = mt_rand();
+        $site_token = pack('LLLL', mt_rand(), mt_rand(), mt_rand(), mt_rand());
         store_set('site-token', $site_token);
     } else {
         $site_token = store_get('site-token');
     }
     
-    if ($user == NULL) {
-        return md5($id . $site_token);
-    } else {
-        return md5(session_id() . $id . $site_token);
-    }
+    return _get_form_token($site_token, $id, $bind_session);
 }
 
 /**
@@ -489,17 +525,37 @@ function get_form_token($id) {
  *
  * @param string $token the token returned by the user agent
  * @param string $id the form ID
+ * @param bool $bind_session whether the token has been bound to the current session
  * @return bool true if the form token is valid
  */
-function validate_form_token($token, $id) {
+function validate_form_token($token, $id, $bind_session = TRUE) {
     global $user;
     
     $site_token = store_get('site-token');
     
-    if ($user == NULL) {
-        return ($token == md5($id . $site_token));
+    return ($token == _get_form_token($site_token, $id, $bind_session));
+}
+
+function _get_form_token($site_token, $id, $bind_session = TRUE) {
+    global $user;
+
+    if (($user == NULL) || (!$bind_session)) {
+        $key = $site_token;
     } else {
-        return ($token == md5(session_id() . $id . $site_token));
+        $key = session_id() . $site_token;
+    }
+
+    if (function_exists('hash_hmac') && function_exists('hash_algos') && (in_array('sha1', hash_algos()))) {
+        return hash_hmac('sha1', $id, $key);
+    } else {
+        if (strlen($site_token) > 64) {
+            $site_token = sha1($site_token, TRUE);
+        }
+    
+        $site_token = str_pad($site_token, 64, chr(0x00));
+        $ipad = str_repeat(chr(0x36), 64);
+        $opad = str_repeat(chr(0x5c), 64);
+        return bin2hex(sha1(($key ^ $opad) . sha1(($key ^ $ipad) . $text, TRUE), TRUE));
     }
 }
 

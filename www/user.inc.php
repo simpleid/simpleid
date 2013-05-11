@@ -68,10 +68,10 @@ function user_init($q = NULL) {
     $user = NULL;
     
     // session_name() has to be called before session_set_cookie_params()
-    session_name('SESS' . md5(SIMPLEID_BASE_URL));
+    session_name(simpleid_cookie_name('sess'));
     
     // Note the last parameter (httponly) requires PHP 5.2
-    session_set_cookie_params(0, get_base_path(), ini_get('session.cookie_domain'), is_base_https(), true);
+    session_set_cookie_params(0, get_base_path(), ini_get('session.cookie_domain'), false, true);
     session_start();
     
     if (isset($_SESSION['user']) && (cache_get('user', $_SESSION['user']) == session_id())) {
@@ -872,62 +872,79 @@ function user_cookieauth_create_cookie($id = NULL, $expires = NULL) {
         log_debug('Automatic login token renewed for ' . $user['uid']);
     }
     
-    if ($id == NULL) $id = get_form_token(mt_rand());
+    if ($id == NULL) $id = random_id();
     if ($expires == NULL) $expires = time() + SIMPLEID_USER_AUTOLOGIN_EXPIRES_IN;
-    $token = get_form_token(mt_rand());
+    $token = random_secret();
+    $uid_hash = get_form_token($user['uid'], FALSE);
+
+    $data = array(
+        'uid' => $user['uid'],
+        'token' => $token,
+        'expires' => $expires,
+        'uaid' => get_user_agent_id(),
+        'ip' => $_SERVER['REMOTE_ADDR']
+    );
     
-    cache_set('autologin-'. md5($user['uid']), $id, array('token' => $token, 'expires' => $expires, 'ip' => $_SERVER['REMOTE_ADDR']));
+    cache_set('autologin-'. $uid_hash, $id, $data);
     
     // Note the last parameter (httponly) requires PHP 5.2
-    setcookie(_user_cookieauth_get_name(), $user['uid'] . ':' . $id . ':' . $token, $expires, get_base_path(), is_base_https(), true);
+    setcookie(simpleid_cookie_name('autologin'), $uid_hash . ':' . $id . ':' . $token, $expires, get_base_path(), '', false, true);
 }
 
 /**
  * Verifies a auto login cookie.  If valid, log in the user automatically.
  */
 function user_cookieauth_user_auto_login() {
-    if (!isset($_COOKIE[_user_cookieauth_get_name()])) return NULL;
+    if (!isset($_COOKIE[simpleid_cookie_name('autologin')])) return NULL;
         
-    $cookie = $_COOKIE[_user_cookieauth_get_name()];
+    $cookie = $_COOKIE[simpleid_cookie_name('autologin')];
     
-    list($test_uid, $id, $token) = explode(':', $cookie);
-    log_debug('Automatic login token detected for ' . $test_uid);
+    list($uid_hash, $id, $token) = explode(':', $cookie);
+    log_debug('Automatic login token detected: ' . implode(':', $uid_hash, $id));
     
-    cache_expire(array('autologin-' . md5($test_uid) => SIMPLEID_USER_AUTOLOGIN_EXPIRES_IN));
-    $cache = cache_get('autologin-' . md5($test_uid), $id);
+    cache_expire(array('autologin-' . $uid_hash => SIMPLEID_USER_AUTOLOGIN_EXPIRES_IN));
+    $data = cache_get('autologin-' . $uid_hash, $id);
     
-    if (!$cache) {  // Cookie doesn't exist
+    if (!$data) {  // Cookie doesn't exist
         log_notice('Automatic login: Token does not exist on server');
         return NULL;
     }
     
-    if ($cache['expires'] < time()) {  // Cookie expired
+    if ($data['expires'] < time()) {  // Cookie expired
         log_notice('Automatic login: Token on server expired');
         return NULL;
     }
     
-    if ($cache['token'] != $token) {
+    if ($data['token'] != $token) {
         log_warn('Automatic login: Token on server does not match');
         // Token not the same - panic
-        cache_expire(array('autologin-' . md5($test_uid) => 0));
+        cache_expire(array('autologin-' . $uid_hash => 0));
+        user_cookieauth_invalidate();
+        return NULL;
+    }
+
+    if ($data['uaid'] != get_user_agent_id()) {
+        log_warn('Automatic login: User agent ID does not match');
+        // Token not the same - panic
+        cache_expire(array('autologin-' . $uid_hash => 0));
         user_cookieauth_invalidate();
         return NULL;
     }
     
     // Load the user, tag it as an auto log in
-    $test_user = user_load($test_uid);
+    $test_user = user_load($data['uid']);
     
     if ($test_user != NULL) {
-        log_debug('Automatic login token accepted for ' . $test_uid);
+        log_debug('Automatic login token accepted for ' . $data['uid']);
         
         $test_user['autologin'] = TRUE;
     
         // Renew the token
-        user_cookieauth_create_cookie($id, $cache['expires']);
+        user_cookieauth_create_cookie($id, $data['expires']);
         
         return $test_user;
     } else {
-        log_warn('Automatic login token accepted for ' . $test_uid . ', but no such user exists');
+        log_warn('Automatic login token accepted for ' . $data['uid'] . ', but no such user exists');
         return NULL;
     }
 }
@@ -937,24 +954,15 @@ function user_cookieauth_user_auto_login() {
  * cache.
  */
 function user_cookieauth_invalidate() {
-    if (isset($_COOKIE[_user_cookieauth_get_name()])) {
-        $cookie = $_COOKIE[_user_cookieauth_get_name()];
+    if (isset($_COOKIE[simpleid_cookie_name('autologin')])) {
+        $cookie = $_COOKIE[simpleid_cookie_name('autologin')];
         
-        list($uid, $id, $token) = explode(':', $cookie);
+        list($uid_hash, $id, $token) = explode(':', $cookie);
         
-        cache_delete('autologin-' . md5($uid), $id);
+        cache_delete('autologin-' . $uid_hash, $id);
         
-        setcookie(_user_cookieauth_get_name(), "", time() - 3600);
+        setcookie(simpleid_cookie_name('autologin'), "", time() - 3600);
     }
-}
-
-/**
- * Get the name of the auto login cookie.
- *
- * @return string the name of the persistent login cookie.
- */
-function _user_cookieauth_get_name() {
-    return "autologin-" . md5(SIMPLEID_BASE_URL);
 }
 
 /**
