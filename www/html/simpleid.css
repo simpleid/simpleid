@@ -188,6 +188,7 @@ pre {
     padding-left: 20px;
     background: transparent url(drive.png) no-repeat top left;
 }
+.url-elide { color: #999999;}
 
 span.last-time { display: none }
 

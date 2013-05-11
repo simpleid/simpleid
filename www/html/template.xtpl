@@ -212,7 +212,7 @@
                 <tbody>
                     <!-- BEGIN:realm -->
                     <tr>
-                        <td><span class="realm">{realm}</span></td>
+                        <td><span class="realm">{realm_name}</span></td>
                         <td><span class="last-time">{last_time}</span> {last_time_formatted}</td>
                         <td><input class="{realm_class}" type="checkbox" value="1" name="autorelease[{realm}]" {auto_release}/></td>
                         <td><input type="checkbox" value="1" name="remove[{realm}]"/></td>
@@ -240,7 +240,7 @@
             </ol>
 
             <form action="{base_path}index.php" method="post" enctype="application/x-www-form-urlencoded">
-                <input type="hidden" name="q" value="otp"/>
+                <input type="hidden" name="q" value="otp"/><input type="hidden" name="tk" value="{token}"/>
                 
                 <div class="form-item">
                     <label for="edit-otp">{otp_label}</label>

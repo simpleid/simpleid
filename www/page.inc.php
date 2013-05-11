@@ -151,7 +151,9 @@ function page_sites() {
     }
     
     if ($user_rps) {
+        uksort($user_rps, '_page_sites_sort');
         foreach ($user_rps as $realm => $rp) {
+            $xtpl->assign('realm_name', preg_replace('@^https?://(www\.|\*\.)?@', '<span class="url-elide">$0</span>', htmlspecialchars($rp['realm'], ENT_QUOTES, 'UTF-8')));
             $xtpl->assign('realm', htmlspecialchars($rp['realm'], ENT_QUOTES, 'UTF-8'));
             $xtpl->assign('last_time', htmlspecialchars($rp['last_time'], ENT_QUOTES, 'UTF-8'));
             $xtpl->assign('last_time_formatted', htmlspecialchars(strftime(SIMPLEID_DATE_TIME_FORMAT, $rp['last_time']), ENT_QUOTES, 'UTF-8'));
@@ -188,6 +190,24 @@ function page_sites() {
     $xtpl->assign('javascript', '<script src="' . get_base_path() . 'html/openid-consent.js" type="text/javascript"></script>');
     $xtpl->parse('main');
     $xtpl->out('main');
+}
+
+/**
+ * A custom sort function for realms.  This strips out the following:
+ *
+ * - http://
+ * - https://
+ * - www.
+ * - *.
+ *
+ * @param string $a
+ * @param string $b
+ * @return int
+ */
+function _page_sites_sort($a, $b) {
+    $a = preg_replace('@^https?://(www\.|\*\.)?@', '', $a);
+    $b = preg_replace('@^https?://(www\.|\*\.)?@', '', $b);
+    return strcasecmp($a, $b);
 }
 
 /**
