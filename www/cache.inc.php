@@ -45,6 +45,7 @@
  */ 
 function cache_set($type, $key, $data, $time = NULL) {
     $filename = _cache_get_name($type, $key);
+    if (!file_exists(dirname($filename))) mkdir(dirname($filename), 0775, true);
     $file = fopen($filename, 'w');
     fwrite($file, serialize($data));
     fclose($file);
@@ -80,12 +81,12 @@ function cache_get($type, $key) {
 function cache_get_all($type) {
     $r = array();
     
-    $dir = opendir(CACHE_DIR);
+    $dir = opendir(CACHE_DIR . '/' . $type);
     
     while (($file = readdir($dir)) !== false) {
-        $filename = CACHE_DIR . '/' . $file;
+        $filename = CACHE_DIR . '/' . $type . '/' . $file;
         
-        if ((filetype($filename) != "file") || (strpos($file, $type . '-') !== 0)) continue;
+        if (filetype($filename) != "file") continue;
         
         $r[] = unserialize(file_get_contents($filename));
     }
@@ -117,15 +118,21 @@ function cache_delete($type, $key) {
  * @deprecated
  */
 function cache_gc($expiry, $type = NULL) {
-    $dir = opendir(CACHE_DIR);
-    
-    while (($file = readdir($dir)) !== false) {
-        $filename = CACHE_DIR . '/' . $file;
+    if ($type == NULL) {
+        $dir = opendir(CACHE_DIR);
+
+        while (($file = readdir($dir)) !== false) {
+            $filename = CACHE_DIR . '/' . $file;
+            if (in_array(filetype($filename), array('dir', 'link')))
+                cache_gc($expiry, $file);
+        }
+    } else {
+        $dir = opendir(CACHE_DIR . '/' . $type);
+        while (($file = readdir($dir)) !== false) {
+            $filename = CACHE_DIR . '/' . $type . '/' . $file;
         
-        if (($type != NULL) && (strpos($file, $type . '-') !== 0)) continue;
-        
-        if ((filetype($filename) == "file") && (filectime($filename) < time() - $expiry)) {
-            unlink($filename);
+            if ((filetype($filename) == "file") && (filectime($filename) < time() - $expiry))
+                unlink($filename);
         }
     }
     
@@ -201,7 +208,7 @@ function cache_ttl($type, $key, $expiry) {
  * @return string a file name
  */
 function _cache_get_name($type, $key) {
-    return CACHE_DIR . '/' . $type . '-' . md5($key) . '.cache';
+    return CACHE_DIR . '/' . $type . '/' . md5($key) . '.cache';
 }
 
 ?>
