@@ -888,16 +888,16 @@ function user_cookieauth_create_cookie($id = NULL, $expires = NULL) {
     cache_set('autologin-'. $uid_hash, $id, $data);
     
     // Note the last parameter (httponly) requires PHP 5.2
-    setcookie(simpleid_cookie_name('autologin'), $uid_hash . ':' . $id . ':' . $token, $expires, get_base_path(), '', false, true);
+    setcookie(simpleid_cookie_name('auth'), $uid_hash . ':' . $id . ':' . $token, $expires, get_base_path(), '', false, true);
 }
 
 /**
  * Verifies a auto login cookie.  If valid, log in the user automatically.
  */
 function user_cookieauth_user_auto_login() {
-    if (!isset($_COOKIE[simpleid_cookie_name('autologin')])) return NULL;
+    if (!isset($_COOKIE[simpleid_cookie_name('auth')])) return NULL;
         
-    $cookie = $_COOKIE[simpleid_cookie_name('autologin')];
+    $cookie = $_COOKIE[simpleid_cookie_name('auth')];
     
     list($uid_hash, $id, $token) = explode(':', $cookie);
     log_debug('Automatic login token detected: ' . implode(':', $uid_hash, $id));
@@ -954,14 +954,14 @@ function user_cookieauth_user_auto_login() {
  * cache.
  */
 function user_cookieauth_invalidate() {
-    if (isset($_COOKIE[simpleid_cookie_name('autologin')])) {
-        $cookie = $_COOKIE[simpleid_cookie_name('autologin')];
+    if (isset($_COOKIE[simpleid_cookie_name('auth')])) {
+        $cookie = $_COOKIE[simpleid_cookie_name('auth')];
         
         list($uid_hash, $id, $token) = explode(':', $cookie);
         
         cache_delete('autologin-' . $uid_hash, $id);
         
-        setcookie(simpleid_cookie_name('autologin'), "", time() - 3600);
+        setcookie(simpleid_cookie_name('auth'), "", time() - 3600);
     }
 }
 
