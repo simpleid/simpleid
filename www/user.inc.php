@@ -696,6 +696,8 @@ function user_public_page($uid = NULL) {
 
 /**
  * Returns the public page for a private personal ID.
+ *
+ * @param string $ppid the PPID
  */
 function user_ppid_page($ppid = NULL) {
     global $xtpl;

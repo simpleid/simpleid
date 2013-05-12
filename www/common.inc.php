@@ -636,7 +636,7 @@ function extension_invoke() {
 /**
  * Returns an array of currently loaded extensions.
  *
- * @param array a list of the names of the currently loaded extensions.
+ * @return array a list of the names of the currently loaded extensions.
  */
 function get_extensions() {
     global $simpleid_extensions;

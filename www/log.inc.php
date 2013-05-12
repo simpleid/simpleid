@@ -21,11 +21,24 @@
  * $Id$
  */
 
+/**
+ * Functions for logging.
+ *
+ * @package simpleid
+ * @filesource
+ */
+
+/** Log level */
 define('SIMPLEID_LOG_DEBUG', 5);
+/** Log level */
 define('SIMPLEID_LOG_INFO', 4);
+/** Log level */
 define('SIMPLEID_LOG_NOTICE', 3);
+/** Log level */
 define('SIMPLEID_LOG_WARN', 2);
+/** Log level */
 define('SIMPLEID_LOG_ERROR', 1);
+/** Log level */
 define('SIMPLEID_LOG_FATAL', 0);
 
 /**
@@ -153,7 +166,7 @@ function log_array($array, $keys = false) {
  *
  * @param string $message the message to log
  * @param int $level the log level
- * @param bool true if the log has been written successfully
+ * @return bool true if the log has been written successfully
  */
 function _log_write($message, $level = false) {
     global $log;
