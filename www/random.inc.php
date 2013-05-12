@@ -80,7 +80,7 @@ function random_bytes($num_bytes) {
  *
  * @param int $num_bytes the approximate number of bytes of entropy in the
  * random string
- * @param string the random string
+ * @return string the random string
  */
 function random_secret($num_bytes = 32) {
     return strtr(base64_encode(random_bytes($num_bytes)),

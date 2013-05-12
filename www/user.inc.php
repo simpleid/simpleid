@@ -696,6 +696,8 @@ function user_public_page($uid = NULL) {
 
 /**
  * Returns the public page for a private personal ID.
+ *
+ * @param string $ppid the PPID
  */
 function user_ppid_page($ppid = NULL) {
     global $xtpl;
@@ -983,7 +985,7 @@ function user_cookieauth_invalidate() {
  * @param string $algorithm the hashing algorithm as supported by
  * the hash_hmac() function
  * @param int $digits the number of digits in the one-time password
- * @param int the one-time password
+ * @return int the one-time password
  * @link http://tools.ietf.org/html/rfc6238
  */
 function user_totp($secret, $time = NULL, $period = 30, $drift = 0, $algorithm = 'sha1', $digits = 6) {
@@ -1006,7 +1008,7 @@ function user_totp($secret, $time = NULL, $period = 30, $drift = 0, $algorithm =
  * @param string $algorithm the hashing algorithm as supported by
  * the hash_hmac() function
  * @param int $digits the number of digits in the one-time password
- * @param int the one-time password
+ * @return int the one-time password
  * @link http://tools.ietf.org/html/rfc4226
  */
 function user_hotp($secret, $data, $algorithm = 'sha1', $digits = 6) {

@@ -59,7 +59,7 @@ $simpleid_settings = array();
  * Returns whether the user name exists in the user store.
  *
  * @param string $uid the name of the user to check
- * @param bool whether the user name exists
+ * @return bool whether the user name exists
  */
 function store_user_exists($uid) {
     if (_store_is_valid_name($uid)) {
@@ -177,7 +177,7 @@ function store_get_uid($identity) {
  * (with components joined using slashes), joined using a semi-colon.
  *
  *
- * @param string $identity the client SSL certificate string of the user to load
+ * @param string $cert the client SSL certificate string of the user to load
  * @return string the user name matching the client SSL certificate string, or NULL if no user has
  * client SSL certificate string
  */
