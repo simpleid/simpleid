@@ -1,3 +1,17 @@
+SimpleID 0.8.4
+--------------
+
+- Bug fixes:
+    * #123 Updated user interface to reflect change in SimpleID web site URL
+    * #125 Fixed line ending (CRLF vs LF) bug introduced when migrating from
+      SVN to Git
+    * #122 Fixed PEAR package not loading PEAR_Config
+    * #133 Fixed bug in bignum.inc where bignum_new() was returning $false
+      instead of false
+- Improvements to SimpleID internals:
+    * #129 Warning if suhosin.get.max_value_length configuration setting
+      is too low
+
 SimpleID 0.8.3
 --------------
 
