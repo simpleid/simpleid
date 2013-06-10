@@ -235,7 +235,7 @@ function hook_consent($form_request, &$response, &$rp) {
  * Return any additional items provided by the extension to be appended to the
  * Simpleweb route array.
  *
- * @see simpleweb.inc
+ * @see simpleweb.inc.php
  * @see simpleid_start()
  * @return array the routes array
  * @since 0.7
