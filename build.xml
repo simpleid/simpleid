@@ -170,6 +170,43 @@
         </exec>
     </target>
     
-    <target name="dist" depends="dist-tar,dist-pear">
+    <!-- Creates OpenShift distribution -->
+    <target name="openshift">
+        <copy todir="${openshift.dir}/php" overwrite="true">
+            <fileset dir="www">
+                <exclude name=".htaccess" />
+                <exclude name=".htaccess.dist" />
+                <exclude name="config.inc" />
+                <exclude name="config.php" />
+                <exclude name="test/**" />
+                <exclude name="test-suite/**" />
+            </fileset>
+            <filterchain>
+                <replacetokens begintoken="@@" endtoken="@@">
+                    <token key="BUILD_VERSION" value="${build.version}" />
+                    <token key="IDENTITIES_DIR" value="OPENSHIFT CONFIGURED - COMMENT OUT THIS LINE" />
+                    <token key="CACHE_DIR" value="OPENSHIFT CONFIGURED - COMMENT OUT THIS LINE" />
+                    <token key="STORE_DIR" value="OPENSHIFT CONFIGURED - COMMENT OUT THIS LINE" />
+                </replacetokens>
+                <replaceregexp>
+                    <regexp pattern="define\('SIMPLEID_CLEAN_URL'" replace="//define('SIMPLEID_CLEAN_URL'" />
+                    <regexp pattern="define\('SIMPLEID_IDENTITIES_DIR'" replace="//define('SIMPLEID_IDENTITIES_DIR'" />
+                    <regexp pattern="define\('SIMPLEID_CACHE_DIR'" replace="//define('SIMPLEID_CACHE_DIR'" />
+                    <regexp pattern="define\('SIMPLEID_STORE_DIR'" replace="//define('SIMPLEID_STORE_DIR'" />
+                </replaceregexp>
+            </filterchain>
+        </copy>
+        <move file="${openshift.dir}/php/config.inc.dist" todir="${openshift.dir}/.openshift/defaults/config" overwrite="true" haltonerror="false" />
+        <move file="${openshift.dir}/php/config.php.dist" todir="${openshift.dir}/.openshift/defaults/config" overwrite="true" haltonerror="false" />
+        <copy todir="${openshift.dir}/.openshift/defaults" overwrite="true">
+            <fileset dir=".">
+                <include name="identities/**"/>
+                <exclude name="identities/*.identity" />
+                <exclude name="identities/*.client" />
+            </fileset>
+        </copy>
+    </target>
+    
+    <target name="dist" depends="dist-tar,dist-pear,openshift">
     </target>
 </project>
