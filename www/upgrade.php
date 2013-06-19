@@ -144,7 +144,7 @@ function upgrade_start() {
         log_fatal('session PHP extension not loaded.');
         indirect_fatal_error('One or more required PHP extensions (session) is not loaded.  See the <a href="http://simpleid.koinic.net/documentation/getting-started/system-requirements">manual</a> for further information on system requirements.');
     }
-    if ((@ini_get('suhosin.get.max_value_length') !== false) && (@ini_get('suhosin.get.max_value_length') < 1024)) {
+    if (is_numeric(@ini_get('suhosin.get.max_value_length')) && (@ini_get('suhosin.get.max_value_length') < 1024)) {
         log_fatal('suhosin.get.max_value_length < 1024');
         indirect_fatal_error('suhosin.get.max_value_length is less than 1024, which will lead to problems. See the <a href="http://simpleid.koinic.net/documentation/getting-started/system-requirements">manual</a> for further information on system requirements.');
     }
