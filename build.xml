@@ -196,7 +196,7 @@
                 </replaceregexp>
             </filterchain>
         </copy>
-        <move file="${openshift.dir}/php/config.inc.dist" todir="${openshift.dir}/.openshift/defaults/config" overwrite="true" haltonerror="false" />
+        <move file="${openshift.dir}/php/config.inc.dist" tofile="${openshift.dir}/.openshift/defaults/config/config.php.dist" overwrite="true" haltonerror="false" />
         <move file="${openshift.dir}/php/config.php.dist" todir="${openshift.dir}/.openshift/defaults/config" overwrite="true" haltonerror="false" />
         <copy todir="${openshift.dir}/.openshift/defaults" overwrite="true">
             <fileset dir=".">
