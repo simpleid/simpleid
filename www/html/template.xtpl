@@ -24,7 +24,7 @@
             {css}
         </style>
         
-        <script src="//ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.2.min.js" type="text/javascript"></script>
+        <script src="{base_path}html/jquery.js" type="text/javascript"></script>
         <script type="text/javascript">
         var l = {
             <!-- BEGIN: js_locale -->"{js_locale_label}": "{js_locale_text}",<!-- END: js_locale -->
