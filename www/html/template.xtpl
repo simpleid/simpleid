@@ -23,7 +23,7 @@
             {css}
         </style>
         
-        <script src="//code.jquery.com/jquery-1.7.2.min.js" type="text/javascript"></script>
+        <script src="{base_path}html/jquery.js" type="text/javascript"></script>
         <!-- BEGIN: framekiller -->
         <script type="text/javascript">
             $(document).ready(function() {
