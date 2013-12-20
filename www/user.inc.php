@@ -619,6 +619,9 @@ function user_otp_page() {
         $xtpl->assign('secret' . ($i + 1), substr($code, $i, 4));
     }
 
+    $url = 'otpauth://totp/SimpleID?secret=' . $code . '&digits=' . $params['digits'] . '&period=' . $params['period'];
+    $xtpl->assign('qr', addslashes($url));
+
     $xtpl->assign('about_otp', t('Login verification adds an extra layer of protection to your account. When enabled, you will need to enter an additional security code whenever you log into SimpleID.'));
     $xtpl->assign('otp_warning', t('<strong>WARNING:</strong> If you enable login verification and lose your authenticator app, you will need to <a href="!url">edit your identity file manually</a> before you can log in again.',
         array('!url' => 'http://simpleid.koinic.net/documentation/troubleshooting/login-verification-recovery')
@@ -626,8 +629,8 @@ function user_otp_page() {
 
     $xtpl->assign('setup_otp', t('To set up login verification, following these steps.'));
     $xtpl->assign('download_app', t('Download an authenticator app that supports TOTP for your smartphone, such as Google Authenticator.'));
-    $xtpl->assign('add_account', t('Add your SimpleID account to authenticator app using this key.  If you are viewing this page on your smartphone you can use <a href="!url">this link</a> to add your account.',
-        array('!url' => 'otpauth://totp/SimpleID?secret=' . $code . '&digits=' . $params['digits'] . '&period=' . $params['period'])
+    $xtpl->assign('add_account', t('Add your SimpleID account to authenticator app using this key.  If you are viewing this page on your smartphone you can use <a href="!url">this link</a> or scan the QR code to add your account.',
+        array('!url' => $url)
     ));
     $xtpl->assign('verify_code', t('To check that your account has been added properly, enter the verification code from your phone into the box below, and click Verify.'));
 

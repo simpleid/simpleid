@@ -279,6 +279,7 @@ span.last-time { display: none }
 .otp-letters {
     padding: 0 2px;
 }
+#otp-key-qr { padding: 16px 0;}
 
 /* Forms */
 .form-item {

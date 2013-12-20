@@ -128,7 +128,7 @@
                 <!--div class="form-item">
                     <label class="option">
                         <input type="checkbox" name="autoverify" value="1" />
-                        {autologin_label}
+                        {autoverify_label}
                     </label>
                 </div-->
                 <!-- END: otp -->
@@ -235,9 +235,12 @@
                 <li>{download_app}</li>
                 <li>{add_account}
                     <div class="otp-key"><span class="otp-letters">{secret1}</span><span class="otp-letters">{secret5}</span><span class="otp-letters">{secret9}</span><span class="otp-letters">{secret13}</span></div>
+                    <div id="otp-key-qr"></div>
                 </li>
                 <li>{verify_code}</li>
             </ol>
+
+            <script src="{base_path}html/jquery.qrcode.js" type="text/javascript"></script><script type="text/javascript">$('#otp-key-qr').qrcode("{qr}");</script>
 
             <form action="{base_path}index.php" method="post" enctype="application/x-www-form-urlencoded">
                 <input type="hidden" name="q" value="otp"/><input type="hidden" name="tk" value="{token}"/>
