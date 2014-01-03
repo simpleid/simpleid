@@ -72,3 +72,7 @@ SimpleID uses the jQuery JavaScript library <http://jquery.com>, by John
 Resig and the jQuery team.  Licensing information for this library can be found
 at <http://docs.jquery.com/Licensing>.
 
+SimpleID uses normalize.css style sheet
+<http://necolas.github.io/normalize.css/>, by Nicolas Gallagher and Jonathan
+Neal.  Licensing information for this library can be found at
+<https://github.com/necolas/normalize.css/blob/master/LICENSE.md>.
