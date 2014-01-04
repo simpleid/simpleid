@@ -19,117 +19,18 @@
  * 
  * $Id$
  */
- 
+
+@import url("normalize.css");
+
+/* General elements -------------------------------------------------------- */
 html {
-  font-size: 100%;
-  -webkit-text-size-adjust: 100%;
-  -ms-text-size-adjust: 100%;
-}
-
-body {
-	margin: 0;
-	padding: 0;
-	font: 12px normal Helvetica, Arial, sans-serif;
-	line-height: 1em;
-}
-
-#upgrade-check {
-    background-color: #AA1144;
-    color: #FFFFFF;
-    padding: 5px 10px;
-    text-align: center;
-    display: none;
-}
-#upgrade-check p {
-    margin: 0;
-    padding: 0;
-}
-#upgrade-check a {
-    color: #FFFFFF;
-    text-decoration: none;
-    border-bottom-color: #FFFFFF;
-}
-
-#header {
-    background-color: #666666;
-    color: #CCCCCC;
-    padding: 5px 10px;
-}
-
-#header h1 {
-    font-weight: bold;
-    font-size: 14px;
-    text-transform: uppercase;
-    margin: 0.5em 0;
-    color: #CCCCCC;
-    letter-spacing: 0;
-}
-
-#header h1 a {
-    color: #FFFFFF;
-    text-decoration: none;
-    border-bottom: none;
-}
-
-#logo {
-    float: left;
-}
-
-#nav {
-    background-color: #666666;
-    color: #CCCCCC;
-    padding: 5px 10px;
-}
-#nav ul {
-    margin: 0;
-    padding: 0;
-    text-align: left;
-}
-#nav li {
-    display: inline;
-    list-style-type: none;
-}
-#nav a {
-    background-color: #888888;
-    padding: 6px 8px;
-    border-width: 0;
-    color: #FFFFFF;
-}
-#nav ul#nav-left { float: left; }
-#nav ul#nav-right { float: right; }
-
-#footer {
-    margin: 2em 0;
-    padding: 0px 10px;
-    text-align: right;
-    font-size: 0.9em;
-    color: #999999;
-}
-#footer address { font-style: normal }
-#footer a { color: #999999; }
-
-#content {
-    margin: 1em 10px;
-    clear: both;
+    font: 12px/19px Helvetica, Arial, sans-serif;
 }
 
 h1 {
-    margin: 1em 0;
     font-weight: normal;
-    font-size: 22px;
     color: #666666;
 }
-
-h2 {
-    margin: 2em 0;
-    padding-top: 1em;
-    font-weight: normal;
-    font-size: 18px;
-    color: #666666;    
-    border-top: 2px dotted #BBBBBB;
-}
-
-p, li { line-height: 1.5; }
 
 a {
     border-bottom: 1px solid #CCCCCC;
@@ -137,7 +38,6 @@ a {
     text-decoration: none !important;
     font-weight: bold;
 }
-
 a:visited {
     border-color: #CCCCCC;
     color: #114499;
@@ -176,6 +76,108 @@ pre {
     overflow: scroll;
 }
 
+/* Page layout ------------------------------------------------------------- */
+#header {
+    background-color: #666666;
+    color: #CCCCCC;
+    padding: 0px 10px;
+    line-height: 1;
+}
+#header-inner { margin: 0px auto; max-width: 1140px; }
+
+#header h1 {
+    font-weight: bold;
+    font-size: 14px;
+    text-transform: uppercase;
+    margin: 0.5em 0;
+    color: #CCCCCC;
+    letter-spacing: 0;
+}
+
+#header h1 a {
+    color: #FFFFFF;
+    text-decoration: none;
+    border-bottom: none;
+}
+
+#nav-toggle, #logo { float: left; padding: 5px 0px; }
+#nav-toggle {
+    padding: 5px;
+    border-right: 1px solid #FFFFFF;
+    margin-right: 0.5em;
+    display: none;
+}
+#nav-toggle img { padding: 0.5em; }
+
+#nav {
+    background-color: #666666;
+    color: #CCCCCC;
+    padding: 5px 10px;
+}
+#nav-inner { margin: 0px auto; max-width: 1140px; }
+#nav ul {
+    margin: 0;
+    padding: 0;
+    text-align: left;
+}
+#nav li {
+    display: inline;
+    list-style-type: none;
+}
+#nav a {
+    background-color: #888888;
+    padding: 6px 8px;
+    border-width: 0;
+    color: #FFFFFF;
+}
+#nav ul#nav-left { float: left; }
+#nav ul#nav-right { float: right; }
+
+#user {
+    float: right;
+    margin: 0.5em 0;
+    padding: 5px 0;
+}
+.logged-in-as .identity {
+    padding-left: 20px;
+    background: transparent url(user.png) no-repeat top left;
+    color: #FFFFFF;
+}
+.logged-in-as a {
+    color: #FFFFFF;
+    border-bottom-color: #FFFFFF;
+    font-weight: normal;
+}
+#logout:before { content: " · "; }
+
+#user-toggle {
+    float: right;
+    padding: 5px;
+    margin-left: 0.5em;
+    border-left: 1px solid #FFFFFF;
+    display: none;
+}
+#user-toggle img { padding: 0.5em; }
+
+#footer {
+    margin: 2em 0;
+    padding: 0px 10px;
+    text-align: right;
+    font-size: 0.9em;
+    color: #999999;
+}
+#footer address { font-style: normal }
+#footer a { color: #999999; }
+
+#content {
+    margin: auto;
+    padding: 1em 10px;
+    max-width: 1140px;
+    clear: both;
+}
+
+
+/* Specific elements ------------------------------------------------------- */
 .realm, .site {
     padding-left: 20px;
     background: transparent url(world.png) no-repeat top left;
@@ -194,6 +196,7 @@ span.last-time { display: none }
 
 .message, .login-security {
     border: 1px solid #666666;
+    border-radius: 4px;
     padding: 0 10px;
     background: #DDDDDD;
     margin-bottom: 10px;
@@ -210,21 +213,6 @@ span.last-time { display: none }
     background: #EEFFDD;
 }
 .secure p { padding-left: 20px; background: transparent url(lock.png) no-repeat top left; }
-
-.user {
-    float: right;
-    margin: 0.5em 0;
-}
-.logged-in-as {
-    padding-left: 20px;
-    background: transparent url(user.png) no-repeat top left;
-}
-.logged-in-as .identity { color: #FFFFFF; }
-.logged-in-as a {
-    color: #FFFFFF;
-    border-bottom-color: #FFFFFF;
-    font-weight: normal;
-}
 
 .block {
     background-color: #EEEEEE;
@@ -293,58 +281,73 @@ label {
 }
 label.option { font-weight: normal; }
 
-select, textarea, input[type="text"], input[type="password"] {
+select, textarea, input[type="text"], input[type="password"], input[type="number"] {
     display: inline-block;
-    padding: 2px;
-    height: 16px;
+    padding: 0.5em;    
+    border: 1px solid #AAAAAA;
+    border-radius: 2px;
+}
+select:focus, textarea:focus, input[type="text"]:focus, input[type="password"]:focus, input[type="number"]:focus {
+    border-color: #1144AA;
 }
 
 input[type="submit"], input[type="button"] {
-  padding: auto 14px;
-  /*font-size: 14px;*/
-  vertical-align: middle;
+    padding: 0.5em 1em;
+    background-color: #EEEEEE;
+    border: 1px solid #999999;
+    border-radius: 2px;
+    zoom: 1;
+    vertical-align: middle;
+    font-weight: bold;
+}
+input[type="submit"]:active, input[type="button"]:active {
+    box-shadow: 0 0 0 1px rgba(0,0,0, 0.15) inset, 0 0 6px rgba(0,0,0, 0.20) inset;
+}
+input[type="submit"][disabled], input[type="button"][disabled] {
+    color: #999999 !important;
+    background-color: #EEEEEE !important;
+    border-color: #999999 !important;
+}
+input[type="submit"].form-default, input[type="button"].form-default {
+    color: #FFFFFF;
+    background-color: #1144AA;
+    border-color: #114499;
+}
+
+input[type="radio"], input[type="checkbox"] { margin: 0.5em 0; }
+input[type="radio"]:focus, input[type="checkbox"]:focus {
+    outline: 1px auto #1144AA;
 }
 
 /* Dialogs and dialog pages */
-.dialog-page {
-    background: #EEEEEE;
-}
-
+.dialog-page { background: #EEEEEE; }
 .dialog-page #content {
-    margin: 50px auto;
-    width: 400px;
+    padding-top: 50px;
+    max-width: 400px;
+}
+.dialog-page #content-inner {
     padding: 20px;
     border: 10px solid #DDDDDD;
     background: #FFFFFF;
 }
 
-.dialog-page .form-text {
-    width: 98%; /* Reduced as width does not include padding and chrome for input elements */ 
+.dialog-page form { padding-right: 2px; } /* Used to adjust the padding in text boxes */
+.dialog-page .form-item { padding-right: 1em; } /* Used to adjust the padding in text boxes */
+.dialog-page select, .dialog-page textarea, .dialog-page input[type="text"], .dialog-page input[type="password"], .dialog-page input[type="number"] {
+    width: 100%;
 }
 
-@media only screen and (max-width: 800px) {
-    body { font-size: 14px; }
-    
-    select, textarea, input[type="text"], input[type="password"] {
-        height: 18px;
-        font-size: 14px;
-    }
-    
-    input[type="submit"], input[type="button"] {
-        padding: 2px 14px;
-        font-size: 14px;
-    }
-    
-    .dialog-page {
-        background: #FFFFFF;
-    }
+/* Mobile devices ---------------------------------------------------------- */
+@media only screen and (max-width: 767px) {
+    html { font-size: 14px; }
 
-    .dialog-page #content {
-        margin: 10px auto 20px auto;
-        width: auto;
-        padding: 20px;
+    #nav-toggle { display: block; }
+    
+    .dialog-page { background: #FFFFFF; }
+    .dialog-page #content { padding-top: 20px; }
+    .dialog-page #content-inner {
+        padding: 0px;
         border-width: 0px;
-        background: #FFFFFF;
     }
     
     .dialog-page #content h1 { margin-top: 0; }
