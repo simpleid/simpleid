@@ -20,7 +20,7 @@
  * $Id$
  */
 
-@import url("normalize.css");
+@import url(normalize.css);
 
 /* General elements -------------------------------------------------------- */
 html {
@@ -105,6 +105,7 @@ pre {
     padding: 5px;
     border-right: 1px solid #FFFFFF;
     margin-right: 0.5em;
+    cursor: pointer;
     display: none;
 }
 #nav-toggle img { padding: 0.5em; }
@@ -155,6 +156,7 @@ pre {
     padding: 5px;
     margin-left: 0.5em;
     border-left: 1px solid #FFFFFF;
+    cursor: pointer;
     display: none;
 }
 #user-toggle img { padding: 0.5em; }
@@ -190,9 +192,9 @@ pre {
     padding-left: 20px;
     background: transparent url(drive.png) no-repeat top left;
 }
-.url-elide { color: #999999;}
+.url-elide { color: #999999; }
 
-span.last-time { display: none }
+span.last-time { display: none; }
 
 .message, .login-security {
     border: 1px solid #666666;
@@ -264,15 +266,11 @@ span.last-time { display: none }
     font-family: "Bitstream Vera Sans Mono","Courier New",monospace;
     margin: 5px;
 }
-.otp-letters {
-    padding: 0 2px;
-}
-#otp-key-qr { padding: 16px 0;}
+.otp-letters { padding: 0 2px; }
+#otp-key-qr { padding: 16px 0; }
 
 /* Forms */
-.form-item {
-    margin: 1em 0;
-}
+.form-item { margin: 1em 0; }
 
 label {
     display: block;
@@ -341,15 +339,45 @@ input[type="radio"]:focus, input[type="checkbox"]:focus {
 @media only screen and (max-width: 767px) {
     html { font-size: 14px; }
 
-    #nav-toggle { display: block; }
+    #logo .version { display: none; }
+
+    #nav-toggle, #user-toggle { display: block; }
+    #nav-toggle.expand, #user-toggle.expand { background-color: #888888; }
+
+    #nav {
+        display: none;
+        position: absolute;
+        float: none;
+        left: 10px;
+        top: 40px;
+        padding: 0;
+    }
+    #nav.expand { display: block; }
+    #nav li { display: block; }
+    #nav a { display: block; }
+
+    #user {
+        display: none;
+        position: absolute;
+        float: none;
+        right: 10px;
+        top: 40px;
+        background-color: #888888;
+        margin: 0;
+        padding: 0 8px;
+    }
+    #user.expand { display: block; }
+    #user span {
+        display: block;
+        padding: 6px 0;
+    }
+    #logout:before { content: ""; }
     
     .dialog-page { background: #FFFFFF; }
-    .dialog-page #content { padding-top: 20px; }
+    .dialog-page #content { padding-top: 10px; }
     .dialog-page #content-inner {
         padding: 0px;
         border-width: 0px;
     }
-    
-    .dialog-page #content h1 { margin-top: 0; }
 }
 

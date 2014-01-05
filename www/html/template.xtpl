@@ -43,7 +43,7 @@
         <div id="header"><div id="header-inner">
             <!-- BEGIN: nav_toggle --><div id="nav-toggle"><img src="{base_path}html/nav-toggle.png" /></div><!-- END: nav_toggle -->
             <div id="logo">
-                <h1><a href="http://simpleid.koinic.net/">SimpleID</a> {version}</h1>
+                <h1><a href="http://simpleid.koinic.net/">SimpleID</a> <span class="version">{version}</span></h1>
             </div>
             <!-- BEGIN: user -->
             <div id="user-toggle"><img src="{base_path}html/user-toggle.png" /></div>
@@ -333,28 +333,36 @@
 
         <script type="text/javascript">
         (function() {
-            var container, button, menu;
+            var nav, nav_toggle, user, user_toggle;
 
-            container = document.getElementById('banner');
-            if (!container) return;
+            nav = document.getElementById('nav');
+            nav_toggle = document.getElementById('nav-toggle');
+            user = document.getElementById('user');
+            user_toggle = document.getElementById('user-toggle');
 
-            button = container.getElementsByClassName('toggle')[0];
-            if (typeof button === 'undefined') return;
-
-            menu = container.getElementsByTagName('dl')[0];
-
-            // Hide menu toggle button if menu is empty and return early.
-            if (typeof menu === 'undefined') {
-                button.style.display = 'none';
-                return;
+            if (nav) {
+                nav_toggle.onclick = function() {
+                    if (nav.className.indexOf('expand') !== -1) {
+                        nav.className = nav.className.replace(' expand', '');
+                        nav_toggle.className = nav_toggle.className.replace(' expand', '');
+                    } else {
+                        nav.className += ' expand';
+                        nav_toggle.className += ' expand';
+                    }
+                }
             }
 
-            button.onclick = function() {
-                if (menu.className.indexOf('expand') !== -1)
-                    menu.className = menu.className.replace(' expand', '');
-                else
-                    menu.className += ' expand';
-            };
+            if (user) {
+                user_toggle.onclick = function() {
+                    if (user.className.indexOf('expand') !== -1) {
+                        user.className = user.className.replace(' expand', '');
+                        user_toggle.className = user_toggle.className.replace(' expand', '');
+                    } else {
+                        user.className += ' expand';
+                        user_toggle.className += ' expand';
+                    }
+                }
+            }
         })();
         </script>
     </body>
