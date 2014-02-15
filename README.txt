@@ -76,3 +76,8 @@ SimpleID uses the jQuery QR code library
 <http://jeromeetienne.github.io/jquery-qrcode/>, by Jerome Etienne.  Licensing
 information for this library can be found at
 <https://github.com/jeromeetienne/jquery-qrcode/blob/master/MIT-LICENSE.txt>.
+
+SimpleID uses normalize.css style sheet
+<http://necolas.github.io/normalize.css/>, by Nicolas Gallagher and Jonathan
+Neal.  Licensing information for this library can be found at
+<https://github.com/necolas/normalize.css/blob/master/LICENSE.md>.

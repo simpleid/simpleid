@@ -40,41 +40,33 @@
         {javascript}
     </head>
     <body class="{page_class}">
-        <!-- BEGIN: upgrade_check -->
-        <div id="upgrade-check">
-        </div>
-        <!-- END: upgrade_check -->
-        <div id="header">
+        <div id="header"><div id="header-inner">
+            <!-- BEGIN: nav_toggle --><div id="nav-toggle"><img src="{base_path}html/nav-toggle.png" /></div><!-- END: nav_toggle -->
             <div id="logo">
-                <h1><a href="http://simpleid.koinic.net/">SimpleID</a> {version}</h1>
+                <h1><a href="http://simpleid.koinic.net/">SimpleID</a> <span class="version">{version}</span></h1>
             </div>
             <!-- BEGIN: user -->
-            <div class="user">
+            <div id="user-toggle"><img src="{base_path}html/user-toggle.png" /></div>
+            <div id="user">
                 <div class="logged-in-as">
-                    <strong title="{identity}" class="identity">{uid}</strong>
-                <!-- BEGIN: logout -->&middot; <a href="{url}">{logout}</a><!-- END: logout -->
+                    <span><strong title="{identity}" class="identity">{uid}</strong></span>
+                <!-- BEGIN: logout --><span id="logout"><a href="{url}">{logout}</a></span><!-- END: logout -->
                 </div>
-                <div style="clear: both"></div>
             </div>
             <!-- END: user -->
             <div style="clear: both;"></div>
-        </div>
+        </div></div>
         <!-- BEGIN: nav -->
-        <div id="nav">
+        <div id="nav"><div id="nav-inner">
             <ul id="nav-left">
                 <li><a href="{nav_base}">{nav_dashboard_label}</a></li>
                 <li><a href="{nav_base}my/profile">{nav_profile_label}</a></li>
                 <li><a href="{nav_base}my/sites">{nav_sites_label}</a></li>
             </ul>
-            <!-- BEGIN: nav_admin -->
-            <!--ul id="nav-right">
-                <li><a href="?q=admin">Admin</a></li>
-            </ul-->
-            <!-- END: nav_admin -->
             <div style="clear: both"></div>
-        </div>
+        </div></div>
         <!-- END: nav -->
-        <div id="content">
+        <div id="content"><div id="content-inner">
             <h1>{title}</h1>
             
             <!-- BEGIN: message -->
@@ -99,12 +91,12 @@
                 
                 <div class="form-item">
                     <label for="edit-name">{name_label}</label>
-                    <!-- BEGIN: input_uid --><input type="text" maxlength="60" name="name" id="edit-name" size="60" value="" autocapitalize="off" autocorrect="off" class="form-text required" {security_disabled} /><!-- END: input_uid -->
+                    <!-- BEGIN: input_uid --><input type="text" maxlength="60" name="name" id="edit-name" value="" autocapitalize="off" autocorrect="off" class="form-text required" {security_disabled} /><!-- END: input_uid -->
                     <!-- BEGIN: fixed_uid --><input type="hidden" name="name" value="{uid}"/><input type="hidden" name="fixed_uid" value="1"/><div id="edit-name">{uid}</div><!-- END: fixed_uid -->
                 </div>
                 <div class="form-item">
                     <label for="edit-pass">{pass_label}</label>
-                    <input type="password" name="pass" id="edit-pass"  size="60"  class="form-text required" {security_disabled} />
+                    <input type="password" name="pass" id="edit-pass" size="60" class="form-text required" {security_disabled} />
                 </div>                
                 <div class="form-item">
                     <label class="option">
@@ -133,9 +125,9 @@
                 </div-->
                 <!-- END: otp -->
 
-                <input type="submit" name="op" id="edit-submit" value="{submit_button}" class="form-submit" {security_disabled} />
+                <input type="submit" name="op" id="edit-submit" value="{submit_button}" class="form-default" {security_disabled} />
                 <!-- BEGIN: state -->
-                    <input type="submit" name="op" id="edit-cancel" value="{cancel_button}" class="form-submit" />
+                    <input type="submit" name="op" id="edit-cancel" value="{cancel_button}" />
                     <input type="hidden" name="s" value="{state}"/>
                 <!-- END: state -->
             </form>
@@ -173,8 +165,8 @@
 
                 {extensions}
                 
-                <input type="submit" name="op" id="edit-submit" value="{ok_button}" class="form-submit" />
-                <input type="submit" name="op" id="edit-cancel" value="{cancel_button}" class="form-submit" />
+                <input type="submit" name="op" id="edit-submit" value="{ok_button}" class="form-default" />
+                <input type="submit" name="op" id="edit-cancel" value="{cancel_button}" />
                 <!-- END: setup -->
 
                 <!-- BEGIN: cancel -->
@@ -186,7 +178,7 @@
                 
                 <p>{switch_user_label}</p>
                 
-                <input type="submit" name="op" id="edit-cancel" value="{cancel_button}" class="form-submit" />
+                <input type="submit" name="op" id="edit-cancel" value="{cancel_button}" class="form-default" />
                 <!-- END: cancel -->                
             </form>
             <!-- END: openid_consent -->
@@ -220,7 +212,7 @@
                     <!-- END: realm -->
                 </tbody>
             </table>
-            <input type="submit" name="op" id="edit-submit" value="{submit_button}" class="form-submit" {disabled} />
+            <input type="submit" name="op" id="edit-submit" value="{submit_button}" class="form-default" {disabled} />
             </form>
             <!-- END: sites -->
 
@@ -249,7 +241,7 @@
                     <label for="edit-otp">{otp_label}</label>
                     <input type="number" maxlength="6" name="otp" id="edit-otp" size="10" value="" autocapitalize="off" autocorrect="off" class="form-text required" />
                 </div>
-                <input type="submit" name="op" id="edit-submit" value="{submit_button}" class="form-submit" />
+                <input type="submit" name="op" id="edit-submit" value="{submit_button}" class="form-default" />
             </form>
 
             <!-- END: otp -->
@@ -329,7 +321,7 @@
             {results}
             </div>
             <!-- END: upgrade_results -->
-        </div>
+        </div></div>
 
         <div id="footer">
             <address>
@@ -338,6 +330,41 @@
                 <a href="http://simpleid.koinic.net/trac/">{footer_support}</a>
             </address>
         </div>
+
+        <script type="text/javascript">
+        (function() {
+            var nav, nav_toggle, user, user_toggle;
+
+            nav = document.getElementById('nav');
+            nav_toggle = document.getElementById('nav-toggle');
+            user = document.getElementById('user');
+            user_toggle = document.getElementById('user-toggle');
+
+            if (nav) {
+                nav_toggle.onclick = function() {
+                    if (nav.className.indexOf('expand') !== -1) {
+                        nav.className = nav.className.replace(' expand', '');
+                        nav_toggle.className = nav_toggle.className.replace(' expand', '');
+                    } else {
+                        nav.className += ' expand';
+                        nav_toggle.className += ' expand';
+                    }
+                }
+            }
+
+            if (user) {
+                user_toggle.onclick = function() {
+                    if (user.className.indexOf('expand') !== -1) {
+                        user.className = user.className.replace(' expand', '');
+                        user_toggle.className = user_toggle.className.replace(' expand', '');
+                    } else {
+                        user.className += ' expand';
+                        user_toggle.className += ' expand';
+                    }
+                }
+            }
+        })();
+        </script>
     </body>
 </html>
 <!-- END: main -->

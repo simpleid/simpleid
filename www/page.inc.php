@@ -223,10 +223,7 @@ function page_nav() {
     $xtpl->assign('nav_profile_label', t('My Profile'));
     $xtpl->assign('nav_sites_label', t('My Sites'));
     
-    if ($user != NULL) {
-        if (isset($user['administrator']) && ($user['administrator'] == 1)) $xtpl->parse('main.nav.nav_admin');
-        
-    }
+    $xtpl->parse('main.nav_toggle');
     $xtpl->parse('main.nav');
 }
 
