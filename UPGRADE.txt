@@ -1,5 +1,3 @@
-// $Id$
-
 Upgrading SimpleID
 ==================
 
@@ -15,6 +13,68 @@ General information on upgrading can be found at
 
 This document sets out the additional steps which may need to be performed to
 upgrade to a specific version of SimpleID.
+
+Upgrading to SimpleID 0.9
+-------------------------
+
+1. System requirements
+
+The system requirements for SimpleID have changed.  The most important
+changes are:
+
+    (a) PHP
+
+        From version 0.9, the minimum version of PHP is 5.3.0.  PHP 4 is no
+        longer supported.
+
+    (b) HTTPS support
+
+        From version 0.9, HTTPS support is mandatory.  The evolving security
+        environment means that it is no longer safe to accept logins from
+        unencrypted connections.
+
+        If you run your own server, there are now many inexpensive certificate 
+        authorities from which to get certificates.  Self-signed certificates
+        are also acceptable (although not recommended).
+
+        If you are using a shared server from a web hosting provider, check
+        with them regarding SSL capabilities.  Many offer a shared SSL
+        certificate to the server at no extra cost.
+
+For further information on the revised system requirements, see the SimpleID
+web site at http://simpleid.koinic.net/node/58
+
+2. Enhanced password security
+
+Version 0.9 now supports storing passwords with hashing algorithms other than
+MD5 and with a salt.  You may wish to update your identity file to take
+advantage of this new feature.
+
+3. File extensions
+
+SimpleID PHP code files no longer use the .inc file extension.  Instead only
+the .php file extension is used.  This prevents misconfigured web servers to
+return SimpleID source code.
+
+You will need to perform the following manually:
+
+    (a) Rename config.inc to config.php
+
+    (b) Rename any custom extensions in the extensions directory from
+        .extension.inc to .extension.php
+
+    (c) Delete all old .inc files from the SimpleID web directory.
+
+4. upgrade.php
+
+You will need to run the upgrade script to complete the upgrade.  To run the
+script, use your web browser to go to
+
+http://www.exmaple.com/simpleid/upgrade.php
+
+where http://www.exmaple.com/simpleid/ is the URL of your SimpleID server
+(where you have moved the www directory).  You will need to be logged in as
+an administrator to proceed with the script.
 
 Upgrading to SimpleID 0.8
 -------------------------

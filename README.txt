@@ -14,6 +14,11 @@ Upgrading
 
 General upgrade instructions can be found in UPGRADE.txt.
 
+IMPORTANT: SimpleID version 0.9 introduced numerous changes and additional
+system requirements.  A manual upgrading process is required.  If you are
+upgrading from an earlier version of SimpleID, please read UPGRADE.txt for
+upgrade instructions.
+
 IMPORTANT: SimpleID version 0.7 introduced numerous changes.  A manual
 upgrading process is required.  If you are upgrading from an earlier version of
 SimpleID, please read UPGRADE.txt for upgrade instructions.
