@@ -79,7 +79,7 @@ identity="http://example.com/"
 ;    5ed9216011934c1fecfe978c00c7aaf2::ideally-a-large-number-of-random-characters-to-use-as-salt                   ; MD5 hash with salt
 ;    0f491332ba8fc76f6157da05a62ff6e45a622990:sha1:ideally-a-large-number-of-random-characters-to-use-as-salt       ; SHA1 hash with salt
 ;
-pass="c8e24ae844b7cb9381g722ae8209a19a"
+pass="cca6e030d81f0de52eb3f75c790ad056e57abaae:sha1:C2WG7PRM7PICMN5R"
 
 ;
 ; Whether this user is given administrative privileges in SimpleID.
