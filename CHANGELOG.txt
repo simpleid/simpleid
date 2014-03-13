@@ -1,3 +1,31 @@
+SimpleID 0.9
+------------
+
+- Security enhancements:
+    * #9 Changed file extensions from .inc to .php
+    * #69 #71 Require HTTPS for login pages
+    * #100 Restricted path and added http_only flag for session cookies
+    * #101 Implemented HTTP strict transport security header
+    * #130 Added support for TOTP one-time passwords
+- Improvements to identity files:
+    * #21 Allow non-MD5 hash algorithms and salted passwords
+    * #137 Identify files can now be symlinked from the identities
+      directory
+- Improvements to user interface:
+    * #93 #106 Localization support
+    * #103 Enhanced simpleweb error pages
+    * #138 Refactored style sheets for better mobile device support
+- New extension:
+    * #85 certauth extension for authentication using client SSL
+      certificates
+- Improvements to SimpleID internals:
+    * #58 #72 Dropped support for PHP 4 and fixed up PHP syntax
+      warnings
+    * #110 Refactored authentication system to allow for custom authentication
+      extensions
+    * #131 Refactored cache system to improve performance
+    * #132 Refactored "remember me" cookies
+
 SimpleID 0.8.5
 --------------
 
