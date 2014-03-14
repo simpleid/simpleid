@@ -141,7 +141,9 @@
         <copy todir="${dist.dir}/${dist.sub.dir}/simpleid">
             <fileset dir=".">
                 <exclude name="cache/*" />
+                <exclude name="cache/**/*.cache" />
                 <exclude name="store/*" />
+                <exclude name="openshift/**" />
                 <exclude name="www/.htaccess" />
                 <exclude name="www/config.inc" />
                 <exclude name="www/config.php" />
