@@ -87,7 +87,6 @@
                 <extension name="session"/>
                 <extension name="xml"/>
                 <extension name="hash"/>
-                <extension name="openssl"/>
             </dependencies>
             <!-- map directory (key) to role -->
             <dirroles key="/">doc</dirroles>
