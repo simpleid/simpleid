@@ -28,7 +28,7 @@
  * @filesource
  */
  
-include_once 'lib/gettext/gettext.inc';
+include_once 'lib/gettext/gettext.inc.php';
  
 /**
  * Initialises the localisation system.
