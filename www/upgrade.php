@@ -272,7 +272,7 @@ function upgrade_apply() {
     }
     
     if (!$upgrade_access_check) {
-        $xtpl->assign('edit_upgrade_php', t('Remember to edit upgrade.php to check <code>$upgrade_access_check</code> back to <code>FALSE</code>.'));
+        $xtpl->assign('edit_upgrade_php', t('Remember to edit upgrade.php to check <code>$upgrade_access_check</code> back to <code>TRUE</code>.'));
         $xtpl->parse('main.upgrade_results.upgrade_access_check');
     }
     $xtpl->assign('results', $results);
