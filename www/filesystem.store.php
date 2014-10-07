@@ -193,6 +193,7 @@ function store_get_uid_from_cert($cert) {
     while (($file = readdir($dir)) !== false) {
         $filename = SIMPLEID_IDENTITIES_DIR . '/' . $file;
         
+        if (is_link($filename)) $filename = readlink($filename);
         if ((filetype($filename) != "file") || (!preg_match('/^(.+)\.identity$/', $file, $matches))) continue;
         
         $uid = $matches[1];
