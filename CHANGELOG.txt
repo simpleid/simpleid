@@ -1,3 +1,12 @@
+SimpleID 0.9.1
+--------------
+
+- Bug fixes:
+    * #147 Incorrect update_access_check warning when upgrading
+    * #148 Identity files with certlogin can now be symlinked from the
+      identities directory
+
+
 SimpleID 0.9
 ------------
 
@@ -9,7 +18,7 @@ SimpleID 0.9
     * #130 Added support for TOTP one-time passwords
 - Improvements to identity files:
     * #21 Allow non-MD5 hash algorithms and salted passwords
-    * #137 Identify files can now be symlinked from the identities
+    * #137 Identity files can now be symlinked from the identities
       directory
 - Improvements to user interface:
     * #93 #106 Localization support
