@@ -23,7 +23,7 @@
 <project default="dist" basedir=".">
     <taskdef name="d51pearpkg2" classname="phing.tasks.ext.d51PearPkg2Task"/>
 
-    <property name="dist.dir" value="dist" /> <!-- dist.dir defined here is a default value and should be overwritten -->
+    <property name="dist.dir" value="../dist" /> <!-- dist.dir defined here is a default value and should be overwritten -->
     <property file="build.properties" />
     <property file="simpleid.properties" />
     
