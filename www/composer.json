@@ -1,0 +1,16 @@
+{
+    "name": "simpleid/simpleid",
+    "description": "A simple, personal OpenID provider written in PHP",
+    "require": {
+        "kelvinmo/simplexrd": "2.2",
+        "smmoosavi/php-gettext": "1.*",
+        "bcosca/fatfree": "3.*"
+    },
+    "license": "GPL-2.0+",
+    "authors": [
+        {
+            "name": "Kelvin Mo",
+            "email": "kmo@users.sourceforge.net"
+        }
+    ]
+}
