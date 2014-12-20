@@ -131,10 +131,11 @@ class BigNum {
                 }
         
                 $bytes = array();
+                $num = $this->value;
           
-                while ($this->_cmp($this->value, 0) > 0) {
-                    array_unshift($bytes, $this->_mod($this->value, 256));
-                    $this->value = $this->_div($this->value, 256);
+                while ($this->_cmp($num, 0) > 0) {
+                    array_unshift($bytes, $this->_mod($num, 256));
+                    $num = $this->_div($num, 256);
                 }
           
                 if ($bytes && ($bytes[0] > 127)) {
@@ -161,15 +162,17 @@ class BigNum {
                 }
 
                 $str = '';
-                while ($this->_cmp($this->value, 0) > 0) {
-                    $r = $this->_mod($this->value, $base);
+                $num = $this->value;
+
+                while ($this->_cmp($num, 0) > 0) {
+                    $r = $this->_mod($num, $base);
                     if (BIGNUM_GMP) {
                         $r = gmp_intval($r);
                     } else {
                         $r = intval($r);
                     }
                     $str = base_convert($r, 10, $base) . $str;
-                    $this->value = $this->_div($this->value, $base);
+                    $num = $this->_div($num, $base);
                 }
      
                 return $str;
@@ -199,6 +202,18 @@ class BigNum {
     function mul($b) {
         $result = new BigNum(0);
         $result->value = $this->_mul($this->value, $b->value);
+        return $result;
+    }
+
+    /**
+     * Raise base to power exp
+     *
+     * @param BigNum $exp the exponent
+     * @return resource a bignum representing this ^ exp
+     */
+    function pow($exp) {
+        $result = new BigNum(0);
+        $result->value = $this->_mul($this->value, $exp->value);
         return $result;
     }
 
@@ -300,6 +315,22 @@ class BigNum {
             return gmp_div($a, $b);
         } else {
             return bcdiv($a, $b);
+        }
+    }
+
+    /**
+     * Raise base to power exp
+     *
+     * @param resource $base the base
+     * @param mixed $exp the exponent, as an integer or a bignum
+     * @return resource a bignum representing base ^ exp
+     */
+    function _pow($base, $exp) {
+        if (BIGNUM_GMP) {
+            if (is_resource($exp) && (get_resource_type($exp) == 'gmp')) $exp = gmp_intval($exp);
+            return gmp_pow($base, $exp);
+        } else {
+            return bcpow($base, $exp);
         }
     }
 
