@@ -41,22 +41,37 @@ define('OPENID_DH_DEFAULT_MOD', '155172898181473697471232257763715539915724801'.
  */
 define('OPENID_DH_DEFAULT_GEN', '2');
 
+/**
+ * A class for Diffie-Hellman key exchange.
+ */
 class DiffieHellman {
 
-// private
+    /** @var BigNum the private key */
     private $x;
 
-// public
+    /** @var BigNum the public key */
     private $y;
 
-// dh_modulus
+    /** @var BigNum the modulus - a large prime number */
     protected $p;
 
-// dh_gen
+    /** @var BigNum the generator - a primitive root modulo */
     protected $g;
 
+    /** @var string the hashing algorithm */
     protected $algo;
 
+    /**
+     * Creates a new instance.
+     *
+     * The modulus and generator are specified in the $dh_modulus and $dh_gen
+     * parameters.  If these are set to NULL, the default from the OpenID
+     * specification are used.
+     *
+     * @param string $dh_modulus modulus 
+     * @param string $dh_gen generator 
+     * @param string $algo the hashing algorithm
+     */
     function __construct($dh_modulus = NULL, $dh_gen = NULL, $algo = 'sha1') {
         if ($dh_modulus != NULL) {
             $this->p = new BigNum(base64_decode($dh_modulus), 256);
