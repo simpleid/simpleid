@@ -3,8 +3,9 @@
     "description": "A simple, personal OpenID provider written in PHP",
     "require": {
         "kelvinmo/simplexrd": "2.2",
-        "smmoosavi/php-gettext": "1.*",
-        "bcosca/fatfree": "3.*"
+        "kelvinmo/simplei18n": "dev-master",
+        "bcosca/fatfree": "3.*",
+        "psr/log": "1.*"
     },
     "require-dev": {
         "phpunit/phpunit": "4.*"
