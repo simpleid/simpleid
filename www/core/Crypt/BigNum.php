@@ -52,7 +52,7 @@ class BigNum {
      *
      * @return bool true if either GMP or BCMath is installed.
      */ 
-    static function bignum_loaded() {
+    static function loaded() {
         return (function_exists('gmp_init') || function_exists('bcadd'));
     }
 
