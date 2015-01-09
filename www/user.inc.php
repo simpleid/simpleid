@@ -837,6 +837,8 @@ function user_header($state = NULL) {
  */
 function user_passauth_user_verify_credentials($uid, $credentials) {
     $allowed_algorithms = array('md5', 'sha1');
+    if (function_exists('hash_algos')) $allowed_algorithms = array_merge($allowed_algorithms, hash_algos());
+    if (function_exists('hash_pbkdf2')) $allowed_algorithms[] = 'pbkdf2';
     
     $test_user = user_load($uid);
     
@@ -849,11 +851,20 @@ function user_passauth_user_verify_credentials($uid, $credentials) {
     if (!in_array($function, $allowed_algorithms)) $function = 'md5';
     $salt_suffix = (isset($hash_function_salt[2])) ? ':' . $hash_function_salt[2] : '';
 
-    if (call_user_func($function, $credentials['pass'] . $salt_suffix) != $hash) {
-        return false;
+    switch ($function) {
+        case 'pbkdf2':
+            list ($algo, $iterations, $salt) = explode(':', $hash_function_salt[2]);
+            $test_hash = hash_pbkdf2($algo, $credentials['pass'], $salt, $iterations);
+            break;
+        case 'md5':
+        case 'sha1':
+            $test_hash = call_user_func($function, $credentials['pass'] . $salt_suffix);
+            break;
+        default:
+            $test_hash = hash($function, $credentials['pass'] . $salt_suffix);
     }
-    
-    return true;
+
+    return ($test_hash == $hash);
 }
 
 /**
@@ -1023,6 +1034,30 @@ function user_hotp($secret, $data, $algorithm = 'sha1', $digits = 6) {
         ($hmac[$offset + 2] & 0xFF) << 8 |
         ($hmac[$offset + 3] & 0xFF);
     return $code % pow(10, $digits);
+}
+
+
+if (!function_exists('hash_pbkdf2') && function_exists('hash_hmac')) {
+    function hash_pbkdf2($algo, $password, $salt, $iterations, $length = 0, $raw_output = false) {
+        $result = '';
+        $hLen = strlen(hash($algo, '', true));
+        if ($length == 0) {
+            $length = $hLen;
+            if (!$raw_output) $length *= 2;
+        }
+        $l = ceil($length / $hLen);
+
+        for ($i = 1; $i <= $l; $i++) {
+            $U = hash_hmac($algo, $salt . pack('N', $i), $password, true);
+            $T = $U;
+            for ($j = 1; $j < $iterations; $j++) {
+                $T ^= ($U = hash_hmac($algo, $U, $password, true));
+            }
+            $result .= $T;
+        }
+
+        return substr(($raw_output) ? $result : bin2hex($result), 0, $length);
+    }
 }
 
 
