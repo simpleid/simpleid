@@ -854,7 +854,8 @@ function user_passauth_user_verify_credentials($uid, $credentials) {
     switch ($function) {
         case 'pbkdf2':
             list ($algo, $iterations, $salt) = explode(':', $hash_function_salt[2]);
-            $test_hash = hash_pbkdf2($algo, $credentials['pass'], $salt, $iterations);
+            $length = (function_exists('hash')) ? strlen(hash($algo, '')) : 0;
+            $test_hash = hash_pbkdf2($algo, $credentials['pass'], $salt, $iterations, $length);
             break;
         case 'md5':
         case 'sha1':
