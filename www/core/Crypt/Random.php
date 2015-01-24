@@ -104,20 +104,26 @@ class Random {
 
     /**
      * Generates a relatively unique identifier which can be used as, among other things,
-     * an OpenID association handle or an OAuth client identifier.  The identifier
-     * returned is (16 + strlen($separator) + 2 * $num_bytes) characters long and contains
-     * only hexadecimal characters and the characters in $separator.
+     * an OpenID association handle or an OAuth client identifier.
      *
      * Note that the identifier returned is not cryptographically secure.
      *
-     * @param string $separator a separator that will appear in the identifier
-     * @param int $num_bytes the approximate number of bytes of entropy in the
-     * identifier
      * @return string a relatively unique identifier
      */
-    function id($separator = '', $num_bytes = 4) {
+    function id() {
         $timeofday = gettimeofday();
-        return vsprintf('%08x%08x', $timeofday) . $separator . bin2hex(self::bytes($num_bytes));
+        $base = pack('NN', $timeofday['sec'], $timeofday['usec']) . self::bytes(32);
+        return strtr(trim(base64_encode(sha1($base, true)), '='), '+/', '-_');
+    }
+
+    /**
+     * Generates a nonce for use in OpenID responses
+     *
+     * @return string an OpenID nonce
+     * @link http://openid.net/specs/openid-authentication-2_0.html#positive_assertions
+     */
+    function openIDNonce() {
+        return gmstrftime('%Y-%m-%dT%H:%M:%SZ') . bin2hex(self::bytes(4));
     }
 }
 ?>
