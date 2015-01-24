@@ -6,6 +6,6 @@ set_include_path(implode(PATH_SEPARATOR, array(
     get_include_path(),
 )));
 
-require 'bootstrap.inc.php';
+require 'autoload.inc.php';
 
 ?>
