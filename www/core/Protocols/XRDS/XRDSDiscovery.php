@@ -22,9 +22,13 @@
 
 namespace SimpleID\Protocols\XRDS;
 
+use \Prefab;
 use SimpleID\Net\HTTPResponse;
 
-class XRDSDiscovery {
+/**
+ * Utility class for XRDS discovery.
+ */
+class XRDSDiscovery extends Prefab {
     /**
      * Discovers the services for particular identifier.
      *
