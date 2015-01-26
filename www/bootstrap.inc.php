@@ -56,6 +56,7 @@ $default_config = array(
         'SimpleID\Base\UserModule',
     ),
     'modules' => array(
+        'SimpleID\Base\MyModule',
         'SimpleID\Auth\PasswordAuthSchemeModule',
         'SimpleID\Auth\RememberMeAuthSchemeModule',
         'SimpleID\Auth\OTPAuthSchemeModule',
