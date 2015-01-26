@@ -77,6 +77,7 @@ pre {
 }
 
 /* Page layout ------------------------------------------------------------- */
+/*.sticky { position: fixed; }*/
 #header {
     background-color: #666666;
     color: #CCCCCC;
@@ -268,6 +269,11 @@ span.last-time { display: none; }
 }
 .otp-letters { padding: 0 2px; }
 #otp-key-qr { padding: 16px 0; }
+input.otp { -moz-appearance:textfield; }
+input.otp::-webkit-outer-spin-button,
+input.otp::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
 
 /* Forms */
 .form-item { margin: 1em 0; }
