@@ -31,10 +31,9 @@ class HTTPResponse {
     private $isNetworkError = false;
     private $isHTTPError = false;
 
+    private $version;
     private $responseCode = null;
-
     private $body;
-
     private $headers = array();
 
     /**
@@ -57,6 +56,7 @@ class HTTPResponse {
 
         // Parse the status line
         list($protocol, $code, $reason) = explode(' ', trim($status), 3);
+        $this->version = substr($protocol, strpos($protocol, '/') + 1);
         $this->responseCode = $code;
 
         $valid_codes = array(
@@ -136,6 +136,15 @@ class HTTPResponse {
      */
     function getResponseCode() {
         return $this->responseCode;
+    }
+
+    /**
+     * Returns the HTTP version
+     *
+     * @return float the HTTP version
+     */
+    function getVersion() {
+        return $this->version;
     }
 
     /**
