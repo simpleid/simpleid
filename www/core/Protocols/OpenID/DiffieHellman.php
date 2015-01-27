@@ -150,7 +150,7 @@ class DiffieHellman {
      * @param string $their_public the other party's public key, in Base64 representation
      * @return BigNum the shared secret
      *
-     * @see openid_dh_generate_key_pair()
+     * @see generateKeyPair()
      * @link http://www.ietf.org/rfc/rfc2631.txt RFC 2631
      */
     protected function getSharedSecret($their_public) {

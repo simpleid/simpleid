@@ -25,10 +25,11 @@ namespace SimpleID\Util;
 use \ArrayAccess;
 
 /**
- * An abstract class implementing the ArrayAccess interface
+ * An abstract class implementing the ArrayAccess interface.
+ * This allows arrays to be decorated with methods.
  */
-class ArrayAccessAdapter implements ArrayAccess {
-
+abstract class ArrayAccessAdapter implements ArrayAccess {
+    /** @var array the underlying array */
     protected $container = array();
 
     /**
