@@ -172,7 +172,7 @@ class SRegOpenIDExtensionModule extends Module {
      * @see hook_page_profile()
      */
     public function profileBlocksHook() {
-        $user = $auth->getUser();
+        $user = $this->auth->getUser();
 
         if (!isset($user['sreg'])) return;
 
