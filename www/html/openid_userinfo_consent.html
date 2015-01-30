@@ -1,0 +1,29 @@
+<p>{{ @userinfo_label }} </p>
+
+<check if="{{ @@policy_label }}"><p>{{ @policy_label | raw }}</p></check>
+
+<table>
+    <tr>
+        <th></th>
+        <th>{{ @name_label }}</th>
+        <th>{{ @value_label }}</th>
+    </tr>
+    <repeat group="{{ @@fields }}" value="{{ @field }}">
+    <tr>
+        <td>
+            <check if="{{ @field.required }}">
+                <true>
+                    <input type="checkbox" id="{{ @module }}-consents-{{ @field.html_id }}" checked="checked" disabled="disabled">
+                    <input type="hidden" name="prefs[consents][{{ @module }}][]" value="{{ @field.id }}">
+                </true>
+                <false>
+                    <input name="prefs[consents][{{ @module }}][]" type="checkbox" value="{{ @field.id }}" id="{{ @module }}-consents-{{ @field.html_id }}"
+                        <check if="{{ @@field.checked }}">checked="checked"</check>>
+                </false>
+            </check>
+        </td>
+        <td><label for="{{ @module }}-consents-{{ @field.html_id }}">{{ @field.name }}</label></td>
+        <td>{{ @field.value }}</td>
+    </tr>
+    </repeat>
+</table>
