@@ -22,13 +22,13 @@
 
 namespace SimpleID\Protocols\OpenID;
 
-use SimpleID\Util\ArrayAccessAdapter;
+use SimpleID\Util\ArrayWrapper;
 
 /**
  * An abstract class representing an OpenID message (request
  * and response)
  */
-abstract class Message extends ArrayAccessAdapter {
+abstract class Message extends ArrayWrapper {
 
     const OPENID_VERSION_2 = 2;
     const OPENID_VERSION_1_1 = 1;
