@@ -34,7 +34,7 @@ use SimpleID\Util\SecurityToken;
 class IndexModule extends Module {
     static function routes($f3) {
         $f3->route('GET|POST /', 'SimpleID\Base\IndexModule->index');
-        $f3->route('GET|POST /continue/@token', 'SimpleID\Base\IndexModule->continue');
+        $f3->route('GET|POST /continue/@token', 'SimpleID\Base\IndexModule->continueRequest');
     }
 
     /**
@@ -83,7 +83,7 @@ class IndexModule extends Module {
      * - rt the FatFree routing path
      * - rq an array containing the request parameters
      */
-    public function continue($f3, $params) {
+    public function continueRequest($f3, $params) {
         $token = new SecurityToken();
         $payload = $token->getPayload($params['token']);
 
