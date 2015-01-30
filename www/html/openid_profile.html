@@ -1,0 +1,50 @@
+<h3>{{ @link_tags_label }}</h3>
+        
+<div>
+    <label><input type="checkbox" name="openid1" value="1" id="discovery-openid1" class="discovery-checkbox">{{ @openid1_label }}</label>
+    <label><input type="checkbox" name="openid2" value="1" id="discovery-openid2" class="discovery-checkbox">{{ @openid2_label }}</label>
+    <label><input type="checkbox" name="local-id" value="1" id="discovery-local-id" class="discovery-checkbox"> {{ @localid_label }} </label>
+</div>
+<pre id="discovery-link-tags">
+</pre>
+<ul id="discovery-templates">
+    <li class="openid1">&lt;link rel=&quot;openid.server&quot; href=&quot;{{ rtrim(@config.canonical_base_path, '/') }}/&quot;&gt;</li>
+    <li class="openid2">&lt;link rel=&quot;openid2.provider&quot; href=&quot;{{ rtrim(@config.canonical_base_path, '/') }}/&quot;&gt;</li>
+    <li class="openid1-local-id">&lt;link rel=&quot;openid.delegate&quot; href=&quot;{{ @@user.openid.identity }}&quot;&gt;</li>
+    <li class="openid2-local-id">&lt;link rel=&quot;openid2.local_id&quot; href=&quot;{{ @@user.openid.identity }}&quot;&gt;</li>
+</ul>
+
+<h3>{{ @yadis_label }}</h3>
+<ol>
+    <li>{{ @yadis_doc_label | raw }}</li>
+    <li>
+        <div>{{ @yadis_add_label }}</div>
+        <pre>&lt;meta http-equiv=&quot;X-XRDS-Location&quot; content=&quot;{{ @xrds_url }}&quot;&gt;</pre>
+    </li>
+</ol>
+
+
+
+<script>
+var discovery_refresh = function() {
+    var code = '';
+    
+    if ($('#discovery-openid1')[0].checked) {
+        code += $('#discovery-templates .openid1').html() + '\n';
+        if ($('#discovery-local-id')[0].checked) code += $('.openid1-local-id').html() + '\n';
+    }
+    if ($('#discovery-openid2')[0].checked) {
+        code += $('#discovery-templates .openid2').html() + '\n';
+        if ($('#discovery-local-id')[0].checked) code += $('.openid2-local-id').html() + '\n';
+    }
+    
+    if (code == '') code = l.code;
+    
+    $('#discovery-link-tags').html(code);
+}
+
+$(document).ready(function() {
+    $('.discovery-checkbox').click(discovery_refresh);
+    discovery_refresh();
+});
+</script>

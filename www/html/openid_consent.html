@@ -1,0 +1,53 @@
+<form action="{{ @base_path }}openid/consent" method="post" enctype="application/x-www-form-urlencoded" id="rp-form">
+    <input type="hidden" name="fs" value="{{ @@fs }}">
+    <input type="hidden" name="tk" value="{{ @@tk }}">
+    
+    <repeat group="{{ @@forms }}" value="{{ @form }}">
+        <check if="{{ @form.weight < 0 }}">{{ @form.content | raw }}</check>
+    </repeat>
+    
+    <check if="{{ !@cancel }}">
+        <true>
+            <p>{{ @realm_label | raw }}</p>
+            
+            <check if="{{ @@return_to_suspect }}">
+            <div class="message unsecure">
+                <p>{{ @suspect_label }}</p>
+            </div>
+            </check>
+            
+            <div class="form-item">
+                <label class="option">
+                    <input class="{{ @@realm_class }}" type="checkbox" name="prefs[consents][openid]" value="true" <check if="{{ @@openid_consent }}">checked="checked"</check>>
+                    {{ @openid_consent_label }}
+                </label>
+            </div>
+
+            <repeat group="{{ @@forms }}" value="{{ @form }}">
+                <check if="{{ @form.weight >= 0 }}">{{ @form.content | raw }}</check>
+            </repeat>
+            
+            <input type="submit" name="op" id="edit-submit" value="{{ @ok_button }}" class="form-default" />
+            <input type="submit" name="op" id="edit-cancel" value="{{ @cancel_button }}" />
+        </true>
+        <false>
+            <p>{{ @unable_label }}</p>
+            
+            <p>{{ @identity_not_matching_label }}</p>
+            
+            <p>{{ @switch_user_label }}</p>
+            
+            <input type="submit" name="op" id="edit-cancel" value="{{ @cancel_button }}" class="form-default">
+        </false>
+    </check>
+</form>
+
+<script>
+$(document).ready(function() {
+    $('.return-to-suspect').click(function() {
+        if ($(this).attr('checked') == false) return true;
+        
+        return confirm(l.openid_suspect);
+    });
+});
+</script>
