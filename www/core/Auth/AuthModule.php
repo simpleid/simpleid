@@ -53,7 +53,11 @@ class AuthModule extends Module {
     }
 
     /**
-     * Special processing required
+     * FatFree Framework event handler.
+     *
+     * This module does not use the default event handler provided by {@link Module},
+     * as it needs to disable the automatic authentication.
+     *
      */
     public function beforeroute() {
         $this->auth->initSession();
@@ -69,6 +73,7 @@ class AuthModule extends Module {
         $this->f3->set('PARAMS.destination', $params['destination']);
 
         $token = new SecurityToken();
+        $token->gc();
 
         // If the user is already logged in, return
         if ($this->auth->isLoggedIn()) $this->f3->reroute('/');
@@ -165,7 +170,7 @@ class AuthModule extends Module {
      * @param array $params
      */
     public function logout($f3, $params) {
-        $params['destination'] = (isset($params[1])) ? $params[1] : '/';
+        $params['destination'] = (isset($params[1])) ? $params[1] : '';
         $this->f3->set('PARAMS.destination', $params['destination']);
 
         // Require HTTPS, redirect if necessary
@@ -220,8 +225,10 @@ class AuthModule extends Module {
             $this->f3->set('cancel_button', t('Cancel'));
         }
 
+        // We can't use SecurityToken::BIND_SESSION here because the PHP session is not
+        // yet stable
         $token = new SecurityToken();
-        $this->f3->set('tk', $token->generate('login', SecurityToken::OPTION_NONCE | SecurityToken::OPTION_BIND_SESSION));
+        $this->f3->set('tk', $token->generate('login', SecurityToken::OPTION_NONCE));
         
         $this->f3->set('fs', $token->generate($form_state));
         if (isset($params['destination'])) $this->f3->set('destination', $params['destination']);

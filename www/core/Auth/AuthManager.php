@@ -36,7 +36,7 @@ use SimpleID\Util\OpaqueIdentifier;
  */
 class AuthManager extends Prefab {
     const AUTH_LEVEL_SESSION = 0;
-    //const AUTH_LEVEL_AUTO_ONCE = 1;
+    const AUTH_LEVEL_TOKEN = 1;
     const AUTH_LEVEL_AUTO = 2;
     const AUTH_LEVEL_CREDENTIALS = 3;
     const AUTH_LEVEL_REENTER_CREDENTIALS = 4;
@@ -52,6 +52,8 @@ class AuthManager extends Prefab {
     protected $cache;
     protected $logger;
     protected $mgr;
+
+    private $auth_info = array();
 
     private $ua_login_state;
 
@@ -88,15 +90,19 @@ class AuthManager extends Prefab {
     public function initUser($auto_auth = true) {
         $this->logger->log(LogLevel::DEBUG, 'SimpleID\Auth\AuthManager->initUser');
 
-        if (isset($_SESSION['auth']) && ($this->cache->get('user.' . rawurlencode($_SESSION['auth']['uid'])) == session_id())) {
+        if (isset($_SESSION['auth']) && ($this->cache->get(rawurlencode($_SESSION['auth']['uid']) . '.user') == session_id())) {
+            $this->auth_info = $_SESSION['auth'];
+
             $store = StoreManager::instance();
-            $user = $store->loadUser($_SESSION['auth']['uid']);
+            $user = $store->loadUser($this->auth_info['uid']);
             $this->f3->set('user', $user);
         
             // If user has just been actively been authenticated in the previous request, then we
             // make it as actively authenticated in this request.
-            $_SESSION['auth']['level'] = $_SESSION['auth']['next_level'];
-            $_SESSION['auth']['next_level'] = self::AUTH_LEVEL_SESSION;
+            $this->auth_info['level'] = $this->auth_info['next_level'];
+            $this->auth_info['next_level'] = self::AUTH_LEVEL_SESSION;
+
+            $_SESSION['auth'] = $this->auth_info;
         } elseif ($auto_auth) {
             $modules = $this->mgr->getModules();
 
@@ -116,7 +122,7 @@ class AuthManager extends Prefab {
      * @return bool true if a user has logged in
      */
     public function isLoggedIn() {
-        return ($this->f3->exists('user') === true);
+        return (isset($this->auth_info['uid']));
     }
 
     /**
@@ -135,7 +141,7 @@ class AuthManager extends Prefab {
      * @return int the authentication level
      */
     public function getAuthLevel() {
-        return (isset($_SESSION['auth']) && isset($_SESSION['auth']['level'])) ? $_SESSION['auth']['level'] : null;
+        return (isset($this->auth_info['level'])) ? $this->auth_info['level'] : null;
     }
 
     /**
@@ -145,7 +151,7 @@ class AuthManager extends Prefab {
      * @return int the time
      */
     public function getAuthTime() {
-        return (isset($_SESSION['auth']) && isset($_SESSION['auth']['time'])) ? $_SESSION['auth']['time'] : null;
+        return (isset($this->auth_info['time'])) ? $this->auth_info['time'] : null;
     }
 
     /**
@@ -164,13 +170,17 @@ class AuthManager extends Prefab {
 
         $this->f3->set('user', $user);
 
-        if (!isset($_SESSION['auth'])) $_SESSION['auth'] = array();
-        $_SESSION['auth']['uid'] = $user['uid'];
-        $_SESSION['auth']['level'] = $_SESSION['auth']['next_level'] = $level;
-        $_SESSION['auth']['modules'] = $modules;
-        $_SESSION['auth']['time'] = time();
+        $this->auth_info['uid'] = $user['uid'];
+        $this->auth_info['level'] = $this->auth_info['next_level'] = $level;
+        $this->auth_info['modules'] = $modules;
+        $this->auth_info['time'] = time();
 
-        $this->cache->set('user.' . rawurlencode($user['uid']), session_id());
+        if ($level >= self::AUTH_LEVEL_AUTO) {
+            $_SESSION['auth'] = $this->auth_info;
+            $this->cache->set(rawurlencode($user['uid']) . '.user', session_id());
+
+            $this->resetUALoginState();
+        }
 
         if ($level > self::AUTH_LEVEL_AUTO) {
             // $user is an object, not an array, and so one cannot modify multi-dimensional
@@ -182,15 +192,14 @@ class AuthManager extends Prefab {
             $user_auth[$uaid]['level'] = $level;
             $user_auth[$uaid]['modules'] = $modules;
             $user_auth[$uaid]['time'] = $_SESSION['auth']['time'];
-            $user_auth[$uaid]['remote'] = $this->f3->get('IP');
+            if ($this->f3->exists('IP')) $user_auth[$uaid]['remote'] = $this->f3->get('IP');
+            if ($this->f3->exists('HEADERS.User-Agent')) $user_auth[$uaid]['ua'] = $this->f3->get('HEADERS.User-Agent');
 
             $user['auth'] = $user_auth;
             $store->saveUser($user);
         
             $this->logger->log(LogLevel::INFO, 'Login successful: ' . $user['uid'] . '['. gmstrftime('%Y-%m-%dT%H:%M:%SZ', $user['auth_time']) . ']');
         }
-
-        $this->resetUALoginState();
 
         $this->mgr->invokeAll('login', $user, $level, $modules, $form_state);
     }
@@ -203,7 +212,7 @@ class AuthManager extends Prefab {
     
         $this->mgr->invokeAll('logout');
 
-        $this->cache->clear('user.' . rawurlencode($user['uid']));
+        $this->cache->clear(rawurlencode($user['uid']) . '.user');
         $this->f3->clear('user');
 
         session_unset();
@@ -258,7 +267,7 @@ class AuthManager extends Prefab {
 
         // We don't use f3->set->COOKIE, as this automatically sets the cookie to be httponly
         // We want this to be script readable.
-        setcookie($this->getCookieName('uals'), $this->ua_login_state, 0, '', '', true, false);
+        setcookie($this->getCookieName('uals'), $this->ua_login_state, 0, $this->f3->get('BASE'), '', true, false);
     }
 
     /**
