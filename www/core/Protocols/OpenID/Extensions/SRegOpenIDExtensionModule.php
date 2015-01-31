@@ -102,7 +102,7 @@ class SRegOpenIDExtensionModule extends Module {
             'fields' => array()
         );
             
-        if (isset($request['policy_url'])) {
+        if (isset($sreg_request['policy_url'])) {
             $hive['policy_label'] = $this->t('You can view the site\'s policy in relation to the use of this information at this URL: <a href="@url">@url</a>.', array('@url' => $request['policy_url']));
         }
             
@@ -121,7 +121,7 @@ class SRegOpenIDExtensionModule extends Module {
                     $form_field['required'] = true;
                 } else {
                     $form_field['required'] = false;
-                    $form_field['checked'] = (!isset($prefs['consents']['sreg']) || in_array($field, $prefs['consents']['sreg'])) ;
+                    $form_field['checked'] = (!isset($prefs['consents']['sreg']) || in_array($field, $prefs['consents']['sreg']));
                 }
                 
                 $hive['fields'][] = $form_field;
