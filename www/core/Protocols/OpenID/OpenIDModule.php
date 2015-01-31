@@ -195,7 +195,7 @@ class OpenIDModule extends Module {
         $response->set('expires_in', SIMPLEID_SHORT_TOKEN_EXPIRES_IN);
         $this->logger->log(LogLevel::INFO, 'Association response', $response->toArray());
 
-        $this->renderDirectResponse($response);
+        $response->render();
     }
 
     /**
@@ -284,7 +284,7 @@ class OpenIDModule extends Module {
                 $this->logger->log(LogLevel::INFO, 'CHECKID_APPROVAL_REQUIRED');
                 if ($immediate) {
                     $response = $this->createApprovalRequiredResponse($request);
-                    $this->renderResponse($response, $request['openid.return_to']);
+                    $response->render($request['openid.return_to']);
                 } else {
                     $response = $this->createOKResponse($request);
                     $this->consentForm($request, $response, $result);
@@ -294,7 +294,7 @@ class OpenIDModule extends Module {
                 $this->logger->log(LogLevel::INFO, 'CHECKID_RETURN_TO_SUSPECT');
                 if ($immediate) {
                     $response = $this->createErrorResponse($request, $immediate);
-                    $this->renderResponse($response, $request['openid.return_to']);
+                    $response->render($request['openid.return_to']);
                 } else {
                     $response = $this->createOKResponse($request);
                     $this->consentForm($request, $response, $result);
@@ -303,15 +303,15 @@ class OpenIDModule extends Module {
             case self::CHECKID_OK:
                 $this->logger->log(LogLevel::INFO, 'CHECKID_OK');
                 $response = $this->createOKResponse($request);
-                $response = $this->signResponse($response, isset($request['openid.assoc_handle']) ? $request['openid.assoc_handle'] : NULL);
-                $this->renderResponse($response, $request['openid.return_to']);
+                $this->signResponse($response, isset($request['openid.assoc_handle']) ? $request['openid.assoc_handle'] : NULL);
+                $response->render($request['openid.return_to']);
                 break;
             case self::CHECKID_REENTER_CREDENTIALS:
             case self::CHECKID_LOGIN_REQUIRED:
                 $this->logger->log(LogLevel::INFO, 'CHECKID_REENTER_CREDENTIALS | CHECKID_LOGIN_REQUIRED');
                 if ($immediate) {
                     $response = $this->createLoginRequiredResponse($request, $result);
-                    $this->renderResponse($response, $request['openid.return_to']);
+                    $response->render($request['openid.return_to']);
                 } else {
                     $token = new SecurityToken();
                     $state = array('rq' => $request->toArray());
@@ -330,7 +330,7 @@ class OpenIDModule extends Module {
                 $this->logger->log(LogLevel::INFO, 'CHECKID_IDENTITIES_NOT_MATCHING | CHECKID_IDENTITY_NOT_EXIST');
                 $response = $this->createErrorResponse($request, $immediate);
                 if ($immediate) {
-                    $this->renderResponse($response, $request['openid.return_to']);
+                    $response->render($request['openid.return_to']);
                 } else {                
                     $this->consentForm($request, $response, $result);                
                 }
@@ -338,7 +338,7 @@ class OpenIDModule extends Module {
             case self::CHECKID_PROTOCOL_ERROR:
                 if (isset($request['openid.return_to'])) {
                     $response = $this->createErrorResponse($request, $immediate);
-                    $this->renderResponse($response, $request['openid.return_to']);
+                    $response->render($request['openid.return_to']);
                 } else {
                     $this->fatalError('Unrecognised request.');
                 }
@@ -850,12 +850,12 @@ class OpenIDModule extends Module {
             $user['clients'] = $user_clients;
             $store->saveUser($user);
             
-            $response = $this->signResponse($response, isset($response['assoc_handle']) ? $response['assoc_handle'] : NULL);
+            $this->signResponse($response, isset($response['assoc_handle']) ? $response['assoc_handle'] : NULL);
             if (!$return_to) $this->f3->set('message', $this->t('You were logged in successfully.'));
         }
 
         if ($return_to) {
-            $this->renderResponse($response, $return_to);
+            $response->render($return_to);
         } else {
             $this->f3->reroute('/');
         }
@@ -873,73 +873,10 @@ class OpenIDModule extends Module {
             if (isset($request['openid.return_to'])) {
                 $return_to = $request['openid.return_to'];
                 $response = $this->createErrorResponse($request, FALSE);
-                $this->renderResponse($response, $return_to);
+                $response->render($return_to);
                 return true;
             }
         }
-    }
-
-    /**
-     * Sends an OpenID assertion response.
-     *
-     * The OpenID specification version 2.0 provides for the sending of assertions
-     * via indirect communication.  However, future versions of the OpenID
-     * specification may provide for sending of assertions via direct communication.
-     *
-     * @param Response $response the signed OpenID assertion response to send
-     * @param string $indirect_url the URL to which the OpenID response is sent.  If
-     * this is an empty string, the response is sent via direct communication
-     * @param int $component for indirect communication, where in the URL should the
-     * response be encoded.  This can be one of OPENID_RESPONSE_QUERY
-     * (always in the query string), OPENID_RESPONSE_FRAGMENT (always in the fragment), or
-     * null (determined by OpenID extensions)
-     * @subpackage openid2
-     * 
-     */
-    protected function renderResponse($response, $indirect_url = NULL, $component = NULL) {
-        if ($indirect_url) {
-            if ($component = NULL) {
-                // We want to see if the extensions want to change the way indirect responses are made
-                $results = $this->mgr->invokeAll('openIDIndirectResponse', $response, $indirect_url);
-                $results = array_filter($results, 'is_null');
-                $component = ($results) ? max($results) : Response::OPENID_RESPONSE_QUERY;
-            }
-            
-            $this->renderIndirectResponse($response, $indirect_url, $component);
-        } else {
-            $this->renderDirectResponse($response);
-        }
-    }
-
-    /**
-     * Sends a direct response.
-     *
-     * @param string $response an OpenID message encoded using Key-Value Form
-     * @param string $status the HTTP status to send
-     */
-    protected function renderDirectResponse($response, $status = 200) {
-        $this->f3->status($status);
-        
-        header("Content-Type: text/plain");
-        print $response->toDirectMessage();
-    }
-
-    /**
-     * Sends an indirect response to a URL.
-     *
-     * The indirect message is encoded in the URL and returned to the user agent using
-     * a HTTP redirect response.  The message can be encoded in either the query component
-     * or the fragment component of the URL.
-     *
-     * @param Response $response the OpenID response
-     * @param string $indirect_url the URL to which the response is to be sent
-     * @param int $component the component of the URL in which the indirect message is
-     * encoded, either OPENID_RESPONSE_QUERY or OPENID_RESPONSE_FRAGMENT
-     */ 
-    protected function renderIndirectResponse($response, $indirect_url, $component) {
-        $this->f3->status(303);
-
-        header('Location: ' . $response->toIndirectURL($indirect_url, $component));
     }
 
     /**
@@ -949,11 +886,13 @@ class OpenIDModule extends Module {
      * @param string $error the error message
      * @param array $additional any additional data to be sent with the error
      * message
-     * @param Request $request the message version
+     * @param Request $request the request in response to which the error is made
      */
     protected function directError($error, $additional = array(), $request = NULL) {
+        $this->f3->status(400);
+
         $error = Response::createError($error, $additional, $request);
-        $this->renderDirectResponse($error, 400);
+        $error->render();
     }
 
     /**
@@ -964,15 +903,11 @@ class OpenIDModule extends Module {
      * @param string $error the error message or code
      * @param array $additional any additional data to be sent with the error
      * message
-     * @param float $version the message version
-     * @param int $component the component of the URL in which the indirect message is
-     * encoded, one of OPENID_RESPONSE_QUERY (query string) or OPENID_RESPONSE_FRAGMENT
-     * (fragment under the OpenID UI extension) or OPENID_RESPONSE_OAUTH (fragment under the
-     * OAuth specification)
+     * @param Request $request the request in response to which the error is made
      */
-    protected function indirectError($url, $error, $additional = array(), $request = NULL, $component = Response::OPENID_RESPONSE_QUERY) {
+    protected function indirectError($url, $error, $additional = array(), $request = NULL) {
         $error = Response::createError($error, $additional, $request);
-        $this->renderIndirectResponse($response, $url, $component);
+        $error->render($url);
     }
 
     /**

@@ -27,9 +27,9 @@ namespace SimpleID\Protocols\OpenID;
  */
 class Response extends Message {
 
-    /** Parameter for {@link toIndirectURL()} */
+    /** Parameter for {@link $indirect_component} */
     const OPENID_RESPONSE_QUERY = 0;
-    /** Parameter for {@link toIndirectURL()} */
+    /** Parameter for {@link $indirect_component} */
     const OPENID_RESPONSE_FRAGMENT = 1;
 
     /** @var array an array of fields to be signed */
@@ -40,6 +40,11 @@ class Response extends Message {
      * to be automatically generated.
      */
     protected $extension_autonum = 1;
+
+    /** @var int for indirect communication, where in the URL should the
+     * response be encoded.  This can be one of OPENID_RESPONSE_QUERY
+     * (always in the query string), OPENID_RESPONSE_FRAGMENT (always in the fragment) */
+    protected $indirect_component = self::OPENID_RESPONSE_QUERY;
 
     /**
      * Creates an OpenID response.
@@ -82,7 +87,7 @@ class Response extends Message {
     }
 
     /**
-     * Set a field in the response
+     * Sets a field in the response
      *
      * @param string $field the field to set
      * @param string $value the value
@@ -97,9 +102,58 @@ class Response extends Message {
         if ($signed) $signed_fields[] = $field;
     }
 
-    public function setArray($data) {
+    /**
+     * Sets multiple fields in the response.
+     *
+     * @param array $data the fields and values to set
+     * @param bool|null $signed whether this field should be included in the
+     * signature
+     */
+    public function setArray($data, $signed = NULL) {
         foreach ($data as $key => $value) {
-            $this->set($key, $value);
+            $this->set($key, $value, $signed);
+        }
+    }
+
+    /**
+     * Gets the component to be used in indirect responses.
+     *
+     * @return int the component
+     */
+    public function getIndirectComponent() {
+        return $this->indirect_component;
+    }
+
+    /**
+     * Sets the component to be used in indirect responses.  This should
+     * be either OPENID_RESPONSE_QUERY or OPENID_RESPONSE_FRAGMENT
+     *
+     * @param int $indirect_component the component
+     */
+    public function setIndirectComponent($indirect_component) {
+        $this->indirect_component = $indirect_component;
+    }
+
+    /**
+     * Sends an OpenID assertion response.
+     *
+     * The OpenID specification version 2.0 provides for the sending of assertions
+     * via indirect communication.  However, future versions of the OpenID
+     * specification may provide for sending of assertions via direct communication.
+     *
+     * @param string $indirect_url the URL to which the OpenID response is sent.  If
+     * this is null, the response is sent via direct communication
+     * 
+     */
+    public function render($indirect_url = NULL) {
+        if ($indirect_url) {
+            $f3 = \Base::component();
+
+            $f3->status(303);
+            header('Location: ' . $response->toIndirectURL($indirect_url));
+        } else {
+            header("Content-Type: text/plain");
+            print $response->toDirectMessage();
         }
     }
 
@@ -115,11 +169,11 @@ class Response extends Message {
     /**
      * Encodes the response in application/x-www-form-urlencoded format.
      *
-     * @param array $message the OpenID message to encode
+     * @param string $indirect_url the URL to which the OpenID response is sent.
      * @return string the encoded message
      * @since 0.8
      */
-    public function toIndirectURL($url, $component = self::OPENID_RESPONSE_QUERY) {
+    public function toIndirectURL($url) {
         // 1. Firstly, get the query string
         $query_array = array();
         foreach ($this->container as $key => $value) $query_array['openid.' . $key] = $value;
@@ -143,10 +197,10 @@ class Response extends Message {
         if (isset($parts['port'])) $url .= ':' . $parts['port'];
         if (isset($parts['path'])) $url .= $parts['path'];
         
-        if (($component == self::OPENID_RESPONSE_QUERY) || (strpos($url, '#') === FALSE)) {
+        if (($this->getIndirectComponent() == self::OPENID_RESPONSE_QUERY) || (strpos($url, '#') === FALSE)) {
             $url .= '?' . ((isset($parts['query'])) ? $parts['query'] . '&' : '') . $query;
             if (isset($parts['fragment'])) $url .= '#' . $parts['fragment'];
-        } elseif ($component == self::OPENID_RESPONSE_FRAGMENT) {
+        } elseif ($this->getIndirectComponent() == self::OPENID_RESPONSE_FRAGMENT) {
             // In theory $parts['fragment'] should be an empty string, but the
             // current draft specification does not prohibit putting other things
             // in the fragment.
