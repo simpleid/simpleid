@@ -102,6 +102,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
 
         $secret = new BigNum($params['secret'], 256);
         $code = strtr($secret->val(32), '0123456789abcdefghijklmnopqrstuv', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567');
+        $code = str_repeat('A', 16 - strlen($code)) . $code;
         for ($i = 0; $i < strlen($code); $i += 4) {
             $this->f3->set('secret' . ($i + 1), substr($code, $i, 4));
         }
