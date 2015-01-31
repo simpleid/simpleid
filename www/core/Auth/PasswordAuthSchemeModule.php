@@ -51,6 +51,7 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
 
             $this->f3->set('name_label', $this->t('User name:'));
             $this->f3->set('pass_label', $this->t('Password:'));
+            $this->f3->set('login_form_module', 'password');
 
             return array(
                 array(
