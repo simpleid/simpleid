@@ -1,13 +1,3 @@
-/*
- * SimpleID
- *
- * Copyright (C) Kelvin Mo 2009
- *
- * This program is licensed under the GPL.
- * 
- * $Id$
- */
-
 $(document).ready(function() {
     $('input#edit-cancel').click(function() {
         window.close();
