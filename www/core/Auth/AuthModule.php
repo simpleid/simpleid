@@ -82,7 +82,11 @@ class AuthModule extends Module {
         $this->checkHttps('error', true);
 
         if (($this->f3->exists('POST.fs') === false)) {
-            $this->loginForm($params);
+            $form_state = array('mode' => AuthManager::MODE_CREDENTIALS);
+            if (in_array($this->f3->get('GET.mode'), array(AuthManager::MODE_VERIFY, AuthManager::MODE_REENTER_CREDENTIALS))) {
+                $form_state['mode'] = $this->f3->get('GET.mode');
+            }
+            $this->loginForm($params, $form_state);
             return;
         }
 
@@ -112,10 +116,10 @@ class AuthModule extends Module {
         }
 
         if ($this->f3->exists('POST.op') && $this->f3->get('POST.op') == $this->t('Cancel')) {
-            $results = $this->mgr->invokeAll('cancelAuthentication', $form_state);
+            $results = $this->mgr->invokeAll('loginFormCancelled', $form_state);
             
             if (!array_reduce($results, function($overall, $result) { return ($result) ? true : $overall; }, false)) {
-                $this->fatalError($this->t('Login cancelled without a proper OpenID request.'));
+                $this->fatalError($this->t('Login cancelled without a proper request.'));
             }
             return;
         }
@@ -220,7 +224,7 @@ class AuthModule extends Module {
                 $this->f3->set('title', $this->t('Verify'));
         }
 
-        if (isset($form_state['cancellable'])) {
+        if (isset($form_state['cancel'])) {
             $this->f3->set('cancellable', true);
             $this->f3->set('cancel_button', t('Cancel'));
         }

@@ -20,13 +20,6 @@
  * 
  */
 
-/**
- * SimpleID processing for OpenID versions 1 and 2.
- *
- * @package simpleid
- * @filesource
- */
-
 namespace SimpleID\Protocols\OpenID;
 
 use Psr\Log\LogLevel;
@@ -42,9 +35,10 @@ class OpenIDModule extends Module {
     const CHECKID_OK = 127;
     const CHECKID_RETURN_TO_SUSPECT = 3;
     const CHECKID_APPROVAL_REQUIRED = 2;
-    const CHECKID_LOGIN_REQUIRED = -1;
-    const CHECKID_IDENTITIES_NOT_MATCHING = -2;
-    const CHECKID_IDENTITY_NOT_EXIST = -3;
+    const CHECKID_REENTER_CREDENTIALS = -1;
+    const CHECKID_LOGIN_REQUIRED = -2;
+    const CHECKID_IDENTITIES_NOT_MATCHING = -3;
+    const CHECKID_IDENTITY_NOT_EXIST = -4;
     const CHECKID_PROTOCOL_ERROR = -127;
 
     /** Constant for the XRDS service type for return_to verification */
@@ -312,18 +306,22 @@ class OpenIDModule extends Module {
                 $response = $this->signResponse($response, isset($request['openid.assoc_handle']) ? $request['openid.assoc_handle'] : NULL);
                 $this->renderResponse($response, $request['openid.return_to']);
                 break;
+            case self::CHECKID_REENTER_CREDENTIALS:
             case self::CHECKID_LOGIN_REQUIRED:
-                $this->logger->log(LogLevel::INFO, 'CHECKID_LOGIN_REQUIRED');
+                $this->logger->log(LogLevel::INFO, 'CHECKID_REENTER_CREDENTIALS | CHECKID_LOGIN_REQUIRED');
                 if ($immediate) {
-                    $response = $this->createLoginRequiredResponse($request);
+                    $response = $this->createLoginRequiredResponse($request, $result);
                     $this->renderResponse($response, $request['openid.return_to']);
                 } else {
                     $token = new SecurityToken();
                     $state = array('rq' => $request->toArray());
+                    $form_state = array('cancel' => 'openid', 'rq' => $request->toArray());
+                    if ($result == self::CHECKID_REENTER_CREDENTIALS) $form_state['mode'] = AuthManager::MODE_REENTER_CREDENTIALS;
+
                     $auth_module = $this->mgr->getModule('SimpleID\Auth\AuthModule');
                     $auth_module->loginForm(array(
                         'destination' => 'continue/' . rawurlencode($token->generate($state))
-                    ));
+                    ), array('mode' => AuthManager::MODE_CREDENTIALS));
                     exit;
                 }
                 break;
@@ -536,7 +534,7 @@ class OpenIDModule extends Module {
      * @link http://openid.net/specs/openid-authentication-1_1.html#anchor17, http://openid.net/specs/openid-authentication-1_1.html#anchor23, http://openid.net/specs/openid-authentication-2_0.html#negative_assertions
      * @subpackage openid2
      */
-    protected function createLoginRequiredResponse($request) {
+    protected function createLoginRequiredResponse($request, $result = self::CHECKID_LOGIN_REQUIRED) {
         $response = new Response($request);
 
         if ($request->getVersion() == Message::OPENID_VERSION_2) {
@@ -544,10 +542,11 @@ class OpenIDModule extends Module {
         } else {
             $token = new SecurityToken();
             $state = array('rq' => $request->toArray());
+            $query = ($result == self::CHECKID_REENTER_CREDENTIALS) ? 'mode=' . AuthManager::MODE_REENTER_CREDENTIALS : '';
 
             $response->setArray(array(
                 'mode' => 'id_res',
-                'user_setup_url' => $this->getCanonicalURL('auth/login/continue/' . rawurlencode($token->generate($state)))
+                'user_setup_url' => $this->getCanonicalURL('auth/login/continue/' . rawurlencode($token->generate($state)), $query)
             ));
         }
         
@@ -822,7 +821,7 @@ class OpenIDModule extends Module {
         if ($return_to == null) $return_to = $request['openid.return_to'];
     
         if ($this->f3->get('POST.op') == $this->t('Cancel')) {
-            $response = $this->createErrorResponse(false);
+            $response = $this->createErrorResponse($request, false);
             if (!$return_to) $this->f3->set('message', $this->t('Log in cancelled.'));
         } else {
             $now = time();
@@ -862,16 +861,21 @@ class OpenIDModule extends Module {
         }
     }
 
-
-    function cancelAuthenticationHook($form_state) {
-        // TODO convert state
-        // PARAMS.continue
-        
-        if (isset($request['openid.return_to'])) {
-            $return_to = $request['openid.return_to'];
-            $response = $this->createErrorResponse($request, FALSE);
-            $this->renderResponse($response, $return_to);
-            return true;
+    /**
+     * Processes a cancellation from the login form.
+     *
+     * @param array $form_state the form state
+     * @return bool|null
+     */
+    public function loginFormCancelled($form_state) {
+        if ($form_state['cancel'] == 'openid') {
+            $request = new Request($form_state['rq']);
+            if (isset($request['openid.return_to'])) {
+                $return_to = $request['openid.return_to'];
+                $response = $this->createErrorResponse($request, FALSE);
+                $this->renderResponse($response, $return_to);
+                return true;
+            }
         }
     }
 

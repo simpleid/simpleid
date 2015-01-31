@@ -4,7 +4,7 @@
 </div>
 </check>
 
-<form action="{{ @base_path }}auth/login/{{ @@PARAMS.destination }}" method="post" enctype="application/x-www-form-urlencoded" id="login-form">
+<form action="{{ @base_path }}auth/login/{{ @@destination }}" method="post" enctype="application/x-www-form-urlencoded" id="login-form">
     <input type="hidden" name="fs" value="{{ @@fs }}">
     <input type="hidden" name="tk" value="{{ @@tk }}">
 

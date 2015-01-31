@@ -78,6 +78,22 @@ abstract class AuthHooks {
     abstract function loginFormSubmitHook(&$form_state);
 
     /**
+     * Processes a login form where the user has cancelled login.
+     *
+     * <code>$form_state</code> contains the same elements as per the
+     * <code>loginForm</code> hook.
+     *
+     * This function should return one of the following:
+     *
+     * - null if the hook is skipping processing to another module
+     * - true if the hook has processed the hook
+     *
+     * @param array $form_state the form state
+     * @return bool|null the result of the processing
+     */
+    abstract function loginFormCancelled($form_state);
+
+    /**
      * Logs in a user.
      *
      * This hook is triggered when all the authentication components are completed.
