@@ -40,17 +40,9 @@ class PAPEOpenIDExtensionModule extends Module {
 
     /** Namespaces for PAPE policies */
     const PAPE_POLICY_NONE = 'http://schemas.openid.net/pape/policies/2007/06/none';
-    const PAPE_POLICY_PPID = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/privatepersonalidentifier';
 
     /** Namespaces for PAPE levels */
     const PAPE_LEVEL_NIST800_63 = 'http://csrc.nist.gov/publications/nistpubs/800-63/SP800-63V1_0_2.pdf';
-
-    /** @var bool true if there is no identifier in the current authentication request */
-    private $identifier_select = false;
-
-    static function routes($f3) {
-        $f3->route('GET /openid/ppid/@ppid', 'SimpleID\Protocols\OpenID\Extensions\PAPEOpenIDExtensionModule->ppidPage');
-    }
 
     /**
      * Returns the support for PAPE in SimpleID XRDS document
@@ -61,7 +53,6 @@ class PAPEOpenIDExtensionModule extends Module {
     public function xrdsTypesHook() {
         return array(
             self::OPENID_NS_PAPE,
-            self::PAPE_POLICY_PPID,
             self::PAPE_LEVEL_NIST800_63
         );
     }
@@ -105,7 +96,7 @@ class PAPEOpenIDExtensionModule extends Module {
     /**
      * @see hook_response()
      */
-    function openIDResponseHook($assertion, $request, $response) {
+    public function openIDResponseHook($assertion, $request, $response) {
         $auth = AuthManager::instance();
         
         // We only deal with positive assertions
@@ -132,75 +123,8 @@ class PAPEOpenIDExtensionModule extends Module {
         $response[$alias . '.auth_level.ns.nist'] = self::PAPE_LEVEL_NIST800_63;
         $response[$alias . '.auth_level.nist'] = 0;
         
-        // The default is that we don't apply any authentication policies. This can be changed later in the
-        // function
+        // The default is that we don't apply any authentication policies.
         $response[$alias . '.auth_policies'] = self::PAPE_POLICY_NONE;
-
-        // Now we go through the authentication policies
-        if (isset($pape_request['preferred_auth_policies'])) {
-            $policies = preg_split('/\s+/', $pape_request['preferred_auth_policies']);
-            
-            if (in_array(self::PAPE_POLICY_PPID, $policies)) {
-                // We want a ppid.  Check that the authentication request is correct
-                if ($this->identifier_select) {
-                    $realm = $request->getRealm();
-                    $identity = $request['openid.identity'];
-                    
-                    $ppid = $this->generatePPID($identity, $realm);
-                    $response['claimed_id'] = $ppid;
-                    $response['identity'] = $ppid;
-                }
-            }
-        }
-    }
-
-    /**
-     * Generates a private personal identifier (PPID).  The PPID is an opaque identifier
-     * for a particular user-RP pair
-     *
-     * @param string $identity the identity of the user
-     * @param string $realm the URL of the relying party
-     * @return string the PPID
-     */
-    function generatePPID($identity, $realm) {
-        $opaque = new OpaqueIdentifier();
-        
-        $parts = parse_url($realm);
-        $host = $parts['host'];
-        if (strstr($host, 'www.') === 0) $host = substr($host, 4);
-        
-        return $this->getCanonicalURL('openid/ppid/' . $opaque->generate($identity, array('aud' => $host)));
-    }
-
-    /**
-     * Returns the public page for a private personal ID.
-     *
-     * @param string $ppid the PPID
-     */
-    function ppidPage($f3, $params) {
-        $web = \Web::instance();
-
-        $ppid = $params['ppid'];
-        
-        header('Vary: Accept');
-                
-        $content_type = $web->acceptable(array('text/html', 'application/xml', 'application/xhtml+xml', 'application/xrds+xml'));
-                
-        if (($content_type == 'application/xrds+xml') || ($this->f3->get('GET.format') == 'xrds')) {
-            header('Content-Type: application/xrds+xml');
-            header('Content-Disposition: inline; filename=yadis.xml');
-        
-            $tpl = new \Template();
-            print $tpl->render('openid_user_xrds.xml', 'application/xrds+xml');
-            return;
-        } else {
-            header('X-XRDS-Location: ' . $this->getCanonicalURL('openid/ppid/' . rawurlencode($ppid), 'format=xrds'));
-                    
-            $this->f3->set('title', $this->t('Private Personal Identifier'));
-            $this->f3->set('message', $this->t('This is a private personal identifier.'));
-            $tpl = new \Template();
-            print $tpl->render('page.html');
-        }   
     }
 }
 
