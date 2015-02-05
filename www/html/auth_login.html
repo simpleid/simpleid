@@ -19,8 +19,12 @@
 </form>
 
 <script type="text/javascript">
+(function ($) {
     $(document).ready(function() {
         if (!$('.login-security').is('.allow-autocomplete')) $('.credentials').attr('autocomplete', 'off');
+        $('#login-form').submit(function() {
+            $('#edit-submit').prop('disabled', true);
+        });
         
         var focus = new Array();
         $('input[data-focus-weight]').each(function() {
@@ -34,4 +38,5 @@
         });
         $(focus[0].el).focus();
     });
+)(jQuery);
 </script>
