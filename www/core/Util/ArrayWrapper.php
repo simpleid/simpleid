@@ -28,9 +28,13 @@ use \ArrayAccess;
  * An abstract class implementing the ArrayAccess interface.
  * This allows arrays to be decorated with methods.
  */
-abstract class ArrayWrapper implements ArrayAccess {
+class ArrayWrapper implements ArrayAccess {
     /** @var array the underlying array */
     protected $container = array();
+
+    public function __construct($container = array()) {
+        $this->container = $container;
+    }
 
     /**
      * Returns this object as an array.
@@ -119,12 +123,18 @@ abstract class ArrayWrapper implements ArrayAccess {
         if (!$this->pathExists($path)) return;
 
         $parts = $this->pathSplit($path);
+
+        if (count($parts) == 1) {
+            unset($this->container[$path]);
+            return;
+        }
+
         $key = array_pop($parts);
         if (array_pop($parts) == '->') {
-            $ref = &$this->pathRefLimit($path, true, 2); //var_dump($ref);
+            $ref = &$this->pathRefLimit($path, true, 2);
             unset($ref->$key);
         } else {
-            $ref = &$this->pathRefLimit($path, true, 1); //var_dump($ref);
+            $ref = &$this->pathRefLimit($path, true, 1);
             unset($ref[$key]);
         }
     }
