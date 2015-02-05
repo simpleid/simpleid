@@ -403,7 +403,7 @@ class OpenIDModule extends Module {
         }
         
         // Check 3: Discover the realm and match its return_to
-        $client_prefs = (isset($user['clients'][$realm])) ? $user['clients'][$realm] : NULL;
+        $client_prefs = (isset($user->clients[$realm])) ? $user->clients[$realm] : NULL;
 
         if (($request->getVersion() == Message::OPENID_VERSION_2) && $config['openid_verify_return_url']) {
             $verified = FALSE;
@@ -450,8 +450,9 @@ class OpenIDModule extends Module {
             $final_assertion_result = min($assertion_results);
             
             if ($final_assertion_result == self::CHECKID_OK) {
-                $user['clients'][$realm]['last_time'] = time();
-                //user_save($user);
+                if (!isset($user->clients[$realm])) $user->clients[$realm] = array();
+                $user->clients[$realm]['last_time'] = time();
+                $store->saveUser($user);
             }
             
             return $final_assertion_result;
@@ -744,9 +745,6 @@ class OpenIDModule extends Module {
         } else {
             $base_path = $this->f3->get('base_path');
             
-            // $user is an object, not an array, and so one cannot modify multi-dimensional
-            // arrays
-            $user_clients = isset($user['clients']) ? $user['clients'] : array();
             $form_state['prefs'] = (isset($user_clients[$realm])) ? $user_clients[$realm] : array();
             
             $forms = $this->mgr->invokeAll('openIDConsentForm', $form_state);
@@ -827,12 +825,8 @@ class OpenIDModule extends Module {
             $now = time();
             $realm = $request->getRealm();
 
-            // $user is an object, not an array, and so one cannot modify multi-dimensional
-            // arrays
-            $user_clients = isset($user['clients']) ? $user['clients'] : array();
-            
-            if (isset($user_clients[$realm])) {
-                $prefs = $user_clients[$realm];
+            if (isset($user->clients[$realm])) {
+                $prefs = $user->clients[$realm];
             } else {
                 $prefs = array(
                     'openid' => array(
@@ -846,8 +840,7 @@ class OpenIDModule extends Module {
             $prefs['consents']['openid'] = ($this->f3->exists('POST.prefs.consents.openid') && ($this->f3->exists('POST.prefs.consents.openid') == 'true'));
             $this->mgr->invokeRefAll('openIDConsentFormSubmit', $form_state);
             
-            $user_clients[$realm] = $prefs;
-            $user['clients'] = $user_clients;
+            $user->clients[$realm] = $prefs;
             $store->saveUser($user);
             
             $this->signResponse($response, isset($response['assoc_handle']) ? $response['assoc_handle'] : NULL);

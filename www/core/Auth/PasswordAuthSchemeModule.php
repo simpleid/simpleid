@@ -145,6 +145,9 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
         }
     }
 
+    public function secretUserDataPathsHook() {
+        return array('password.password');
+    }
 }
 
 if (!function_exists('hash_pbkdf2') && function_exists('hash_hmac')) {

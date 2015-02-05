@@ -25,6 +25,7 @@ namespace SimpleID\Auth;
 use \Base;
 use \Cache;
 use \Prefab;
+use \Web\Geo;
 use Psr\Log\LogLevel;
 use SimpleID\ModuleManager;
 use SimpleID\Store\StoreManager;
@@ -183,22 +184,18 @@ class AuthManager extends Prefab {
         }
 
         if ($level > self::AUTH_LEVEL_AUTO) {
-            // $user is an object, not an array, and so one cannot modify multi-dimensional
-            // arrays
             $uaid = $this->assignUAID();
-            $user_auth = (isset($user['auth'])) ? $user['auth'] : array();
 
-            if (!isset($user_auth[$uaid])) $user_auth[$uaid] = array();            
-            $user_auth[$uaid]['level'] = $level;
-            $user_auth[$uaid]['modules'] = $modules;
-            $user_auth[$uaid]['time'] = $_SESSION['auth']['time'];
-            if ($this->f3->exists('IP')) $user_auth[$uaid]['remote'] = $this->f3->get('IP');
-            if ($this->f3->exists('HEADERS.User-Agent')) $user_auth[$uaid]['ua'] = $this->f3->get('HEADERS.User-Agent');
+            $user->auth[$uaid]['type'] = 'browser';
+            $user->auth[$uaid]['level'] = $level;
+            $user->auth[$uaid]['modules'] = $modules;
+            $user->auth[$uaid]['time'] = $_SESSION['auth']['time'];
+            if ($this->f3->exists('IP')) $user->auth[$uaid]['remote'] = $this->f3->get('IP');
+            if ($this->f3->exists('HEADERS.User-Agent')) $user->auth[$uaid]['ua'] = $this->f3->get('HEADERS.User-Agent');
 
-            $user['auth'] = $user_auth;
             $store->saveUser($user);
         
-            $this->logger->log(LogLevel::INFO, 'Login successful: ' . $user['uid'] . '['. gmstrftime('%Y-%m-%dT%H:%M:%SZ', $user['auth_time']) . ']');
+            $this->logger->log(LogLevel::INFO, 'Login successful: ' . $user['uid'] . ' ['. gmstrftime('%Y-%m-%dT%H:%M:%SZ', $user->auth[$uaid]['time']) . ']');
         }
 
         $this->mgr->invokeAll('login', $user, $level, $modules, $form_state);
@@ -242,10 +239,10 @@ class AuthManager extends Prefab {
      *
      * @return string the UAID
      */
-    public function assignUAID() {
+    public function assignUAID($reset = false) {
         $name = 'COOKIE.' . $this->getCookieName('uaid');
 
-        if ($this->f3->exists($name) === true) return $this->f3->get($name);
+        if (($this->f3->exists($name) === true) && !$reset) return $this->f3->get($name);
 
         $rand = new Random();
         $uaid = $rand->id();
@@ -282,6 +279,10 @@ class AuthManager extends Prefab {
             self::$cookie_prefix = substr($opaque->generate('cookie'), -9) . '_';
         }
         return self::$cookie_prefix . $suffix;
+    }
+
+    public function toString() {
+        return print_r($this->auth_info, true);
     }
 }
 

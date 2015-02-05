@@ -177,8 +177,9 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             $test_user = $store->loadUser($form_state['uid']);
             if (!isset($test_user['otp'])) return;
             if ($test_user['otp']['type'] == 'recovery') return;
+
             $uaid = $auth->assignUAID();
-            if (in_array($uaid, $test_user['otp']['remember'])) return;
+            if (isset($user->auth[$uaid]) && isset($user->auth[$uaid]['otp']) && $user->auth[$uaid]['otp']['remember']) return;
 
             $tpl = new \Template();
 
@@ -241,11 +242,11 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
         if (($level >= AuthManager::AUTH_LEVEL_VERIFIED) && isset($form_state['otp_remember']) && ($form_state['otp_remember'] == 1)) {
             $uaid = $auth->assignUAID();
 
-            // $user is an object, not an array, and so one cannot modify multi-dimensional
-            // arrays
-            $user_otp = $user['otp'];
-            $user_otp['remember'][] = $uaid;
-            $user['otp'] = $user_otp;
+            if (!isset($user->auth[$uaid])) $user->auth[$uaid] = array();
+            if (!isset($user->auth[$uaid]['otp'])) $user->auth[$uaid]['otp'] = array();
+            
+            $user->auth[$uaid]['otp']['remember'] = true;
+
             $store->saveUser($user);
         }
     }
@@ -347,5 +348,8 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
         return $code % pow(10, $digits);
     }
 
+    public function secretUserDataPathsHook() {
+        return array('otp.secret', 'otp.drift');
+    }
 }
 ?>
