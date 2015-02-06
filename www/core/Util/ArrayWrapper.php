@@ -37,6 +37,17 @@ class ArrayWrapper implements ArrayAccess {
     }
 
     /**
+     * Loads data from an array, replacing existing data.
+     *
+     * This data is typically read from another source
+     *
+     * @param array $data the data
+     */
+    public function loadData($data) {
+        $this->container = array_replace_recursive($this->container, $data);
+    }
+
+    /**
      * Returns this object as an array.
      *
      * @return array

@@ -29,11 +29,16 @@ use SimpleID\Store\Storable;
 use SimpleID\Util\ArrayWrapper;
 use SimpleID\Base\UserModule;
 
+/**
+ * Represents a SimpleID user
+ */
 class User extends ArrayWrapper implements Serializable, Storable {
+
+    const ACTIVITY_LOG_SIZE = 10;
 
     protected $uid;
 
-    public $auth = array();
+    protected $activities = array();
 
     public $clients = array();
 
@@ -41,18 +46,30 @@ class User extends ArrayWrapper implements Serializable, Storable {
         parent::__construct($data);
     }
 
-    public function loadData($data) {
-        $this->container = array_replace_recursive($this->container, $data);
-    }
-
+    /**
+     * Determines whether the user has a local OpenID identity
+     *
+     * @return bool true if the user has a local OpenID identity
+     */
     public function hasLocalOpenIDIdentity() {
         return isset($this->container['openid']['identity']);
     }
 
+    /**
+     * Returns the user's local OpenID identity
+     *
+     * @return string the user's local OpenID identity
+     */
     public function getLocalOpenIDIdentity() {
         return ($this->hasLocalOpenIDIdentity()) ? $this->container['openid']['identity'] : null;
     }
 
+    /**
+     * Returns a display name for the user.  The display name is worked
+     * out based on the data available.
+     *
+     * @return string the display name
+     */
     public function getDisplayName() {
         if (isset($this->container['userinfo']['name'])) return $this->container['userinfo']['name'];
         if (isset($this->container['userinfo']['given_name']) && isset($this->container['userinfo']['family_name']))
@@ -60,6 +77,23 @@ class User extends ArrayWrapper implements Serializable, Storable {
         return $this->uid;
     }
 
+    public function addActivity($id, $data) {
+        $this->activities[$id] = $data;
+        uasort($this->activities, function($a, $b) {
+            if ($a['time'] == $b['time']) { return 0; } return ($a['time'] < $b['time']) ? 1 : -1;
+        });
+        if (count($this->activities) > self::ACTIVITY_LOG_SIZE) {
+            $this->activities = array_slice($this->activities, 0, self::ACTIVITY_LOG_SIZE);
+        }
+    }
+
+    public function getActivities() {
+        return $this->activities;
+    }
+
+    /**
+     * Implementation of ArrayAccess
+     */
     public function offsetSet($offset, $value) {
         switch ($offset) {
             case 'uid':
@@ -125,6 +159,9 @@ class User extends ArrayWrapper implements Serializable, Storable {
         return $copy->toArray();        
     }
 
+    /**
+     * Implementation of Serializable
+     */
     public function serialize() {
         $f3 = Base::instance();
 
@@ -140,6 +177,9 @@ class User extends ArrayWrapper implements Serializable, Storable {
         return $f3->serialize($result);
     }
 
+    /**
+     * Implementation of Serializable
+     */
     public function unserialize($data) {
         $f3 = Base::instance();
 
@@ -149,14 +189,31 @@ class User extends ArrayWrapper implements Serializable, Storable {
         }
     }
 
+    /**
+     * Implementation of Storable
+     */
     public function getStoreType() {
         return 'user';
     }
 
+    /**
+     * Implementation of Storable
+     */
     public function getStoreID() {
         return $this->uid;
     }
 
+    /**
+     * Implementation of Storable
+     */
+    public function setStoreID($id) {
+        $this->uid = $id;
+    }
+
+    /**
+     * Returns a string representation of the user, with sensitive
+     * information removed.
+     */
     public function toString() {
         $result = array();
         foreach (get_object_vars($this) as $var => $value) {
