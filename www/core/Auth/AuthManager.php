@@ -97,13 +97,6 @@ class AuthManager extends Prefab {
             $store = StoreManager::instance();
             $user = $store->loadUser($this->auth_info['uid']);
             $this->f3->set('user', $user);
-        
-            // If user has just been actively been authenticated in the previous request, then we
-            // make it as actively authenticated in this request.
-            $this->auth_info['level'] = $this->auth_info['next_level'];
-            $this->auth_info['next_level'] = self::AUTH_LEVEL_SESSION;
-
-            $_SESSION['auth'] = $this->auth_info;
         } elseif ($auto_auth) {
             $modules = $this->mgr->getModules();
 
@@ -172,7 +165,7 @@ class AuthManager extends Prefab {
         $this->f3->set('user', $user);
 
         $this->auth_info['uid'] = $user['uid'];
-        $this->auth_info['level'] = $this->auth_info['next_level'] = $level;
+        $this->auth_info['level'] = $level;
         $this->auth_info['modules'] = $modules;
         $this->auth_info['time'] = time();
 
@@ -184,18 +177,21 @@ class AuthManager extends Prefab {
         }
 
         if ($level > self::AUTH_LEVEL_AUTO) {
-            $uaid = $this->assignUAID();
+            if (!isset($form_state['auth_skip_activity'])) {
+                $activity = array(
+                    'type' => 'browser',
+                    'level' => $level,
+                    'modules' => $modules,
+                    'time' => $_SESSION['auth']['time'],
+                );
+                if ($this->f3->exists('IP')) $activity['remote'] = $this->f3->get('IP');
+                if ($this->f3->exists('HEADERS.User-Agent')) $activity['ua'] = $this->f3->get('HEADERS.User-Agent');
 
-            $user->auth[$uaid]['type'] = 'browser';
-            $user->auth[$uaid]['level'] = $level;
-            $user->auth[$uaid]['modules'] = $modules;
-            $user->auth[$uaid]['time'] = $_SESSION['auth']['time'];
-            if ($this->f3->exists('IP')) $user->auth[$uaid]['remote'] = $this->f3->get('IP');
-            if ($this->f3->exists('HEADERS.User-Agent')) $user->auth[$uaid]['ua'] = $this->f3->get('HEADERS.User-Agent');
-
-            $store->saveUser($user);
+                $user->addActivity($this->assignUAID();, $activity);
+                $store->saveUser($user);
+            }
         
-            $this->logger->log(LogLevel::INFO, 'Login successful: ' . $user['uid'] . ' ['. gmstrftime('%Y-%m-%dT%H:%M:%SZ', $user->auth[$uaid]['time']) . ']');
+            $this->logger->log(LogLevel::INFO, 'Login successful: ' . $user['uid'] . ' ['. gmstrftime('%Y-%m-%dT%H:%M:%SZ', $activity['time']) . ']');
         }
 
         $this->mgr->invokeAll('login', $user, $level, $modules, $form_state);
