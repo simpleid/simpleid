@@ -147,13 +147,13 @@ class Response extends Message {
      */
     public function render($indirect_url = NULL) {
         if ($indirect_url) {
-            $f3 = \Base::component();
+            $f3 = \Base::instance();
 
             $f3->status(303);
-            header('Location: ' . $response->toIndirectURL($indirect_url));
+            header('Location: ' . $this->toIndirectURL($indirect_url));
         } else {
             header("Content-Type: text/plain");
-            print $response->toDirectMessage();
+            print $this->toDirectMessage();
         }
     }
 
