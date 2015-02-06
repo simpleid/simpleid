@@ -30,6 +30,9 @@ use SimpleID\ModuleManager;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
 
+/**
+ * The module for authentication under OpenID version 1.1 and 2.0
+ */
 class OpenIDModule extends Module {
 
     const CHECKID_OK = 127;
@@ -59,7 +62,7 @@ class OpenIDModule extends Module {
         $this->mgr = ModuleManager::instance();
     }
 
-    function indexHook($_request) {
+    public function indexHook($_request) {
         $web = \Web::instance();
 
         $content_type = $web->acceptable(array('text/html', 'application/xml', 'application/xhtml+xml', 'application/xrds+xml'));
@@ -89,9 +92,8 @@ class OpenIDModule extends Module {
      * variable.
      *
      * @param Request $request the OpenID request
-     * @subpackage openid2
      */
-    function start($request) {
+    public function start($request) {
         switch ($request['openid.mode']) {
             case 'associate':
                 $this->associate($request);
@@ -128,8 +130,6 @@ class OpenIDModule extends Module {
      *
      * @param Request $request the OpenID request
      * @link http://openid.net/specs/openid-authentication-1_1.html#mode_associate, http://openid.net/specs/openid-authentication-2_0.html#associations
-     * @subpackage openid2
-     *
      */
     protected function associate($request) {
         $this->logger->log(LogLevel::DEBUG, 'SimpleID\Protocols\OpenID\OpenIDModule->associate');
@@ -216,8 +216,6 @@ class OpenIDModule extends Module {
      * assertion.
      *
      * @param Request $request the OpenID request
-     * @subpackage openid2
-     *
      */
     public function checkid($request) {      
         $immediate = ($request['openid.mode'] == 'checkid_immediate');
@@ -265,7 +263,7 @@ class OpenIDModule extends Module {
         
         if (isset($request['openid.identity'])) {
             // Standard request
-            $this->logger->log(LogLevel::DEBUG, 'openid.identity found, use simpleid_checkid_identity');
+            $this->logger->log(LogLevel::DEBUG, 'openid.identity found, use openIDCheckIdentity');
             $result = $this->openIDCheckIdentity($request, $immediate);
         } else {
             $this->logger->log(LogLevel::DEBUG, 'openid.identity not found, trying extensions');
@@ -321,7 +319,7 @@ class OpenIDModule extends Module {
                     $auth_module = $this->mgr->getModule('SimpleID\Auth\AuthModule');
                     $auth_module->loginForm(array(
                         'destination' => 'continue/' . rawurlencode($token->generate($state))
-                    ), array('mode' => AuthManager::MODE_CREDENTIALS));
+                    ), array('mode' => AuthManager::MODE_CREDENTIALS, 'auth_skip_activity' => true));
                     exit;
                 }
                 break;
@@ -352,13 +350,10 @@ class OpenIDModule extends Module {
      * Checks whether the current user logged into SimpleID matches the identity
      * supplied in an OpenID request.
      *
-     * @param array &$request the OpenID request
+     * @param Request $request the OpenID request
      * @param bool $immediate whether checkid_immediate was used
      * @return int one of CHECKID_OK, CHECKID_APPROVAL_REQUIRED, CHECKID_RETURN_TO_SUSPECT, CHECKID_IDENTITY_NOT_EXIST,
      * CHECKID_IDENTITIES_NOT_MATCHING, CHECKID_LOGIN_REQUIRED or CHECKID_PROTOCOL_ERROR
-     * @global array the current logged in user
-     * @global float the OpenID version
-     * @subpackage openid2
      */
     protected function openIDCheckIdentity($request, $immediate) {
         $auth = AuthManager::instance();
@@ -468,7 +463,6 @@ class OpenIDModule extends Module {
      * @param Request $request the OpenID request
      * @return Response an OpenID response with a positive assertion
      * @link http://openid.net/specs/openid-authentication-1_1.html#anchor17, http://openid.net/specs/openid-authentication-1_1.html#anchor23, http://openid.net/specs/openid-authentication-2_0.html#positive_assertions
-     * @subpackage openid2
      */
     protected function createOKResponse($request) {
         $rand = new Random();
@@ -502,7 +496,6 @@ class OpenIDModule extends Module {
      * @param Request $request the OpenID request
      * @return Response an OpenID response with a negative assertion
      * @link http://openid.net/specs/openid-authentication-1_1.html#anchor17, http://openid.net/specs/openid-authentication-1_1.html#anchor23, http://openid.net/specs/openid-authentication-2_0.html#negative_assertions
-     * @subpackage openid2
      */
     protected function createApprovalRequiredResponse($request) {
         $response = new Response($request);
@@ -533,7 +526,6 @@ class OpenIDModule extends Module {
      * @param Request $request the OpenID request
      * @return Response an OpenID response with a negative assertion
      * @link http://openid.net/specs/openid-authentication-1_1.html#anchor17, http://openid.net/specs/openid-authentication-1_1.html#anchor23, http://openid.net/specs/openid-authentication-2_0.html#negative_assertions
-     * @subpackage openid2
      */
     protected function createLoginRequiredResponse($request, $result = self::CHECKID_LOGIN_REQUIRED) {
         $response = new Response($request);
@@ -567,7 +559,6 @@ class OpenIDModule extends Module {
      * @param bool $immediate true if openid.mode of the request was checkid_immediate
      * @return Response an OpenID response with a negative assertion
      * @link http://openid.net/specs/openid-authentication-1_1.html#anchor17, http://openid.net/specs/openid-authentication-1_1.html#anchor23, http://openid.net/specs/openid-authentication-2_0.html#negative_assertions
-     * @subpackage openid2
      */
     protected function createErrorResponse($request, $immediate = false) {
         $response = new Response($request);
@@ -597,8 +588,6 @@ class OpenIDModule extends Module {
      * for the signature.  If $assoc_handle is not specified, a private association
      * is created
      * @return Response the signed OpenID response
-     * @subpackage openid2
-     *
      */
     protected function signResponse($response, $assoc_handle = NULL) {
         $cache = \Cache::instance();
@@ -640,8 +629,6 @@ class OpenIDModule extends Module {
      *
      * @param Request $request the OpenID request
      * @see http://openid.net/specs/openid-authentication-1_1.html#mode_check_authentication, http://openid.net/specs/openid-authentication-2_0.html#verifying_signatures
-     * @subpackage openid2
-     * 
      */
     protected function check_authentication($request) {
         $this->logger->log(LogLevel::DEBUG, 'SimpleID\Protocols\OpenID\OpenIDModule->check_authentication');
@@ -664,7 +651,7 @@ class OpenIDModule extends Module {
 
         $this->logger->log(LogLevel::INFO, 'OpenID direct verification response', $response->toArray());
         
-        $this->renderDirectResponse($response);
+        $response->render();
     }
 
     /**
@@ -673,7 +660,6 @@ class OpenIDModule extends Module {
      * @param Request $request the OpenID request/response
      * @return bool true if the signature is verified
      * @since 0.8
-     * @subpackage openid2
      */
     protected function verifySignatures($request) {
         $cache = \Cache::instance();
@@ -718,15 +704,13 @@ class OpenIDModule extends Module {
      * {@link simpleid_checkid_identity()} function returns a CHECKID_IDENTITIES_NOT_MATCHING
      * or CHECKID_IDENTITY_NOT_EXIST
      *
-     * @param array $request the original OpenID request
-     * @param array $response the proposed OpenID response, subject to user
+     * @param Request $request the original OpenID request
+     * @param Response $response the proposed OpenID response, subject to user
      * verification
      * @param int $reason either CHECKID_APPROVAL_REQUIRED, CHECKID_RETURN_TO_SUSPECT,
      * CHECKID_IDENTITIES_NOT_MATCHING or CHECKID_IDENTITY_NOT_EXIST
-     * @subpackage openid2
-     *
      */
-    function consentForm($request, $response, $reason = CHECKID_APPROVAL_REQUIRED) {
+    protected function consentForm($request, $response, $reason = CHECKID_APPROVAL_REQUIRED) {
         $tpl = new \Template();
 
         $form_state = array(
@@ -788,8 +772,6 @@ class OpenIDModule extends Module {
      *
      * If the user verifies the relying party, an OpenID response will be sent to
      * the relying party.  Otherwise, the dashboard will be displayed to the user.
-     *
-     * @subpackage openid2
      */
     public function consent() {
         $auth = AuthManager::instance();
@@ -822,6 +804,8 @@ class OpenIDModule extends Module {
             $response = $this->createErrorResponse($request, false);
             if (!$return_to) $this->f3->set('message', $this->t('Log in cancelled.'));
         } else {
+            $this->mgr->invokeRefAll('openIDConsentFormSubmit', $form_state);
+
             $now = time();
             $realm = $request->getRealm();
 
@@ -838,7 +822,7 @@ class OpenIDModule extends Module {
             }
             $prefs['last_time'] = $now;
             $prefs['consents']['openid'] = ($this->f3->exists('POST.prefs.consents.openid') && ($this->f3->exists('POST.prefs.consents.openid') == 'true'));
-            $this->mgr->invokeRefAll('openIDConsentFormSubmit', $form_state);
+            
             
             $user->clients[$realm] = $prefs;
             $store->saveUser($user);
@@ -951,8 +935,6 @@ class OpenIDModule extends Module {
 
     /**
      * Displays the XRDS document for this SimpleID installation.
-     *
-     * @subpackage openid2
      * 
      */
     public function providerXRDS() {
@@ -969,8 +951,6 @@ class OpenIDModule extends Module {
 
     /**
      * Returns the user's public XRDS page.
-     * 
-     * @param string $uid the user ID
      */
     public function userXRDS($f3, $params) {
         $store = StoreManager::instance();
