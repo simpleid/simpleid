@@ -30,31 +30,30 @@ class RelyingParty extends Client {
     // OpenID clients are always dynamic
     protected $dynamic = true;
 
-    protected $realm;
-    protected $services;
-
     public $return_to_verified;
 
     public function __construct($realm) {
-        //parent::__construct();
-        $this->realm = $realm;
+        parent::__construct(array(
+            'openid' => array('realm' => $realm, 'services' => NULL)
+        ));
+        $this->cid = self::buildID($realm);
     }
 
     /**
      * Returns the realm
      */
     public function getRealm() {
-        return $this->realm;
+        return $this->container['openid']['realm'];
     }
 
     public function getServices() {
-        return $this->services;
+        return $this->container['openid']['services'];
     }
 
     public function discover() {
         $discovery = XRDSDiscovery::instance();
-        $url = self::getDiscoveryURL($this->realm);
-        $this->services = $discovery->discover($url);
+        $url = self::getDiscoveryURL($this->getRealm());
+        $this->container['openid']['services'] = $discovery->discover($url);
     }
 
     /**
@@ -69,7 +68,7 @@ class RelyingParty extends Client {
      *
      * @since 0.7
      */
-    public static function getDiscoveryURL($realm) {
+    protected static function getDiscoveryURL($realm) {
         $parts = parse_url($realm);
         $host = strtr($parts['host'], array('*.' => 'www.'));;
         
@@ -85,6 +84,11 @@ class RelyingParty extends Client {
         if (isset($parts['query'])) $url .= '?' . $parts['query'];
         if (isset($parts['fragment'])) $url .= '#' . $parts['fragment'];
         return $url;
+    }
+
+    public static function buildID($realm) {
+        $url = self::getDiscoveryURL($realm);
+        return '_' . trim(strtr(base64_encode(sha1($url, true)), '+/', '-_'), '=') . '.openid';
     }
 
     public function getDisplayName() {

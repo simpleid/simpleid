@@ -131,7 +131,7 @@ class StoreManager extends Prefab {
 
         if ($client == null) return null;
 
-        if (($class_name == null) || (!is_subclass_of($class_name, 'SimpleID\Model\Client')) {
+        if (($class_name == null) || !is_subclass_of($class_name, 'SimpleID\Model\Client')) {
             return $client;
         } else {
             return new $class_name($client->toArray());

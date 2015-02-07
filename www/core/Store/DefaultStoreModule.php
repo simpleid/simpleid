@@ -60,6 +60,8 @@ class DefaultStoreModule extends StoreModule {
      */
     public function exists($type, $id) {
         switch ($type) {
+            case 'client':
+                return $this->hasClient($id);
             case 'user':
                 return $this->hasUser($id);
             default:
@@ -72,6 +74,8 @@ class DefaultStoreModule extends StoreModule {
      */
     public function read($type, $id) {
         switch ($type) {
+            case 'client':
+                return $this->readClient($id);
             case 'user':
                 return $this->readUser($id);
             default:
@@ -84,6 +88,8 @@ class DefaultStoreModule extends StoreModule {
      */
     public function write($type, $id, $value) {
         switch ($type) {
+            case 'client':
+                return $this->writeClient($id, $value);
             case 'user':
                 return $this->writeUser($id, $value);
             default:

@@ -423,9 +423,6 @@ class OpenIDModule extends Module {
                 }
             }
             
-            $relying_party->return_to_verified = $verified;
-            $this->saveRelyingParty($relying_party);
-            
             if (!$verified) {
                 if (($client_prefs != NULL) && isset($client_prefs['consents']['openid']) && $client_prefs['consents']['openid']) {
                     $this->logger->log(LogLevel::NOTICE, 'OpenID 2 discovery: not verified, but overridden by user preference');
@@ -816,6 +813,7 @@ class OpenIDModule extends Module {
                     'openid' => array(
                         'version' => $request->getVersion()
                     ),
+                    'cid' => RelyingParty::buildID($realm),
                     'first_time' => $now,
                     'consents' => array()
                 );
@@ -903,34 +901,21 @@ class OpenIDModule extends Module {
      * @since 0.8
      */
     public function loadRelyingParty($realm) {
-        $this->logger->log(LogLevel::DEBUG, 'SimpleID\Protocols\OpenID\OpenIDModule->loadRelyingParty');
+        $store = StoreManager::instance();
 
-        $url = RelyingParty::getDiscoveryURL($realm);
-        $relying_party = $this->cache->get(sha1($url) . '.openid_rp');
+        $cid = RelyingParty::buildID($realm);
+        $relying_party = $store->loadClient($cid);
         
-        if ($relying_party === false) {
-            $this->logger->log(LogLevel::INFO, 'OpenID 2 RP discovery: realm: ' . $realm . '; URL: ' . $url);
+        if ($relying_party == null) {
+            $this->logger->log(LogLevel::INFO, 'OpenID 2 RP discovery: realm: ' . $realm);
 
             $relying_party = new RelyingParty($realm);
             $relying_party->discover();
             
-            $this->saveRelyingParty($relying_party);
+            $store->saveClient($relying_party);
         }
 
         return $relying_party;
-    }
-
-    /**
-     * Saves information on a relying party to disk.
-     *
-     * @param string $realm the openid.realm parameter
-     * @param array $rp_info containing information on a relying party.
-     *
-     * @since 0.8
-     */
-    public function saveRelyingParty($relying_party) {
-        $url = RelyingParty::getDiscoveryURL($relying_party->getRealm());
-        $this->cache->set(sha1($url) . '.openid_rp', $relying_party, SIMPLEID_SHORT_TOKEN_EXPIRES_IN);
     }
 
     /**
