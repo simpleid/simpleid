@@ -33,7 +33,7 @@ class CertAuthSchemeModule extends AuthSchemeModule {
     /**
      * Attempts to automatically login using the client certificate
      * 
-     * @return User the user object, or NULL
+     * @return SimpleID\Models\User the user object, or NULL
      */
     public function autoAuthHook() {
         if (!$this->hasClientCert()) return NULL;

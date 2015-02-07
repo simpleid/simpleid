@@ -29,12 +29,20 @@ use SimpleID\Crypt\Random;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
 
+/**
+ * An authentication scheme module that provides two-factor authentication
+ * based on a RFC 6238 Time-Based One-Time Password (TOTP).
+ */
 class OTPAuthSchemeModule extends AuthSchemeModule {
 
     static function routes($f3) {
         $f3->route('GET|POST /auth/otp', 'SimpleID\Auth\OTPAuthSchemeModule->setup');
     }
 
+    /**
+     * Displays the page used to set up login verification using one-time
+     * passwords.
+     */
     public function setup() {
         $auth = AuthManager::instance();
         $store = StoreManager::instance();
@@ -169,6 +177,9 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
         ));
     }
 
+    /**
+     * @see SimpleID\API\AuthHooks::loginFormHook()
+     */
     public function loginFormHook(&$form_state) {
         if ($form_state['mode'] == AuthManager::MODE_VERIFY) {
             $auth = AuthManager::instance();
@@ -203,6 +214,9 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
         }
     }
 
+    /**
+     * @see SimpleID\API\AuthHooks::loginFormValidateHook()
+     */
     public function loginFormValidateHook(&$form_state) {
         if ($form_state['mode'] == AuthManager::MODE_VERIFY) {
             if ($this->f3->exists('POST.otp.otp') === false) {
@@ -213,6 +227,9 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
         }
     }
 
+    /**
+     * @see SimpleID\API\AuthHooks::loginFormSubmitHook()
+     */
     public function loginFormSubmitHook(&$form_state) {
         if ($form_state['mode'] == AuthManager::MODE_VERIFY) {
             $store = StoreManager::instance();
@@ -235,6 +252,9 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
         }
     }
 
+    /**
+     * @see SimpleID\API\AuthHooks::loginHook()
+     */
     public function loginHook($user, $level, $modules, $form_state) {
         $auth = AuthManager::instance();
         $store = StoreManager::instance();
@@ -348,6 +368,9 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
         return $code % pow(10, $digits);
     }
 
+    /**
+     * @see SimpleID\API\AuthHooks::secretUserDataPathsHook()
+     */
     public function secretUserDataPathsHook() {
         return array('otp.secret', 'otp.drift');
     }

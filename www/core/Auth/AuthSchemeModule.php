@@ -28,9 +28,9 @@ use SimpleID\ModuleManager;
 /**
  * An authentication scheme module.
  *
- * This module contains convenience variables, <code>$auth</code>
- * and <code>$mgr</code>, pointing to instances of
- * <code>AuthManager</code> and <code>ModuleManager</code>
+ * This module contains convenience variables, `$auth`
+ * and `$mgr`, pointing to instances of
+ * `AuthManager` and `ModuleManager`
  * respectively
  */
 abstract class AuthSchemeModule extends Module {

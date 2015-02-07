@@ -189,23 +189,17 @@ class User extends ArrayWrapper implements Serializable, Storable {
         }
     }
 
-    /**
-     * Implementation of Storable
-     */
+
     public function getStoreType() {
         return 'user';
     }
 
-    /**
-     * Implementation of Storable
-     */
+
     public function getStoreID() {
         return $this->uid;
     }
 
-    /**
-     * Implementation of Storable
-     */
+
     public function setStoreID($id) {
         $this->uid = $id;
     }

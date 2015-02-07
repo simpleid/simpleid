@@ -145,6 +145,9 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
         }
     }
 
+    /**
+     * @see SimpleID\API\AuthHooks::secretUserDataPathsHook()
+     */
     public function secretUserDataPathsHook() {
         return array('password.password');
     }

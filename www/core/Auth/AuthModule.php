@@ -32,7 +32,9 @@ use SimpleID\Util\SecurityToken;
  *
  * This module delegates the actual authentication function to
  * other modules, using various hooks.  Details of the hooks can be
- * found in the documentation for <code>AuthHooks</code>
+ * found in the API documention found in the See link
+ *
+ * @see SimpleID\API\AuthHooks
  */
 class AuthModule extends Module {
 
@@ -55,7 +57,7 @@ class AuthModule extends Module {
     /**
      * FatFree Framework event handler.
      *
-     * This module does not use the default event handler provided by {@link Module},
+     * This module does not use the default event handler provided by {@link SimpleID\Module},
      * as it needs to disable the automatic authentication.
      *
      */
@@ -67,6 +69,9 @@ class AuthModule extends Module {
     /**
      * Attempts to log in a user, using the user name and password specified in the
      * HTTP request.
+     *
+     * @param \Base $f3
+     * @param array $params
      */
     public function login($f3, $params) {
         $params['destination'] = (isset($params[1])) ? $params[1] : '';
@@ -170,7 +175,7 @@ class AuthModule extends Module {
     /**
      * Attempts to log out a user and returns to the login form.
      *
-     * @param Base $f3
+     * @param \Base $f3
      * @param array $params
      */
     public function logout($f3, $params) {

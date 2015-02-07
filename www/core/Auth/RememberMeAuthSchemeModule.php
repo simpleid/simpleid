@@ -43,7 +43,8 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
     /**
      * Attempts to automatically login using the auto login cookie
      * 
-     * @return User the user object, or NULL
+     * @see SimpleID\API\AuthHooks::autoAuthHook()
+     * @return SimpleID\Models\User the user object, or NULL
      */
     public function autoAuthHook() {
         if (!$this->f3->exists('COOKIE.' . $this->cookie_name)) return null;
@@ -143,6 +144,8 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
 
     /**
      * Removes the auto login cookie from the user agent.
+     *
+     * @see SimpleID\API\AuthHooks::logoutHook()
      */
     public function logoutHook() {
         if ($this->f3->exists('COOKIE.' . $this->cookie_name)) {
@@ -162,7 +165,7 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
      * used
      *
      */
-    function createCookie($id = NULL, $expires = NULL) {
+    protected function createCookie($id = NULL, $expires = NULL) {
         $user = $this->auth->getUser();
 
         $rand = new Random();

@@ -21,9 +21,34 @@
 
 namespace SimpleID\Store;
 
+/**
+ * Interface representing an item that can be stored.
+ */
 interface Storable {
+    /**
+     * Returns the item type for this object
+     *
+     * @return string the item type
+     */
     public function getStoreType();
+
+    /**
+     * Returns the unique item ID for this object.
+     * 
+     * @return string the ID for this object
+     */
     public function getStoreID();
+
+    /**
+     * Sets the unique item ID for this object
+     *
+     * The ID should be:
+     *
+     * - unique for all items of this type; and
+     * - able to be used as a file name.
+     *
+     * @param string $id the ID for this object
+     */
     public function setStoreID($id);
 }
 

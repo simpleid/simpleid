@@ -19,14 +19,6 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-/**
- * Functions related to generating random bits and unique values.
- *
- * @package simpleid
- * @since 0.8
- * @filesource
- */
-
 namespace SimpleID\Crypt;
 
 if (!defined('SIMPLEID_RAND_SOURCE')) {
@@ -37,6 +29,11 @@ if (!defined('SIMPLEID_RAND_SOURCE')) {
     define('SIMPLEID_RAND_SOURCE', '/dev/urandom');
 }
 
+/**
+ * Functions related to generating random bits and unique values.
+ *
+ * @since 0.8
+ */
 class Random {
 
     /**

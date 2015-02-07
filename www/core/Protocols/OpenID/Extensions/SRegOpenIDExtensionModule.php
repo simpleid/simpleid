@@ -46,7 +46,7 @@ class SRegOpenIDExtensionModule extends Module {
     }
 
     /**
-     * @see hook_response()
+     * @see SimpleID\API\OpenIDHooks::openIDResponseHook()
      */
     public function openIDResponseHook($assertion, $request, $response) {
         // We only deal with positive assertions
