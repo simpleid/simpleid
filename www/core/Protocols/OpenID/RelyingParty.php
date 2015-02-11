@@ -25,31 +25,62 @@ namespace SimpleID\Protocols\OpenID;
 use SimpleID\Protocols\XRDS\XRDSDiscovery;
 use SimpleID\Models\Client;
 
+/**
+ * A class representing an OpenID ID relying party.
+ *
+ * A relying party is identified based by its discovery URL.  The
+ * discovery URL is based on the `openid.realm` parameter, with
+ * the asterisk replaced by `www.`.
+ */
 class RelyingParty extends Client {
 
     // OpenID clients are always dynamic
     protected $dynamic = true;
 
-    public $return_to_verified;
+    private $store_id;
 
     public function __construct($realm) {
         parent::__construct(array(
-            'openid' => array('realm' => $realm, 'services' => NULL)
+            'openid' => array('realm' => $realm, 'services' => NULL, 'discovery_time' => 0)
         ));
-        $this->cid = self::buildID($realm);
+        $this->cid = $realm;
+        $this->store_id = self::buildID($realm);
     }
 
     /**
      * Returns the realm
+     *
+     * @return string the realm
      */
     public function getRealm() {
         return $this->container['openid']['realm'];
     }
 
+    /**
+     * Returns the discovered XRDS services.
+     *
+     * Note that these discovered services may not be current.  The time
+     * discovery was last made can be obtained from {@link getDiscoveryTime()}.
+     *
+     * @return SimpleID\Protocols\XRDS\XRDSServices the XRDS services or null
+     */
     public function getServices() {
         return $this->container['openid']['services'];
     }
 
+    /**
+     * Returns the time when discovery was most recently performed.
+     *
+     * @return int the time, or 0 if discovery was never performed for this
+     * relying party
+     */
+    public function getDiscoveryTime() {
+        return $this->container['openid']['discovery_time'];
+    }
+
+    /**
+     * Performs XRDS discovery on this relying party.
+     */
     public function discover() {
         $discovery = XRDSDiscovery::instance();
         $url = self::getDiscoveryURL($this->getRealm());
@@ -64,7 +95,7 @@ class RelyingParty extends Client {
      * with "www.".
      *
      * @param string $realm the realm
-     * @url string the URL
+     * @return string the URL
      *
      * @since 0.7
      */
@@ -91,8 +122,20 @@ class RelyingParty extends Client {
         return '_' . trim(strtr(base64_encode(sha1($url, true)), '+/', '-_'), '=') . '.openid';
     }
 
+    public function getStoreID() {
+        return $this->store_id;
+    }
+
+    public function setStoreID($id) {
+        $this->store_id = $id;
+    }
+
     public function getDisplayName() {
-        
+        return preg_replace('@^https?://(www\.|\*\.)?@', '', $this->getRealm());
+    }
+
+    public function getDisplayHTML() {
+        return preg_replace('@^https?://(www\.|\*\.)?@', '<span class="url-elide">$0</span>', $this->getRealm());
     }
 }
 

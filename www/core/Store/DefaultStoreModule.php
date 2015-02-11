@@ -273,8 +273,8 @@ class DefaultStoreModule extends StoreModule {
      * @param string $client the name of the client to load
      * @return User data for the specified user
      */
-    protected function readClient($client) {
-        if (!$this->isValidName($client) || !$this->hasClient($client)) return null;
+    protected function readClient($cid) {
+        if (!$this->isValidName($cid) || !$this->hasClient($cid)) return null;
 
         $store_file = $this->config['store_dir'] . "/$cid.client";
         

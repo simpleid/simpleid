@@ -361,6 +361,7 @@ class OpenIDModule extends Module {
         $config = $this->f3->get('config');
         
         $realm = $request->getRealm();
+        $cid = RelyingParty::buildID($realm);
         
         // Check 1: Is the user logged into SimpleID as any user?
         if (!$auth->isLoggedIn()) {
@@ -398,7 +399,7 @@ class OpenIDModule extends Module {
         }
         
         // Check 3: Discover the realm and match its return_to
-        $client_prefs = (isset($user->clients[$realm])) ? $user->clients[$realm] : NULL;
+        $client_prefs = (isset($user->clients[$cid])) ? $user->clients[$cid] : NULL;
 
         if (($request->getVersion() == Message::OPENID_VERSION_2) && $config['openid_verify_return_url']) {
             $verified = FALSE;
@@ -442,8 +443,8 @@ class OpenIDModule extends Module {
             $final_assertion_result = min($assertion_results);
             
             if ($final_assertion_result == self::CHECKID_OK) {
-                if (!isset($user->clients[$realm])) $user->clients[$realm] = array();
-                $user->clients[$realm]['last_time'] = time();
+                if (!isset($user->clients[$cid])) $user->clients[$cid] = array();
+                $user->clients[$cid]['last_time'] = time();
                 $store->saveUser($user);
             }
             
@@ -805,15 +806,19 @@ class OpenIDModule extends Module {
 
             $now = time();
             $realm = $request->getRealm();
+            $cid = RelyingParty::buildID($realm);
+            $relying_party = $this->loadRelyingParty($realm, true);
 
-            if (isset($user->clients[$realm])) {
-                $prefs = $user->clients[$realm];
+            if (isset($user->clients[$cid])) {
+                $prefs = $user->clients[$cid];
             } else {
                 $prefs = array(
                     'openid' => array(
                         'version' => $request->getVersion()
                     ),
-                    'cid' => RelyingParty::buildID($realm),
+                    'store_id' => $relying_party->getStoreID(),
+                    'display_name' => $relying_party->getDisplayName(),
+                    'display_html' => $relying_party->getDisplayHTML(),
                     'first_time' => $now,
                     'consents' => array()
                 );
@@ -821,8 +826,7 @@ class OpenIDModule extends Module {
             $prefs['last_time'] = $now;
             $prefs['consents']['openid'] = ($this->f3->exists('POST.prefs.consents.openid') && ($this->f3->exists('POST.prefs.consents.openid') == 'true'));
             
-            
-            $user->clients[$realm] = $prefs;
+            $user->clients[$cid] = $prefs;
             $store->saveUser($user);
             
             $this->signResponse($response, isset($response['assoc_handle']) ? $response['assoc_handle'] : NULL);
@@ -890,28 +894,23 @@ class OpenIDModule extends Module {
      * obtained includes the discovery URL, the parsed XRDS document, and any other
      * information saved by SimpleID extensions
      *
-     * The results are cached for 1 hour.  For performance reasons, stale results may
-     * be obtained by using the $allow_stale parameter
-     *
      * @param string $realm the openid.realm parameter
      * @param bool $allow_stale allow stale results to be returned, otherwise discovery
      * will occur
-     * @return array containing information on a relying party.
+     * @return RelyingParty containing information on a relying party.
      * @link http://openid.net/specs/openid-authentication-2_0.html#rp_discovery
      * @since 0.8
      */
-    public function loadRelyingParty($realm) {
+    public function loadRelyingParty($realm, $allow_stale = false) {
         $store = StoreManager::instance();
 
         $cid = RelyingParty::buildID($realm);
         $relying_party = $store->loadClient($cid);
-        
-        if ($relying_party == null) {
-            $this->logger->log(LogLevel::INFO, 'OpenID 2 RP discovery: realm: ' . $realm);
+        if ($relying_party == null) $relying_party = new RelyingParty($realm);
 
-            $relying_party = new RelyingParty($realm);
+        if ((time() - $relying_party->getDiscoveryTime() > SIMPLEID_SHORT_TOKEN_EXPIRES_IN) && !$allow_stale) {
+            $this->logger->log(LogLevel::INFO, 'OpenID 2 RP discovery: realm: ' . $realm);
             $relying_party->discover();
-            
             $store->saveClient($relying_party);
         }
 
