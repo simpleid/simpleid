@@ -38,11 +38,30 @@ use SimpleID\Util\LocaleManager;
  * all modules.
  */
 abstract class Module extends \Prefab {
-
+    /** FatFree framework object
+     * @var \Base
+     */
     protected $f3;
+
+    /** Logger
+     * @var Psr\Log\LoggerInterface 
+     */
     protected $logger;
 
     private $domain;
+
+    /**
+     * Initialises URL routes to this module using the FatFree framework.
+     *
+     * This static method is called during initialisation to build a list of
+     * URLs that all the modules provide.  Subclasses should call `$f3->route()`
+     * or `$f3->map()` to provide URL routes to the module.
+     *
+     * @param \Base $f3 the FatFree framework
+     */
+    public static function routes($f3) {
+
+    }
 
     public function __construct() {
         $this->f3 = \Base::instance();
@@ -144,7 +163,6 @@ abstract class Module extends \Prefab {
      *
      * @param string $path the FatFree path or alias
      * @param string $query a properly encoded query string
-     * @param bool $relative whether a relative URL should be returned
      * @param string $secure if $relative is false, either 'https' to force an HTTPS connection, 'http' to force
      * an unencrypted HTTP connection, 'detect' to base on the current connection, or NULL to vary based on SIMPLEID_BASE_URL
      * @return string the url

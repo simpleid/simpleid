@@ -38,8 +38,8 @@ class Random {
 
     /**
      * Obtains a number of random bytes.  This function uses an entropy source specified
-     * in SIMPLEID_RAND_SOURCE.  If SIMPLEID_RAND_SOURCE is not available, the mt_rand()
-     * PHP function is used
+     * in SIMPLEID_RAND_SOURCE or the OpenSSL or mcrypt extensions.  If
+     * SIMPLEID_RAND_SOURCE is not available, the mt_rand() PHP function is used.
      *
      * @param int $num_bytes the number of bytes to generate
      * @return string a string containing random bytes
@@ -83,7 +83,7 @@ class Random {
     /**
      * Obtains a random string of a specified number of bytes of entropy.
      *
-     * The function calls the {@link random_bytes()} function with the specified
+     * The function calls the {@link bytes()} function with the specified
      * number of bytes, then converts to a string containing only alphanumeric
      * characters (case sensitive), plus the characters ., _ and -.
      *

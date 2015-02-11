@@ -27,6 +27,13 @@ use SimpleID\Module;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\RateLimiter;
 
+/**
+ * A module implementing the WebFinger protocol for accessing user
+ * information.
+ *
+ * @see http://tools.ietf.org/html/rfc7033
+ * @since 2.0
+ */
 class WebFingerModule extends Module {
     static function routes($f3) {
         $f3->route('GET|HEAD /.well-known/webfinger', 'SimpleID\Protocols\WebFinger\WebFingerModule->start');

@@ -176,10 +176,10 @@ class ModuleManager extends Prefab {
     }
 
     /**
-     * Invokes a hook in all the loaded modules.
+     * Invokes a hook in all the loaded modules by reference.
      *
      * @param string $hook the name of the hook to call
-     * @param mixed $args the arguments to the hook
+     * @param mixed &$data the data that is passed by reference
      * @return array the return values from the hook
      */
     public function invokeRefAll($hook, &$data) {
