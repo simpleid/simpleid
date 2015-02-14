@@ -1,0 +1,15 @@
+<repeat group="{{ @@blocks }}" value="{{ @block }}">
+    <div class="block" id="{{ @block.id }}">
+        <div class="block-header">
+            <check if="{{ @@block.links }}">
+                <div class="block-header-links">
+                    <repeat group="{{ @block.links }}" value="{{ @link }}"><a href="{{ @link.href }}">{{ @link.name }}</a></li></repeat>
+                </div>
+            </check>
+            <h2>{{ @block.title }}</h2>
+        </div>
+        <div class="block-content">
+            {{ @block.content | raw }}
+        </div>
+    </div>
+</repeat>
