@@ -47,6 +47,8 @@ class OpenIDModule extends Module {
     /** Constant for the XRDS service type for return_to verification */
     const OPENID_RETURN_TO = 'http://specs.openid.net/auth/2.0/return_to';
 
+    static private $scope_settings = NULL;
+
     protected $cache;
     protected $mgr;
 
@@ -300,6 +302,7 @@ class OpenIDModule extends Module {
                 break;
             case self::CHECKID_OK:
                 $this->logger->log(LogLevel::INFO, 'CHECKID_OK');
+                $this->logActivity($request);
                 $response = $this->createOKResponse($request);
                 $this->signResponse($response, isset($request['openid.assoc_handle']) ? $request['openid.assoc_handle'] : NULL);
                 $response->render($request['openid.return_to']);
@@ -459,6 +462,8 @@ class OpenIDModule extends Module {
      * Returns an OpenID response indicating a positive assertion.
      *
      * @param Request $request the OpenID request
+     * @param int $result the authentication result providing the positive
+     * assertion
      * @return Response an OpenID response with a positive assertion
      * @link http://openid.net/specs/openid-authentication-1_1.html#anchor17, http://openid.net/specs/openid-authentication-1_1.html#anchor23, http://openid.net/specs/openid-authentication-2_0.html#positive_assertions
      */
@@ -522,6 +527,8 @@ class OpenIDModule extends Module {
      * checkid_immediate request, where the user has not logged in.
      *
      * @param Request $request the OpenID request
+     * @param int $result the authentication result providing the negative
+     * assertion
      * @return Response an OpenID response with a negative assertion
      * @link http://openid.net/specs/openid-authentication-1_1.html#anchor17, http://openid.net/specs/openid-authentication-1_1.html#anchor23, http://openid.net/specs/openid-authentication-2_0.html#negative_assertions
      */
@@ -804,30 +811,8 @@ class OpenIDModule extends Module {
         } else {
             $this->mgr->invokeRefAll('openIDConsentFormSubmit', $form_state);
 
-            $now = time();
-            $realm = $request->getRealm();
-            $cid = RelyingParty::buildID($realm);
-            $relying_party = $this->loadRelyingParty($realm, true);
-
-            if (isset($user->clients[$cid])) {
-                $prefs = $user->clients[$cid];
-            } else {
-                $prefs = array(
-                    'openid' => array(
-                        'version' => $request->getVersion()
-                    ),
-                    'store_id' => $relying_party->getStoreID(),
-                    'display_name' => $relying_party->getDisplayName(),
-                    'display_html' => $relying_party->getDisplayHTML(),
-                    'first_time' => $now,
-                    'consents' => array()
-                );
-            }
-            $prefs['last_time'] = $now;
-            $prefs['consents']['openid'] = ($this->f3->exists('POST.prefs.consents.openid') && ($this->f3->exists('POST.prefs.consents.openid') == 'true'));
-            
-            $user->clients[$cid] = $prefs;
-            $store->saveUser($user);
+            $consents = array('openid' => ($this->f3->exists('POST.prefs.consents.openid') && ($this->f3->exists('POST.prefs.consents.openid') == 'true')));
+            $this->logActivity($request, $consents);
             
             $this->signResponse($response, isset($response['assoc_handle']) ? $response['assoc_handle'] : NULL);
             if (!$return_to) $this->f3->set('message', $this->t('You were logged in successfully.'));
@@ -857,6 +842,58 @@ class OpenIDModule extends Module {
             }
         }
     }
+
+    /**
+     * Logs the authentication activity against the user.
+     *
+     * @param Request $request the OpenID request
+     * @param array $consents if not `null`, saves the consents
+     */
+    protected function logActivity($request, $consents = NULL) {
+        $store = StoreManager::instance();
+
+        $auth = AuthManager::instance();
+        $user = $auth->getUser();
+
+        $realm = $request->getRealm();
+        $cid = RelyingParty::buildID($realm);
+        $relying_party = $this->loadRelyingParty($realm, true);
+
+        $now = time();
+
+        $activity = array(
+            'type' => 'app',
+            'id' => $realm,
+            'time' => $now
+        );
+        if ($this->f3->exists('IP')) $activity['remote'] = $this->f3->get('IP');
+        $user->addActivity($cid, $activity);
+
+        if (isset($user->clients[$cid])) {
+            $prefs = $user->clients[$cid];
+        } else {
+            $prefs = array(
+                'openid' => array(
+                    'version' => $request->getVersion()
+                ),
+                'store_id' => $relying_party->getStoreID(),
+                'display_name' => $relying_party->getDisplayName(),
+                'display_html' => $relying_party->getDisplayHTML(),
+                'first_time' => $now,
+                'consents' => array()
+            );
+        }
+
+        $prefs['last_time'] = $now;
+
+        if ($consents != null) {
+            $prefs['consents'] = $consents;
+        }
+            
+        $user->clients[$cid] = $prefs;
+        $store->saveUser($user);
+    }
+
 
     /**
      * Sends a direct message indicating an error.  This is a convenience function
@@ -953,6 +990,23 @@ class OpenIDModule extends Module {
             
             $this->fatalError($this->t('User %uid not found.', array('%uid' => $uid)));
         }
+    }
+
+    /**
+     * Returns the OpenID Connect scopes supported by this server.
+     *
+     * @return array an array containing the scopes supported by this server
+     * @since 2.0
+     */
+    public function scopesHook() {
+        if (self::$scope_settings == NULL) {
+            self::$scope_settings = array(
+                'openid' => array(
+                    'description' => $this->t('know who you are'),
+                )
+            );
+        }
+        return self::$scope_settings;
     }
 
     /**
