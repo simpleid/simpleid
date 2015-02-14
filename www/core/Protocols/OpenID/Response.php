@@ -277,7 +277,9 @@ class Response extends Message {
      * @param Request $request the request
      */
     static public function createError($error, $additional = array(), $request = NULL) {
-        return new Response(array_merge(array('error' => $error), $additional), $request);
+        $response = new Response($request);
+        $response->loadData(array_merge(array('error' => $error), $additional));
+        return $response;
     }
 
     /** Signed fields*/
