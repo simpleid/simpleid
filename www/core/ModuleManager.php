@@ -148,7 +148,7 @@ class ModuleManager extends Prefab {
                 $this->logger->log(LogLevel::DEBUG, 'SimpleID\ModuleManager->invokeAll: ' . $name . '->' . $function);
                 $result = call_user_func_array(array($module, $function), $args);
                 if (isset($result) && is_array($result)) {
-                    $return = array_merge($return, $result);
+                    $return = array_replace_recursive($return, $result);
                 } elseif (isset($result)) {
                     $return[] = $result;
                 }
@@ -191,7 +191,7 @@ class ModuleManager extends Prefab {
                 $this->logger->log(LogLevel::DEBUG, 'SimpleID\ModuleManager->invokeRefAll: ' . $name . '->' . $function);
                 $result = $module->$function($data);
                 if (isset($result) && is_array($result)) {
-                    $return = array_merge($return, $result);
+                    $return = array_replace_recursive($return, $result);
                 } elseif (isset($result)) {
                     $return[] = $result;
                 }
