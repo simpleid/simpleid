@@ -3,7 +3,7 @@
  * SimpleID identity file.
  *
  * This file contains all the data associated with an identity.  It should
- * always be named username.identity.json, where username is the user name
+ * always be named username.user.json, where username is the user name
  * to be used when logging into SimpleID.
  *
  * This file is formatted using a modified version of JSON.  Comments (like
