@@ -56,7 +56,7 @@ class AuthManager extends Prefab {
 
     private $auth_info = array();
 
-    private $ua_login_state;
+    private $ua_login_state = null;
 
     public function __construct() {
         $this->f3 = Base::instance();
@@ -91,7 +91,7 @@ class AuthManager extends Prefab {
     public function initUser($auto_auth = true) {
         $this->logger->log(LogLevel::DEBUG, 'SimpleID\Auth\AuthManager->initUser');
 
-        if (isset($_SESSION['auth']) && ($this->cache->get(rawurlencode($_SESSION['auth']['uid']) . '.user') == session_id())) {
+        if (isset($_SESSION['auth']) && ($this->cache->get(rawurlencode($_SESSION['auth']['uid']) . '.login') == session_id())) {
             $this->auth_info = $_SESSION['auth'];
 
             $store = StoreManager::instance();
@@ -171,9 +171,9 @@ class AuthManager extends Prefab {
 
         if ($level >= self::AUTH_LEVEL_AUTO) {
             $_SESSION['auth'] = $this->auth_info;
-            $this->cache->set(rawurlencode($user['uid']) . '.user', session_id());
+            $this->cache->set(rawurlencode($user['uid']) . '.login', session_id());
 
-            $this->resetUALoginState();
+            $this->assignUALoginState(true);
         }
 
         if ($level > self::AUTH_LEVEL_AUTO) {
@@ -187,11 +187,11 @@ class AuthManager extends Prefab {
                 if ($this->f3->exists('IP')) $activity['remote'] = $this->f3->get('IP');
                 if ($this->f3->exists('HEADERS.User-Agent')) $activity['ua'] = $this->f3->get('HEADERS.User-Agent');
 
-                $user->addActivity($this->assignUAID();, $activity);
+                $user->addActivity($this->assignUAID(), $activity);
                 $store->saveUser($user);
             }
         
-            $this->logger->log(LogLevel::INFO, 'Login successful: ' . $user['uid'] . ' ['. gmstrftime('%Y-%m-%dT%H:%M:%SZ', $activity['time']) . ']');
+            $this->logger->log(LogLevel::INFO, 'Login successful: ' . $user['uid']);
         }
 
         $this->mgr->invokeAll('login', $user, $level, $modules, $form_state);
@@ -205,7 +205,7 @@ class AuthManager extends Prefab {
     
         $this->mgr->invokeAll('logout');
 
-        $this->cache->clear(rawurlencode($user['uid']) . '.user');
+        $this->cache->clear(rawurlencode($user['uid']) . '.login');
         $this->f3->clear('user');
 
         session_unset();
@@ -214,7 +214,7 @@ class AuthManager extends Prefab {
         $this->f3->set('COOKIE.' . session_name(), '');
         session_regenerate_id(true);
 
-        $this->resetUALoginState();
+        $this->assignUALoginState(true);
 
         $this->logger->log(LogLevel::INFO, 'Logout successful: ' . $user['uid']);
     }
@@ -228,11 +228,13 @@ class AuthManager extends Prefab {
      * cookie.  Therefore, the UAID may be useful for security purposes.
      *
      * This function will look for a cookie sent by the user agent with
-     * the name returned by {@link simpleid_cookie_name()} with a suffix
+     * the name returned by {@link getCookieName()} with a suffix
      * of uaid.  If the cookie does not exist, it will generate a
-     * random UAID and return it to the user agent with a Set-Cookie
+     * UAID and return it to the user agent with a Set-Cookie
      * response header.
      *
+     * @param bool $reset true to reset the UAID regardless of whether
+     * the cookie is present
      * @return string the UAID
      */
     public function assignUAID($reset = false) {
@@ -248,19 +250,40 @@ class AuthManager extends Prefab {
         return $uaid;
     }
 
-    public function getUALoginState() {
+    /**
+     * Assigns and returns a unique login state for the current
+     * authenticated session with user agent (UALS).
+     *
+     * A UALS uniquely identifies the current authenticated session with
+     * the user agent (e.g. browser).  It is reset with each successful
+     * login and logout.  The cookie associated with a UALS is only
+     * valid for the current session.
+     *
+     * This function will look for a cookie sent by the user agent with
+     * the name returned by {@link getCookieName()} with a suffix
+     * of uals.  If the cookie does not exist, it will generate a
+     * UALS and return it to the user agent with a Set-Cookie
+     * response header.
+     *
+     * @param bool $reset true to reset the UALS
+     * @return string the UALS
+     */
+    public function assignUALoginState($reset = false) {
+        $name = $this->getCookieName('uals');
+        if (($this->f3->exists('COOKIE.' . $name) === true) && !$reset) {
+            $this->ua_login_state = $this->f3->get('COOKIE.' . $name);
+        } else {
+            $rand = new Random();
+            $opaque = new OpaqueIdentifier();
+
+            $this->ua_login_state = $opaque->generate($this->assignUAID() . ':' . $rand->id());
+
+            // We don't use f3->set->COOKIE, as this automatically sets the cookie to be httponly
+            // We want this to be script readable.
+            setcookie($this->getCookieName('uals'), $this->ua_login_state, 0, $this->f3->get('BASE'), '', true, false);
+        }
+
         return $this->ua_login_state;
-    }
-
-    public function resetUALoginState() {
-        $rand = new Random();
-        $opaque = new OpaqueIdentifier();
-
-        $this->ua_login_state = $opaque->generate($this->assignUAID() . ':' . $rand->id());
-
-        // We don't use f3->set->COOKIE, as this automatically sets the cookie to be httponly
-        // We want this to be script readable.
-        setcookie($this->getCookieName('uals'), $this->ua_login_state, 0, $this->f3->get('BASE'), '', true, false);
     }
 
     /**
