@@ -1,0 +1,8 @@
+source:
+    - api
+    - www
+
+destination: apidoc
+
+exclude:
+    - vendor
