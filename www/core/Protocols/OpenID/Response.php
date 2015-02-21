@@ -24,6 +24,10 @@ namespace SimpleID\Protocols\OpenID;
 
 /**
  * Class representing an OpenID response.
+ *
+ * Response parameters are stored *without* the `openid.` prefix.  This
+ * prefix is added by the {@link render()} function when it is
+ * required.
  */
 class Response extends Message {
 

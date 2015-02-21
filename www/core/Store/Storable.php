@@ -22,7 +22,8 @@
 namespace SimpleID\Store;
 
 /**
- * Interface representing an item that can be stored.
+ * Interface representing an item that can be stored using
+ * {@link StoreManager}.
  */
 interface Storable {
     /**

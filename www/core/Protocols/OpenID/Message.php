@@ -26,7 +26,11 @@ use SimpleID\Util\ArrayWrapper;
 
 /**
  * An abstract class representing an OpenID message (request
- * and response)
+ * and response).
+ *
+ * This class is a subclass of {@link ArrayWrapper}.  Message parameters
+ * are stored in {@link ArrayWrapper->container} and are accessed
+ * using array syntax.
  */
 abstract class Message extends ArrayWrapper {
 

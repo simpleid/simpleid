@@ -125,6 +125,16 @@ class StoreManager extends Prefab {
         $store->delete($type, $item->getStoreID());
     }
 
+    /**
+     * Loads a client, recasted to a specified class if required.
+     *
+     * `$class_name` must be a subclass of {@link SimpleID\Models\Client}.  If `$class_name` is
+     * null, then the original class saved with the client is returned.
+     *
+     * @param string $cid the client ID
+     * @param string $class_name the name of the class in which the data is
+     * to be cast, nor null
+     */
     public function loadClient($cid, $class_name = null) {
         $store = $this->getStore('client:read');
         $client = $store->read('client', $cid);

@@ -41,9 +41,11 @@ if (function_exists('gmp_init')) {
     define('BIGNUM_GMP', false);
 }
 
-
+/**
+ * A generic big integer using the GMP or the BCMath library.
+ */
 class BigNum {
-    /* @var resource the internal representation of the value */
+    /** @var resource the internal representation of the value */
     protected $value;
 
     /**
@@ -209,7 +211,7 @@ class BigNum {
      * Raise base to power exp
      *
      * @param BigNum $exp the exponent
-     * @return resource a bignum representing this ^ exp
+     * @return BigNum a bignum representing this ^ exp
      */
     function pow($exp) {
         $result = new BigNum(0);

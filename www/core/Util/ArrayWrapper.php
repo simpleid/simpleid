@@ -25,13 +25,58 @@ namespace SimpleID\Util;
 use \ArrayAccess;
 
 /**
- * An abstract class implementing the ArrayAccess interface.
- * This allows arrays to be decorated with methods.
+ * A class that wraps around an array while providing array-like and
+ * JS-like access notations.  Subclasses of this class are used extensively
+ * throughout SimpleID to decorate arrays with additional methods.
+ *
+ * Two types of access methods are made available with this class.
+ *
+ * **{@link ArrayAccess} interface.** This class implements the `ArrayAccess`
+ * interface.  This means that elements of the underlying array can be
+ * accessed directly using PHP's array syntax.
+ *
+ * It should be noted that when using the ArrayAccess interface, the values
+ * returned are *copies* of the values of the underlying array.  This is
+ * particularly important if the value itself is an array.  Changes to these
+ * lower-dimension values will not be reflected in the original underlying
+ * array.  For example, the following will not work.
+ *
+ * <code>
+ * $array_wrapper = new ArrayWrapper(array('dim1' => array('foo' => 1, 'bar' => 2)));
+ * print $array_wrapper['dim1']['foo'];  # Prints 1
+ * $array_wrapper['dim']['foo'] = 3;     # Will not work
+ * print $array_wrapper['dim1']['foo'];  # Still prints 1
+ * </code>
+ *
+ * In order to alter these values in the underlying array, use dot-notation
+ * (explained below).
+ *
+ * **Dot-notation.** Dot notation can be used to traverse through arrays and
+ * objects.  Dot notation is similar to JavaScript - use `.` to traverse
+ * through arrays (with either string or numeric keys) and `->` to traverse
+ * through object properties.  The entire expression in dot-notation is called
+ * a *path*.
+ *
+ * Dot-notation can be used in {@link pathGet()}, {@link pathExists()}, {@link pathSet()},
+ * and {@link pathRef()}.  Thus in the example above:
+ *
+ * <code>
+ * $array_wrapper = new ArrayWrapper(array('dim1' => array('foo' => 1, 'bar' => 2)));
+ * print $array_wrapper->pathGet('dim1.foo');  # Prints 1
+ * $array_wrapper->pathSet('dim.foo', 3);      # Works!
+ * print $array_wrapper->pathGet('dim1.foo');  # Now prints 3
+ * </code>
+ *
  */
 class ArrayWrapper implements ArrayAccess {
     /** @var array the underlying array */
     protected $container = array();
 
+    /**
+     * Creates a new ArrayWrapper over an underlying array
+     *
+     * @param array $container the underlying array
+     */
     public function __construct($container = array()) {
         $this->container = $container;
     }

@@ -77,6 +77,19 @@ class User extends ArrayWrapper implements Serializable, Storable {
         return $this->uid;
     }
 
+    /**
+     * Add an entry to the user's recent activity log.
+     *
+     * The recent activity log contains the most recent authentication
+     * activity performed by or on behalf of the user.  This includes instances
+     * where the user manually logged into SimpleID, or where a client
+     * requested authentication or authorisation from the user
+     *
+     * @param string $id the ID of the agent creating the activity - this could
+     * be the user agent ID assigned by SimpleID (in case of user logins) or
+     * the client ID
+     * @param array $data additional data
+     */
     public function addActivity($id, $data) {
         $this->activities[$id] = $data;
         uasort($this->activities, function($a, $b) {
@@ -87,13 +100,15 @@ class User extends ArrayWrapper implements Serializable, Storable {
         }
     }
 
+    /**
+     * Returns the user's recent activity log.
+     *
+     * @return array the activity log
+     */
     public function getActivities() {
         return $this->activities;
     }
 
-    /**
-     * Implementation of ArrayAccess
-     */
     public function offsetSet($offset, $value) {
         switch ($offset) {
             case 'uid':
@@ -107,9 +122,6 @@ class User extends ArrayWrapper implements Serializable, Storable {
         }
     }
 
-    /**
-     * Implementation of ArrayAccess
-     */
     public function offsetExists($offset) {
         switch ($offset) {
             case 'uid':
@@ -123,10 +135,6 @@ class User extends ArrayWrapper implements Serializable, Storable {
         }
     }
 
-
-    /**
-     * Implementation of ArrayAccess
-     */
     public function offsetGet($offset) {
         switch ($offset) {
             case 'uid':
@@ -159,9 +167,6 @@ class User extends ArrayWrapper implements Serializable, Storable {
         return $copy->toArray();        
     }
 
-    /**
-     * Implementation of Serializable
-     */
     public function serialize() {
         $f3 = Base::instance();
 
@@ -177,9 +182,6 @@ class User extends ArrayWrapper implements Serializable, Storable {
         return $f3->serialize($result);
     }
 
-    /**
-     * Implementation of Serializable
-     */
     public function unserialize($data) {
         $f3 = Base::instance();
 

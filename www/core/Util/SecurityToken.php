@@ -174,3 +174,5 @@ class SecurityToken {
         return $site_token;
     }
 }
+
+?>
