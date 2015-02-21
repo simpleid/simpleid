@@ -7,6 +7,14 @@ namespace SimpleID\API;
  */
 abstract class MyHooks {
     /**
+     * Invoked when authorisation given to client app is revoked from the
+     * user's app page.
+     *
+     * @param string $cid the client ID
+     */
+    abstract function revokeAppHook($cid);
+
+    /**
      * Returns additional blocks to be displayed in the user's dashboard
      * (previously `hook_page_dashboard`).
      *

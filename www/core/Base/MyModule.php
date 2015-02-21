@@ -168,7 +168,15 @@ class MyModule extends Module {
         );
 
         $mgr = ModuleManager::instance();
-        $scope_info = $mgr->invokeAll('scopes');
+        $modules = $mgr->getModules();
+        $scope_info = array();
+        foreach ($this->modules as $module) {
+            $result = $mgr->invoke($module, 'scopes');
+            if (isset($result) && is_array($result)) {
+                $scope_info = array_replace_recursive($scope_info, $result);
+            }
+        }
+
         $consent_info = array();
         foreach ($prefs['consents'] as $protocol => $consents) {
             if (is_array($consents)) {
@@ -221,6 +229,10 @@ class MyModule extends Module {
             ));
             return;
         }
+
+        $mgr = ModuleManager::instance();
+        $mgr->invokeAll('revokeApp', $params['cid']);
+
         unset($prefs[$params['cid']]);
         
         $store = StoreManager::instance();
