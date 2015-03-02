@@ -347,6 +347,24 @@ function unpickle($pickle) {
 }
 
 /**
+ * Compares two strings using the same time whether they're equal or not.
+ * This function should be used to mitigate timing attacks when, for
+ * example, comparing password hashes
+ *
+ * @param string $str1
+ * @param string $str2
+ * @return bool true if the two strings are equal
+ */
+function secure_compare($str1, $str2) {
+    if (function_exists('hash_equals')) return hash_equals($str1, $str2);
+
+    $xor = $str1 ^ $str2;
+    $result = strlen($str1) ^ strlen($str2); //not the same length, then fail ($result != 0)
+    for ($i = strlen($xor) - 1; $i >= 0; $i--) $result += ord($xor[$i]);
+    return !$result;
+}
+
+/**
  * Obtains the URI of the current request, given a base URI.
  *
  * @param string $base the base URI

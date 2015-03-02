@@ -865,7 +865,7 @@ function user_passauth_user_verify_credentials($uid, $credentials) {
             $test_hash = hash($function, $credentials['pass'] . $salt_suffix);
     }
 
-    return ($test_hash == $hash);
+    return secure_compare($test_hash, $hash);
 }
 
 /**
