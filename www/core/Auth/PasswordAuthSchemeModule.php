@@ -136,8 +136,8 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
                 parse_str($param_string, $params);
                 if (!isset($params['f'])) $params['f'] = 'sha256';
                 if (!isset($params['dk'])) $params['dk'] = 0;
-                return (hash_pbkdf2($params['f'], $credentials['password']['password'], base64_decode($salt), $params['c'], $params['dk'], true)
-                    == base64_decode($hash));
+                return $this->secureCompare(hash_pbkdf2($params['f'], $credentials['password']['password'], base64_decode($salt), $params['c'], $params['dk'], true),
+                    base64_decode($hash));
                 break;
             default:
                 $this->logger->log(LogLevel::WARNING, 'Unknown password prefix: ' . $prefix);
