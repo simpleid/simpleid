@@ -68,8 +68,8 @@ abstract class Module extends \Prefab {
         $this->logger = $this->f3->get('logger');
 
         $info = autoload_get_module_info(get_class($this));
-        if (isset($info['site'])) {
-            $this->domain = $info['site'];
+        if (isset($info['asset_domain'])) {
+            $this->domain = $info['asset_domain'];
         } else {
             $this->domain = LocaleManager::DEFAULT_DOMAIN;
         }
