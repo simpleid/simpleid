@@ -23,9 +23,11 @@
         </script>
         <check if="{{ @@framekiller }}">
             <script type="text/javascript">
-                $(document).ready(function() {
-                    if (top !== self) top.location.replace(self.location.href);
-                });
+                (function ($) {
+                    $(document).ready(function() {
+                        if (top !== self) top.location.replace(self.location.href);
+                    });
+                })(jQuery);
             </script>
         </check>
         {{ @@javascript | raw }}
@@ -81,38 +83,21 @@
         </div>
 
         <script type="text/javascript">
-        (function() {
-            var nav, nav_toggle, user, user_toggle;
-
-            nav = document.getElementById('nav');
-            nav_toggle = document.getElementById('nav-toggle');
-            user = document.getElementById('user');
-            user_toggle = document.getElementById('user-toggle');
-
-            if (nav) {
-                nav_toggle.onclick = function() {
-                    if (nav.className.indexOf('expand') !== -1) {
-                        nav.className = nav.className.replace(' expand', '');
-                        nav_toggle.className = nav_toggle.className.replace(' expand', '');
-                    } else {
-                        nav.className += ' expand';
-                        nav_toggle.className += ' expand';
-                    }
+            (function ($) {
+                if ($(document).has('#nav')) {
+                    $('#nav-toggle').click(function () {
+                        $('#nav').toggleClass('expand');
+                        $('#nav-toggle').toggleClass('expand');
+                    });
                 }
-            }
 
-            if (user) {
-                user_toggle.onclick = function() {
-                    if (user.className.indexOf('expand') !== -1) {
-                        user.className = user.className.replace(' expand', '');
-                        user_toggle.className = user_toggle.className.replace(' expand', '');
-                    } else {
-                        user.className += ' expand';
-                        user_toggle.className += ' expand';
-                    }
+                if ($(document).has('#user')) {
+                    $('#user-toggle').click(function () {
+                        $('#user').toggleClass('expand');
+                        $('#user-toggle').toggleClass('expand');
+                    });
                 }
-            }
-        })();
+            })(jQuery);
         </script>
     </body>
 </html>
