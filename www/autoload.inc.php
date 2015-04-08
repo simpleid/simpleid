@@ -38,15 +38,18 @@ function autoload_get_module_info($class) {
     static $class_map = array(
         'SimpleID\\' => array(
             'base_dir' => '/core/',
-            'ext' => false,
+            'dir_suffix' => false,
+            'has_assets' => false
         ),
         'SimpleID\\Modules\\' => array(
             'base_dir' => '/site/',
-            'ext' => true,
+            'dir_suffix' => true,
+            'has_assets' => true
         ),
         'SimpleID\\Upgrade\\' => array(
             'base_dir' => '/upgrade/',
-            'ext' => false
+            'dir_suffix' => false,
+            'has_assets' => true
         )
     );
 
@@ -61,13 +64,19 @@ function autoload_get_module_info($class) {
 
         $results['relative_class'] = substr($class, $prefix_length);
 
-        if ($params['ext']) {
-            $results['ext'] = strtolower(substr($results['relative_class'], 0, strncmp('\\', $results['relative_class'], 1) + 1));
-            $ext = $results['ext'] . '/';
+        if ($params['dir_suffix']) {
+            $domain = strtolower(substr($results['relative_class'], 0, strncmp('\\', $results['relative_class'], 1) + 1));
+            $suffix =  $domain . '/';
         } else {
-            $ext = '';
+            $parts = explode('/', $params['base_dir']);
+            $domain = $parts[count($parts) - 2];
+            $suffix = '';
         }
-        $results['dir'] = __DIR__ . $params['base_dir'] . $ext;
+        $results['dir'] = __DIR__ . $params['base_dir'] . $suffix;
+        if ($params['has_assets']) {
+            $results['asset_dir'] = $results['dir'];
+            $results['asset_domain'] = $domain;
+        }
         $results['file'] = $results['dir'] . str_replace('\\', '/', $results['relative_class']) . '.php';
     }
 

@@ -33,8 +33,6 @@ use SimpleID\Util\LocaleManager;
  * This is a singleton class which is used to load modules specified in
  * the configuration file.  This class also provides functionality for
  * calling hooks.
- *
- * @since 2.0
  */
 class ModuleManager extends Prefab {
     /** @var array array of all loaded modules */
@@ -62,11 +60,11 @@ class ModuleManager extends Prefab {
         $module = new $name();
         $this->modules[$name] = $module;
         
-        if (isset($info['site'])) {
-            $this->f3->set('UI', $f3->get('UI') . PATH_SEPARATOR . $info['dir']);
+        if (isset($info['asset_domain'])) {
+            $this->f3->set('UI', $this->f3->get('UI') . PATH_SEPARATOR . $info['asset_dir']);
 
             $locale = LocaleManager::instance();
-            $locale->addDomain($info['site'], $info['dir']);
+            $locale->addDomain($info['asset_domain'], $info['asset_dir']);
         }
     }
 
