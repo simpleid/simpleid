@@ -2,9 +2,10 @@
     "name": "simpleid/simpleid",
     "description": "A simple, personal OpenID provider written in PHP",
     "require": {
+        "php": ">=5.3.7",
         "kelvinmo/simplexrd": "2.2",
         "kelvinmo/simplei18n": "0.1.*",
-        "kelvinmo/fernet-php": "0.1.*",
+        "kelvinmo/fernet-php": "0.2.*",
         "bcosca/fatfree": "3.4.*",
         "psr/log": "1.*"
     },
