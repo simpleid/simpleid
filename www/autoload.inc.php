@@ -21,9 +21,6 @@
  */
 include_once 'vendor/autoload.php';
 
-const CORE_MODULE_PREFIX = 'SimpleID\\';
-const SITE_MODULE_PREFIX = 'SimpleID\\Modules\\';
-
 spl_autoload_register(function ($class) {
     $info = autoload_get_module_info($class);
     if (isset($info['file']) && file_exists($info['file'])) {
@@ -32,28 +29,48 @@ spl_autoload_register(function ($class) {
     return;
 });
 
-
+/**
+ * Retrieves information on a SimpleID module
+ *
+ * @param string $name the fully qualified class name of the module
+ */
 function autoload_get_module_info($class) {
-    static $core_length = 0;
-    static $site_length = 0;
-
-    if ($core_length == 0) $core_length = strlen(CORE_MODULE_PREFIX);
-    if ($site_length == 0) $site_length = strlen(SITE_MODULE_PREFIX);
+    static $class_map = array(
+        'SimpleID\\' => array(
+            'base_dir' => '/core/',
+            'ext' => false,
+        ),
+        'SimpleID\\Modules\\' => array(
+            'base_dir' => '/site/',
+            'ext' => true,
+        ),
+        'SimpleID\\Upgrade\\' => array(
+            'base_dir' => '/upgrade/',
+            'ext' => false
+        )
+    );
 
     $results = array();
 
     $class = ltrim($class, '\\');
 
-    if (strncmp(CORE_MODULE_PREFIX, $class, $core_length) === 0) {
-        $results['relative_class'] = substr($class, $core_length);
-        $results['dir'] = __DIR__ . '/core/';
-        $results['file'] = $results['dir'] . str_replace('\\', '/', $results['relative_class']) . '.php';
-    } elseif (strncmp(SITE_MODULE_PREFIX, $class, $site_length) === 0) {
-        $results['relative_class'] = substr($class, $site_length);
-        $results['site'] = strtolower(substr($results['relative_class'], 0, strncmp('\\', $results['relative_class'], 1) + 1));
-        $results['dir'] = __DIR__ . '/site/' . $results['site'] . '/';
+    foreach ($class_map as $prefix => $params) {
+        $prefix_length = strlen($prefix);
+
+        if (strncmp($prefix, $class, $prefix_length) !== 0) continue;
+
+        $results['relative_class'] = substr($class, $prefix_length);
+
+        if ($params['ext']) {
+            $results['ext'] = strtolower(substr($results['relative_class'], 0, strncmp('\\', $results['relative_class'], 1) + 1));
+            $ext = $results['ext'] . '/';
+        } else {
+            $ext = '';
+        }
+        $results['dir'] = __DIR__ . $params['base_dir'] . $ext;
         $results['file'] = $results['dir'] . str_replace('\\', '/', $results['relative_class']) . '.php';
     }
+
     return $results;
 }
 
