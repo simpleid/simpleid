@@ -1,0 +1,4 @@
+{
+    "0.9.0": ["upgrade_config_inc_to_php", "upgrade_delete_token"],
+    "0.7.0": ["upgrade_rp_to_store", "upgrade_token_to_store"]
+}
