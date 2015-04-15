@@ -22,31 +22,7 @@
 
 namespace SimpleID\Protocols\XRDS;
 
-/**
- * The namespace identifier for an XRDS document.
- */
-const XRDS_NS = 'xri://$xrds';
-
-/**
- * The namespace identifier for XRDS version 2.
- */
-const XRD2_NS = 'xri://$xrd*($v*2.0)';
-
-/**
- * The namespace identifier for XRDS Simple.
- */
-const XRDS_SIMPLE_NS = 'http://xrds-simple.net/core/1.0';
-
-/**
- * The type identifier for XRDS Simple.
- */
-const XRDS_SIMPLE_TYPE = 'xri://$xrds*simple';
-
-/**
- * The namespace identifier for OpenID services.
- */
-const XRD_OPENID_NS = 'http://openid.net/xmlns/1.0';
-
+use \XMLReader;
 
 /**
  * A simple XRDS parser.
@@ -59,6 +35,38 @@ const XRD_OPENID_NS = 'http://openid.net/xmlns/1.0';
  * @link http://xrds-simple.net/
  */
 class XRDSParser {
+
+    /**
+     * The namespace identifier for an XRDS document.
+     */
+    const XRDS_NS = 'xri://$xrds';
+
+    /**
+     * The namespace identifier for XRDS version 2.
+     */
+    const XRD2_NS = 'xri://$xrd*($v*2.0)';
+
+    /**
+     * The namespace identifier for XRDS Simple.
+     */
+    const XRDS_SIMPLE_NS = 'http://xrds-simple.net/core/1.0';
+
+    /**
+     * The type identifier for XRDS Simple.
+     */
+    const XRDS_SIMPLE_TYPE = 'xri://$xrds*simple';
+
+    /**
+     * The namespace identifier for OpenID services.
+     */
+    const XRD_OPENID_NS = 'http://openid.net/xmlns/1.0';
+
+    /**
+     * XML reader
+     * @var XMLReader
+     */
+    private $reader;
+
     /**
      * XML parser
      * @var resource
@@ -72,46 +80,13 @@ class XRDSParser {
     private $services;
     
     /**
-     * State: are we parsing a service element?
-     * @var bool
-     */
-    private $in_service = FALSE;
-    
-    /**
-     * CDATA buffer
-     * @var string
-     */
-    private $_buffer;
-    /**
-     * Attributes buffer
-     * @var array
-     */
-    private $_attribs = array();
-    
-    /**
-     * priority attribute buffer
-     * @var string
-     */
-    private $priority = NULL;
-    
-    /**
-     * Currently parsed service buffer
-     * @var array
-     */
-    private $service = array();
-    
-    /**
      * Creates an instance of the XRDS parser.
      *
      * This constructor also initialises the underlying XML parser.
      */
     public function __construct() {
         $this->services = new XRDSServices();
-        $this->parser = xml_parser_create_ns();
-        xml_parser_set_option($this->parser, XML_OPTION_CASE_FOLDING,0);
-        xml_set_object($this->parser, $this);
-        xml_set_element_handler($this->parser, 'element_start', 'element_end');
-        xml_set_character_data_handler($this->parser, 'cdata');
+        $this->reader = new XMLReader();
     }
     
     /**
@@ -121,140 +96,96 @@ class XRDSParser {
      * freed.  Memory associated with the class itself is not freed.
      *
      */
-    public function free() {
-        xml_parser_free($this->parser);
+    public function close() {
+        $this->reader->close();
+    }
+
+    /**
+     * Loads an XRDS document.
+     *
+     * @param string $xml the XML document to load
+     */
+    public function load($xml) {
+        $this->reader->xml($xml);
     }
     
     /**
-     * Parses an XRDS document.
+     * Parses an XRDS document and returns the discovered services.
      *
-     * Once the parsing is complete, use {@link XRDSParser::services()} to obtain
-     * the services extracted from the document.
-     *
-     * @param string $xml the XML document to parse
+     * @return XRDSServices the discovered services
      */
-    public function parse($xml) {
-        xml_parse($this->parser, $xml);
-    }
-    
-    /**
-     * Gets an array of discovered services.
-     *
-     * @return array an array of discovered services, or an empty array
-     * @see XRDSParser::parse()
-     */
-    public function services() {
+    public function parse() {
+        while ($this->reader->read()) {
+            if (($this->reader->nodeType == XMLReader::ELEMENT) 
+                && (strtolower($this->reader->namespaceURI) == strtolower(self::XRD2_NS))) {
+                switch ($this->reader->localName) {
+                    case 'Service':
+                        $this->services->add($this->parseService());
+                        break;
+                }
+            
+            }
+        }
+
         return $this->services;
     }
-    
-    /**
-     * XML parser callback
-     *
-     */
-    private function element_start(&$parser, $qualified, $attribs) {
-        list($ns, $name) = $this->parse_namespace($qualified);
 
-        // Strictly speaking, XML namespace URIs are semi-case sensitive
-        // (i.e. the scheme and host are not case sensitive, but other elements
-        // are).  However, the XRDS-Simple specifications defines a
-        // namespace URI for XRD (xri://$XRD*($v*2.0) rather than xri://$xrd*($v*2.0))
-        // with an unusual case.
-        if ((strtolower($ns) == strtolower(XRD2_NS)) && ($name == 'Service')) {
-            $this->in_service = TRUE;
-            $this->service = array();
-            
-            if (in_array('priority', $attribs)) {
-                $this->service['#priority'] = $attribs['priority'];
-            }
-            if (in_array('id', $attribs)) {
-                $this->service['#id'] = $attribs['id'];
-            }
-        }
-        
-        if ((strtolower($ns) == strtolower(XRD2_NS)) && ($this->in_service)) {
-            switch ($name) {
-                case 'Type':
-                case 'LocalID':
-                case 'URI':
-                    if (in_array('priority', $attribs)) {
-                        $this->priority = $attribs['priority'];
-                    } else {
-                        $this->priority = NULL;
-                    }
-            }
-        }
-        
-        $this->_buffer = '';
-        $this->_attribs = $attribs;
-    }
+    private function parseService() {
+        $service = array();
 
-    /**
-     * XML parser callback
-     *
-     */
-    private function element_end(&$parser, $qualified) {
-        list($ns, $name) = $this->parse_namespace($qualified);
-        
-        if ((strtolower($ns) == strtolower(XRD2_NS)) && ($this->in_service)) {
-            switch ($name) {
-                case 'Service':
-                    foreach (array('type', 'localid', 'uri') as $key) {
-                        if (!isset($this->service[$key])) continue;
-                        $this->service[$key] = $this->flatten_uris($this->service[$key]);
-                    }
+        if ($this->reader->getAttribute('priority')) {
+            $service['#priority'] = $this->reader->getAttribute('priority');
+        }
+        if ($this->reader->getAttribute('id')) {
+            $service['#id'] = $this->reader->getAttribute('id');
+        }
+
+        if ($this->reader->isEmptyElement) return $service;
+
+        while ($this->reader->read()) {
+            if (($this->reader->nodeType == XMLReader::END_ELEMENT) &&
+                (strtolower($this->reader->namespaceURI) == strtolower(self::XRD2_NS)) &&
+                ($this->reader->localName == 'Service')) {
+
+                foreach (array('type', 'localid', 'uri') as $key) {
+                    if (!isset($service[$key])) continue;
+                    $service[$key] = $this->flatten_uris($service[$key]);
+                }
+                break;
+            }
                 
-                    $this->services->add($this->service);
-                    $this->in_service = FALSE;
-                    break;
 
-                case 'Type':
-                case 'LocalID':
-                case 'URI':
-                    $key = strtolower($name);
-                    if (!isset($this->service[$key])) {
-                        $this->service[$key] = array();
-                    }
-                    if ($this->priority != NULL) {
-                        $this->service[$key][] = array('#uri' => trim($this->_buffer), '#priority' => $this->priority);
-                    } else {
-                        $this->service[$key][] = array('#uri' => trim($this->_buffer));
-                    }
-                    $this->priority = NULL;
-                    break;
+            if (($this->reader->nodeType == XMLReader::ELEMENT) 
+                && (strtolower($this->reader->namespaceURI) == strtolower(self::XRD2_NS))) {
+                switch ($this->reader->localName) {
+                    case 'Type':
+                    case 'LocalID':
+                    case 'URI':
+                        $key = strtolower($this->reader->localName);
+                        if (!isset($service[$key])) {
+                            $service[$key] = array();
+                        }
+
+                        $item = array('#uri' => trim($this->reader->readString()));
+                        if ($this->reader->getAttribute('priority'))
+                            $item['#priority'] = $this->reader->getAttribute('priority');
+
+                        $service[$key][] = $item;
+                        break;
+                }
             }
-        }
-        
-        if ((strtolower($ns) == strtolower(XRD_OPENID_NS)) && ($this->in_service)) {
-            switch ($name) {
-                case 'Delegate':
-                    $this->service['delegate'] = trim($this->_buffer);
+
+            if (($this->reader->nodeType == XMLReader::ELEMENT) 
+                && (strtolower($this->reader->namespaceURI) == strtolower(self::XRD_OPENID_NS)) &&
+                ($this->reader->localName == 'Delegate')) {
+                $service['delegate'] = trim($this->reader->readString());
             }
+
         }
 
-        $this->_attribs = array();
+        return $service;        
     }
 
-    /**
-     * XML parser callback
-     *
-     */
-    private function cdata(&$parser, $data) {
-        $this->_buffer .= $data;
-    }
-    
-    /**
-     * Parses a namespace-qualified element name.
-     *
-     * @param string $qualified the qualified name
-     * @return array an array with two elements - the first element contains
-     * the namespace qualifier (or an empty string), the second element contains
-     * the element name
-     */
-    protected function parse_namespace($qualified) {
-        $pos = strrpos($qualified, ':');
-        if ($pos !== FALSE) return array(substr($qualified, 0, $pos), substr($qualified, $pos + 1, strlen($qualified)));
-        return array('', $qualified);
-    }
     
     /**
      * Flattens the service array.

@@ -3,10 +3,12 @@
     "description": "A simple, personal OpenID provider written in PHP",
     "require": {
         "php": ">=5.3.7",
-        "kelvinmo/simplexrd": "2.2",
+        "ext-xmlreader": "*",
+        "kelvinmo/simplexrd": "3.*",
         "kelvinmo/simplei18n": "0.1.*",
         "kelvinmo/fernet-php": "0.2.*",
         "bcosca/fatfree": "3.4.*",
+        "bshaffer/oauth2-server-php": "1.6.*",
         "psr/log": "1.*"
     },
     "require-dev": {

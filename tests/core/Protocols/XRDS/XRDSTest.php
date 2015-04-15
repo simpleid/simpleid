@@ -109,17 +109,18 @@ class XRDSTest extends \PHPUnit_Framework_TestCase {
 
     public function testParser() {
         $parser = $this->getParser();
-        $parser->parse(self::getXRDSDocument());
-        $parser->free();
-        $services = $parser->services();
+        $parser->load(self::getXRDSDocument());
+        $services = $parser->parse();
+        $parser->close();
+
         $this->assertEquals(4, $services->getLength());
     }
 
     public function testType() {
         $parser = $this->getParser();
-        $parser->parse($this->getXRDSDocument());
-        $parser->free();
-        $services = $parser->services();
+        $parser->load(self::getXRDSDocument());
+        $services = $parser->parse();
+        $parser->close();
 
         $service = $services->getByType('http://openid.net/server/1.0');
         $this->assertCount(1, $service);

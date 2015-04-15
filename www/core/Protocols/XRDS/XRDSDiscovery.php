@@ -229,9 +229,9 @@ class XRDSDiscovery extends Prefab {
      */
     protected function parseXRDS($xrds) {
         $parser = new XRDSParser();
-        $parser->parse($xrds);
-        $parser->free();
-        $services = $parser->services();
+        $parser->load($xrds);
+        $services = $parser->parse();
+        $parser->close();
 
         return $services;
     }
