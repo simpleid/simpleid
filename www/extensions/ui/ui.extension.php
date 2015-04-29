@@ -38,7 +38,8 @@ define('OPENID_NS_UI', 'http://specs.openid.net/extensions/ui/1.0');
  * @return array
  * @see hook_xrds_types()
  */
-function ui_xrds_types() {
+function ui_xrds_types()
+{
     return array(
         'http://specs.openid.net/extensions/ui/1.0/mode/popup',
         'http://specs.openid.net/extensions/ui/1.0/icon'
@@ -51,22 +52,31 @@ function ui_xrds_types() {
  * @return array
  * @see hook_response()
  */
-function ui_response($assertion, $request) {
+function ui_response($assertion, $request)
+{
     global $user;
     global $version;
     
     // We only deal with negative assertions
-    if ($assertion) return array();
+    if ($assertion) {
+        return array();
+    }
     
     // We only respond if the extension is requested
-    if (!openid_extension_requested(OPENID_NS_UI, $request)) return array();
+    if (!openid_extension_requested(OPENID_NS_UI, $request)) {
+        return array();
+    }
     
     // We only deal with openid.ui.x-has-session requests
     $filtered_request = openid_extension_filter_request(OPENID_NS_UI, $request);
-    if (!isset($filtered_request['mode']) || ($filtered_request['mode'] != 'x-has-session')) return array();
+    if (!isset($filtered_request['mode']) || ($filtered_request['mode'] != 'x-has-session')) {
+        return array();
+    }
     
     // If user is null, there is no active session
-    if ($user == NULL) return array();
+    if ($user == null) {
+        return array();
+    }
     
     // There is an active session
     $alias = openid_extension_alias(OPENID_NS_UI);
@@ -83,17 +93,24 @@ function ui_response($assertion, $request) {
  *
  * @see hook_signed_fields()
  */
-function ui_signed_fields($response) {
+function ui_signed_fields($response)
+{
     // We only respond if the extension is requested
-    if (!openid_extension_requested(OPENID_NS_UI, $response)) return array();
+    if (!openid_extension_requested(OPENID_NS_UI, $response)) {
+        return array();
+    }
     
     $fields = array_keys(openid_extension_filter_request(OPENID_NS_UI, $response));
     $alias = openid_extension_alias(OPENID_NS_UI);
     $signed_fields = array();
 
-    if (isset($response['openid.ns.' . $alias])) $signed_fields[] = 'ns.' . $alias;
+    if (isset($response['openid.ns.' . $alias])) {
+        $signed_fields[] = 'ns.' . $alias;
+    }
     foreach ($fields as $field) {
-        if (isset($response['openid.' . $alias . '.' . $field])) $signed_fields[] = $alias . '.' . $field;
+        if (isset($response['openid.' . $alias . '.' . $field])) {
+            $signed_fields[] = $alias . '.' . $field;
+        }
     }
     
     return $signed_fields;
@@ -107,18 +124,25 @@ function ui_signed_fields($response) {
  * @param string $state
  * @see hook_user_login_form()
  */
-function ui_user_login_form($destination, $state) {
-    if (($destination != 'continue') || (!$state)) return;
+function ui_user_login_form($destination, $state)
+{
+    if (($destination != 'continue') || (!$state)) {
+        return;
+    }
     
     $request = unpickle($state);
     openid_parse_request($request);
     
     // Skip if popup does not exist
-    if (!openid_extension_requested(OPENID_NS_UI, $request)) return;
+    if (!openid_extension_requested(OPENID_NS_UI, $request)) {
+        return;
+    }
     
     $filtered_request = openid_extension_filter_request(OPENID_NS_UI, $request);
     
-    if (isset($filtered_request['mode']) && ($filtered_request['mode'] == 'popup')) _ui_insert_css_js();
+    if (isset($filtered_request['mode']) && ($filtered_request['mode'] == 'popup')) {
+        _ui_insert_css_js();
+    }
     
     return;
 }
@@ -133,13 +157,18 @@ function ui_user_login_form($destination, $state) {
  * @return string
  * @see hook_consent_form()
  */
-function ui_consent_form($request, $response, $rp) {
+function ui_consent_form($request, $response, $rp)
+{
     // Skip if popup does not exist
-    if (!openid_extension_requested(OPENID_NS_UI, $request)) return '';
+    if (!openid_extension_requested(OPENID_NS_UI, $request)) {
+        return '';
+    }
     
     $filtered_request = openid_extension_filter_request(OPENID_NS_UI, $request);
     
-    if (isset($filtered_request['mode']) && ($filtered_request['mode'] == 'popup')) _ui_insert_css_js();
+    if (isset($filtered_request['mode']) && ($filtered_request['mode'] == 'popup')) {
+        _ui_insert_css_js();
+    }
     
     if (isset($filtered_request['icon']) && ($filtered_request['icon'] == 'true')) {
         global $xtpl;
@@ -158,9 +187,12 @@ function ui_consent_form($request, $response, $rp) {
  * Specifies that the OpenID response should be sent via the fragment
  *
  */
-function ui_indirect_response($url, $response) {
+function ui_indirect_response($url, $response)
+{
     global $openid_ns_to_alias;
-    if (!array_key_exists(OPENID_NS_UI, $openid_ns_to_alias)) return NULL;
+    if (!array_key_exists(OPENID_NS_UI, $openid_ns_to_alias)) {
+        return null;
+    }
     
     // Cheat - if we run this, then the redirect page will also be themed!
     _ui_insert_css_js();
@@ -168,21 +200,23 @@ function ui_indirect_response($url, $response) {
     if (strstr($url, '#')) {
         return OPENID_RESPONSE_FRAGMENT;
     } else {
-        return NULL;
+        return null;
     }
 }
 
 /**
  * Adds an extra route to the SimpleWeb framework.
  */
-function ui_routes() {
+function ui_routes()
+{
     return array('ui/icon' => 'ui_icon');
 }
 
 /**
  * Returns an icon.
  */
-function ui_icon() {
+function ui_icon()
+{
     if (!isset($_GET['realm']) || !isset($_GET['tk']) || ($_GET['tk'] != _ui_icon_token($_GET['realm']))) {
         header_response_code('404 Not Found');
         indirect_fatal_error(t('Invalid UI icon parameters.'));
@@ -191,7 +225,7 @@ function ui_icon() {
     $realm = $_GET['realm'];
     $icon_res = _ui_get_icon($realm);
     
-    if ($icon_res === NULL) {
+    if ($icon_res === null) {
         header_response_code('404 Not Found');
         indirect_fatal_error(t('Unable to get icon.'));
     }
@@ -199,7 +233,9 @@ function ui_icon() {
     header('Via: ' . $icon_res['protocol'] . ' simpleid-ui-icon-' . md5($realm));
     header('Cache-Control: max-age=86400');
     header('Content-Type: ' . $icon_res['headers']['content-type']);
-    if (isset($icon_res['headers']['content-encoding'])) header('Content-Encoding: ' . $icon_res['headers']['content-encoding']);
+    if (isset($icon_res['headers']['content-encoding'])) {
+        header('Content-Encoding: ' . $icon_res['headers']['content-encoding']);
+    }
     print $icon_res['data'];
 }
 
@@ -207,7 +243,8 @@ function ui_icon() {
  * Inserts the necessary CSS and JavaScript code to implement the popup mode
  * from the User Interface extension.
  */
-function _ui_insert_css_js() {
+function _ui_insert_css_js()
+{
     global $xtpl;
     
     $css = (isset($xtpl->vars['css'])) ? $xtpl->vars['css'] : '';
@@ -224,10 +261,13 @@ function _ui_insert_css_js() {
  * @return array the response from {@link http_make_request()} with the discovered URL of the
  * RP's icon
  */
-function _ui_get_icon($realm) {
+function _ui_get_icon($realm)
+{
     $rp_info = simpleid_get_rp_info($realm);
     
-    if (isset($rp_info['ui_icon'])) return $rp_info['ui_icon'];
+    if (isset($rp_info['ui_icon'])) {
+        return $rp_info['ui_icon'];
+    }
     
     $services = discovery_xrds_services_by_type($rp_info['services'], 'http://specs.openid.net/extensions/ui/icon');
         
@@ -236,13 +276,13 @@ function _ui_get_icon($realm) {
         
         $icon_res = http_make_request($icon_url);
         if (isset($icon_res['http-error'])) {
-            return NULL;
+            return null;
         }
         
         $rp_info['ui_icon'] = $icon_res;
         simpleid_set_rp_info($realm, $rp_info);
     } else {
-        return NULL;
+        return null;
     }
 }
 
@@ -254,7 +294,7 @@ function _ui_get_icon($realm) {
  * @param string $realm the openid.realm parameter
  * @return string the token
  */
-function _ui_icon_token($realm) {
+function _ui_icon_token($realm)
+{
     return get_form_token('q=ui/icon&realm=' . rawurlencode($realm));
 }
-?>

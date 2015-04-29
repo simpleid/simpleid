@@ -23,7 +23,7 @@
 
 /**
  * Implements the Attribute Exchange extension.
- * 
+ *
  *
  * @package simpleid
  * @subpackage extensions
@@ -68,26 +68,34 @@ $ax_sreg_map = array(
  * @return array
  * @see hook_xrds_types()
  */
-function ax_xrds_types() {
+function ax_xrds_types()
+{
     return array(OPENID_NS_AX);
 }
 
 /**
  * @see hook_response()
  */
-function ax_response($assertion, $request) {
+function ax_response($assertion, $request)
+{
     global $user;
     global $version;
     global $ax_sreg_map;
     
     // We only deal with positive assertions
-    if (!$assertion) return array();
+    if (!$assertion) {
+        return array();
+    }
     
     // We only respond if the extension is requested
-    if (!openid_extension_requested(OPENID_NS_AX, $request)) return array();
+    if (!openid_extension_requested(OPENID_NS_AX, $request)) {
+        return array();
+    }
     
     $request = openid_extension_filter_request(OPENID_NS_AX, $request);
-    if (!isset($request['mode'])) return array();
+    if (!isset($request['mode'])) {
+        return array();
+    }
     $mode = $request['mode'];
     
     $response = array();
@@ -106,7 +114,7 @@ function ax_response($assertion, $request) {
             $response['openid.' . $alias . '.type.' . $field] = $type;
             $value = _ax_get_value($type);
             
-            if ($value == NULL) {
+            if ($value == null) {
                 $response['openid.' . $alias . '.count.' .  $field] = 0;
             } elseif (is_array($value)) {
                 $response['openid.' . $alias . '.count.' .  $field] = count($value);
@@ -131,17 +139,24 @@ function ax_response($assertion, $request) {
  *
  * @see hook_signed_fields()
  */
-function ax_signed_fields($response) {
+function ax_signed_fields($response)
+{
     // We only respond if the extension is requested
-    if (!openid_extension_requested(OPENID_NS_AX, $response)) return array();
+    if (!openid_extension_requested(OPENID_NS_AX, $response)) {
+        return array();
+    }
     
     $fields = array_keys(openid_extension_filter_request(OPENID_NS_AX, $response));
     $alias = openid_extension_alias(OPENID_NS_AX);
     $signed_fields = array();
 
-    if (isset($response['openid.ns.' . $alias])) $signed_fields[] = 'ns.' . $alias;
+    if (isset($response['openid.ns.' . $alias])) {
+        $signed_fields[] = 'ns.' . $alias;
+    }
     foreach ($fields as $field) {
-        if (isset($response['openid.' . $alias . '.' . $field])) $signed_fields[] = $alias . '.' . $field;
+        if (isset($response['openid.' . $alias . '.' . $field])) {
+            $signed_fields[] = $alias . '.' . $field;
+        }
     }
     
     return $signed_fields;
@@ -150,14 +165,19 @@ function ax_signed_fields($response) {
 /**
  * @see hook_consent_form()
  */
-function ax_consent_form($request, $response, $rp) {
+function ax_consent_form($request, $response, $rp)
+{
     global $user;
     
     // We only respond if the extension is requested
-    if (!openid_extension_requested(OPENID_NS_AX, $request)) return '';
+    if (!openid_extension_requested(OPENID_NS_AX, $request)) {
+        return '';
+    }
     
     $request = openid_extension_filter_request(OPENID_NS_AX, $request);
-    if (!isset($request['mode'])) return '';
+    if (!isset($request['mode'])) {
+        return '';
+    }
     $mode = $request['mode'];
     
     $xtpl2 = new XTemplate('extensions/ax/ax.xtpl');
@@ -179,13 +199,15 @@ function ax_consent_form($request, $response, $rp) {
             
             if (is_array($value)) {
                 $xtpl2->assign('value', htmlspecialchars(implode(',', $value), ENT_QUOTES, 'UTF-8'));
-            } elseif ($value != NULL) {
+            } elseif ($value != null) {
                 $xtpl2->assign('value', htmlspecialchars($value, ENT_QUOTES, 'UTF-8'));
             }
             
             $xtpl2->assign('checked', (in_array($field, $required) || !isset($rp['ax_consents']) || in_array($field, $rp['ax_consents'])) ? 'checked="checked"' : '');
             $xtpl2->assign('disabled', (in_array($field, $required)) ? 'disabled="disabled"' : '');
-            if (in_array($field, $required)) $xtpl2->parse('fetch_request.ax.required');
+            if (in_array($field, $required)) {
+                $xtpl2->parse('fetch_request.ax.required');
+            }
             
             $xtpl2->parse('fetch_request.ax');
             
@@ -209,17 +231,22 @@ function ax_consent_form($request, $response, $rp) {
 /**
  * @see hook_consent()
  */
-function ax_consent($form_request, &$response, &$rp) {
+function ax_consent($form_request, &$response, &$rp)
+{
     // We only respond if the extension is requested
-    if (!openid_extension_requested(OPENID_NS_AX, $response)) return array();
+    if (!openid_extension_requested(OPENID_NS_AX, $response)) {
+        return array();
+    }
     
     $fields = array_keys(openid_extension_filter_request(OPENID_NS_AX, $response));
     $alias = openid_extension_alias(OPENID_NS_AX);
     
     foreach ($fields as $field) {
-        if ((strpos($field, 'value.') !== 0) && (strpos($field, 'count.') !== 0)) continue;
+        if ((strpos($field, 'value.') !== 0) && (strpos($field, 'count.') !== 0)) {
+            continue;
+        }
         
-        $type_alias = (strpos($field, '.', 6) === FALSE) ? substr($field, 6) : substr($field, strpos($field, '.', 6) - 6);
+        $type_alias = (strpos($field, '.', 6) === false) ? substr($field, 6) : substr($field, strpos($field, '.', 6) - 6);
         $type = $response['openid.' . $alias . '.type.' . $type_alias];
         
         if (isset($response['openid.' . $alias . '.' . $field])) {
@@ -229,7 +256,9 @@ function ax_consent($form_request, &$response, &$rp) {
         }
     }
     foreach ($fields as $field) {
-        if (strpos($field, 'type.') !== 0) continue;
+        if (strpos($field, 'type.') !== 0) {
+            continue;
+        }
         $type = $response['openid.' . $alias . '.' . $field];
         
         if (isset($response['openid.' . $alias . '.' . $field])) {
@@ -250,7 +279,8 @@ function ax_consent($form_request, &$response, &$rp) {
 /**
  * @see hook_page_profile()
  */
-function ax_page_profile() {
+function ax_page_profile()
+{
     global $user;
     $xtpl2 = new XTemplate('extensions/ax/ax.xtpl');
     
@@ -287,7 +317,8 @@ function ax_page_profile() {
  * @param string $type the type URI to look up
  * @return string the value or NULL if not found
  */
-function _ax_get_value($type) {
+function _ax_get_value($type)
+{
     global $user;
     global $ax_sreg_map;
     
@@ -297,31 +328,42 @@ function _ax_get_value($type) {
         // Look up OpenID Connect
         switch ($type) {
             case 'http://axschema.org/namePerson/friendly':
-                if (isset($user['user_info']['nickname'])) return $user['user_info']['nickname'];
+                if (isset($user['user_info']['nickname'])) {
+                    return $user['user_info']['nickname'];
+                }
                 break;
             case 'http://axschema.org/contact/email':
-                if (isset($user['user_info']['email'])) return $user['user_info']['email'];
+                if (isset($user['user_info']['email'])) {
+                    return $user['user_info']['email'];
+                }
                 break;
             case 'http://axschema.org/namePerson':
-                if (isset($user['user_info']['name'])) return $user['user_info']['name'];
+                if (isset($user['user_info']['name'])) {
+                    return $user['user_info']['name'];
+                }
                 break;
             case 'http://axschema.org/pref/timezone':
-                if (isset($user['user_info']['zoneinfo'])) return $user['user_info']['zoneinfo'];
+                if (isset($user['user_info']['zoneinfo'])) {
+                    return $user['user_info']['zoneinfo'];
+                }
                 break;
             case 'http://axschema.org/person/gender':
-                if (isset($user['user_info']['gender'])) return strtoupper(substr($user['user_info']['gender'], 0, 1));
+                if (isset($user['user_info']['gender'])) {
+                    return strtoupper(substr($user['user_info']['gender'], 0, 1));
+                }
                 break;
             case 'http://axschema.org/contact/postalCode/home':
-                if (isset($user['user_info']['address']['postal_code'])) return $user['user_info']['address']['postcal_code'];
+                if (isset($user['user_info']['address']['postal_code'])) {
+                    return $user['user_info']['address']['postcal_code'];
+                }
                 break;
-        } 
+        }
         
         // Look up sreg
         if (isset($ax_sreg_map[$type]) && isset($user['sreg'][$ax_sreg_map[$type]])) {
             return $user['sreg'][$ax_sreg_map[$type]];
         } else {
-            return NULL;
+            return null;
         }
     }
 }
-?>

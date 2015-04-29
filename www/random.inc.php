@@ -45,17 +45,18 @@ if (!defined('SIMPLEID_RAND_SOURCE')) {
  * @param int $num_bytes the number of bytes to generate
  * @return string a string containing random bytes
  */
-function random_bytes($num_bytes) {
+function random_bytes($num_bytes)
+{
     static $f = null;
     $bytes = '';
     if ($f === null) {
         if (SIMPLEID_RAND_SOURCE === null) {
-            $f = FALSE;
+            $f = false;
         } else {
             $f = @fopen(SIMPLEID_RAND_SOURCE, "r");
         }
     }
-    if ($f === FALSE) {
+    if ($f === false) {
         $bytes = '';
         for ($i = 0; $i < $num_bytes; $i += 4) {
             $bytes .= pack('L', mt_rand());
@@ -82,10 +83,13 @@ function random_bytes($num_bytes) {
  * random string
  * @return string the random string
  */
-function random_secret($num_bytes = 32) {
-    return strtr(base64_encode(random_bytes($num_bytes)),
+function random_secret($num_bytes = 32)
+{
+    return strtr(
+        base64_encode(random_bytes($num_bytes)),
         'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=',
-        '-_.9876543210zyxwvutsrqponmlkjihgfedcbaZYXWVUTSRQPONMLKJIHGFEDCBA');
+        '-_.9876543210zyxwvutsrqponmlkjihgfedcbaZYXWVUTSRQPONMLKJIHGFEDCBA'
+    );
 }
 
 /**
@@ -97,8 +101,8 @@ function random_secret($num_bytes = 32) {
  *
  * @return string a relatively unique identifier
  */
-function random_id() {
+function random_id()
+{
     $timeofday = gettimeofday();
     return vsprintf('%08x%08x', $timeofday) . bin2hex(random_bytes(4));
 }
-?>

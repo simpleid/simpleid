@@ -1,4 +1,4 @@
-<?php 
+<?php
 /*
  * SimpleID
  *
@@ -76,7 +76,8 @@ define('XRD_OPENID_NS', 'http://openid.net/xmlns/1.0');
  * @return array an array of discovered services, or an empty array if no services
  * are found
  */
-function discovery_xrds_discover($identifier, $openid = FALSE) {
+function discovery_xrds_discover($identifier, $openid = false)
+{
     $identifier = discovery_xrds_normalize($identifier);
     $url = discovery_xrds_url($identifier);
     
@@ -85,7 +86,9 @@ function discovery_xrds_discover($identifier, $openid = FALSE) {
     if ($xrds) {
         return discovery_xrds_parse($xrds);
     } else {
-        if ($openid) return discovery_html_get_services($url);
+        if ($openid) {
+            return discovery_html_get_services($url);
+        }
         return array();
     }
 }
@@ -99,12 +102,15 @@ function discovery_xrds_discover($identifier, $openid = FALSE) {
  * @return array an array of matching services, or an empty array of no services
  * match
  */
-function discovery_xrds_services_by_type($services, $type) {
+function discovery_xrds_services_by_type($services, $type)
+{
     $matches = array();
     
     foreach ($services as $service) {
         foreach ($service['type'] as $service_type) {
-            if ($service_type == $type) $matches[] = $service;
+            if ($service_type == $type) {
+                $matches[] = $service;
+            }
         }
     }
     return $matches;
@@ -119,11 +125,14 @@ function discovery_xrds_services_by_type($services, $type) {
  * @return array the matching service, or NULL of no services
  * are found
  */
-function discovery_xrds_service_by_id($services, $id) {
+function discovery_xrds_service_by_id($services, $id)
+{
     foreach ($services as $service) {
-        if ($service['#id'] == $id) return $service;
+        if ($service['#id'] == $id) {
+            return $service;
+        }
     }
-    return NULL;
+    return null;
 }
 
 /**
@@ -136,13 +145,18 @@ function discovery_xrds_service_by_id($services, $id) {
  * @param int $retries the number of tries to make
  * @return string the contents of the XRDS document
  */
-function discovery_xrds_get($url, $check = TRUE, $retries = 5) {
-    if ($retries == 0) return NULL;
+function discovery_xrds_get($url, $check = true, $retries = 5)
+{
+    if ($retries == 0) {
+        return null;
+    }
     
     $response = http_make_request($url, array('Accept' => 'application/xrds+xml'));
 
-    if (isset($response['http-error'])) return NULL;
-    if (($response['content-type'] == 'application/xrds+xml') || ($check == FALSE)) {
+    if (isset($response['http-error'])) {
+        return null;
+    }
+    if (($response['content-type'] == 'application/xrds+xml') || ($check == false)) {
         return $response['data'];
     } elseif (isset($response['headers']['x-xrds-location'])) {
         return discovery_xrds_get($response['headers']['x-xrds-location'], false, $retries - 1);
@@ -151,7 +165,7 @@ function discovery_xrds_get($url, $check = TRUE, $retries = 5) {
         if ($location) {
             return discovery_xrds_get($location, false, $retries - 1);
         }
-        return NULL;
+        return null;
     }
 }
 
@@ -165,17 +179,28 @@ function discovery_xrds_get($url, $check = TRUE, $retries = 5) {
  * @param string $identifier the identifier to normalise
  * @return string the normalised identifier
  */
-function discovery_xrds_normalize($identifier) {
+function discovery_xrds_normalize($identifier)
+{
     $normalized = $identifier;
     
     if (discovery_is_xri($identifier)) {
-        if (stristr($identifier, 'xri://') !== false) $normalized = substr($identifier, 6);
+        if (stristr($identifier, 'xri://') !== false) {
+            $normalized = substr($identifier, 6);
+        }
     } elseif (discovery_is_email($identifier)) {
-        if (stristr($identifier, 'acct:') !== false) $normalized = substr($identifier, 5);
-        if (stristr($identifier, 'mailto:') !== false) $normalized = substr($identifier, 7);
+        if (stristr($identifier, 'acct:') !== false) {
+            $normalized = substr($identifier, 5);
+        }
+        if (stristr($identifier, 'mailto:') !== false) {
+            $normalized = substr($identifier, 7);
+        }
     } else {
-        if (stristr($identifier, '://') === false) $normalized = 'http://'. $identifier;
-        if (substr_count($normalized, '/') < 3) $normalized .= '/';
+        if (stristr($identifier, '://') === false) {
+            $normalized = 'http://'. $identifier;
+        }
+        if (substr_count($normalized, '/') < 3) {
+            $normalized .= '/';
+        }
     }
     
     return $normalized;
@@ -188,7 +213,8 @@ function discovery_xrds_normalize($identifier) {
  * @param string $identifier the identifier
  * @return string the URL
  */
-function discovery_xrds_url($identifier) {
+function discovery_xrds_url($identifier)
+{
     if (discovery_is_xri($identifier)) {
         return 'http://xri.net/' . $identifier;
     } elseif (discovery_is_email($identifier)) {
@@ -208,10 +234,15 @@ function discovery_xrds_url($identifier) {
  * @param string $identifier the parameter to test
  * @return bool true if the identifier is an XRI
  */
-function discovery_is_xri($identifier) {
+function discovery_is_xri($identifier)
+{
     $firstchar = substr($identifier, 0, 1);
-    if ($firstchar == "@" || $firstchar == "=" || $firstchar == "+" || $firstchar == "\$" || $firstchar == "!") return true;
-    if (stristr($identifier, 'xri://') !== FALSE) return true;
+    if ($firstchar == "@" || $firstchar == "=" || $firstchar == "+" || $firstchar == "\$" || $firstchar == "!") {
+        return true;
+    }
+    if (stristr($identifier, 'xri://') !== false) {
+        return true;
+    }
     return false;
 }
 
@@ -226,21 +257,32 @@ function discovery_is_xri($identifier) {
  * @param string $identifier the parameter to test
  * @return bool true if the identifier is an e-mail address
  */
-function discovery_is_email($identifier) {
+function discovery_is_email($identifier)
+{
     // If it begins with acct: or mailto:, strip it out
-    if (stristr($identifier, 'acct:') !== false) $identifier = substr($identifier, 5);
-    if (stristr($identifier, 'mailto:') !== false) $identifier = substr($identifier, 7);
+    if (stristr($identifier, 'acct:') !== false) {
+        $identifier = substr($identifier, 5);
+    }
+    if (stristr($identifier, 'mailto:') !== false) {
+        $identifier = substr($identifier, 7);
+    }
     
     // If it contains a slash, it is not an e-mail address
-    if (strpos($identifier, "/") !== false) return false;
+    if (strpos($identifier, "/") !== false) {
+        return false;
+    }
     
     $at = strpos($identifier, "@");
     
     // If it does not contain a @, it is not an e-mail address
-    if ($at === false) return false;
+    if ($at === false) {
+        return false;
+    }
     
     // If it contains more than one @, it is not an e-mail
-    if (strrpos($identifier, "@") != $at) return false;
+    if (strrpos($identifier, "@") != $at) {
+        return false;
+    }
     
     return true;
 }
@@ -258,14 +300,23 @@ function discovery_is_email($identifier) {
  * @param array $b
  * @return int
  */
-function discovery_xrds_priority_sort($a, $b) {
-    if (!isset($a['#priority']) && !isset($b['#priority'])) return 0;
+function discovery_xrds_priority_sort($a, $b)
+{
+    if (!isset($a['#priority']) && !isset($b['#priority'])) {
+        return 0;
+    }
     
     // if #priority is missing, #priority is assumed to be infinity
-    if (!isset($a['#priority'])) return 1;
-    if (!isset($b['#priority'])) return -1;
+    if (!isset($a['#priority'])) {
+        return 1;
+    }
+    if (!isset($b['#priority'])) {
+        return -1;
+    }
     
-    if ($a['#priority'] == $b['#priority']) return 0;
+    if ($a['#priority'] == $b['#priority']) {
+        return 0;
+    }
     return ($a['#priority'] < $b['#priority']) ? -1 : 1;
 }
 
@@ -277,7 +328,8 @@ function discovery_xrds_priority_sort($a, $b) {
  *
  * @see XRDSParser
  */
-function discovery_xrds_parse($xrds) {
+function discovery_xrds_parse($xrds)
+{
     $parser = new XRDSParser();
     $parser->parse($xrds);
     $parser->free();
@@ -298,7 +350,8 @@ function discovery_xrds_parse($xrds) {
  * @return array an array of discovered services, or an empty array if no services
  * are found
  */
-function discovery_html_get_services($url) {
+function discovery_html_get_services($url)
+{
     $services = array();
         
     $response = http_make_request($url);
@@ -312,7 +365,9 @@ function discovery_html_get_services($url) {
             'type' => 'http://specs.openid.net/auth/2.0/signon',
             'uri' => $uri
             );
-        if ($delegate) $service['localid'] = $delegate;
+        if ($delegate) {
+            $service['localid'] = $delegate;
+        }
         $services[] = $service;
     }
 
@@ -324,7 +379,9 @@ function discovery_html_get_services($url) {
             'type' => 'http://openid.net/signon/1.0',
             'uri' => $uri
             );
-        if ($delegate) $service['localid'] = $delegate;
+        if ($delegate) {
+            $service['localid'] = $delegate;
+        }
         $services[] = $service;
     }
     
@@ -340,7 +397,8 @@ function discovery_html_get_services($url) {
  * @return mixed the value of the meta element, or FALSE if the element is not
  * found
  */
-function _discovery_meta_httpequiv($equiv, $html) {
+function _discovery_meta_httpequiv($equiv, $html)
+{
     $html = preg_replace('/<!(?:--(?:[^-]*|-[^-]+)*--\s*)>/', '', $html); // Strip html comments
     
     $equiv = preg_quote($equiv);
@@ -351,7 +409,7 @@ function _discovery_meta_httpequiv($equiv, $html) {
             return $content[1];
         }
     }
-    return FALSE;
+    return false;
 }
 
 /**
@@ -363,7 +421,8 @@ function _discovery_meta_httpequiv($equiv, $html) {
  * @return mixed the href of the link element, or FALSE if the element is not
  * found
  */
-function _discovery_link_rel($rel, $html) {
+function _discovery_link_rel($rel, $html)
+{
     $html = preg_replace('/<!(?:--(?:[^-]*|-[^-]+)*--\s*)>/s', '', $html); // Strip html comments
     
     $rel = preg_quote($rel);
@@ -372,7 +431,7 @@ function _discovery_link_rel($rel, $html) {
         preg_match('|href=["\']([^"]+)["\']|iU', $matches[3], $href);
         return trim($href[1]);
     }
-    return FALSE;
+    return false;
 }
 
 /**
@@ -385,7 +444,8 @@ function _discovery_link_rel($rel, $html) {
  *
  * @link http://xrds-simple.net/
  */
-class XRDSParser {
+class XRDSParser
+{
     /**
      * XML parser
      * @var resource
@@ -405,7 +465,7 @@ class XRDSParser {
      * @var bool
      * @access private
      */
-    var $in_service = FALSE;
+    var $in_service = false;
     
     /**
      * CDATA buffer
@@ -425,7 +485,7 @@ class XRDSParser {
      * @var string
      * @access private
      */
-    var $priority = NULL;
+    var $priority = null;
     
     /**
      * Currently parsed service buffer
@@ -439,9 +499,10 @@ class XRDSParser {
      *
      * This constructor also initialises the underlying XML parser.
      */
-    function XRDSParser() {
+    function XRDSParser()
+    {
         $this->parser = xml_parser_create_ns();
-        xml_parser_set_option($this->parser, XML_OPTION_CASE_FOLDING,0);
+        xml_parser_set_option($this->parser, XML_OPTION_CASE_FOLDING, 0);
         xml_set_object($this->parser, $this);
         xml_set_element_handler($this->parser, 'element_start', 'element_end');
         xml_set_character_data_handler($this->parser, 'cdata');
@@ -455,7 +516,8 @@ class XRDSParser {
      *
      * @access public
      */
-    function free() {
+    function free()
+    {
         xml_parser_free($this->parser);
     }
     
@@ -468,7 +530,8 @@ class XRDSParser {
      * @param string $xml the XML document to parse
      * @access public
      */
-    function parse($xml) {
+    function parse($xml)
+    {
         xml_parse($this->parser, $xml);
     }
     
@@ -479,7 +542,8 @@ class XRDSParser {
      * @access public
      * @see XRDSParser::parse()
      */
-    function services() {
+    function services()
+    {
         return $this->services;
     }
     
@@ -488,7 +552,8 @@ class XRDSParser {
      *
      * @access private
      */
-    function element_start(&$parser, $qualified, $attribs) {
+    function element_start(&$parser, $qualified, $attribs)
+    {
         list($ns, $name) = $this->parse_namespace($qualified);
 
         // Strictly speaking, XML namespace URIs are semi-case sensitive
@@ -497,7 +562,7 @@ class XRDSParser {
         // namespace URI for XRD (xri://$XRD*($v*2.0) rather than xri://$xrd*($v*2.0))
         // with an unusual case.
         if ((strtolower($ns) == strtolower(XRD2_NS)) && ($name == 'Service')) {
-            $this->in_service = TRUE;
+            $this->in_service = true;
             $this->service = array();
             
             if (in_array('priority', $attribs)) {
@@ -516,7 +581,7 @@ class XRDSParser {
                     if (in_array('priority', $attribs)) {
                         $this->priority = $attribs['priority'];
                     } else {
-                        $this->priority = NULL;
+                        $this->priority = null;
                     }
             }
         }
@@ -530,19 +595,22 @@ class XRDSParser {
      *
      * @access private
      */
-    function element_end(&$parser, $qualified) {
+    function element_end(&$parser, $qualified)
+    {
         list($ns, $name) = $this->parse_namespace($qualified);
         
         if ((strtolower($ns) == strtolower(XRD2_NS)) && ($this->in_service)) {
             switch ($name) {
                 case 'Service':
                     foreach (array('type', 'localid', 'uri') as $key) {
-                        if (!isset($this->service[$key])) continue;
+                        if (!isset($this->service[$key])) {
+                            continue;
+                        }
                         $this->service[$key] = $this->flatten_uris($this->service[$key]);
                     }
                 
                     $this->services[] = $this->service;
-                    $this->in_service = FALSE;
+                    $this->in_service = false;
                     break;
 
                 case 'Type':
@@ -552,12 +620,12 @@ class XRDSParser {
                     if (!isset($this->service[$key])) {
                         $this->service[$key] = array();
                     }
-                    if ($this->priority != NULL) {
+                    if ($this->priority != null) {
                         $this->service[$key][] = array('#uri' => trim($this->_buffer), '#priority' => $this->priority);
                     } else {
                         $this->service[$key][] = array('#uri' => trim($this->_buffer));
                     }
-                    $this->priority = NULL;
+                    $this->priority = null;
                     break;
             }
         }
@@ -577,7 +645,8 @@ class XRDSParser {
      *
      * @access private
      */
-    function cdata(&$parser, $data) {
+    function cdata(&$parser, $data)
+    {
         $this->_buffer .= $data;
     }
     
@@ -590,9 +659,12 @@ class XRDSParser {
      * the element name
      * @access protected
      */
-    function parse_namespace($qualified) {
+    function parse_namespace($qualified)
+    {
         $pos = strrpos($qualified, ':');
-        if ($pos !== FALSE) return array(substr($qualified, 0, $pos), substr($qualified, $pos + 1, strlen($qualified)));
+        if ($pos !== false) {
+            return array(substr($qualified, 0, $pos), substr($qualified, $pos + 1, strlen($qualified)));
+        }
         return array('', $qualified);
     }
     
@@ -613,10 +685,13 @@ class XRDSParser {
      * @return array the services array with URIs sorted by priority
      * @access protected
      */
-    function flatten_uris($array, $sort = TRUE) {
+    function flatten_uris($array, $sort = true)
+    {
         $result = array();
         
-        if ($sort) uasort($array, 'discovery_xrds_priority_sort');
+        if ($sort) {
+            uasort($array, 'discovery_xrds_priority_sort');
+        }
         
         for ($i = 0; $i < count($array); $i++) {
             $result[] = $array[$i]['#uri'];
@@ -640,8 +715,8 @@ if (!function_exists('rfc3986_urlencode')) {
      * @param string $s the URL to encode
      * @return string the encoded URL
      */
-    function rfc3986_urlencode($s) {
+    function rfc3986_urlencode($s)
+    {
         return str_replace('%7E', '~', rawurlencode($s));
     }
 }
-?>

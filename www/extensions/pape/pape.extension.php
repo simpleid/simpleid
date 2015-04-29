@@ -23,7 +23,7 @@
 
 /**
  * Implements the Provider Authentication Policy Extension extension.
- * 
+ *
  *
  * @package simpleid
  * @subpackage extensions
@@ -46,7 +46,8 @@ define('PAPE_LEVEL_NIST800_63', 'http://csrc.nist.gov/publications/nistpubs/800-
  * @return array
  * @see hook_xrds_types()
  */
-function pape_xrds_types() {
+function pape_xrds_types()
+{
     return array(
         OPENID_NS_PAPE,
         PAPE_POLICY_PPID,
@@ -57,26 +58,33 @@ function pape_xrds_types() {
 /**
  * @see hook_checkid_identity()
  */
-function pape_checkid_identity($request, $identity, $immediate) {
+function pape_checkid_identity($request, $identity, $immediate)
+{
     global $user;
     
     // We only respond if the extension is requested
-    if (!openid_extension_requested(OPENID_NS_PAPE, $request)) return null;
+    if (!openid_extension_requested(OPENID_NS_PAPE, $request)) {
+        return null;
+    }
     
     // See if we are choosing an identity and save for later
     // This may be used by pape_response() to produce a private identifier
-    if ($request['openid.identity'] == OPENID_IDENTIFIER_SELECT) _pape_identifier_select(true);
+    if ($request['openid.identity'] == OPENID_IDENTIFIER_SELECT) {
+        _pape_identifier_select(true);
+    }
     
     $pape_request = openid_extension_filter_request(OPENID_NS_PAPE, $request);
     
     // If the relying party provides a max_auth_age
     if (isset($pape_request['max_auth_age'])) {
         // If we are not logged in then we don't need to do anything
-        if ($user == NULL) return NULL;
+        if ($user == null) {
+            return null;
+        }
         
         // If the last time we logged on actively (i.e. using a password) is greater than
         // max_auth_age, we then require the user to log in again
-        if ((!isset($user['auth_active']) || !$user['auth_active']) 
+        if ((!isset($user['auth_active']) || !$user['auth_active'])
             && ((time() - $user['auth_time']) > $pape_request['max_auth_age'])) {
             set_message(t('This web site\'s policy requires you to log in again to confirm your identity.'));
             
@@ -89,14 +97,19 @@ function pape_checkid_identity($request, $identity, $immediate) {
 /**
  * @see hook_response()
  */
-function pape_response($assertion, $request) {
+function pape_response($assertion, $request)
+{
     global $user, $version;
     
     // We only deal with positive assertions
-    if (!$assertion) return array();
+    if (!$assertion) {
+        return array();
+    }
     
     // We only respond if we are using OpenID 2 or later
-    if ($version < OPENID_VERSION_2) return array();
+    if ($version < OPENID_VERSION_2) {
+        return array();
+    }
     
     // Get what is requested
     $pape_request = openid_extension_filter_request(OPENID_NS_PAPE, $request);
@@ -131,7 +144,7 @@ function pape_response($assertion, $request) {
                 $realm = openid_get_realm($request, $version);
                 $identity = $request['openid.identity'];
                 
-                $ppid = _pape_ppid($identity, $realm);                
+                $ppid = _pape_ppid($identity, $realm);
                 $response['openid.claimed_id'] = $ppid;
                 $response['openid.identity'] = $ppid;
             }
@@ -146,14 +159,19 @@ function pape_response($assertion, $request) {
  *
  * @see hook_signed_fields()
  */
-function pape_signed_fields($response) {
+function pape_signed_fields($response)
+{
     $fields = array_keys(openid_extension_filter_request(OPENID_NS_PAPE, $response));
     $alias = openid_extension_alias(OPENID_NS_PAPE);
     $signed_fields = array();
 
-    if (isset($response['openid.ns.' . $alias])) $signed_fields[] = 'ns.' . $alias;
+    if (isset($response['openid.ns.' . $alias])) {
+        $signed_fields[] = 'ns.' . $alias;
+    }
     foreach ($fields as $field) {
-        if (isset($response['openid.' . $alias . '.' . $field])) $signed_fields[] = $alias . '.' . $field;
+        if (isset($response['openid.' . $alias . '.' . $field])) {
+            $signed_fields[] = $alias . '.' . $field;
+        }
     }
     
     return $signed_fields;
@@ -165,10 +183,13 @@ function pape_signed_fields($response) {
  * @param bool $identifier_select
  * @return bool whether the current OpenID request is requesting an identity
  */
-function _pape_identifier_select($identifier_select = NULL) {
+function _pape_identifier_select($identifier_select = null)
+{
     static $static_identifier_select = false;
     
-    if (!is_null($identifier_select)) $static_identifier_select = $identifier_select;
+    if (!is_null($identifier_select)) {
+        $static_identifier_select = $identifier_select;
+    }
     
     return $static_identifier_select;
 }
@@ -181,9 +202,10 @@ function _pape_identifier_select($identifier_select = NULL) {
  * @param string $realm the URL of the relying party
  * @return string the PPID
  */
-function _pape_ppid($identity, $realm) {
+function _pape_ppid($identity, $realm)
+{
     // We are reusing the site-token from get_form_token() in common.inc
-    if (store_get('site-token') == NULL) {
+    if (store_get('site-token') == null) {
         $site_token = mt_rand();
         store_set('site-token', $site_token);
     } else {
@@ -192,9 +214,9 @@ function _pape_ppid($identity, $realm) {
     
     $parts = parse_url($realm);
     $host = $parts['host'];
-    if (strstr($host, 'www.') === 0) $host = substr($host, 4);
+    if (strstr($host, 'www.') === 0) {
+        $host = substr($host, 4);
+    }
     
     return simpleid_url('ppid/' . md5($site_token . $identity . $host));
 }
-
-?>

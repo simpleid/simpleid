@@ -98,9 +98,14 @@ $openid_ns_to_alias = array("http://openid.net/extensions/sreg/1.1" => "sreg"); 
  * @see $version
  *
  */
-function openid_get_version($request, $key = 'openid.ns') {
-    if (!isset($request[$key])) return OPENID_VERSION_1_1;
-    if ($request[$key] != OPENID_NS_2_0) return OPENID_VERSION_1_1;
+function openid_get_version($request, $key = 'openid.ns')
+{
+    if (!isset($request[$key])) {
+        return OPENID_VERSION_1_1;
+    }
+    if ($request[$key] != OPENID_NS_2_0) {
+        return OPENID_VERSION_1_1;
+    }
     return OPENID_VERSION_2;
 }
 
@@ -114,19 +119,30 @@ function openid_get_version($request, $key = 'openid.ns') {
  * @return string the message in key-value form encoding
  * @link http://openid.net/specs/openid-authentication-1_1.html#anchor32, http://openid.net/specs/openid-authentication-2_0.html#kvform
  */
-function openid_direct_message($data, $version = OPENID_VERSION_2) {
+function openid_direct_message($data, $version = OPENID_VERSION_2)
+{
     $message = '';
     $ns = '';
     
     // Add namespace for OpenID 2
-    if ($version == OPENID_VERSION_2) $ns = OPENID_NS_2_0;
-    if (($ns != '') && !isset($data['ns'])) $data['ns'] = $ns;
+    if ($version == OPENID_VERSION_2) {
+        $ns = OPENID_NS_2_0;
+    }
+    if (($ns != '') && !isset($data['ns'])) {
+        $data['ns'] = $ns;
+    }
     
     foreach ($data as $key => $value) {
         // Filter out invalid characters
-        if (strpos($key, ':') !== false) return null;
-        if (strpos($key, "\n") !== false) return null;
-        if (strpos($value, "\n") !== false) return null;
+        if (strpos($key, ':') !== false) {
+            return null;
+        }
+        if (strpos($key, "\n") !== false) {
+            return null;
+        }
+        if (strpos($value, "\n") !== false) {
+            return null;
+        }
         
         $message .= "$key:$value\n";
     }
@@ -139,7 +155,8 @@ function openid_direct_message($data, $version = OPENID_VERSION_2) {
  * @param string $message an OpenID message encoded using Key-Value Form
  * @param string $status the HTTP status to send
  */
-function openid_direct_response($message, $status = '200 OK') {
+function openid_direct_response($message, $status = '200 OK')
+{
     if (substr(PHP_SAPI, 0, 3) === 'cgi') {
         header("Status: $status");
     } else {
@@ -160,12 +177,17 @@ function openid_direct_response($message, $status = '200 OK') {
  * @return array the message
  * @link http://openid.net/specs/openid-authentication-2_0.html#indirect_comm
  */
-function openid_indirect_message($data, $version = OPENID_VERSION_2) {
+function openid_indirect_message($data, $version = OPENID_VERSION_2)
+{
     $ns = '';
     
     // Add namespace for OpenID 2
-    if ($version == OPENID_VERSION_2) $ns = OPENID_NS_2_0;
-    if (($ns != '') && !isset($data['openid.ns'])) $data['openid.ns'] = $ns;
+    if ($version == OPENID_VERSION_2) {
+        $ns = OPENID_NS_2_0;
+    }
+    if (($ns != '') && !isset($data['openid.ns'])) {
+        $data['openid.ns'] = $ns;
+    }
     
     return $data;
 }
@@ -182,9 +204,10 @@ function openid_indirect_message($data, $version = OPENID_VERSION_2) {
  * and values, or a URL-encoded query string
  * @param int $component the component of the URL in which the indirect message is
  * encoded, either OPENID_RESPONSE_QUERY or OPENID_RESPONSE_FRAGMENT
- */ 
-function openid_indirect_response($url, $message, $component = OPENID_RESPONSE_QUERY) {
-    if (substr(PHP_SAPI, 0,3) === 'cgi') {
+ */
+function openid_indirect_response($url, $message, $component = OPENID_RESPONSE_QUERY)
+{
+    if (substr(PHP_SAPI, 0, 3) === 'cgi') {
         header('Status: 303 See Other');
     } else {
         header($_SERVER['SERVER_PROTOCOL'] . ' 303 See Other');
@@ -205,7 +228,8 @@ function openid_indirect_response($url, $message, $component = OPENID_RESPONSE_Q
  * @return string the URL to which the response is to be sent, with the
  * encoded message
  */
-function openid_indirect_response_url($url, $message, $component = OPENID_RESPONSE_QUERY) {
+function openid_indirect_response_url($url, $message, $component = OPENID_RESPONSE_QUERY)
+{
     // 1. Firstly, get the query string
     $query = '';
     
@@ -216,7 +240,9 @@ function openid_indirect_response_url($url, $message, $component = OPENID_RESPON
     }
     
     // 2. If there is no query string, then we just return the URL
-    if (!$query) return $url;
+    if (!$query) {
+        return $url;
+    }
     
     // 3. The URL may already have a query and a fragment.  If this is so, we
     //    need to slot in the new query string properly.  We disassemble and
@@ -226,16 +252,24 @@ function openid_indirect_response_url($url, $message, $component = OPENID_RESPON
     $url = $parts['scheme'] . '://';
     if (isset($parts['user'])) {
         $url .= $parts['user'];
-        if (isset($parts['pass'])) $url .= ':' . $parts['pass'];
+        if (isset($parts['pass'])) {
+            $url .= ':' . $parts['pass'];
+        }
         $url .= '@';
     }
     $url .= $parts['host'];
-    if (isset($parts['port'])) $url .= ':' . $parts['port'];
-    if (isset($parts['path'])) $url .= $parts['path'];
+    if (isset($parts['port'])) {
+        $url .= ':' . $parts['port'];
+    }
+    if (isset($parts['path'])) {
+        $url .= $parts['path'];
+    }
     
-    if (($component == OPENID_RESPONSE_QUERY) || (strpos($url, '#') === FALSE)) {
+    if (($component == OPENID_RESPONSE_QUERY) || (strpos($url, '#') === false)) {
         $url .= '?' . ((isset($parts['query'])) ? $parts['query'] . '&' : '') . $query;
-        if (isset($parts['fragment'])) $url .= '#' . $parts['fragment'];
+        if (isset($parts['fragment'])) {
+            $url .= '#' . $parts['fragment'];
+        }
     } elseif ($component == OPENID_RESPONSE_FRAGMENT) {
         // In theory $parts['fragment'] should be an empty string, but the
         // current draft specification does not prohibit putting other things
@@ -257,7 +291,8 @@ function openid_indirect_response_url($url, $message, $component = OPENID_RESPON
  * @return string the encoded message
  * @since 0.8
  */
-function openid_urlencode_message($message) {
+function openid_urlencode_message($message)
+{
     $pairs = array();
     
     foreach ($message as $key => $value) {
@@ -276,7 +311,8 @@ function openid_urlencode_message($message) {
  * message
  * @param float $version the message version
  */
-function openid_direct_error($error, $additional = array(), $version = OPENID_VERSION_2) {
+function openid_direct_error($error, $additional = array(), $version = OPENID_VERSION_2)
+{
     $message = openid_direct_message(array_merge(array('error' => $error), $additional), $version);
     openid_direct_response($message, '400 Bad Request');
 }
@@ -293,7 +329,8 @@ function openid_direct_error($error, $additional = array(), $version = OPENID_VE
  * @param int $component the component of the URL in which the indirect message is
  * encoded, either OPENID_RESPONSE_QUERY or OPENID_RESPONSE_FRAGMENT
  */
-function openid_indirect_error($url, $error, $additional = array(), $version = OPENID_VERSION_2, $component = OPENID_RESPONSE_QUERY) {
+function openid_indirect_error($url, $error, $additional = array(), $version = OPENID_VERSION_2, $component = OPENID_RESPONSE_QUERY)
+{
     $message = openid_indirect_message(array_merge(array('openid.mode'=> 'error', 'openid.error' => $error), $additional), $version);
     openid_indirect_response($url, $message, $component);
 }
@@ -306,7 +343,8 @@ function openid_indirect_error($url, $error, $additional = array(), $version = O
  * @param float $version the OpenID version for the message
  * @return string the realm URI
  */
-function openid_get_realm($request, $version) {
+function openid_get_realm($request, $version)
+{
     if ($version == OPENID_VERSION_1_1) {
         $realm = $request['openid.trust_root'];
     }
@@ -330,7 +368,8 @@ function openid_get_realm($request, $version) {
  *
  * @since 0.7
  */
-function openid_parse_direct_message($message) {
+function openid_parse_direct_message($message)
+{
     $data = array();
 
     $items = explode("\n", $message);
@@ -352,11 +391,16 @@ function openid_parse_direct_message($message) {
  *
  * @since 0.7
  */
-function openid_parse_query($query) {
+function openid_parse_query($query)
+{
     $data = array();
     
-    if ($query === NULL) return array();
-    if ($query === '') return array();
+    if ($query === null) {
+        return array();
+    }
+    if ($query === '') {
+        return array();
+    }
     
     $pairs = explode('&', $query);
     
@@ -375,7 +419,8 @@ function openid_parse_query($query) {
  *
  * @param array $request the OpenID request
  */
-function openid_parse_request($request) {
+function openid_parse_request($request)
+{
     global $openid_ns_to_alias;
     
     foreach ($request as $key => $value) {
@@ -405,23 +450,30 @@ function openid_parse_request($request) {
  * @return bool true if the URL matches the realm
  * @since 0.6
  */
-function openid_url_matches_realm($url, $realm) {
+function openid_url_matches_realm($url, $realm)
+{
     $url = parse_url($url);
     $realm = parse_url($realm);
     
-    foreach(array('user', 'pass', 'fragment') as $key) {
-        if (array_key_exists($key, $url) || array_key_exists($key, $realm))
+    foreach (array('user', 'pass', 'fragment') as $key) {
+        if (array_key_exists($key, $url) || array_key_exists($key, $realm)) {
             return false;
+        }
     }
     
-    if ($url['scheme'] != $realm['scheme']) return false;
-    
-    if (!isset($url['port']))
-        $url['port'] = '';
-    if (!isset($realm['port']))
-        $realm['port'] = '';
-    if (($url['port'] != $realm['port']))
+    if ($url['scheme'] != $realm['scheme']) {
         return false;
+    }
+    
+    if (!isset($url['port'])) {
+        $url['port'] = '';
+    }
+    if (!isset($realm['port'])) {
+        $realm['port'] = '';
+    }
+    if (($url['port'] != $realm['port'])) {
+        return false;
+    }
     
     if (substr($realm['host'], 0, 2) == '*.') {
         $realm_re = '/^([^.]+\.)?' . preg_quote(substr($realm['host'], 2)) . '$/i';
@@ -429,14 +481,22 @@ function openid_url_matches_realm($url, $realm) {
         $realm_re = '/^' . preg_quote($realm['host']) . '$/i';
     }
     
-    if (!preg_match($realm_re, $url['host'])) return false;
+    if (!preg_match($realm_re, $url['host'])) {
+        return false;
+    }
     
-    if (!isset($url['path']))
+    if (!isset($url['path'])) {
         $url['path'] = '';
-    if (!isset($realm['path']))
+    }
+    if (!isset($realm['path'])) {
         $realm['path'] = '';
-    if (substr($realm['path'], -1) == '/') $realm['path'] = substr($realm['path'], 0, -1);
-    if (($url['path'] != $realm['path']) && !preg_match('#^' . preg_quote($realm['path']) . '/.*$#', $url['path'])) return false;
+    }
+    if (substr($realm['path'], -1) == '/') {
+        $realm['path'] = substr($realm['path'], 0, -1);
+    }
+    if (($url['path'] != $realm['path']) && !preg_match('#^' . preg_quote($realm['path']) . '/.*$#', $url['path'])) {
+        return false;
+    }
     
     return true;
 }
@@ -453,21 +513,33 @@ function openid_url_matches_realm($url, $realm) {
  *
  * @since 0.7
  */
-function openid_realm_discovery_url($realm) {
+function openid_realm_discovery_url($realm)
+{
     $parts = parse_url($realm);
-    $host = strtr($parts['host'], array('*.' => 'www.'));;
+    $host = strtr($parts['host'], array('*.' => 'www.'));
+    ;
     
     $url = $parts['scheme'] . '://';
     if (isset($parts['user'])) {
         $url .= $parts['user'];
-        if (isset($parts['pass'])) $url .= ':' . $parts['pass'];
+        if (isset($parts['pass'])) {
+            $url .= ':' . $parts['pass'];
+        }
         $url .= '@';
     }
     $url .= $host;
-    if (isset($parts['port'])) $url .= ':' . $parts['port'];
-    if (isset($parts['path'])) $url .= $parts['path'];
-    if (isset($parts['query'])) $url .= '?' . $parts['query'];
-    if (isset($parts['fragment'])) $url .= '#' . $parts['fragment'];
+    if (isset($parts['port'])) {
+        $url .= ':' . $parts['port'];
+    }
+    if (isset($parts['path'])) {
+        $url .= $parts['path'];
+    }
+    if (isset($parts['query'])) {
+        $url .= '?' . $parts['query'];
+    }
+    if (isset($parts['fragment'])) {
+        $url .= '#' . $parts['fragment'];
+    }
     return $url;
 }
 
@@ -486,35 +558,52 @@ function openid_realm_discovery_url($realm) {
  *
  * @since 0.7
  */
-function openid_verify_return_to($return_to, $actual_url) {
+function openid_verify_return_to($return_to, $actual_url)
+{
     $expected = parse_url($return_to);
     $actual = parse_url($actual_url);
     
     // Schemes are case insensitive
-    if (strtoupper($expected['scheme']) != strtoupper($actual['scheme'])) return false;
+    if (strtoupper($expected['scheme']) != strtoupper($actual['scheme'])) {
+        return false;
+    }
     
     // Hosts are case insensitive
-    if (strtoupper($expected['host']) != strtoupper($actual['host'])) return false;
+    if (strtoupper($expected['host']) != strtoupper($actual['host'])) {
+        return false;
+    }
     
-    if (!isset($expected['port']))
+    if (!isset($expected['port'])) {
         $expected['port'] = '';
-    if (!isset($actual['port']))
+    }
+    if (!isset($actual['port'])) {
         $actual['port'] = '';
-    if ($expected['port'] != $actual['port']) return false;
+    }
+    if ($expected['port'] != $actual['port']) {
+        return false;
+    }
     
-    if (!isset($expected['path']))
+    if (!isset($expected['path'])) {
         $expected['path'] = '';
-    if (!isset($actual['path']))
+    }
+    if (!isset($actual['path'])) {
         $actual['path'] = '';
-    if ($expected['path'] != $actual['path']) return false;
+    }
+    if ($expected['path'] != $actual['path']) {
+        return false;
+    }
     
     if ($expected['query']) {
         $expected_query = openid_parse_query($expected['query']);
         $actual_query = openid_parse_query($actual['query']);
         
-        foreach ($expected_query as $key => $value) {            
-            if (!array_key_exists($key, $actual_query)) return false;
-            if ($value != $actual_query[$key]) return false;
+        foreach ($expected_query as $key => $value) {
+            if (!array_key_exists($key, $actual_query)) {
+                return false;
+            }
+            if ($value != $actual_query[$key]) {
+                return false;
+            }
         }
     }
     
@@ -534,10 +623,13 @@ function openid_verify_return_to($return_to, $actual_url) {
  * @return array the filtered request, with the prefix (in the example above,
  * openid.example.) stripped in the keys.
  */
-function openid_extension_filter_request($ns, $request) {
+function openid_extension_filter_request($ns, $request)
+{
     global $openid_ns_to_alias;
     
-    if (!isset($openid_ns_to_alias[$ns])) return array();
+    if (!isset($openid_ns_to_alias[$ns])) {
+        return array();
+    }
     
     $alias = $openid_ns_to_alias[$ns];
     $return = array();
@@ -563,10 +655,13 @@ function openid_extension_filter_request($ns, $request) {
  * @param array $request the OpenID request
  * @return bool true if the extension is present in the request
  */
-function openid_extension_requested($ns, $request) {
+function openid_extension_requested($ns, $request)
+{
     global $openid_ns_to_alias;
     
-    if (!isset($openid_ns_to_alias[$ns])) return false;
+    if (!isset($openid_ns_to_alias[$ns])) {
+        return false;
+    }
     $alias = $openid_ns_to_alias[$ns];
     
     if (is_array($request)) {
@@ -592,13 +687,16 @@ function openid_extension_requested($ns, $request) {
  * @return string the alias, or NULL if the Type URI does not already
  * have an alias in the current OpenID request <i>and</i> $create is false
  */
-function openid_extension_alias($ns, $create = FALSE) {
+function openid_extension_alias($ns, $create = false)
+{
     global $openid_ns_to_alias;
     static $e = 1;
     
-    if (isset($openid_ns_to_alias[$ns])) return $openid_ns_to_alias[$ns];
-    if ($create !== FALSE) {
-        if ($create === TRUE) {
+    if (isset($openid_ns_to_alias[$ns])) {
+        return $openid_ns_to_alias[$ns];
+    }
+    if ($create !== false) {
+        if ($create === true) {
             $alias = 'e' . $e;
             $e++;
         } elseif (is_string($create)) {
@@ -615,7 +713,7 @@ function openid_extension_alias($ns, $create = FALSE) {
         $openid_ns_to_alias[$ns] = $alias;
         return $alias;
     }
-    return NULL;
+    return null;
 }
 
 
@@ -626,7 +724,8 @@ function openid_extension_alias($ns, $create = FALSE) {
  * @return string an OpenID nonce
  * @link http://openid.net/specs/openid-authentication-2_0.html#positive_assertions
  */
-function openid_nonce() {
+function openid_nonce()
+{
     return gmstrftime('%Y-%m-%dT%H:%M:%SZ') . bin2hex(random_bytes(4));
 }
 
@@ -639,9 +738,12 @@ function openid_nonce() {
  * and an array containing the key size (mac_size) and HMAC function (hmac_func) as
  * values
  */
-function openid_association_types() {
+function openid_association_types()
+{
     $association_types = array('HMAC-SHA1' => array('mac_size' => 20, 'hmac_func' => '_openid_hmac_sha1'));
-    if (OPENID_SHA256_SUPPORTED) $association_types['HMAC-SHA256'] = array('mac_size' => 32, 'hmac_func' => '_openid_hmac_sha256');
+    if (OPENID_SHA256_SUPPORTED) {
+        $association_types['HMAC-SHA256'] = array('mac_size' => 32, 'hmac_func' => '_openid_hmac_sha256');
+    }
     return $association_types;
 }
 
@@ -659,16 +761,21 @@ function openid_association_types() {
  * and an array containing the hash function (hash_func) as
  * values
  */
-function openid_session_types($is_https = FALSE, $version = OPENID_VERSION_2) {
+function openid_session_types($is_https = false, $version = OPENID_VERSION_2)
+{
     $session_types = array(
         'DH-SHA1' => array('hash_func' => '_openid_sha1'),
     );
-    if (OPENID_SHA256_SUPPORTED) $session_types['DH-SHA256'] = array('hash_func' => '_openid_sha256');
-    if (($version >= OPENID_VERSION_2) && ($is_https == TRUE)) {
+    if (OPENID_SHA256_SUPPORTED) {
+        $session_types['DH-SHA256'] = array('hash_func' => '_openid_sha256');
+    }
+    if (($version >= OPENID_VERSION_2) && ($is_https == true)) {
         // Under OpenID 2.0 no-encryption is only allowed if TLS is used
         $session_types['no-encryption'] = array();
     }
-    if ($version == OPENID_VERSION_1_1) $session_types[''] = array();
+    if ($version == OPENID_VERSION_1_1) {
+        $session_types[''] = array();
+    }
     return $session_types;
 }
 
@@ -687,7 +794,8 @@ function openid_session_types($is_https = FALSE, $version = OPENID_VERSION_2) {
  * @return array an array containing (a) dh_server_public - the server's public key (in Base64), and (b)
  * enc_mac_key encrypted MAC key (in Base64), encrypted using the Diffie-Hellman shared secret
  */
-function openid_dh_server_assoc($mac_key, $dh_consumer_public, $dh_modulus = NULL, $dh_gen = NULL, $hash_func = '_openid_sha1') {
+function openid_dh_server_assoc($mac_key, $dh_consumer_public, $dh_modulus = null, $dh_gen = null, $hash_func = '_openid_sha1')
+{
     
     // Generate a key pair for the server
     $key_pair = openid_dh_generate_key_pair($dh_modulus, $dh_gen);
@@ -712,7 +820,8 @@ function openid_dh_server_assoc($mac_key, $dh_consumer_public, $dh_modulus = NUL
  * @param string $hash_func the hash function
  * @return string the decrypted session MAC key, in Base64 representation
  */
-function openid_dh_consumer_assoc($enc_mac_key, $dh_server_public, $dh_consumer_private, $dh_modulus = NULL, $hash_func = '_openid_sha1') {
+function openid_dh_consumer_assoc($enc_mac_key, $dh_server_public, $dh_consumer_private, $dh_modulus = null, $hash_func = '_openid_sha1')
+{
     // Retrieve the shared secret
     $ZZ = openid_dh_shared_secret($dh_server_public, $dh_consumer_private, $dh_modulus);
     
@@ -738,12 +847,13 @@ function openid_dh_consumer_assoc($enc_mac_key, $dh_server_public, $dh_consumer_
  * @see openid_dh_generate_key_pair()
  * @link http://www.ietf.org/rfc/rfc2631.txt RFC 2631
  */
-function openid_dh_shared_secret($their_public, $my_private, $dh_modulus = NULL) {
+function openid_dh_shared_secret($their_public, $my_private, $dh_modulus = null)
+{
     // Decode the keys
     $y = _openid_base64_to_bignum($their_public);
     $x = _openid_base64_to_bignum($my_private);
     
-    if ($dh_modulus != NULL) {
+    if ($dh_modulus != null) {
         $p = _openid_base64_to_bignum($dh_modulus);
     } else {
         $p = bignum_new(OPENID_DH_DEFAULT_MOD);
@@ -763,14 +873,15 @@ function openid_dh_shared_secret($their_public, $my_private, $dh_modulus = NULL)
  * @return array an array containing: (a) private - the private key, in Base64
  * and (b) public - the public key, in Base64
  */
-function openid_dh_generate_key_pair($dh_modulus = NULL, $dh_gen = NULL) {
-    if ($dh_modulus != NULL) {
+function openid_dh_generate_key_pair($dh_modulus = null, $dh_gen = null)
+{
+    if ($dh_modulus != null) {
         $p = _openid_base64_to_bignum($dh_modulus);
     } else {
         $p = bignum_new(OPENID_DH_DEFAULT_MOD);
     }
 
-    if ($dh_gen != NULL) {
+    if ($dh_gen != null) {
         $g = _openid_base64_to_bignum($dh_gen);
     } else {
         $g = bignum_new(OPENID_DH_DEFAULT_GEN);
@@ -795,7 +906,8 @@ function openid_dh_generate_key_pair($dh_modulus = NULL, $dh_gen = NULL) {
  * @param string $hash_func the hash function
  * @return string the encrypted MAC key in Base64 representation
  */
-function openid_encrypt_mac_key($ZZ, $mac_key, $hash_func = '_openid_sha1') {
+function openid_encrypt_mac_key($ZZ, $mac_key, $hash_func = '_openid_sha1')
+{
     // Encrypt/decrypt the MAC key using the shared secret and the hash function
     $encrypted_mac_key = _openid_xor($ZZ, $mac_key, $hash_func);
     
@@ -814,7 +926,8 @@ function openid_encrypt_mac_key($ZZ, $mac_key, $hash_func = '_openid_sha1') {
  * @param string $hash_func the hash function
  * @return string the ciphertext or plaintext
  */
-function _openid_xor($key, $plain_cipher, $hash_func = '_openid_sha1') {
+function _openid_xor($key, $plain_cipher, $hash_func = '_openid_sha1')
+{
     $decoded_key = bignum_val($key, 256);
     $hashed_key = call_user_func($hash_func, $decoded_key);
     
@@ -833,7 +946,8 @@ function _openid_xor($key, $plain_cipher, $hash_func = '_openid_sha1') {
  * @param resource $stop a prime number as a bignum
  * @return resource the random integer as a bignum
  */
-function _openid_dh_rand($stop) {
+function _openid_dh_rand($stop)
+{
     static $duplicate_cache = array();
   
     // Used as the key for the duplicate cache
@@ -877,7 +991,8 @@ function _openid_dh_rand($stop) {
  * @param string $str arbitary precision integer, encoded in Base64
  * @return resource the string representation
  */
-function _openid_base64_to_bignum($str) {
+function _openid_base64_to_bignum($str)
+{
     return bignum_new(base64_decode($str), 256);
 }
 
@@ -888,7 +1003,8 @@ function _openid_base64_to_bignum($str) {
  * @param string $str the string representation
  * @return string the Base64 encoded arbitary precision integer
  */
-function _openid_bignum_to_base64($str) {
+function _openid_bignum_to_base64($str)
+{
     return base64_encode(bignum_val($str, 256));
 }
 
@@ -899,7 +1015,8 @@ function _openid_bignum_to_base64($str) {
  * @return string the signed two's complement binary string
  * @link http://openid.net/specs/openid-authentication-2_0.html#btwoc
  */
-function _openid_btwoc($num) {
+function _openid_btwoc($num)
+{
     return pack('H*', $num);
 }
 
@@ -915,7 +1032,8 @@ function _openid_btwoc($num) {
  * @param float $version the OpenID version
  * @return string the signature encoded in Base64
  */
-function openid_sign($data, $keys, $mac_key, $hmac_func = '_openid_hmac_sha1', $version = OPENID_VERSION_2) {
+function openid_sign($data, $keys, $mac_key, $hmac_func = '_openid_hmac_sha1', $version = OPENID_VERSION_2)
+{
     $signature = '';
     $sign_data = array();
 
@@ -938,13 +1056,14 @@ function openid_sign($data, $keys, $mac_key, $hmac_func = '_openid_hmac_sha1', $
  * OpenID versions 1 and 2 specify that messages are to be encoded using Key-Value
  * Encoding when generating signatures.  However, future OpenID version may
  * specify different ways of encoding the message, such as OAuth.
- * 
+ *
  * @param array $data the data to sign
  * @param float $version the OpenID version
  * @return string the signature base string
  * @link http://openid.net/specs/openid-authentication-2_0.html#anchor11
  */
-function _openid_signature_base_string($data, $version) {
+function _openid_signature_base_string($data, $version)
+{
     switch ($version) {
         case OPENID_VERSION_1_1:
         case OPENID_VERSION_2:
@@ -964,7 +1083,8 @@ function _openid_signature_base_string($data, $version) {
  * @param string $text the text to be hashed
  * @return string the hash in binary representation
  */
-function _openid_sha1($text) {
+function _openid_sha1($text)
+{
     return sha1($text, true);
 }
 
@@ -975,11 +1095,14 @@ function _openid_sha1($text) {
  * @param string $text the text to be hashed
  * @return string the hash in binary representation
  */
-function _openid_hmac_sha1($key, $text) {
+function _openid_hmac_sha1($key, $text)
+{
     if (function_exists('hash_hmac') && function_exists('hash_algos') && (in_array('sha1', hash_algos()))) {
         return hash_hmac('sha1', $text, $key, true);
     } else {
-        if (!defined('OPENID_SHA1_BLOCKSIZE')) define('OPENID_SHA1_BLOCKSIZE', 64);
+        if (!defined('OPENID_SHA1_BLOCKSIZE')) {
+            define('OPENID_SHA1_BLOCKSIZE', 64);
+        }
         
         if (strlen($key) > OPENID_SHA1_BLOCKSIZE) {
             $key = _openid_sha1($key);
@@ -996,7 +1119,6 @@ function _openid_hmac_sha1($key, $text) {
 
 // Check if SHA-256 support is available
 if (function_exists('hash_hmac') && function_exists('hash_algos') && (in_array('sha256', hash_algos()))) {
-    
     /**
      * Whether the current installation of PHP supports SHA256.  SHA256 is supported
      * if the hash module is properly compiled and loaded into PHP.
@@ -1009,7 +1131,8 @@ if (function_exists('hash_hmac') && function_exists('hash_algos') && (in_array('
      * @param string $text the text to be hashed
      * @return string $hash the hash in binary representation
      */
-    function _openid_sha256($text) {
+    function _openid_sha256($text)
+    {
         return hash('sha256', $text, true);
     }
     
@@ -1020,7 +1143,8 @@ if (function_exists('hash_hmac') && function_exists('hash_algos') && (in_array('
      * @param string $text the text to be hashed
      * @return string the hash in binary representation
      */
-    function _openid_hmac_sha256($key, $text) {
+    function _openid_hmac_sha256($key, $text)
+    {
         return hash_hmac('sha256', $text, $key, true);
     }
 } else {
@@ -1043,7 +1167,8 @@ if (!function_exists('rfc3986_urlencode')) {
      * @param string $s the URL to encode
      * @return string the encoded URL
      */
-    function rfc3986_urlencode($s) {
+    function rfc3986_urlencode($s)
+    {
         if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
             return rawurlencode($s);
         } else {
@@ -1051,4 +1176,3 @@ if (!function_exists('rfc3986_urlencode')) {
         }
     }
 }
-?>

@@ -1,4 +1,4 @@
-<?php 
+<?php
 /*
  * SimpleID
  *
@@ -35,14 +35,16 @@ include_once 'lib/gettext/gettext.inc.php';
  *
  * @param string $locale the locale to use
  */
-function locale_init($locale) {
+function locale_init($locale)
+{
     T_setlocale(LC_MESSAGES, $locale);
     // Set the text domain as 'messages'
     $domain = 'messages';
     bindtextdomain($domain, 'locale');
     // bind_textdomain_codeset is supported only in PHP 4.2.0+
-    if (function_exists('bind_textdomain_codeset')) 
+    if (function_exists('bind_textdomain_codeset')) {
         bind_textdomain_codeset($domain, 'UTF-8');
+    }
     textdomain($domain);
 }
 
@@ -56,7 +58,8 @@ function locale_init($locale) {
  * and ! to replace as is
  * @return string the translated string
  */
-function t($string, $variables = array()) {
+function t($string, $variables = array())
+{
     $translated = gettext($string);
     
     foreach ($variables as $variable => $value) {
@@ -71,7 +74,6 @@ function t($string, $variables = array()) {
             case '!':
                 // Pass-through.
         }
-  }
-  return strtr($translated, $variables);
+    }
+    return strtr($translated, $variables);
 }
-?>

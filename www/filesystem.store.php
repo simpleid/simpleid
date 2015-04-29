@@ -61,7 +61,8 @@ $simpleid_settings = array();
  * @param string $uid the name of the user to check
  * @return bool whether the user name exists
  */
-function store_user_exists($uid) {
+function store_user_exists($uid)
+{
     if (_store_is_valid_name($uid)) {
         $identity_file = SIMPLEID_IDENTITIES_DIR . "/$uid.identity";
         return (file_exists($identity_file));
@@ -79,8 +80,11 @@ function store_user_exists($uid) {
  * @param string $uid the name of the user to load
  * @return mixed data for the specified user
  */
-function store_user_load($uid) {
-    if (!_store_is_valid_name($uid)) return array();
+function store_user_load($uid)
+{
+    if (!_store_is_valid_name($uid)) {
+        return array();
+    }
     $store_file = SIMPLEID_STORE_DIR . "/$uid.usrstore";
     
     if (file_exists($store_file)) {
@@ -90,7 +94,7 @@ function store_user_load($uid) {
     }
     
     $identity_file = SIMPLEID_IDENTITIES_DIR . "/$uid.identity";
-    $data = array_merge($data, parse_ini_file($identity_file, TRUE));
+    $data = array_merge($data, parse_ini_file($identity_file, true));
     
     return $data;
 }
@@ -108,9 +112,12 @@ function store_user_load($uid) {
  * @param string $type one of: 'identity' (identity file), 'usrstore' (user store
  * file) or NULL (latter of the two)
  * @return int the updated time
- */ 
-function store_user_updated_time($uid, $type = NULL) {
-    if (!_store_is_valid_name($uid)) return NULL;
+ */
+function store_user_updated_time($uid, $type = null)
+{
+    if (!_store_is_valid_name($uid)) {
+        return null;
+    }
     
     $identity_file = SIMPLEID_IDENTITIES_DIR . "/$uid.identity";
     $identity_time = filemtime($identity_file);
@@ -119,17 +126,17 @@ function store_user_updated_time($uid, $type = NULL) {
     if (file_exists($store_file)) {
         $store_time = filemtime($store_file);
     } else {
-        $store_time = NULL;
+        $store_time = null;
     }
     
     if ($type == 'identity') {
         return $identity_time;
     } elseif ($type == 'usrstore') {
         return $store_time;
-    } elseif ($type == NULL) {
+    } elseif ($type == null) {
         return ($identity_time > $store_time) ? $identity_time : $store_time;
     } else {
-        return NULL;
+        return null;
     }
 }
 
@@ -141,19 +148,26 @@ function store_user_updated_time($uid, $type = NULL) {
  * @return string the user name for the Identity URI, or NULL if no user has
  * the specified Identity URI
  */
-function store_get_uid($identity) {
+function store_get_uid($identity)
+{
     $uid = cache_get('identity', $identity);
-    if ($uid !== NULL) return $uid;
+    if ($uid !== null) {
+        return $uid;
+    }
     
-    $r = NULL;
+    $r = null;
     
     $dir = opendir(SIMPLEID_IDENTITIES_DIR);
     
     while (($file = readdir($dir)) !== false) {
         $filename = SIMPLEID_IDENTITIES_DIR . '/' . $file;
         
-        if (is_link($filename)) $filename = readlink($filename);
-        if ((filetype($filename) != "file") || (!preg_match('/^(.+)\.identity$/', $file, $matches))) continue;
+        if (is_link($filename)) {
+            $filename = readlink($filename);
+        }
+        if ((filetype($filename) != "file") || (!preg_match('/^(.+)\.identity$/', $file, $matches))) {
+            continue;
+        }
         
         $uid = $matches[1];
         $test_user = store_user_load($uid);
@@ -182,19 +196,26 @@ function store_get_uid($identity) {
  * @return string the user name matching the client SSL certificate string, or NULL if no user has
  * client SSL certificate string
  */
-function store_get_uid_from_cert($cert) {
+function store_get_uid_from_cert($cert)
+{
     $uid = cache_get('cert', $cert);
-    if ($uid !== NULL) return $uid;
+    if ($uid !== null) {
+        return $uid;
+    }
     
-    $r = NULL;
+    $r = null;
     
     $dir = opendir(SIMPLEID_IDENTITIES_DIR);
     
     while (($file = readdir($dir)) !== false) {
         $filename = SIMPLEID_IDENTITIES_DIR . '/' . $file;
         
-        if (is_link($filename)) $filename = readlink($filename);
-        if ((filetype($filename) != "file") || (!preg_match('/^(.+)\.identity$/', $file, $matches))) continue;
+        if (is_link($filename)) {
+            $filename = readlink($filename);
+        }
+        if ((filetype($filename) != "file") || (!preg_match('/^(.+)\.identity$/', $file, $matches))) {
+            continue;
+        }
         
         $uid = $matches[1];
         $test_user = store_user_load($uid);
@@ -202,15 +223,21 @@ function store_get_uid_from_cert($cert) {
         if (isset($test_user['certauth']['cert'])) {
             if (is_array($test_user['certauth']['cert'])) {
                 foreach ($test_user['certauth']['cert'] as $test_cert) {
-                    if (trim($test_cert) != '') cache_set('cert', $test_cert, $uid);
+                    if (trim($test_cert) != '') {
+                        cache_set('cert', $test_cert, $uid);
+                    }
                 }
                 foreach ($test_user['certauth']['cert'] as $test_cert) {
-                    if ((trim($test_cert) != '') && ($test_cert == $cert))  $r = $uid;
+                    if ((trim($test_cert) != '') && ($test_cert == $cert)) {
+                        $r = $uid;
+                    }
                 }
             } else {
                 if (trim($test_cert) != '') {
                     cache_set('cert', $test_user['certauth']['cert'], $uid);
-                    if ($test_user['certauth']['cert'] == $cert) $r = $uid;
+                    if ($test_user['certauth']['cert'] == $cert) {
+                        $r = $uid;
+                    }
                 }
             }
         }
@@ -233,9 +260,12 @@ function store_get_uid_from_cert($cert) {
  *
  * @since 0.7
  */
-function store_user_save($uid, $data, $exclude = array()) {
+function store_user_save($uid, $data, $exclude = array())
+{
     foreach ($exclude as $key) {
-        if (isset($data[$key])) unset($data[$key]);
+        if (isset($data[$key])) {
+            unset($data[$key]);
+        }
     }
     
     if (!_store_is_valid_name($uid)) {
@@ -257,10 +287,13 @@ function store_user_save($uid, $data, $exclude = array()) {
  * @return mixed the value of the setting
  *
  */
-function store_get($name, $default = NULL) {
+function store_get($name, $default = null)
+{
     global $simpleid_settings;
     
-    if (!_store_is_valid_name($name)) return $default;
+    if (!_store_is_valid_name($name)) {
+        return $default;
+    }
     
     if (!isset($simpleid_settings[$name])) {
         $setting_file = SIMPLEID_STORE_DIR . "/$name.setting";
@@ -282,7 +315,8 @@ function store_get($name, $default = NULL) {
  * @param mixed $value the value of the setting
  *
  */
-function store_set($name, $value) {
+function store_set($name, $value)
+{
     global $simpleid_settings;
     
     if (!_store_is_valid_name($name)) {
@@ -304,7 +338,8 @@ function store_set($name, $value) {
  * @param string $name the name of the setting to delete
  *
  */
-function store_del($name) {
+function store_del($name)
+{
     global $simpleid_settings;
     
     if (!_store_is_valid_name($name)) {
@@ -312,10 +347,14 @@ function store_del($name) {
         return;
     }
     
-    if (isset($simpleid_settings[$name])) unset($simpleid_settings[$name]);
+    if (isset($simpleid_settings[$name])) {
+        unset($simpleid_settings[$name]);
+    }
     
     $setting_file = SIMPLEID_STORE_DIR . "/$name.setting";
-    if (file_exists($setting_file)) unlink($setting_file);
+    if (file_exists($setting_file)) {
+        unlink($setting_file);
+    }
 }
 
 /**
@@ -325,10 +364,10 @@ function store_del($name) {
  * directory separator (i.e. / or \).
  *
  * @param string $name the name to check
- * @return boolean whether the name is valid for use with this store 
+ * @return boolean whether the name is valid for use with this store
  *
  */
-function _store_is_valid_name($name) {
+function _store_is_valid_name($name)
+{
     return preg_match('!\A[^/\\\\]*\z!', $name);
 }
-?>

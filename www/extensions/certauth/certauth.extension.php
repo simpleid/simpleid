@@ -36,19 +36,22 @@
  * Note that the web server must be set up to request a SSL client certificate
  * and pass the certificate's details to PHP.
  */
-function certauth_user_auto_login() {
-    if (!_certauth_has_client_cert()) return NULL;
+function certauth_user_auto_login()
+{
+    if (!_certauth_has_client_cert()) {
+        return null;
+    }
     
     $cert = trim($_SERVER['SSL_CLIENT_M_SERIAL']) . ';' . trim($_SERVER['SSL_CLIENT_I_DN']);
     log_debug('Client SSL certificate: ' . $cert);
 
     $uid = store_get_uid_from_cert($cert);
-    if ($uid != NULL) {
+    if ($uid != null) {
         log_debug('Client SSL certificate accepted for ' . $uid);
         return user_load($uid);
     } else {
         log_warn('Client SSL certificate presented, but no user with that certificate exists.');
-        return NULL;
+        return null;
     }
 }
 
@@ -66,23 +69,35 @@ function certauth_user_auto_login() {
  *
  * @return true if the user agent has supplied a valid SSL certificate
  */
-function _certauth_has_client_cert() {
+function _certauth_has_client_cert()
+{
     // False if we are not in HTTP
-    if (!is_https()) return false;
+    if (!is_https()) {
+        return false;
+    }
     
     // False if certificate is not valid
-    if (!isset($_SERVER['SSL_CLIENT_VERIFY']) || ($_SERVER['SSL_CLIENT_VERIFY'] !== 'SUCCESS')) return false;
+    if (!isset($_SERVER['SSL_CLIENT_VERIFY']) || ($_SERVER['SSL_CLIENT_VERIFY'] !== 'SUCCESS')) {
+        return false;
+    }
     
     // False if certificate is expired or has no expiry date
-    if (!isset($_SERVER['SSL_CLIENT_V_REMAIN']) || ($_SERVER['SSL_CLIENT_V_REMAIN'] < 0)) return false;
-    if (!isset($_SERVER['SSL_CLIENT_V_END'])) return false;
+    if (!isset($_SERVER['SSL_CLIENT_V_REMAIN']) || ($_SERVER['SSL_CLIENT_V_REMAIN'] < 0)) {
+        return false;
+    }
+    if (!isset($_SERVER['SSL_CLIENT_V_END'])) {
+        return false;
+    }
     
     // False if no serial number
-    if (!isset($_SERVER['SSL_CLIENT_M_SERIAL'])) return false;
+    if (!isset($_SERVER['SSL_CLIENT_M_SERIAL'])) {
+        return false;
+    }
     
     // False if no issuer
-    if (!isset($_SERVER['SSL_CLIENT_I_DN'])) return false;
+    if (!isset($_SERVER['SSL_CLIENT_I_DN'])) {
+        return false;
+    }
     
     return true;
 }
-?>

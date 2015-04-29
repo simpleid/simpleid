@@ -1,4 +1,4 @@
-<?php 
+<?php
 /*
  * SimpleID
  *
@@ -32,14 +32,15 @@
 /**
  * Displays the dashboard page.
  */
-function page_dashboard() {
+function page_dashboard()
+{
     global $user;
     global $xtpl;
     
     // Require HTTPS, redirect if necessary
     check_https('redirect', true);
     
-    if ($user == NULL) {
+    if ($user == null) {
         user_login_form('');
         return;
     }
@@ -63,14 +64,15 @@ function page_dashboard() {
 /**
  * Displays the profile page.
  */
-function page_profile() {
+function page_profile()
+{
     global $user;
     global $xtpl;
     
     // Require HTTPS, redirect if necessary
     check_https('redirect', true);
     
-    if ($user == NULL) {
+    if ($user == null) {
         user_login_form('my/profile');
         return;
     }
@@ -81,7 +83,7 @@ function page_profile() {
     $blocks = _page_discovery_block();
 
     $blocks = array_merge($blocks, _user_page_profile(), extension_invoke_all('page_profile'));
-    $blocks = array_map('page_render_block', $blocks); 
+    $blocks = array_map('page_render_block', $blocks);
     $xtpl->assign('blocks', implode($blocks));
     $xtpl->parse('main.blocks');
     
@@ -97,14 +99,15 @@ function page_profile() {
 /**
  * Returns the user's home page.
  */
-function page_sites() {
+function page_sites()
+{
     global $user;
     global $xtpl;
     
     // Require HTTPS, redirect if necessary
     check_https('redirect', true);
     
-    if ($user == NULL) {
+    if ($user == null) {
         user_login_form('my/sites');
         return;
     }
@@ -161,8 +164,10 @@ function page_sites() {
             
             if (SIMPLEID_VERIFY_RETURN_URL_USING_REALM) {
                 // $rp_info would usually expire by now, so we allow for stale results to be retrieved to improve performance
-                $rp_info = simpleid_get_rp_info($realm, TRUE);
-                if (!isset($rp_info['return_to_verified']) || !$rp_info['return_to_verified']) $xtpl->assign('realm_class', 'return-to-suspect');
+                $rp_info = simpleid_get_rp_info($realm, true);
+                if (!isset($rp_info['return_to_verified']) || !$rp_info['return_to_verified']) {
+                    $xtpl->assign('realm_class', 'return-to-suspect');
+                }
             }
             
             $xtpl->parse('main.sites.realm');
@@ -179,7 +184,7 @@ function page_sites() {
     $xtpl->assign('last_time_label', t('Last access'));
     $xtpl->assign('auto_release_label', t('Automatic'));
     $xtpl->assign('remove_label', t('Remove'));
-    $xtpl->assign('submit_button', t('Submit'));    
+    $xtpl->assign('submit_button', t('Submit'));
     
     $xtpl->parse('main.sites');
     
@@ -204,7 +209,8 @@ function page_sites() {
  * @param string $b
  * @return int
  */
-function _page_sites_sort($a, $b) {
+function _page_sites_sort($a, $b)
+{
     $a = preg_replace('@^https?://(www\.|\*\.)?@', '', $a);
     $b = preg_replace('@^https?://(www\.|\*\.)?@', '', $b);
     return strcasecmp($a, $b);
@@ -213,7 +219,8 @@ function _page_sites_sort($a, $b) {
 /**
  * Set up the navigation section in the header
  */
-function page_nav() {
+function page_nav()
+{
     global $user;
     global $xtpl;
     
@@ -233,10 +240,13 @@ function page_nav() {
  * @param array $block the block to render
  * @return string the HTML of the rendered block
  */
-function page_render_block($block) {
+function page_render_block($block)
+{
     static $xtpl_block;
     
-    if (!$xtpl_block) $xtpl_block = new XTemplate('html/block.xtpl');
+    if (!$xtpl_block) {
+        $xtpl_block = new XTemplate('html/block.xtpl');
+    }
     
     $xtpl_block->reset('block');
     $xtpl_block->assign('id', $block['id']);
@@ -257,7 +267,8 @@ function page_render_block($block) {
  *
  * @return array the welcome block
  */
-function _page_welcome_block() {
+function _page_welcome_block()
+{
     global $user;
     
     return array(array(
@@ -272,7 +283,8 @@ function _page_welcome_block() {
  *
  * @return array the dashboard OTP block
  */
-function _page_dashboard_otp_block() {
+function _page_dashboard_otp_block()
+{
     global $user;
 
     $base_path = get_base_path();
@@ -301,7 +313,8 @@ function _page_dashboard_otp_block() {
  *
  * @return array the discovery block
  */
-function _page_discovery_block() {
+function _page_discovery_block()
+{
     global $user;
     
     $html = "<h3>" . t('&lt;link&gt; tags') . "</h3>";
@@ -328,4 +341,3 @@ function _page_discovery_block() {
         'links' => '<a href="http://simpleid.koinic.net/documentation/getting-started/setting-identity/claim-your-identifier">More information</a>'
     ));
 }
-?>

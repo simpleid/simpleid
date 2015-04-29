@@ -45,7 +45,7 @@
  *
  * @global bool $upgrade_access_check
  */
-$upgrade_access_check = TRUE;
+$upgrade_access_check = true;
 
 /* ----- Do not modify anything following this line ------------------------- */
 
@@ -55,7 +55,7 @@ if (file_exists("config.php")) {
     include_once "config.php";
 } elseif (file_exists("config.inc")) {
     include_once "config.inc";
-    define('UPGRADE_LEGACY_CONFIG_INC', TRUE);
+    define('UPGRADE_LEGACY_CONFIG_INC', true);
 } else {
     die(t('No configuration file found.  See the <a href="!url">manual</a> for instructions on how to set up a configuration file.', array('!url' => 'http://simpleid.koinic.net/documentation/getting-started')));
 }
@@ -89,7 +89,7 @@ $upgrade_functions = array(
  *
  * @global object $xtpl
  */
-$xtpl = NULL;
+$xtpl = null;
 
 /**
  * This variable holds the combined $_GET and $_POST superglobal arrays.
@@ -105,7 +105,8 @@ upgrade_start();
  *
  * @see user_init()
  */
-function upgrade_start() {
+function upgrade_start()
+{
     global $xtpl, $GETPOST;
     
     locale_init(SIMPLEID_LOCALE);
@@ -162,7 +163,7 @@ function upgrade_start() {
     $q = explode('/', $q);
     
     extension_init();
-    user_init(NULL);
+    user_init(null);
     upgrade_user_init();
     
     $routes = array(
@@ -177,7 +178,8 @@ function upgrade_start() {
 /**
  * Displays the upgrade info page.
  */
-function upgrade_info() {
+function upgrade_info()
+{
     global $xtpl;
     
     $xtpl->assign('token', get_form_token('upgrade_info'));
@@ -202,7 +204,8 @@ function upgrade_info() {
  * functions applicable to this upgrade and displays the upgrade
  * selection page.
  */
-function upgrade_selection() {
+function upgrade_selection()
+{
     global $xtpl, $upgrade_access_check;
     
     cache_expire(array('upgrade' => 0));
@@ -255,7 +258,8 @@ function upgrade_selection() {
 /**
  * Applies the upgrade.
  */
-function upgrade_apply() {
+function upgrade_apply()
+{
     global $xtpl, $upgrade_access_check;
     
     if (!validate_form_token($_POST['tk'], 'upgrade_selection')) {
@@ -298,7 +302,8 @@ function upgrade_apply() {
  *
  * @return string the detected version, or the string '0.6.0 or earlier'
  */
-function upgrade_get_version() {
+function upgrade_get_version()
+{
     return store_get('version', '0.6.0 or earlier');
 }
 
@@ -310,8 +315,11 @@ function upgrade_get_version() {
  *
  * @param string $version the version to set
  */
-function upgrade_set_version($version = NULL) {
-    if ($version == NULL) $version = SIMPLEID_VERSION;
+function upgrade_set_version($version = null)
+{
+    if ($version == null) {
+        $version = SIMPLEID_VERSION;
+    }
     store_set('version', $version);
 }
 
@@ -331,10 +339,13 @@ function upgrade_set_version($version = NULL) {
  * in this array
  *
  */
-function upgrade_get_functions($version = NULL) {
+function upgrade_get_functions($version = null)
+{
     global $upgrade_functions;
     
-    if ($version == NULL) $version = upgrade_get_version();
+    if ($version == null) {
+        $version = upgrade_get_version();
+    }
     $functions = array();
     
     uksort($upgrade_functions, '_upgrade_version_reverse_sort');
@@ -345,7 +356,9 @@ function upgrade_get_functions($version = NULL) {
         }
     }
     
-    if (version_compare($version, SIMPLEID_VERSION, '<')) $functions[] = 'upgrade_set_version';
+    if (version_compare($version, SIMPLEID_VERSION, '<')) {
+        $functions[] = 'upgrade_set_version';
+    }
     
     return $functions;
 }
@@ -357,7 +370,8 @@ function upgrade_get_functions($version = NULL) {
  * @param string $b
  * @return int
  */
-function _upgrade_version_reverse_sort($a, $b) {
+function _upgrade_version_reverse_sort($a, $b)
+{
     return -version_compare($a, $b);
 }
 
@@ -371,11 +385,14 @@ function _upgrade_version_reverse_sort($a, $b) {
  *
  * If the user does not have permission, {@link upgade_access_denied()} is called
  */
-function upgrade_user_init() {
+function upgrade_user_init()
+{
     global $user, $upgrade_access_check;
     
     if ($upgrade_access_check) {
-        if (($user == NULL) || ($user['administrator'] != 1)) upgrade_access_denied();
+        if (($user == null) || ($user['administrator'] != 1)) {
+            upgrade_access_denied();
+        }
     }
 }
 
@@ -383,10 +400,11 @@ function upgrade_user_init() {
  * Displays a page notifying the user that he or she does not have permission to
  * run the upgrade script.
  */
-function upgrade_access_denied() {
+function upgrade_access_denied()
+{
     global $xtpl;
     
-    $xtpl->assign('login_required', t('Access denied. You are not authorised to access this page. Please <a href="index.php?q=login">log in</a> as an administrator (a user whose identity file includes the line <code>administrator=1</code>).'));    
+    $xtpl->assign('login_required', t('Access denied. You are not authorised to access this page. Please <a href="index.php?q=login">log in</a> as an administrator (a user whose identity file includes the line <code>administrator=1</code>).'));
     $xtpl->assign('edit_upgrade_php', t('If you cannot log in, you will have to edit <code>upgrade.php</code> to bypass this access check. To do this:'));
     $xtpl->assign('edit_upgrade_php1', t('With a text editor find the upgrade.php file.'));
     $xtpl->assign('edit_upgrade_php2', t('There is a line inside your upgrade.php file that says <code>$upgrade_access_check = TRUE;</code>. Change it to <code>$upgrade_access_check = FALSE;</code>.'));
@@ -410,19 +428,22 @@ function upgrade_access_denied() {
  *
  * @since 0.7
  */
-function upgrade_rp_to_store() {
+function upgrade_rp_to_store()
+{
     $dir = opendir(SIMPLEID_IDENTITIES_DIR);
     
     while (($file = readdir($dir)) !== false) {
         $filename = SIMPLEID_IDENTITIES_DIR . '/' . $file;
         
-        if ((filetype($filename) != "file") || (!preg_match('/^(.+)\.identity$/', $file, $matches))) continue;
+        if ((filetype($filename) != "file") || (!preg_match('/^(.+)\.identity$/', $file, $matches))) {
+            continue;
+        }
         
         $uid = $matches[1];
         
         $user = user_load($uid);
         $rp = cache_get('rp', $uid);
-        if ($rp != NULL) {
+        if ($rp != null) {
             $user['rp'] = $rp;
             user_save($user);
             cache_delete('rp', $uid);
@@ -435,10 +456,11 @@ function upgrade_rp_to_store() {
  *
  * @since 0.7
  */
-function upgrade_token_to_store() {
+function upgrade_token_to_store()
+{
     $site_token = cache_get('token', SIMPLEID_BASE_URL);
     
-    if ($site_token != NULL) {
+    if ($site_token != null) {
         store_set('site-token', $site_token);
         cache_delete('token', SIMPLEID_BASE_URL);
     }
@@ -449,7 +471,8 @@ function upgrade_token_to_store() {
  *
  * @since 0.9
  */
-function upgrade_config_inc_to_php() {
+function upgrade_config_inc_to_php()
+{
     if (defined('UPGRADE_LEGACY_CONFIG_INC')) {
         return '<p>You will need to rename <code>config.inc</code> to <code>config.php</code>.</p>';
     }
@@ -460,7 +483,7 @@ function upgrade_config_inc_to_php() {
  *
  * @since 0.9
  */
-function upgrade_delete_token() {
+function upgrade_delete_token()
+{
     store_del('site-token');
 }
-?>

@@ -1,4 +1,4 @@
-<?php 
+<?php
 /*
  * SimpleWeb
  *
@@ -70,8 +70,9 @@
  *
  */
  
-function simpleweb_run($routes, $request_path = NULL, $not_found_route = NULL) {
-    if ($request_path == NULL) {
+function simpleweb_run($routes, $request_path = null, $not_found_route = null)
+{
+    if ($request_path == null) {
         // We take the request path from the request URI
         $request_path = $_SERVER['REQUEST_URI'];
         
@@ -94,17 +95,22 @@ function simpleweb_run($routes, $request_path = NULL, $not_found_route = NULL) {
     $request_path = strtok($request_path, '?');
     
     foreach ($routes as $pattern => $route) {
-        
-        if (!isset($route)) continue;
+        if (!isset($route)) {
+            continue;
+        }
         $regex = '#^' . trim($pattern, '/') . '$#i';
         
-        if (!preg_match($regex, $request_path, $args) > 0) continue;
+        if (!preg_match($regex, $request_path, $args) > 0) {
+            continue;
+        }
         
         $args = (count($args) > 1) ? array_slice($args, 1) : array();
         return _simpleweb_invoke($route, $args);
     }
     
-    if ($not_found_route) return _simpleweb_invoke($not_found_route, array($request_path));
+    if ($not_found_route) {
+        return _simpleweb_invoke($not_found_route, array($request_path));
+    }
     
     _simpleweb_not_found();
 }
@@ -116,11 +122,12 @@ function simpleweb_run($routes, $request_path = NULL, $not_found_route = NULL) {
  * @param array $args the arguments
  * @return mixed the result from calling the route.
  */
-function _simpleweb_invoke($route, $args = array()) {
+function _simpleweb_invoke($route, $args = array())
+{
     if (strpos($route, '::') !== false) {
         list($class, $method) = split($route, '::', 2);
         return call_user_func_array(array($class, $method), $args);
-    } elseif(strpos($route, '->') !== false) {
+    } elseif (strpos($route, '->') !== false) {
         list($class, $method) = split($route, '->', 2);
         $object &= new $class;
         return call_user_func_array(array($object, $method), $args);
@@ -132,16 +139,17 @@ function _simpleweb_invoke($route, $args = array()) {
 /**
  * Displays a HTTP 404 Not Found error and exits.
  */
-function _simpleweb_not_found() {
-    switch ($_SERVER['REDIRECT_STATUS']) { 
- 	    case '403':
- 	        $status = '403 Forbidden';  
- 	        break;
- 	    case '404':
- 		default: 
- 		    $status = '404 Not Found'; 
- 		    break; 
-    } 
+function _simpleweb_not_found()
+{
+    switch ($_SERVER['REDIRECT_STATUS']) {
+        case '403':
+            $status = '403 Forbidden';
+            break;
+        case '404':
+        default:
+            $status = '404 Not Found';
+            break;
+    }
     
     if (substr(PHP_SAPI, 0, 3) === 'cgi') {
         header('Status: ' . $status);
@@ -154,4 +162,3 @@ function _simpleweb_not_found() {
     
     exit;
 }
-?>

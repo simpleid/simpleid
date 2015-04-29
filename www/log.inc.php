@@ -47,7 +47,7 @@ define('SIMPLEID_LOG_FATAL', 0);
  *
  * @global resource $log
  */
-$log = NULL;
+$log = null;
 
 
 /**
@@ -57,13 +57,16 @@ $log = NULL;
  *
  * @return bool true if the log file is opened successfully.
  */
-function log_open() {
+function log_open()
+{
     global $log;
-    if (!defined('SIMPLEID_LOGFILE') || (SIMPLEID_LOGFILE == '')) return;
+    if (!defined('SIMPLEID_LOGFILE') || (SIMPLEID_LOGFILE == '')) {
+        return;
+    }
     $log = fopen(SIMPLEID_LOGFILE, 'a');
     
     if ($log === false) {
-        $log = NULL;
+        $log = null;
         return false;
     } else {
         return true;
@@ -73,11 +76,12 @@ function log_open() {
 /**
  * Closes the log file, if it is open.
  */
-function log_close() {
-    if ($log != NULL) {
+function log_close()
+{
+    if ($log != null) {
         fflush($log);
         fclose($log);
-        $log = NULL;
+        $log = null;
     }
 }
 
@@ -87,7 +91,8 @@ function log_close() {
  * @param string $message the message to log
  * @see _log_write()
  */
-function log_debug($message) {
+function log_debug($message)
+{
     _log_write($message, SIMPLEID_LOG_DEBUG);
 }
 
@@ -97,7 +102,8 @@ function log_debug($message) {
  * @param string $message the message to log
  * @see _log_write()
  */
-function log_info($message) {
+function log_info($message)
+{
     _log_write($message, SIMPLEID_LOG_INFO);
 }
 
@@ -107,7 +113,8 @@ function log_info($message) {
  * @param string $message the message to log
  * @see _log_write()
  */
-function log_notice($message) {
+function log_notice($message)
+{
     _log_write($message, SIMPLEID_LOG_NOTICE);
 }
 
@@ -117,7 +124,8 @@ function log_notice($message) {
  * @param string $message the message to log
  * @see _log_write()
  */
-function log_warn($message) {
+function log_warn($message)
+{
     _log_write($message, SIMPLEID_LOG_WARN);
 }
 
@@ -127,7 +135,8 @@ function log_warn($message) {
  * @param string $message the message to log
  * @see _log_write()
  */
-function log_error($message) {
+function log_error($message)
+{
     _log_write($message, SIMPLEID_LOG_ERROR);
 }
 
@@ -137,7 +146,8 @@ function log_error($message) {
  * @param string $message the message to log
  * @see _log_write()
  */
-function log_fatal($message) {
+function log_fatal($message)
+{
     _log_write($message, SIMPLEID_LOG_FATAL);
 }
 
@@ -149,10 +159,13 @@ function log_fatal($message) {
  * to false if all the keys in the array should be included
  * @return string the converted string.
  */
-function log_array($array, $keys = false) {
+function log_array($array, $keys = false)
+{
     $output = array();
     
-    if ($keys == false) $keys = array_keys($array);
+    if ($keys == false) {
+        $keys = array_keys($array);
+    }
     
     foreach ($keys as $key) {
         $output[] = $key . ": " . $array[$key];
@@ -168,7 +181,8 @@ function log_array($array, $keys = false) {
  * @param int $level the log level
  * @return bool true if the log has been written successfully
  */
-function _log_write($message, $level = false) {
+function _log_write($message, $level = false)
+{
     global $log;
     static $levels;
     
@@ -194,7 +208,7 @@ function _log_write($message, $level = false) {
     }
 
     /* If the log file isn't already open, open it now. */
-    if (($log == NULL) && !log_open()) {
+    if (($log == null) && !log_open()) {
         return false;
     }
 
@@ -206,5 +220,3 @@ function _log_write($message, $level = false) {
 
     return $success;
 }
-
-?>

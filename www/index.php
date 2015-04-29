@@ -1,4 +1,4 @@
-<?php 
+<?php
 /*
  * SimpleID
  *
@@ -85,7 +85,7 @@ $version = OPENID_VERSION_1_1;
  *
  * @global object $xtpl
  */
-$xtpl = NULL;
+$xtpl = null;
 
 /**
  * This variable holds the combined $_GET and $_POST superglobal arrays.
@@ -102,7 +102,8 @@ simpleid_start();
  *
  * @see user_init()
  */
-function simpleid_start() {
+function simpleid_start()
+{
     global $xtpl, $GETPOST;
     
     locale_init(SIMPLEID_LOCALE);
@@ -173,8 +174,7 @@ function simpleid_start() {
     // Clean stale assocations
     cache_expire(array(
         'association' => SIMPLEID_ASSOC_EXPIRES_IN,
-        'stateless' => 300)
-    );
+        'stateless' => 300));
     
     simpleid_route($q);
 }
@@ -186,7 +186,8 @@ function simpleid_start() {
  *
  * @param string $q the request path
  */
-function simpleid_route($q) {
+function simpleid_route($q)
+{
     $routes = array(
         'continue' => 'simpleid_continue',
         'login' => 'user_login',
@@ -221,7 +222,8 @@ function simpleid_route($q) {
  *   appropriate
  *
  */
-function simpleid_index() {
+function simpleid_index()
+{
     global $GETPOST;
     
     log_debug('simpleid_index');
@@ -255,7 +257,8 @@ function simpleid_index() {
  *
  * @param array $request the OpenID request
  */
-function simpleid_process_openid($request) {
+function simpleid_process_openid($request)
+{
     global $version;
     
     $version = openid_get_version($request);
@@ -298,7 +301,8 @@ function simpleid_process_openid($request) {
  * @link http://openid.net/specs/openid-authentication-1_1.html#mode_associate, http://openid.net/specs/openid-authentication-2_0.html#associations
  *
  */
-function simpleid_associate($request) {
+function simpleid_associate($request)
+{
     global $version;
     
     log_info('OpenID association request: ' . log_array($request));
@@ -307,13 +311,15 @@ function simpleid_associate($request) {
     $session_types = openid_session_types(is_https(), $version);
 
     // Common Request Parameters [8.1.1]
-    if (($version == OPENID_VERSION_1_1) && !isset($request['openid.session_type'])) $request['openid.session_type'] = '';
+    if (($version == OPENID_VERSION_1_1) && !isset($request['openid.session_type'])) {
+        $request['openid.session_type'] = '';
+    }
     $assoc_type = $request['openid.assoc_type'];
     $session_type = $request['openid.session_type'];
     
     // Diffie-Hellman Request Parameters [8.1.2]
-    $dh_modulus = (isset($request['openid.dh_modulus'])) ? $request['openid.dh_modulus'] : NULL;
-    $dh_gen = (isset($request['openid.dh_gen'])) ? $request['openid.dh_gen'] : NULL;
+    $dh_modulus = (isset($request['openid.dh_modulus'])) ? $request['openid.dh_modulus'] : null;
+    $dh_gen = (isset($request['openid.dh_gen'])) ? $request['openid.dh_gen'] : null;
     $dh_consumer_public = $request['openid.dh_consumer_public'];
     
     if (!isset($request['openid.session_type']) || !isset($request['openid.assoc_type'])) {
@@ -362,7 +368,7 @@ function simpleid_associate($request) {
 /**
  * Creates an association.
  *
- * This function calls {@link openid_dh_server_assoc()} where required, to 
+ * This function calls {@link openid_dh_server_assoc()} where required, to
  * generate the cryptographic values required for an association response.
  *
  * @param int $mode either ASSOCIATION_SHARED or ASSOCIATION_PRIVATE
@@ -376,7 +382,8 @@ function simpleid_associate($request) {
  * association data for storage.
  * @link http://openid.net/specs/openid-authentication-1_1.html#anchor14, http://openid.net/specs/openid-authentication-2_0.html#anchor20
  */
-function _simpleid_create_association($mode = ASSOCIATION_SHARED, $assoc_type = 'HMAC-SHA1', $session_type = 'no-encryption', $dh_modulus = NULL, $dh_gen = NULL, $dh_consumer_public = NULL) {
+function _simpleid_create_association($mode = ASSOCIATION_SHARED, $assoc_type = 'HMAC-SHA1', $session_type = 'no-encryption', $dh_modulus = null, $dh_gen = null, $dh_consumer_public = null)
+{
     global $version;
     
     $assoc_types = openid_association_types();
@@ -399,7 +406,9 @@ function _simpleid_create_association($mode = ASSOCIATION_SHARED, $assoc_type = 
     // If $session_type is '', then it must be using OpenID 1.1 (blank parameter
     // is not allowed for OpenID 2.0.  For OpenID 1.1 blank requests, we don't
     // put a session_type in the response.
-    if ($session_type != '') $response['session_type'] = $session_type;
+    if ($session_type != '') {
+        $response['session_type'] = $session_type;
+    }
     
     if (($session_type == 'no-encryption') || ($session_type == '')) {
         $mac_key = base64_encode(call_user_func($hmac_func, $secret, $response['assoc_handle']));
@@ -414,7 +423,9 @@ function _simpleid_create_association($mode = ASSOCIATION_SHARED, $assoc_type = 
     }
 
     $association = array('assoc_handle' => $assoc_handle, 'assoc_type' => $assoc_type, 'mac_key' => $mac_key, 'created' => time());
-    if ($mode == ASSOCIATION_PRIVATE) $association['private'] = 1;
+    if ($mode == ASSOCIATION_PRIVATE) {
+        $association['private'] = 1;
+    }
     cache_set('association', $assoc_handle, $association);
 
     if ($mode == ASSOCIATION_SHARED) {
@@ -449,14 +460,15 @@ function _simpleid_create_association($mode = ASSOCIATION_SHARED, $assoc_type = 
  * @param array $request the OpenID request
  *
  */
-function simpleid_checkid($request) {
+function simpleid_checkid($request)
+{
     global $version;
     
     $immediate = ($request['openid.mode'] == 'checkid_immediate');
     
     log_info('OpenID authentication request: ' . (($immediate) ? 'immediate' : 'setup') . '; '. log_array($request));
 
-    // Check for protocol correctness    
+    // Check for protocol correctness
     if ($version == OPENID_VERSION_1_1) {
         if (!isset($request['openid.return_to'])) {
             log_error('Protocol Error: openid.return_to not set.');
@@ -504,7 +516,7 @@ function simpleid_checkid($request) {
         $results = extension_invoke_all('checkid', $request, $immediate);
         
         // Filter out nulls
-        $results = array_merge(array_diff($results, array(NULL)));
+        $results = array_merge(array_diff($results, array(null)));
         
         // If there are still results, it is the lowest value, otherwise, it is CHECKID_PROTOCOL_ERROR
         $result = ($results) ? min($results) : CHECKID_PROTOCOL_ERROR;
@@ -534,7 +546,7 @@ function simpleid_checkid($request) {
         case CHECKID_OK:
             log_info('CHECKID_OK');
             $response = simpleid_checkid_ok($request);
-            $response = simpleid_sign($response, isset($request['openid.assoc_handle']) ? $request['openid.assoc_handle'] : NULL);
+            $response = simpleid_sign($response, isset($request['openid.assoc_handle']) ? $request['openid.assoc_handle'] : null);
             simpleid_assertion_response($response, $request['openid.return_to']);
             break;
         case CHECKID_LOGIN_REQUIRED:
@@ -551,10 +563,10 @@ function simpleid_checkid($request) {
         case CHECKID_IDENTITY_NOT_EXIST:
             log_info('CHECKID_IDENTITIES_NOT_MATCHING | CHECKID_IDENTITY_NOT_EXIST');
             $response = simpleid_checkid_error($request, $immediate);
-            if ($immediate) {                
+            if ($immediate) {
                 simpleid_assertion_response($response, $request['openid.return_to']);
-            } else {                
-                simpleid_openid_consent_form($request, $response, $result);                
+            } else {
+                simpleid_openid_consent_form($request, $response, $result);
             }
             break;
         case CHECKID_PROTOCOL_ERROR:
@@ -580,13 +592,14 @@ function simpleid_checkid($request) {
  * CHECKID_IDENTITIES_NOT_MATCHING, CHECKID_LOGIN_REQUIRED or CHECKID_PROTOCOL_ERROR
  * @global array the current logged in user
  */
-function simpleid_checkid_identity(&$request, $immediate) {
+function simpleid_checkid_identity(&$request, $immediate)
+{
     global $user, $version;
     
     $realm = openid_get_realm($request, $version);
     
     // Check 1: Is the user logged into SimpleID as any user?
-    if ($user == NULL) {
+    if ($user == null) {
         return CHECKID_LOGIN_REQUIRED;
     } else {
         $uid = $user['uid'];
@@ -603,7 +616,9 @@ function simpleid_checkid_identity(&$request, $immediate) {
         $identity = $request['openid.identity'];
         $test_user = user_load_from_identity($identity);
     }
-    if ($test_user == NULL) return CHECKID_IDENTITY_NOT_EXIST;
+    if ($test_user == null) {
+        return CHECKID_IDENTITY_NOT_EXIST;
+    }
     if ($test_user['uid'] != $user['uid']) {
         log_notice('Requested user ' . $test_user['uid'] . ' does not match logged in user ' . $user['uid']);
         return CHECKID_IDENTITIES_NOT_MATCHING;
@@ -611,7 +626,7 @@ function simpleid_checkid_identity(&$request, $immediate) {
     
     // Pass the assertion to extensions
     $assertion_results = extension_invoke_all('checkid_identity', $request, $identity, $immediate);
-    $assertion_results = array_merge(array_diff($assertion_results, array(NULL)));
+    $assertion_results = array_merge(array_diff($assertion_results, array(null)));
     
     // Populate the request with the selected identity
     if ($request['openid.identity'] == OPENID_IDENTIFIER_SELECT) {
@@ -620,10 +635,10 @@ function simpleid_checkid_identity(&$request, $immediate) {
     }
     
     // Check 3: Discover the realm and match its return_to
-    $user_rp = (isset($user['rp'][$realm])) ? $user['rp'][$realm] : NULL;
+    $user_rp = (isset($user['rp'][$realm])) ? $user['rp'][$realm] : null;
 
     if (($version >= OPENID_VERSION_2) && SIMPLEID_VERIFY_RETURN_URL_USING_REALM) {
-        $verified = FALSE;
+        $verified = false;
         
         $rp_info = simpleid_get_rp_info($realm);
         $services = discovery_xrds_services_by_type($rp_info['services'], OPENID_RETURN_TO);
@@ -639,7 +654,7 @@ function simpleid_checkid_identity(&$request, $immediate) {
             foreach ($return_to_uris as $return_to) {
                 if (openid_url_matches_realm($request['openid.return_to'], $return_to)) {
                     log_info('OpenID 2 discovery: verified');
-                    $verified = TRUE;
+                    $verified = true;
                     break;
                 }
             }
@@ -649,7 +664,7 @@ function simpleid_checkid_identity(&$request, $immediate) {
         simpleid_set_rp_info($realm, $rp_info);
         
         if (!$verified) {
-            if (($user_rp != NULL) && ($user_rp['auto_release'] == 1)) {
+            if (($user_rp != null) && ($user_rp['auto_release'] == 1)) {
                 log_notice('OpenID 2 discovery: not verified, but overridden by user preference');
             } else {
                 log_notice('OpenID 2 discovery: not verified');
@@ -659,8 +674,8 @@ function simpleid_checkid_identity(&$request, $immediate) {
     }
     
     // Check 4: For checkid_immediate, the user must already have given
-    // permission to log in automatically.    
-    if (($user_rp != NULL) && ($user_rp['auto_release'] == 1)) {
+    // permission to log in automatically.
+    if (($user_rp != null) && ($user_rp['auto_release'] == 1)) {
         log_info('Automatic set for realm ' . $realm);
         $assertion_results[] = CHECKID_OK;
         return min($assertion_results);
@@ -685,14 +700,15 @@ function simpleid_checkid_identity(&$request, $immediate) {
  * @link http://openid.net/specs/openid-authentication-2_0.html#rp_discovery
  * @since 0.8
  */
-function simpleid_get_rp_info($realm, $allow_stale = FALSE) {
+function simpleid_get_rp_info($realm, $allow_stale = false)
+{
     $url = openid_realm_discovery_url($realm);
     
     log_info('simpleid_get_rp_info');
     
     $rp_info = cache_get('rp-info', $realm);
     
-    if (($rp_info == NULL) || (!isset($rp_info['updated'])) || (!$allow_stale && ($rp_info['updated'] < time() - 3600))) {
+    if (($rp_info == null) || (!isset($rp_info['updated'])) || (!$allow_stale && ($rp_info['updated'] < time() - 3600))) {
         log_info('OpenID 2 RP discovery: realm: ' . $realm . '; url: ' . $url);
         
         $rp_info = array(
@@ -715,8 +731,11 @@ function simpleid_get_rp_info($realm, $allow_stale = FALSE) {
  *
  * @since 0.8
  */
-function simpleid_set_rp_info($realm, $rp_info) {
-    if (!isset($rp_info['updated'])) $rp_info['updated'] = time();
+function simpleid_set_rp_info($realm, $rp_info)
+{
+    if (!isset($rp_info['updated'])) {
+        $rp_info['updated'] = time();
+    }
     cache_set('rp-info', $realm, $rp_info, $rp_info['updated']);
 }
 
@@ -727,7 +746,8 @@ function simpleid_set_rp_info($realm, $rp_info) {
  * @return array an OpenID response with a positive assertion
  * @link http://openid.net/specs/openid-authentication-1_1.html#anchor17, http://openid.net/specs/openid-authentication-1_1.html#anchor23, http://openid.net/specs/openid-authentication-2_0.html#positive_assertions
  */
-function simpleid_checkid_ok($request) {
+function simpleid_checkid_ok($request)
+{
     global $version;
     
     $message = array(
@@ -736,15 +756,21 @@ function simpleid_checkid_ok($request) {
         'openid.response_nonce' => openid_nonce()
     );
     
-    if (isset($request['openid.assoc_handle'])) $message['openid.assoc_handle'] = $request['openid.assoc_handle'];
-    if (isset($request['openid.identity'])) $message['openid.identity'] = $request['openid.identity'];
-    if (isset($request['openid.return_to'])) $message['openid.return_to'] = $request['openid.return_to'];
+    if (isset($request['openid.assoc_handle'])) {
+        $message['openid.assoc_handle'] = $request['openid.assoc_handle'];
+    }
+    if (isset($request['openid.identity'])) {
+        $message['openid.identity'] = $request['openid.identity'];
+    }
+    if (isset($request['openid.return_to'])) {
+        $message['openid.return_to'] = $request['openid.return_to'];
+    }
     
     if (($version >= OPENID_VERSION_2) && isset($request['openid.claimed_id'])) {
         $message['openid.claimed_id'] = $request['openid.claimed_id'];
     }
     
-    $message = array_merge($message, extension_invoke_all('response', TRUE, $request));
+    $message = array_merge($message, extension_invoke_all('response', true, $request));
     
     log_info('OpenID authentication response: ' . log_array($message));
     return openid_indirect_message($message, $version);
@@ -759,7 +785,8 @@ function simpleid_checkid_ok($request) {
  * @return mixed an OpenID response with a negative assertion
  * @link http://openid.net/specs/openid-authentication-1_1.html#anchor17, http://openid.net/specs/openid-authentication-1_1.html#anchor23, http://openid.net/specs/openid-authentication-2_0.html#negative_assertions
  */
-function simpleid_checkid_approval_required($request) {
+function simpleid_checkid_approval_required($request)
+{
     global $version;
     
     if ($version >= OPENID_VERSION_2) {
@@ -767,12 +794,12 @@ function simpleid_checkid_approval_required($request) {
     } else {
         $request['openid.mode'] = 'checkid_setup';
         $message = array(
-            'openid.mode' => 'id_res',            
+            'openid.mode' => 'id_res',
             'openid.user_setup_url' => simpleid_url('continue', 's=' . rawurlencode(pickle($request)))
         );
     }
     
-    $message = array_merge($message, extension_invoke_all('response', FALSE, $request));
+    $message = array_merge($message, extension_invoke_all('response', false, $request));
     
     log_info('OpenID authentication response: ' . log_array($message));
     return openid_indirect_message($message, $version);
@@ -786,19 +813,20 @@ function simpleid_checkid_approval_required($request) {
  * @return array an OpenID response with a negative assertion
  * @link http://openid.net/specs/openid-authentication-1_1.html#anchor17, http://openid.net/specs/openid-authentication-1_1.html#anchor23, http://openid.net/specs/openid-authentication-2_0.html#negative_assertions
  */
-function simpleid_checkid_login_required($request) {
+function simpleid_checkid_login_required($request)
+{
     global $version;
     
     if ($version >= OPENID_VERSION_2) {
         $message = array('openid.mode' => 'setup_needed');
-    } else {    
+    } else {
         $message = array(
             'openid.mode' => 'id_res',
             'openid.user_setup_url' => simpleid_url('login', 'destination=continue&s=' . rawurlencode(pickle($request)))
         );
     }
     
-    $message = array_merge($message, extension_invoke_all('response', FALSE, $request));
+    $message = array_merge($message, extension_invoke_all('response', false, $request));
     
     log_info('OpenID authentication response: ' . log_array($message));
     return openid_indirect_message($message, $version);
@@ -815,7 +843,8 @@ function simpleid_checkid_login_required($request) {
  * @return array an OpenID response with a negative assertion
  * @link http://openid.net/specs/openid-authentication-1_1.html#anchor17, http://openid.net/specs/openid-authentication-1_1.html#anchor23, http://openid.net/specs/openid-authentication-2_0.html#negative_assertions
  */
-function simpleid_checkid_error($request, $immediate = false) {
+function simpleid_checkid_error($request, $immediate = false)
+{
     global $version;
     
     $message = array();
@@ -829,7 +858,7 @@ function simpleid_checkid_error($request, $immediate = false) {
         $message['openid.mode'] = 'cancel';
     }
     
-    $message = array_merge($message, extension_invoke_all('response', FALSE, $request));
+    $message = array_merge($message, extension_invoke_all('response', false, $request));
     
     log_info('OpenID authentication response: ' . log_array($message));
     return openid_indirect_message($message, $version);
@@ -846,7 +875,8 @@ function simpleid_checkid_error($request, $immediate = false) {
  * @return array the signed OpenID response
  *
  */
-function simpleid_sign(&$response, $assoc_handle = NULL) {
+function simpleid_sign(&$response, $assoc_handle = null)
+{
     global $version;
     
     if (!$assoc_handle) {
@@ -880,7 +910,9 @@ function simpleid_sign(&$response, $assoc_handle = NULL) {
     // Check if the signed keys are actually present
     $to_sign = array();
     foreach ($signed_fields as $field) {
-        if (isset($response['openid.' . $field])) $to_sign[] = $field;
+        if (isset($response['openid.' . $field])) {
+            $to_sign[] = $field;
+        }
     }
     
     $response['openid.signed'] = implode(',', $to_sign);
@@ -904,7 +936,8 @@ function simpleid_sign(&$response, $assoc_handle = NULL) {
  * @param array $request the OpenID request
  * @see http://openid.net/specs/openid-authentication-1_1.html#mode_check_authentication, http://openid.net/specs/openid-authentication-2_0.html#verifying_signatures
  */
-function simpleid_check_authentication($request) {
+function simpleid_check_authentication($request)
+{
     global $version;
     
     log_info('OpenID direct verification: ' . log_array($request));
@@ -939,28 +972,29 @@ function simpleid_check_authentication($request) {
  * @return bool true if the signature is verified
  * @since 0.8
  */
-function simpleid_verify_signatures($request) {
+function simpleid_verify_signatures($request)
+{
     global $version;
     
     log_info('simpleid_verify_signatures');
     
-    $is_valid = TRUE;
+    $is_valid = true;
   
-    $assoc = (isset($request['openid.assoc_handle'])) ? cache_get('association', $request['openid.assoc_handle']) : NULL;
-    $stateless = (isset($request['openid.response_nonce'])) ? cache_get('stateless', $request['openid.response_nonce']) : NULL;
+    $assoc = (isset($request['openid.assoc_handle'])) ? cache_get('association', $request['openid.assoc_handle']) : null;
+    $stateless = (isset($request['openid.response_nonce'])) ? cache_get('stateless', $request['openid.response_nonce']) : null;
   
     if (!$assoc) {
         log_notice('simpleid_verify_signatures: Association not found.');
-        $is_valid = FALSE;
+        $is_valid = false;
     } elseif (!$assoc['assoc_type']) {
         log_error('simpleid_verify_signatures: Association does not contain valid assoc_type.');
-        $is_valid = FALSE;
+        $is_valid = false;
     } elseif (!isset($assoc['private']) || ($assoc['private'] != 1)) {
         log_warn('simpleid_verify_signatures: Attempting to verify an association with a shared key.');
-        $is_valid = FALSE;
+        $is_valid = false;
     } elseif (!$stateless || ($stateless['assoc_handle'] != $request['openid.assoc_handle'])) {
         log_warn('simpleid_verify_signatures: Attempting to verify a response_nonce more than once, or private association expired.');
-        $is_valid = FALSE;
+        $is_valid = false;
     } else {
         $mac_key = $assoc['mac_key'];
         $assoc_types = openid_association_types();
@@ -972,7 +1006,7 @@ function simpleid_verify_signatures($request) {
         
         if ($signature != $request['openid.sig']) {
             log_warn('simpleid_verify_signatures: Signature supplied in request does not match the signatured generated.');
-            $is_valid = FALSE;
+            $is_valid = false;
         }
         
         cache_delete('stateless', $request['openid.response_nonce']);
@@ -990,7 +1024,8 @@ function simpleid_verify_signatures($request) {
  * {@link simpleid_process_openid} function.  This allows SimpleID to preserve
  * the state of an OpenID request.
  */
-function simpleid_continue() {
+function simpleid_continue()
+{
     global $GETPOST;
     
     $request = unpickle($GETPOST['s']);
@@ -999,7 +1034,7 @@ function simpleid_continue() {
 }
 
 /**
- * Provides a form for user consent of an OpenID relying party, where the 
+ * Provides a form for user consent of an OpenID relying party, where the
  * {@link simpleid_checkid_identity()} function returns a CHECKID_APPROVAL_REQUIRED
  * or CHECKID_RETURN_TO_SUSPECT.
  *
@@ -1013,7 +1048,8 @@ function simpleid_continue() {
  * @param int $reason either CHECKID_APPROVAL_REQUIRED, CHECKID_RETURN_TO_SUSPECT,
  * CHECKID_IDENTITIES_NOT_MATCHING or CHECKID_IDENTITY_NOT_EXIST
  */
-function simpleid_openid_consent_form($request, $response, $reason = CHECKID_APPROVAL_REQUIRED) {
+function simpleid_openid_consent_form($request, $response, $reason = CHECKID_APPROVAL_REQUIRED)
+{
     global $user;
     global $xtpl;
     global $version;
@@ -1041,14 +1077,16 @@ function simpleid_openid_consent_form($request, $response, $reason = CHECKID_APP
     } else {
         $xtpl->assign('javascript', '<script src="' . get_base_path() . 'html/openid-consent.js" type="text/javascript"></script>');
         
-        $rp = (isset($user['rp'][$realm])) ? $user['rp'][$realm] : NULL;
+        $rp = (isset($user['rp'][$realm])) ? $user['rp'][$realm] : null;
         
         $extensions = extension_invoke_all('consent_form', $request, $response, $rp);
         $xtpl->assign('extensions', implode($extensions));
         
         if ($reason == CHECKID_RETURN_TO_SUSPECT) {
-            $xtpl->assign('suspect_label', t('Warning: This web site has not confirmed its identity and might be fraudulent.  Do not share any personal information with this web site unless you are sure it is legitimate. See the <a href="!url" class="popup">SimpleID documentation for details</a> (OpenID version 2.0 return_to discovery failure)',
-                array('!url' => 'http://simpleid.koinic.net/documentation/troubleshooting/returnto-discovery-failure')));
+            $xtpl->assign('suspect_label', t(
+                'Warning: This web site has not confirmed its identity and might be fraudulent.  Do not share any personal information with this web site unless you are sure it is legitimate. See the <a href="!url" class="popup">SimpleID documentation for details</a> (OpenID version 2.0 return_to discovery failure)',
+                array('!url' => 'http://simpleid.koinic.net/documentation/troubleshooting/returnto-discovery-failure')
+            ));
             
             $xtpl->parse('main.openid_consent.setup.suspect');
             $xtpl->assign('realm_class', 'return-to-suspect');
@@ -1085,10 +1123,11 @@ function simpleid_openid_consent_form($request, $response, $reason = CHECKID_APP
  * the relying party.  Otherwise, the dashboard will be displayed to the user.
  *
  */
-function simpleid_openid_consent() {
+function simpleid_openid_consent()
+{
     global $xtpl, $user, $version, $GETPOST;
     
-    if ($user == NULL) {
+    if ($user == null) {
         user_login_form('');
         return;
     }
@@ -1107,11 +1146,15 @@ function simpleid_openid_consent() {
     $version = openid_get_version($response);
     openid_parse_request($response);
     $return_to = $response['openid.return_to'];
-    if (!$return_to) $return_to = $GETPOST['openid.return_to'];
+    if (!$return_to) {
+        $return_to = $GETPOST['openid.return_to'];
+    }
     
     if ($GETPOST['op'] == t('Cancel')) {
         $response = simpleid_checkid_error(false);
-        if (!$return_to) set_message(t('Log in cancelled.'));
+        if (!$return_to) {
+            set_message(t('Log in cancelled.'));
+        }
     } else {
         $now = time();
         $realm = $GETPOST['openid.realm'];
@@ -1138,8 +1181,10 @@ function simpleid_openid_consent() {
         $user['rp'][$realm] = $rp;
         user_save($user);
         
-        $response = simpleid_sign($response, isset($response['openid.assoc_handle']) ? $response['openid.assoc_handle'] : NULL);
-        if (!$return_to) set_message(t('You were logged in successfully.'));
+        $response = simpleid_sign($response, isset($response['openid.assoc_handle']) ? $response['openid.assoc_handle'] : null);
+        if (!$return_to) {
+            set_message(t('You were logged in successfully.'));
+        }
     }
 
     if ($return_to) {
@@ -1160,7 +1205,8 @@ function simpleid_openid_consent() {
  * @param string $indirect_url the URL to which the OpenID response is sent.  If
  * this is an empty string, the response is sent via direct communication
  */
-function simpleid_assertion_response($response, $indirect_url = NULL) {
+function simpleid_assertion_response($response, $indirect_url = null)
+{
     global $xtpl, $version;
     
     if ($indirect_url) {
@@ -1177,9 +1223,10 @@ function simpleid_assertion_response($response, $indirect_url = NULL) {
 
 /**
  * Displays the XRDS document for this SimpleID installation.
- * 
+ *
  */
-function simpleid_xrds() {
+function simpleid_xrds()
+{
     global $xtpl;
     
     log_debug('Providing XRDS.');
@@ -1198,6 +1245,3 @@ function simpleid_xrds() {
     $xtpl->parse('xrds');
     $xtpl->out('xrds');
 }
-
-
-?>

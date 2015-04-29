@@ -55,7 +55,8 @@ define('SIMPLEHTTP_USER_AGENT', 'SimpleHTTP/' . substr('$Rev$', 6, -2));
  * 'headers' (an array of return headers in lowercase),
  * 'content-type' (the HTTP content-type returned)
  */
-function http_make_request($url, $headers = array(), $body = NULL, $method = 'GET', $retry = 3) {
+function http_make_request($url, $headers = array(), $body = null, $method = 'GET', $retry = 3)
+{
     // If CURL is available, we use it
     if (extension_loaded('curl')) {
         $response = _http_make_request_curl($url, $headers, $body, $method, $retry);
@@ -96,7 +97,8 @@ function http_make_request($url, $headers = array(), $body = NULL, $method = 'GE
  *
  * @return array an array of protocols
  */
-function http_protocols() {
+function http_protocols()
+{
     if (extension_loaded('curl')) {
         $curl_version = curl_version();
         return $curl_version['protocols'];
@@ -118,7 +120,8 @@ function http_protocols() {
  * (if the HTTP status code is not 200 or 304), 'headers' (an array of return headers),
  * 'content-type' (the HTTP content-type returned)
  */
-function _http_make_request_curl($url, $headers = array(), $body = NULL, $method = 'GET', $retry = 3) {
+function _http_make_request_curl($url, $headers = array(), $body = null, $method = 'GET', $retry = 3)
+{
     // CURLOPT_FOLLOWLOCATION only works when safe mode is off or when open_basedir is set
     // In these instances we will need to follow redirects manually
     $manual_redirect = ((@ini_get('safe_mode') === 1)   // safe mode
@@ -133,7 +136,9 @@ function _http_make_request_curl($url, $headers = array(), $body = NULL, $method
         curl_setopt($curl, CURLOPT_ENCODING, '');
     }
     
-    if (!$manual_redirect) curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+    if (!$manual_redirect) {
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+    }
     
     curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
     curl_setopt($curl, CURLOPT_MAXREDIRS, $retry);
@@ -149,16 +154,18 @@ function _http_make_request_curl($url, $headers = array(), $body = NULL, $method
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
     
-    if ($body != NULL) curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
+    if ($body != null) {
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
+    }
     
     $response = curl_exec($curl);
     
-    if (($response === FALSE) && ((curl_errno($curl) == 23) || (curl_errno($curl) == 61))) {
+    if (($response === false) && ((curl_errno($curl) == 23) || (curl_errno($curl) == 61))) {
         curl_setopt($curl, CURLOPT_ENCODING, 'none');
         $response = curl_exec($curl);
     }
     
-    if ($response === FALSE) {
+    if ($response === false) {
         $result = array();
         $result['error-code'] = curl_errno($curl);
         $result['error'] = curl_error($curl);
@@ -179,7 +186,7 @@ function _http_make_request_curl($url, $headers = array(), $body = NULL, $method
         $header_blocks = explode("\r\n\r\n", $response_headers);
         $header_block = array_pop($header_blocks);
 
-        $result = array_merge($result, _http_parse_headers($header_block, TRUE));
+        $result = array_merge($result, _http_parse_headers($header_block, true));
         
         // If we are in safe mode, we need to process redirects manually
         if ($manual_redirect && (($result['code'] == 301) || ($result['code'] == 302) || ($result['code'] == 307))) {
@@ -212,7 +219,8 @@ function _http_make_request_curl($url, $headers = array(), $body = NULL, $method
  * (if the HTTP status code is not 200 or 304), 'headers' (an array of return headers),
  * 'content-type' (the HTTP content-type returned)
  */
-function _http_make_request_fsock($url, $headers = array(), $body = NULL, $method = 'GET', $retry = 3) {
+function _http_make_request_fsock($url, $headers = array(), $body = null, $method = 'GET', $retry = 3)
+{
     $result = array();
     
     $parts = parse_url($url);
@@ -244,7 +252,9 @@ function _http_make_request_fsock($url, $headers = array(), $body = NULL, $metho
     
     if (isset($parts['path'])) {
         $path = $url_parts['path'];
-        if (isset($parts['query'])) $path .= '?' . $url_parts['query'];
+        if (isset($parts['query'])) {
+            $path .= '?' . $url_parts['query'];
+        }
     } else {
         $path = '/';
     }
@@ -272,7 +282,9 @@ function _http_make_request_fsock($url, $headers = array(), $body = NULL, $metho
     // End of headers - separator
     $request .= "\r\n";
     
-    if ($body != NULL) $request .= $body;
+    if ($body != null) {
+        $request .= $body;
+    }
     
     fwrite($fp, $request);
 
@@ -286,7 +298,7 @@ function _http_make_request_fsock($url, $headers = array(), $body = NULL, $metho
     // Parse response.
     list($header_block, $result['data']) = explode("\r\n\r\n", $response, 2);
     
-    $result = array_merge($result, _http_parse_headers($header_block, FALSE));
+    $result = array_merge($result, _http_parse_headers($header_block, false));
     
     // Process redirects
     if (($result['code'] == 301) || ($result['code'] == 302) || ($result['code'] == 307)) {
@@ -313,7 +325,8 @@ function _http_make_request_fsock($url, $headers = array(), $body = NULL, $metho
  * 'headers' (an array of return headers in lowercase).  If $curl is false, additional
  * parsing is done for 'code' and 'content-type'
  */
-function _http_parse_headers($header_block, $curl) {
+function _http_parse_headers($header_block, $curl)
+{
     $headers = array();
     $result = array();
     
@@ -331,8 +344,10 @@ function _http_parse_headers($header_block, $curl) {
     // Parse the status line
     list($protocol, $code, $reason) = explode(' ', trim($status), 3);
     
-    $result['protocol'] = $protocol;    
-    if (!$curl) $result['code'] = $code;
+    $result['protocol'] = $protocol;
+    if (!$curl) {
+        $result['code'] = $code;
+    }
 
     // Parse headers.
     while ($field = trim(array_shift($fields))) {
@@ -350,10 +365,11 @@ function _http_parse_headers($header_block, $curl) {
             $headers[$header] = trim($value);
         }
         
-        if (!$curl && (strtolower($header) == 'content-type')) $result['content-type'] = $value;
+        if (!$curl && (strtolower($header) == 'content-type')) {
+            $result['content-type'] = $value;
+        }
     }
         
     $result['headers'] = $headers;
     return $result;
 }
-?>

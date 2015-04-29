@@ -22,290 +22,291 @@
  * License: LGPL / BSD - see license.txt
  * Changelog: see changelog.txt
  */
-class XTemplate {
+class XTemplate
+{
 
-	/**
-	 * Properties
-	 */
+    /**
+     * Properties
+     */
 
-	/**
-	 * Raw contents of the template file
-	 *
-	 * @access public
-	 * @var string
-	 */
-	public $filecontents = '';
+    /**
+     * Raw contents of the template file
+     *
+     * @access public
+     * @var string
+     */
+    public $filecontents = '';
 
-	/**
-	 * Unparsed blocks
-	 *
-	 * @access public
-	 * @var array
-	 */
-	public $blocks = array();
+    /**
+     * Unparsed blocks
+     *
+     * @access public
+     * @var array
+     */
+    public $blocks = array();
 
-	/**
-	 * Parsed blocks
-	 *
-	 * @var unknown_type
-	 */
-	public $parsed_blocks = array();
+    /**
+     * Parsed blocks
+     *
+     * @var unknown_type
+     */
+    public $parsed_blocks = array();
 
-	/**
-	 * Preparsed blocks (for file includes)
-	 *
-	 * @access public
-	 * @var array
-	 */
-	public $preparsed_blocks = array();
+    /**
+     * Preparsed blocks (for file includes)
+     *
+     * @access public
+     * @var array
+     */
+    public $preparsed_blocks = array();
 
-	/**
-	 * Block parsing order for recursive parsing
-	 * (Sometimes reverse :)
-	 *
-	 * @access public
-	 * @var array
-	 */
-	public $block_parse_order = array();
+    /**
+     * Block parsing order for recursive parsing
+     * (Sometimes reverse :)
+     *
+     * @access public
+     * @var array
+     */
+    public $block_parse_order = array();
 
-	/**
-	 * Store sub-block names
-	 * (For fast resetting)
-	 *
-	 * @access public
-	 * @var array
-	 */
-	public $sub_blocks = array();
+    /**
+     * Store sub-block names
+     * (For fast resetting)
+     *
+     * @access public
+     * @var array
+     */
+    public $sub_blocks = array();
 
-	/**
-	 * Variables array
-	 *
-	 * @access public
-	 * @var array
-	 */
-	public $vars = array();
+    /**
+     * Variables array
+     *
+     * @access public
+     * @var array
+     */
+    public $vars = array();
 
-	/**
-	 * File variables array
-	 *
-	 * @access public
-	 * @var array
-	 */
-	public $filevars = array();
+    /**
+     * File variables array
+     *
+     * @access public
+     * @var array
+     */
+    public $filevars = array();
 
-	/**
-	 * Filevars' parent block
-	 *
-	 * @access public
-	 * @var array
-	 */
-	public $filevar_parent = array();
+    /**
+     * Filevars' parent block
+     *
+     * @access public
+     * @var array
+     */
+    public $filevar_parent = array();
 
-	/**
-	 * File caching during duration of script
-	 * e.g. files only cached to speed {FILE "filename"} repeats
-	 *
-	 * @access public
-	 * @var array
-	 */
-	public $filecache = array();
+    /**
+     * File caching during duration of script
+     * e.g. files only cached to speed {FILE "filename"} repeats
+     *
+     * @access public
+     * @var array
+     */
+    public $filecache = array();
 
-	/**
-	 * Location of template files
-	 *
-	 * @access public
-	 * @var string
-	 */
-	public $tpldir = '';
+    /**
+     * Location of template files
+     *
+     * @access public
+     * @var string
+     */
+    public $tpldir = '';
 
-	/**
-	 * Filenames lookup table
-	 *
-	 * @access public
-	 * @var null
-	 */
-	public $files = null;
+    /**
+     * Filenames lookup table
+     *
+     * @access public
+     * @var null
+     */
+    public $files = null;
 
-	/**
-	 * Template filename
-	 *
-	 * @access public
-	 * @var string
-	 */
-	public $filename = '';
+    /**
+     * Template filename
+     *
+     * @access public
+     * @var string
+     */
+    public $filename = '';
 
-	// moved to setup method so uses the tag_start & end_delims
-	/**
-	 * RegEx for file includes
-	 *
-	 * "/\{FILE\s*\"([^\"]+)\"\s*\}/m";
-	 *
-	 * @access public
-	 * @var string
-	 */
-	public $file_delim = '';
+    // moved to setup method so uses the tag_start & end_delims
+    /**
+     * RegEx for file includes
+     *
+     * "/\{FILE\s*\"([^\"]+)\"\s*\}/m";
+     *
+     * @access public
+     * @var string
+     */
+    public $file_delim = '';
 
-	/**
-	 * RegEx for file include variable
-	 *
-	 * "/\{FILE\s*\{([A-Za-z0-9\._]+?)\}\s*\}/m";
-	 *
-	 * @access public
-	 * @var string
-	 */
-	public $filevar_delim = '';
+    /**
+     * RegEx for file include variable
+     *
+     * "/\{FILE\s*\{([A-Za-z0-9\._]+?)\}\s*\}/m";
+     *
+     * @access public
+     * @var string
+     */
+    public $filevar_delim = '';
 
-	/**
-	 * RegEx for file includes with newlines
-	 *
-	 * "/^\s*\{FILE\s*\{([A-Za-z0-9\._]+?)\}\s*\}\s*\n/m";
-	 *
-	 * @access public
-	 * @var string
-	 */
-	public $filevar_delim_nl = '';
+    /**
+     * RegEx for file includes with newlines
+     *
+     * "/^\s*\{FILE\s*\{([A-Za-z0-9\._]+?)\}\s*\}\s*\n/m";
+     *
+     * @access public
+     * @var string
+     */
+    public $filevar_delim_nl = '';
 
-	/**
-	 * Template block start delimiter
-	 *
-	 * @access public
-	 * @var string
-	 */
-	public $block_start_delim = '<!-- ';
+    /**
+     * Template block start delimiter
+     *
+     * @access public
+     * @var string
+     */
+    public $block_start_delim = '<!-- ';
 
-	/**
-	 * Template block end delimiter
-	 *
-	 * @access public
-	 * @var string
-	 */
-	public $block_end_delim = '-->';
+    /**
+     * Template block end delimiter
+     *
+     * @access public
+     * @var string
+     */
+    public $block_end_delim = '-->';
 
-	/**
-	 * Template block start word
-	 *
-	 * @access public
-	 * @var string
-	 */
-	public $block_start_word = 'BEGIN:';
+    /**
+     * Template block start word
+     *
+     * @access public
+     * @var string
+     */
+    public $block_start_word = 'BEGIN:';
 
-	/**
-	 * Template block end word
-	 *
-	 * The last 3 properties and this make the delimiters look like:
-	 * @example <!-- BEGIN: block_name -->
-	 * if you use the default syntax.
-	 *
-	 * @access public
-	 * @var string
-	 */
-	public $block_end_word = 'END:';
+    /**
+     * Template block end word
+     *
+     * The last 3 properties and this make the delimiters look like:
+     * @example <!-- BEGIN: block_name -->
+     * if you use the default syntax.
+     *
+     * @access public
+     * @var string
+     */
+    public $block_end_word = 'END:';
 
-	/**
-	 * Template tag start delimiter
-	 *
-	 * This makes the delimiters look like:
-	 * @example {tagname}
-	 * if you use the default syntax.
-	 *
-	 * @access public
-	 * @var string
-	 */
-	public $tag_start_delim = '{';
+    /**
+     * Template tag start delimiter
+     *
+     * This makes the delimiters look like:
+     * @example {tagname}
+     * if you use the default syntax.
+     *
+     * @access public
+     * @var string
+     */
+    public $tag_start_delim = '{';
 
-	/**
-	 * Template tag end delimiter
-	 *
-	 * This makes the delimiters look like:
-	 * @example {tagname}
-	 * if you use the default syntax.
-	 *
-	 * @access public
-	 * @var string
-	 */
-	public $tag_end_delim = '}';
-	/* this makes the delimiters look like: {tagname} if you use my syntax. */
+    /**
+     * Template tag end delimiter
+     *
+     * This makes the delimiters look like:
+     * @example {tagname}
+     * if you use the default syntax.
+     *
+     * @access public
+     * @var string
+     */
+    public $tag_end_delim = '}';
+    /* this makes the delimiters look like: {tagname} if you use my syntax. */
 
-	/**
-	 * Regular expression element for comments within tags and blocks
-	 *
-	 * @example {tagname#My Comment}
-	 * @example {tagname #My Comment}
-	 * @example <!-- BEGIN: blockname#My Comment -->
-	 * @example <!-- BEGIN: blockname #My Comment -->
-	 *
-	 * @access public
-	 * @var string
-	 */
-	public $comment_preg = '( ?#.*?)?';
+    /**
+     * Regular expression element for comments within tags and blocks
+     *
+     * @example {tagname#My Comment}
+     * @example {tagname #My Comment}
+     * @example <!-- BEGIN: blockname#My Comment -->
+     * @example <!-- BEGIN: blockname #My Comment -->
+     *
+     * @access public
+     * @var string
+     */
+    public $comment_preg = '( ?#.*?)?';
 
-	/**
-	 * Default main template block name
-	 *
-	 * @access public
-	 * @var string
-	 */
-	public $mainblock = 'main';
+    /**
+     * Default main template block name
+     *
+     * @access public
+     * @var string
+     */
+    public $mainblock = 'main';
 
-	/**
-	 * Script output type
-	 *
-	 * @access public
-	 * @var string
-	 */
-	public $output_type = 'HTML';
+    /**
+     * Script output type
+     *
+     * @access public
+     * @var string
+     */
+    public $output_type = 'HTML';
 
-	/**
-	 * Debug mode
-	 *
-	 * @access public
-	 * @var boolean
-	 */
-	public $debug = false;
+    /**
+     * Debug mode
+     *
+     * @access public
+     * @var boolean
+     */
+    public $debug = false;
 
-	/**
-	 * Null string for unassigned vars
-	 *
-	 * @access protected
-	 * @var array
-	 */
-	protected $_null_string = array('' => '');
+    /**
+     * Null string for unassigned vars
+     *
+     * @access protected
+     * @var array
+     */
+    protected $_null_string = array('' => '');
 
-	/**
-	 * Null string for unassigned blocks
-	 *
-	 * @access protected
-	 * @var array
-	 */
-	protected $_null_block = array('' => '');
+    /**
+     * Null string for unassigned blocks
+     *
+     * @access protected
+     * @var array
+     */
+    protected $_null_block = array('' => '');
 
-	/**
-	 * Errors
-	 *
-	 * @access protected
-	 * @var string
-	 */
-	protected $_error = '';
+    /**
+     * Errors
+     *
+     * @access protected
+     * @var string
+     */
+    protected $_error = '';
 
-	/**
-	 * Auto-reset sub blocks
-	 *
-	 * @access protected
-	 * @var boolean
-	 */
-	protected $_autoreset = true;
+    /**
+     * Auto-reset sub blocks
+     *
+     * @access protected
+     * @var boolean
+     */
+    protected $_autoreset = true;
 
-	/**
-	 * Set to FALSE to generate errors if a non-existant blocks is referenced
-	 *
-	 * @author NW
-	 * @since 2002/10/17
-	 * @access protected
-	 * @var boolean
-	 */
-	protected $_ignore_missing_blocks = true;
+    /**
+     * Set to FALSE to generate errors if a non-existant blocks is referenced
+     *
+     * @author NW
+     * @since 2002/10/17
+     * @access protected
+     * @var boolean
+     */
+    protected $_ignore_missing_blocks = true;
 
-	/**
+    /**
      * PHP 5 Constructor - Instantiate the object
      *
      * @param string $file Template file to work on
@@ -315,12 +316,13 @@ class XTemplate {
      * @param boolean $autosetup If true, run setup() as part of constuctor
      * @return XTemplate
      */
-	public function __construct($file, $tpldir = '', $files = null, $mainblock = 'main', $autosetup = true) {
+    public function __construct($file, $tpldir = '', $files = null, $mainblock = 'main', $autosetup = true)
+    {
 
-		$this->restart($file, $tpldir, $files, $mainblock, $autosetup, $this->tag_start_delim, $this->tag_end_delim);
-	}
+        $this->restart($file, $tpldir, $files, $mainblock, $autosetup, $this->tag_start_delim, $this->tag_end_delim);
+    }
 
-	/*
+    /*
      * PHP 4 Constructor - Instantiate the object
      *
      * @deprecated Use PHP 5 constructor instead
@@ -337,105 +339,107 @@ class XTemplate {
 	}*/
 
 
-	/***************************************************************************/
-	/***[ public stuff ]********************************************************/
-	/***************************************************************************/
+    /***************************************************************************/
+    /***[ public stuff ]********************************************************/
+    /***************************************************************************/
 
-	/**
-	 * Restart the class - allows one instantiation with several files processed by restarting
-	 * e.g. $xtpl = new XTemplate('file1.xtpl');
-	 * $xtpl->parse('main');
-	 * $xtpl->out('main');
-	 * $xtpl->restart('file2.xtpl');
-	 * $xtpl->parse('main');
-	 * $xtpl->out('main');
-	 * (Added in response to sf:641407 feature request)
-	 *
-	 * @param string $file Template file to work on
-	 * @param string/array $tpldir Location of template files
-	 * @param array $files Filenames lookup
-	 * @param string $mainblock Name of main block in the template
-	 * @param boolean $autosetup If true, run setup() as part of restarting
-	 * @param string $tag_start {
-	 * @param string $tag_end }
-	 */
-	public function restart ($file, $tpldir = '', $files = null, $mainblock = 'main', $autosetup = true, $tag_start = '{', $tag_end = '}') {
+    /**
+     * Restart the class - allows one instantiation with several files processed by restarting
+     * e.g. $xtpl = new XTemplate('file1.xtpl');
+     * $xtpl->parse('main');
+     * $xtpl->out('main');
+     * $xtpl->restart('file2.xtpl');
+     * $xtpl->parse('main');
+     * $xtpl->out('main');
+     * (Added in response to sf:641407 feature request)
+     *
+     * @param string $file Template file to work on
+     * @param string/array $tpldir Location of template files
+     * @param array $files Filenames lookup
+     * @param string $mainblock Name of main block in the template
+     * @param boolean $autosetup If true, run setup() as part of restarting
+     * @param string $tag_start {
+     * @param string $tag_end }
+     */
+    public function restart($file, $tpldir = '', $files = null, $mainblock = 'main', $autosetup = true, $tag_start = '{', $tag_end = '}')
+    {
 
-		$this->filename = $file;
+        $this->filename = $file;
 
-		// From SF Feature request 1202027
-		// Kenneth Kalmer
-		$this->tpldir = $tpldir;
-		if (defined('XTPL_DIR') && empty($this->tpldir)) {
-			$this->tpldir = XTPL_DIR;
-		}
+        // From SF Feature request 1202027
+        // Kenneth Kalmer
+        $this->tpldir = $tpldir;
+        if (defined('XTPL_DIR') && empty($this->tpldir)) {
+            $this->tpldir = XTPL_DIR;
+        }
 
-		if (is_array($files)) {
-			$this->files = $files;
-		}
+        if (is_array($files)) {
+            $this->files = $files;
+        }
 
-		$this->mainblock = $mainblock;
+        $this->mainblock = $mainblock;
 
-		$this->tag_start_delim = $tag_start;
-		$this->tag_end_delim = $tag_end;
+        $this->tag_start_delim = $tag_start;
+        $this->tag_end_delim = $tag_end;
 
-		// Start with fresh file contents
-		$this->filecontents = '';
+        // Start with fresh file contents
+        $this->filecontents = '';
 
-		// Reset the template arrays
-		$this->blocks = array();
-		$this->parsed_blocks = array();
-		$this->preparsed_blocks = array();
-		$this->block_parse_order = array();
-		$this->sub_blocks = array();
-		$this->vars = array();
-		$this->filevars = array();
-		$this->filevar_parent = array();
-		$this->filecache = array();
+        // Reset the template arrays
+        $this->blocks = array();
+        $this->parsed_blocks = array();
+        $this->preparsed_blocks = array();
+        $this->block_parse_order = array();
+        $this->sub_blocks = array();
+        $this->vars = array();
+        $this->filevars = array();
+        $this->filevar_parent = array();
+        $this->filecache = array();
 
-		if ($autosetup) {
-			$this->setup();
-		}
-	}
+        if ($autosetup) {
+            $this->setup();
+        }
+    }
 
-	/**
+    /**
      * setup - the elements that were previously in the constructor
      *
      * @access public
      * @param boolean $add_outer If true is passed when called, it adds an outer main block to the file
      */
-	public function setup ($add_outer = false) {
+    public function setup($add_outer = false)
+    {
 
-		$this->tag_start_delim = preg_quote($this->tag_start_delim);
-		$this->tag_end_delim = preg_quote($this->tag_end_delim);
+        $this->tag_start_delim = preg_quote($this->tag_start_delim);
+        $this->tag_end_delim = preg_quote($this->tag_end_delim);
 
-		// Setup the file delimiters
+        // Setup the file delimiters
 
-		// regexp for file includes
-		$this->file_delim = "/" . $this->tag_start_delim . "FILE\s*\"([^\"]+)\"" . $this->comment_preg . $this->tag_end_delim . "/m";
+        // regexp for file includes
+        $this->file_delim = "/" . $this->tag_start_delim . "FILE\s*\"([^\"]+)\"" . $this->comment_preg . $this->tag_end_delim . "/m";
 
-		// regexp for file includes
-		$this->filevar_delim = "/" . $this->tag_start_delim . "FILE\s*" . $this->tag_start_delim . "([A-Za-z0-9\._]+?)" . $this->comment_preg . $this->tag_end_delim . $this->comment_preg . $this->tag_end_delim . "/m";
+        // regexp for file includes
+        $this->filevar_delim = "/" . $this->tag_start_delim . "FILE\s*" . $this->tag_start_delim . "([A-Za-z0-9\._]+?)" . $this->comment_preg . $this->tag_end_delim . $this->comment_preg . $this->tag_end_delim . "/m";
 
-		// regexp for file includes w/ newlines
-		$this->filevar_delim_nl = "/^\s*" . $this->tag_start_delim . "FILE\s*" . $this->tag_start_delim . "([A-Za-z0-9\._]+?)" . $this->comment_preg . $this->tag_end_delim . $this->comment_preg . $this->tag_end_delim . "\s*\n/m";
+        // regexp for file includes w/ newlines
+        $this->filevar_delim_nl = "/^\s*" . $this->tag_start_delim . "FILE\s*" . $this->tag_start_delim . "([A-Za-z0-9\._]+?)" . $this->comment_preg . $this->tag_end_delim . $this->comment_preg . $this->tag_end_delim . "\s*\n/m";
 
-		if (empty($this->filecontents)) {
-			// read in template file
-			$this->filecontents = $this->_r_getfile($this->filename);
-		}
+        if (empty($this->filecontents)) {
+            // read in template file
+            $this->filecontents = $this->_r_getfile($this->filename);
+        }
 
-		if ($add_outer) {
-			$this->_add_outer_block();
-		}
+        if ($add_outer) {
+            $this->_add_outer_block();
+        }
 
-		// preprocess some stuff
-		$this->blocks = $this->_maketree($this->filecontents, '');
-		$this->filevar_parent = $this->_store_filevar_parents($this->blocks);
-		$this->scan_globals();
-	}
+        // preprocess some stuff
+        $this->blocks = $this->_maketree($this->filecontents, '');
+        $this->filevar_parent = $this->_store_filevar_parents($this->blocks);
+        $this->scan_globals();
+    }
 
-	/**
+    /**
      * assign a variable
      *
      * @example Simplest case:
@@ -459,265 +463,243 @@ class XTemplate {
      * @access public
      * @param string $name Variable to assign $val to
      * @param string / array $val Value to assign to $name
-	 * @param boolean $reset_array Reset the variable array if $val is an array
+     * @param boolean $reset_array Reset the variable array if $val is an array
      */
-	public function assign ($name, $val = '', $reset_array = true) {
+    public function assign($name, $val = '', $reset_array = true)
+    {
 
-		if (is_array($name)) {
+        if (is_array($name)) {
+            foreach ($name as $k => $v) {
+                $this->vars[$k] = $v;
+            }
+        } elseif (is_array($val)) {
+            // Clear the existing values
+            if ($reset_array) {
+                $this->vars[$name] = array();
+            }
 
-			foreach ($name as $k => $v) {
+            foreach ($val as $k => $v) {
+                $this->vars[$name][$k] = $v;
+            }
 
-				$this->vars[$k] = $v;
-			}
-		} elseif (is_array($val)) {
+        } else {
+            $this->vars[$name] = $val;
+        }
+    }
 
-			// Clear the existing values
-    		if ($reset_array) {
-    			$this->vars[$name] = array();
-    		}
-
-        	foreach ($val as $k => $v) {
-
-        		$this->vars[$name][$k] = $v;
-        	}
-
-		} else {
-
-			$this->vars[$name] = $val;
-		}
-	}
-
-	/**
+    /**
      * assign a file variable
      *
      * @access public
      * @param string $name Variable to assign $val to
      * @param string / array $val Values to assign to $name
      */
-	public function assign_file ($name, $val = '') {
+    public function assign_file($name, $val = '')
+    {
 
-		if (is_array($name)) {
+        if (is_array($name)) {
+            foreach ($name as $k => $v) {
+                $this->_assign_file_sub($k, $v);
+            }
+        } else {
+            $this->_assign_file_sub($name, $val);
+        }
+    }
 
-			foreach ($name as $k => $v) {
-
-				$this->_assign_file_sub($k, $v);
-			}
-		} else {
-
-			$this->_assign_file_sub($name, $val);
-		}
-	}
-
-	/**
+    /**
      * parse a block
      *
      * @access public
      * @param string $bname Block name to parse
      */
-	public function parse ($bname) {
+    public function parse($bname)
+    {
 
-		if (isset($this->preparsed_blocks[$bname])) {
+        if (isset($this->preparsed_blocks[$bname])) {
+            $copy = $this->preparsed_blocks[$bname];
 
-			$copy = $this->preparsed_blocks[$bname];
+        } elseif (isset($this->blocks[$bname])) {
+            $copy = $this->blocks[$bname];
 
-		} elseif (isset($this->blocks[$bname])) {
+        } elseif ($this->_ignore_missing_blocks) {
+            // ------------------------------------------------------
+            // NW : 17 Oct 2002. Added default of ignore_missing_blocks
+            //      to allow for generalised processing where some
+            //      blocks may be removed from the HTML without the
+            //      processing code needing to be altered.
+            // ------------------------------------------------------
+            // JRC: 3/1/2003 added set error to ignore missing functionality
+            $this->_set_error("parse: blockname [$bname] does not exist");
+            return;
 
-			$copy = $this->blocks[$bname];
+        } else {
+            $this->_set_error("parse: blockname [$bname] does not exist");
+        }
 
-		} elseif ($this->_ignore_missing_blocks) {
-			// ------------------------------------------------------
-			// NW : 17 Oct 2002. Added default of ignore_missing_blocks
-			//      to allow for generalised processing where some
-			//      blocks may be removed from the HTML without the
-			//      processing code needing to be altered.
-			// ------------------------------------------------------
-			// JRC: 3/1/2003 added set error to ignore missing functionality
-			$this->_set_error("parse: blockname [$bname] does not exist");
-			return;
+        /* from there we should have no more {FILE } directives */
+        if (!isset($copy)) {
+            die('Block: ' . $bname);
+        }
 
-		} else {
+        $copy = preg_replace($this->filevar_delim_nl, '', $copy);
 
-			$this->_set_error("parse: blockname [$bname] does not exist");
-		}
+        $var_array = array();
 
-		/* from there we should have no more {FILE } directives */
-		if (!isset($copy)) {
-			die('Block: ' . $bname);
-		}
+        /* find & replace variables+blocks */
+        preg_match_all("|" . $this->tag_start_delim . "([A-Za-z0-9\._]+?" . $this->comment_preg . ")" . $this->tag_end_delim. "|", $copy, $var_array);
 
-		$copy = preg_replace($this->filevar_delim_nl, '', $copy);
+        $var_array = $var_array[1];
 
-		$var_array = array();
+        foreach ($var_array as $k => $v) {
+            // Are there any comments in the tags {tag#a comment for documenting the template}
+            $any_comments = explode('#', $v);
+            $v = rtrim($any_comments[0]);
 
-		/* find & replace variables+blocks */
-		preg_match_all("|" . $this->tag_start_delim . "([A-Za-z0-9\._]+?" . $this->comment_preg . ")" . $this->tag_end_delim. "|", $copy, $var_array);
+            if (sizeof($any_comments) > 1) {
+                $comments = $any_comments[1];
+            } else {
+                $comments = '';
+            }
 
-		$var_array = $var_array[1];
+            $sub = explode('.', $v);
 
-		foreach ($var_array as $k => $v) {
+            if ($sub[0] == '_BLOCK_') {
+                unset($sub[0]);
 
-			// Are there any comments in the tags {tag#a comment for documenting the template}
-			$any_comments = explode('#', $v);
-			$v = rtrim($any_comments[0]);
+                $bname2 = implode('.', $sub);
 
-			if (sizeof($any_comments) > 1) {
+                // trinary operator eliminates assign error in E_ALL reporting
+                $var = isset($this->parsed_blocks[$bname2]) ? $this->parsed_blocks[$bname2] : null;
+                $nul = (!isset($this->_null_block[$bname2])) ? $this->_null_block[''] : $this->_null_block[$bname2];
 
-				$comments = $any_comments[1];
-			} else {
+                if ($var === '') {
+                    if ($nul == '') {
+                        // -----------------------------------------------------------
+                        // Removed requirement for blocks to be at the start of string
+                        // -----------------------------------------------------------
+                        //                      $copy=preg_replace("/^\s*\{".$v."\}\s*\n*/m","",$copy);
+                        // Now blocks don't need to be at the beginning of a line,
+                        //$copy=preg_replace("/\s*" . $this->tag_start_delim . $v . $this->tag_end_delim . "\s*\n*/m","",$copy);
+                        $copy = preg_replace("|" . $this->tag_start_delim . $v . $this->tag_end_delim . "|m", '', $copy);
 
-				$comments = '';
-			}
+                    } else {
+                        $copy = preg_replace("|" . $this->tag_start_delim . $v . $this->tag_end_delim . "|m", "$nul", $copy);
+                    }
+                } else {
+                    //$var = trim($var);
+                    switch (true) {
+                        case preg_match('/^\n/', $var) && preg_match('/\n$/', $var):
+                            $var = substr($var, 1, -1);
+                            break;
 
-			$sub = explode('.', $v);
+                        case preg_match('/^\n/', $var):
+                            $var = substr($var, 1);
+                            break;
 
-			if ($sub[0] == '_BLOCK_') {
+                        case preg_match('/\n$/', $var):
+                            $var = substr($var, 0, -1);
+                            break;
+                    }
 
-				unset($sub[0]);
+                    // SF Bug no. 810773 - thanks anonymous
+                    $var = str_replace('\\', '\\\\', $var);
+                    // Ensure dollars in strings are not evaluated reported by SadGeezer 31/3/04
+                    $var = str_replace('$', '\\$', $var);
+                    // Replaced str_replaces with preg_quote
+                    //$var = preg_quote($var);
+                    $var = str_replace('\\|', '|', $var);
+                    $copy = preg_replace("|" . $this->tag_start_delim . $v . $this->tag_end_delim . "|m", "$var", $copy);
 
-				$bname2 = implode('.', $sub);
+                    if (preg_match('/^\n/', $copy) && preg_match('/\n$/', $copy)) {
+                        $copy = substr($copy, 1, -1);
+                    }
+                }
+            } else {
+                $var = $this->vars;
 
-				// trinary operator eliminates assign error in E_ALL reporting
-				$var = isset($this->parsed_blocks[$bname2]) ? $this->parsed_blocks[$bname2] : null;
-				$nul = (!isset($this->_null_block[$bname2])) ? $this->_null_block[''] : $this->_null_block[$bname2];
+                foreach ($sub as $v1) {
+                    // NW 4 Oct 2002 - Added isset and is_array check to avoid NOTICE messages
+                    // JC 17 Oct 2002 - Changed EMPTY to stlen=0
+                    //                if (empty($var[$v1])) { // this line would think that zeros(0) were empty - which is not true
+                    if (!isset($var[$v1]) || (!is_array($var[$v1]) && strlen($var[$v1]) == 0)) {
+                        // Check for constant, when variable not assigned
+                        if (defined($v1)) {
+                            $var[$v1] = constant($v1);
 
-				if ($var === '') {
+                        } else {
+                            $var[$v1] = null;
+                        }
+                    }
 
-					if ($nul == '') {
-						// -----------------------------------------------------------
-						// Removed requirement for blocks to be at the start of string
-						// -----------------------------------------------------------
-						//                      $copy=preg_replace("/^\s*\{".$v."\}\s*\n*/m","",$copy);
-						// Now blocks don't need to be at the beginning of a line,
-						//$copy=preg_replace("/\s*" . $this->tag_start_delim . $v . $this->tag_end_delim . "\s*\n*/m","",$copy);
-						$copy = preg_replace("|" . $this->tag_start_delim . $v . $this->tag_end_delim . "|m", '', $copy);
+                    $var = $var[$v1];
+                }
 
-					} else {
+                $nul = (!isset($this->_null_string[$v])) ? ($this->_null_string[""]) : ($this->_null_string[$v]);
+                $var = (!isset($var)) ? $nul : $var;
 
-						$copy = preg_replace("|" . $this->tag_start_delim . $v . $this->tag_end_delim . "|m", "$nul", $copy);
-					}
-				} else {
+                if ($var === '') {
+                    // -----------------------------------------------------------
+                    // Removed requriement for blocks to be at the start of string
+                    // -----------------------------------------------------------
+                    //                    $copy=preg_replace("|^\s*\{".$v." ?#?".$comments."\}\s*\n|m","",$copy);
+                    $copy = preg_replace("|" . $this->tag_start_delim . $v . "( ?#" . $comments . ")?" . $this->tag_end_delim . "|m", '', $copy);
+                }
 
-					//$var = trim($var);
-					switch (true) {
-						case preg_match('/^\n/', $var) && preg_match('/\n$/', $var):
-							$var = substr($var, 1, -1);
-							break;
+                $var = trim($var);
+                // SF Bug no. 810773 - thanks anonymous
+                $var = str_replace('\\', '\\\\', $var);
+                // Ensure dollars in strings are not evaluated reported by SadGeezer 31/3/04
+                $var = str_replace('$', '\\$', $var);
+                // Replace str_replaces with preg_quote
+                //$var = preg_quote($var);
+                $var = str_replace('\\|', '|', $var);
+                $copy = preg_replace("|" . $this->tag_start_delim . $v . "( ?#" . $comments . ")?" . $this->tag_end_delim . "|m", "$var", $copy);
 
-						case preg_match('/^\n/', $var):
-							$var = substr($var, 1);
-							break;
+                if (preg_match('/^\n/', $copy) && preg_match('/\n$/', $copy)) {
+                    $copy = substr($copy, 1);
+                }
+            }
+        }
 
-						case preg_match('/\n$/', $var):
-							$var = substr($var, 0, -1);
-							break;
-					}
+        if (isset($this->parsed_blocks[$bname])) {
+            $this->parsed_blocks[$bname] .= $copy;
+        } else {
+            $this->parsed_blocks[$bname] = $copy;
+        }
 
-					// SF Bug no. 810773 - thanks anonymous
-					$var = str_replace('\\', '\\\\', $var);
-					// Ensure dollars in strings are not evaluated reported by SadGeezer 31/3/04
-					$var = str_replace('$', '\\$', $var);
-					// Replaced str_replaces with preg_quote
-					//$var = preg_quote($var);
-					$var = str_replace('\\|', '|', $var);
-					$copy = preg_replace("|" . $this->tag_start_delim . $v . $this->tag_end_delim . "|m", "$var", $copy);
+        /* reset sub-blocks */
+        if ($this->_autoreset && (!empty($this->sub_blocks[$bname]))) {
+            reset($this->sub_blocks[$bname]);
 
-					if (preg_match('/^\n/', $copy) && preg_match('/\n$/', $copy)) {
-						$copy = substr($copy, 1, -1);
-					}
-				}
-			} else {
+            foreach ($this->sub_blocks[$bname] as $k => $v) {
+                $this->reset($v);
+            }
+        }
+    }
 
-				$var = $this->vars;
-
-				foreach ($sub as $v1) {
-
-					// NW 4 Oct 2002 - Added isset and is_array check to avoid NOTICE messages
-					// JC 17 Oct 2002 - Changed EMPTY to stlen=0
-					//                if (empty($var[$v1])) { // this line would think that zeros(0) were empty - which is not true
-					if (!isset($var[$v1]) || (!is_array($var[$v1]) && strlen($var[$v1]) == 0)) {
-
-						// Check for constant, when variable not assigned
-						if (defined($v1)) {
-
-							$var[$v1] = constant($v1);
-
-						} else {
-
-							$var[$v1] = null;
-						}
-					}
-
-					$var = $var[$v1];
-				}
-
-				$nul = (!isset($this->_null_string[$v])) ? ($this->_null_string[""]) : ($this->_null_string[$v]);
-				$var = (!isset($var)) ? $nul : $var;
-
-				if ($var === '') {
-					// -----------------------------------------------------------
-					// Removed requriement for blocks to be at the start of string
-					// -----------------------------------------------------------
-					//                    $copy=preg_replace("|^\s*\{".$v." ?#?".$comments."\}\s*\n|m","",$copy);
-					$copy = preg_replace("|" . $this->tag_start_delim . $v . "( ?#" . $comments . ")?" . $this->tag_end_delim . "|m", '', $copy);
-				}
-
-				$var = trim($var);
-				// SF Bug no. 810773 - thanks anonymous
-				$var = str_replace('\\', '\\\\', $var);
-				// Ensure dollars in strings are not evaluated reported by SadGeezer 31/3/04
-				$var = str_replace('$', '\\$', $var);
-				// Replace str_replaces with preg_quote
-				//$var = preg_quote($var);
-				$var = str_replace('\\|', '|', $var);
-				$copy = preg_replace("|" . $this->tag_start_delim . $v . "( ?#" . $comments . ")?" . $this->tag_end_delim . "|m", "$var", $copy);
-
-				if (preg_match('/^\n/', $copy) && preg_match('/\n$/', $copy)) {
-					$copy = substr($copy, 1);
-				}
-			}
-		}
-
-		if (isset($this->parsed_blocks[$bname])) {
-			$this->parsed_blocks[$bname] .= $copy;
-		} else {
-			$this->parsed_blocks[$bname] = $copy;
-		}
-
-		/* reset sub-blocks */
-		if ($this->_autoreset && (!empty($this->sub_blocks[$bname]))) {
-
-			reset($this->sub_blocks[$bname]);
-
-			foreach ($this->sub_blocks[$bname] as $k => $v) {
-				$this->reset($v);
-			}
-		}
-	}
-
-	/**
+    /**
      * returns the parsed text for a block, including all sub-blocks.
      *
      * @access public
      * @param string $bname Block name to parse
      */
-	public function rparse ($bname) {
+    public function rparse($bname)
+    {
 
-		if (!empty($this->sub_blocks[$bname])) {
+        if (!empty($this->sub_blocks[$bname])) {
+            reset($this->sub_blocks[$bname]);
 
-			reset($this->sub_blocks[$bname]);
+            foreach ($this->sub_blocks[$bname] as $k => $v) {
+                if (!empty($v)) {
+                    $this->rparse($v);
+                }
+            }
+        }
 
-			foreach ($this->sub_blocks[$bname] as $k => $v) {
+        $this->parse($bname);
+    }
 
-				if (!empty($v)) {
-					$this->rparse($v);
-				}
-			}
-		}
-
-		$this->parse($bname);
-	}
-
-	/**
+    /**
      * inserts a loop ( call assign & parse )
      *
      * @access public
@@ -725,13 +707,14 @@ class XTemplate {
      * @param string $var Variable to assign values to
      * @param string / array $value Value to assign to $var
     */
-	public function insert_loop ($bname, $var, $value = '') {
+    public function insert_loop($bname, $var, $value = '')
+    {
 
-		$this->assign($var, $value);
-		$this->parse($bname);
-	}
+        $this->assign($var, $value);
+        $this->parse($bname);
+    }
 
-	/**
+    /**
      * parses a block for every set of data in the values array
      *
      * @access public
@@ -739,220 +722,230 @@ class XTemplate {
      * @param string $var Variable to assign values to
      * @param array $values Values to assign to $var
     */
-	public function array_loop ($bname, $var, &$values) {
+    public function array_loop($bname, $var, &$values)
+    {
 
-		if (is_array($values)) {
+        if (is_array($values)) {
+            foreach ($values as $v) {
+                $this->insert_loop($bname, $var, $v);
+            }
+        }
+    }
 
-			foreach($values as $v) {
-
-				$this->insert_loop($bname, $var, $v);
-			}
-		}
-	}
-
-	/**
+    /**
      * returns the parsed text for a block
      *
      * @access public
      * @param string $bname Block name to return
      * @return string
      */
-	public function text ($bname = '') {
+    public function text($bname = '')
+    {
 
-		$text = '';
+        $text = '';
 
-		if ($this->debug && $this->output_type == 'HTML') {
-			// JC 20/11/02 echo the template filename if in development as
-			// html comment
-			$text .= '<!-- XTemplate: ' . realpath($this->filename) . " -->\n";
-		}
+        if ($this->debug && $this->output_type == 'HTML') {
+            // JC 20/11/02 echo the template filename if in development as
+            // html comment
+            $text .= '<!-- XTemplate: ' . realpath($this->filename) . " -->\n";
+        }
 
-		$bname = !empty($bname) ? $bname : $this->mainblock;
+        $bname = !empty($bname) ? $bname : $this->mainblock;
 
-		$text .= isset($this->parsed_blocks[$bname]) ? $this->parsed_blocks[$bname] : $this->get_error();
+        $text .= isset($this->parsed_blocks[$bname]) ? $this->parsed_blocks[$bname] : $this->get_error();
 
-		return $text;
-	}
+        return $text;
+    }
 
-	/**
+    /**
      * prints the parsed text
      *
      * @access public
      * @param string $bname Block name to echo out
      */
-	public function out ($bname) {
+    public function out($bname)
+    {
 
-		$out = $this->text($bname);
-		//        $length=strlen($out);
-		//header("Content-Length: ".$length); // TODO: Comment this back in later
+        $out = $this->text($bname);
+        //        $length=strlen($out);
+        //header("Content-Length: ".$length); // TODO: Comment this back in later
 
-		echo $out;
-	}
+        echo $out;
+    }
 
-	/**
+    /**
      * prints the parsed text to a specified file
      *
      * @access public
      * @param string $bname Block name to write out
      * @param string $fname File name to write to
      */
-	public function out_file ($bname, $fname) {
+    public function out_file($bname, $fname)
+    {
 
-		if (!empty($bname) && !empty($fname) && is_writeable($fname)) {
+        if (!empty($bname) && !empty($fname) && is_writeable($fname)) {
+            $fp = fopen($fname, 'w');
+            fwrite($fp, $this->text($bname));
+            fclose($fp);
+        }
+    }
 
-			$fp = fopen($fname, 'w');
-			fwrite($fp, $this->text($bname));
-			fclose($fp);
-		}
-	}
-
-	/**
+    /**
      * resets the parsed text
      *
      * @access public
      * @param string $bname Block to reset
      */
-	public function reset ($bname) {
+    public function reset($bname)
+    {
 
-		$this->parsed_blocks[$bname] = '';
-	}
+        $this->parsed_blocks[$bname] = '';
+    }
 
-	/**
+    /**
      * returns true if block was parsed, false if not
      *
      * @access public
      * @param string $bname Block name to test
      * @return boolean
      */
-	public function parsed ($bname) {
+    public function parsed($bname)
+    {
 
-		return (!empty($this->parsed_blocks[$bname]));
-	}
+        return (!empty($this->parsed_blocks[$bname]));
+    }
 
-	/**
+    /**
      * sets the string to replace in case the var was not assigned
      *
      * @access public
      * @param string $str Display string for null block
      * @param string $varname Variable name to apply $str to
      */
-	public function set_null_string($str, $varname = '') {
+    public function set_null_string($str, $varname = '')
+    {
 
-		$this->_null_string[$varname] = $str;
-	}
+        $this->_null_string[$varname] = $str;
+    }
 
-	/**
-	 * Backwards compatibility only
-	 *
-	 * @param string $str
-	 * @param string $varname
-	 * @deprecated Change to set_null_string to keep in with rest of naming convention
-	 */
-	public function SetNullString ($str, $varname = '') {
-		$this->set_null_string($str, $varname);
-	}
+    /**
+     * Backwards compatibility only
+     *
+     * @param string $str
+     * @param string $varname
+     * @deprecated Change to set_null_string to keep in with rest of naming convention
+     */
+    public function SetNullString($str, $varname = '')
+    {
+        $this->set_null_string($str, $varname);
+    }
 
-	/**
+    /**
      * sets the string to replace in case the block was not parsed
      *
      * @access public
      * @param string $str Display string for null block
      * @param string $bname Block name to apply $str to
      */
-	public function set_null_block ($str, $bname = '') {
+    public function set_null_block($str, $bname = '')
+    {
 
-		$this->_null_block[$bname] = $str;
-	}
+        $this->_null_block[$bname] = $str;
+    }
 
-	/**
-	 * Backwards compatibility only
-	 *
-	 * @param string $str
-	 * @param string $bname
-	 * @deprecated Change to set_null_block to keep in with rest of naming convention
-	 */
-	public function SetNullBlock ($str, $bname = '') {
-		$this->set_null_block($str, $bname);
-	}
+    /**
+     * Backwards compatibility only
+     *
+     * @param string $str
+     * @param string $bname
+     * @deprecated Change to set_null_block to keep in with rest of naming convention
+     */
+    public function SetNullBlock($str, $bname = '')
+    {
+        $this->set_null_block($str, $bname);
+    }
 
-	/**
+    /**
      * sets AUTORESET to 1. (default is 1)
      * if set to 1, parse() automatically resets the parsed blocks' sub blocks
      * (for multiple level blocks)
      *
      * @access public
      */
-	public function set_autoreset () {
+    public function set_autoreset()
+    {
 
-		$this->_autoreset = true;
-	}
+        $this->_autoreset = true;
+    }
 
-	/**
+    /**
      * sets AUTORESET to 0. (default is 1)
      * if set to 1, parse() automatically resets the parsed blocks' sub blocks
      * (for multiple level blocks)
      *
      * @access public
      */
-	public function clear_autoreset () {
+    public function clear_autoreset()
+    {
 
-		$this->_autoreset = false;
-	}
+        $this->_autoreset = false;
+    }
 
-	/**
+    /**
      * scans global variables and assigns to PHP array
      *
      * @access public
      */
-	public function scan_globals () {
+    public function scan_globals()
+    {
 
-		reset($GLOBALS);
+        reset($GLOBALS);
 
-		foreach ($GLOBALS as $k => $v) {
-			$GLOB[$k] = $v;
-		}
+        foreach ($GLOBALS as $k => $v) {
+            $GLOB[$k] = $v;
+        }
 
-		/**
-		 * Access global variables as:
-		 * @example {PHP._SERVER.HTTP_HOST}
-		 * in your template!
-		 */
-		$this->assign('PHP', $GLOB);
-	}
+        /**
+         * Access global variables as:
+         * @example {PHP._SERVER.HTTP_HOST}
+         * in your template!
+         */
+        $this->assign('PHP', $GLOB);
+    }
 
-	/**
+    /**
      * gets error condition / string
      *
      * @access public
      * @return boolean / string
      */
-	public function get_error () {
+    public function get_error()
+    {
 
-		// JRC: 3/1/2003 Added ouptut wrapper and detection of output type for error message output
-		$retval = false;
+        // JRC: 3/1/2003 Added ouptut wrapper and detection of output type for error message output
+        $retval = false;
 
-		if ($this->_error != '') {
+        if ($this->_error != '') {
+            switch ($this->output_type) {
+                case 'HTML':
+                case 'html':
+                    $retval = '<b>[XTemplate]</b><ul>' . nl2br(str_replace('* ', '<li>', str_replace(" *\n", "</li>\n", $this->_error))) . '</ul>';
+                    break;
 
-			switch ($this->output_type) {
-				case 'HTML':
-				case 'html':
-					$retval = '<b>[XTemplate]</b><ul>' . nl2br(str_replace('* ', '<li>', str_replace(" *\n", "</li>\n", $this->_error))) . '</ul>';
-					break;
+                default:
+                    $retval = '[XTemplate] ' . str_replace(' *\n', "\n", $this->_error);
+                    break;
+            }
+        }
 
-				default:
-					$retval = '[XTemplate] ' . str_replace(' *\n', "\n", $this->_error);
-					break;
-			}
-		}
+        return $retval;
+    }
 
-		return $retval;
-	}
+    /***************************************************************************/
+    /***[ private stuff ]*******************************************************/
+    /***************************************************************************/
 
-	/***************************************************************************/
-	/***[ private stuff ]*******************************************************/
-	/***************************************************************************/
-
-	/**
+    /**
      * generates the array containing to-be-parsed stuff:
      * $blocks["main"],$blocks["main.table"],$blocks["main.table.row"], etc.
      * also builds the reverse parse order.
@@ -961,343 +954,319 @@ class XTemplate {
      * @param string $con content to be processed
      * @param string $parentblock name of the parent block in the block hierarchy
      */
-	public function _maketree ($con, $parentblock='') {
+    public function _maketree($con, $parentblock = '')
+    {
 
-		$blocks = array();
+        $blocks = array();
 
-		$con2 = explode($this->block_start_delim, $con);
+        $con2 = explode($this->block_start_delim, $con);
 
-		if (!empty($parentblock)) {
+        if (!empty($parentblock)) {
+            $block_names = explode('.', $parentblock);
+            $level = sizeof($block_names);
 
-			$block_names = explode('.', $parentblock);
-			$level = sizeof($block_names);
+        } else {
+            $block_names = array();
+            $level = 0;
+        }
 
-		} else {
+        // JRC 06/04/2005 Added block comments (on BEGIN or END) <!-- BEGIN: block_name#Comments placed here -->
+        //$patt = "($this->block_start_word|$this->block_end_word)\s*(\w+)\s*$this->block_end_delim(.*)";
+        $patt = "(" . $this->block_start_word . "|" . $this->block_end_word . ")\s*(\w+)" . $this->comment_preg . "\s*" . $this->block_end_delim . "(.*)";
 
-			$block_names = array();
-			$level = 0;
-		}
+        foreach ($con2 as $k => $v) {
+            $res = array();
 
-		// JRC 06/04/2005 Added block comments (on BEGIN or END) <!-- BEGIN: block_name#Comments placed here -->
-		//$patt = "($this->block_start_word|$this->block_end_word)\s*(\w+)\s*$this->block_end_delim(.*)";
-		$patt = "(" . $this->block_start_word . "|" . $this->block_end_word . ")\s*(\w+)" . $this->comment_preg . "\s*" . $this->block_end_delim . "(.*)";
+            if (preg_match_all("/$patt/ims", $v, $res, PREG_SET_ORDER)) {
+                // $res[0][1] = BEGIN or END
+                // $res[0][2] = block name
+                // $res[0][3] = comment
+                // $res[0][4] = kinda content
+                $block_word     = $res[0][1];
+                $block_name     = $res[0][2];
+                $comment    = $res[0][3];
+                $content    = $res[0][4];
 
-		foreach($con2 as $k => $v) {
+                if (strtoupper($block_word) == $this->block_start_word) {
+                    $parent_name = implode('.', $block_names);
 
-			$res = array();
+                    // add one level - array("main","table","row")
+                    $block_names[++$level] = $block_name;
 
-			if (preg_match_all("/$patt/ims", $v, $res, PREG_SET_ORDER)) {
-				// $res[0][1] = BEGIN or END
-				// $res[0][2] = block name
-				// $res[0][3] = comment
-				// $res[0][4] = kinda content
-				$block_word	= $res[0][1];
-				$block_name	= $res[0][2];
-				$comment	= $res[0][3];
-				$content	= $res[0][4];
+                    // make block name (main.table.row)
+                    $cur_block_name=implode('.', $block_names);
 
-				if (strtoupper($block_word) == $this->block_start_word) {
+                    // build block parsing order (reverse)
+                    $this->block_parse_order[] = $cur_block_name;
 
-					$parent_name = implode('.', $block_names);
+                    //add contents. trinary operator eliminates assign error in E_ALL reporting
+                    $blocks[$cur_block_name] = isset($blocks[$cur_block_name]) ? $blocks[$cur_block_name] . $content : $content;
 
-					// add one level - array("main","table","row")
-					$block_names[++$level] = $block_name;
+                    // add {_BLOCK_.blockname} string to parent block
+                    $blocks[$parent_name] .= str_replace('\\', '', $this->tag_start_delim) . '_BLOCK_.' . $cur_block_name . str_replace('\\', '', $this->tag_end_delim);
 
-					// make block name (main.table.row)
-					$cur_block_name=implode('.', $block_names);
+                    // store sub block names for autoresetting and recursive parsing
+                    $this->sub_blocks[$parent_name][] = $cur_block_name;
 
-					// build block parsing order (reverse)
-					$this->block_parse_order[] = $cur_block_name;
+                    // store sub block names for autoresetting
+                    $this->sub_blocks[$cur_block_name][] = '';
 
-					//add contents. trinary operator eliminates assign error in E_ALL reporting
-					$blocks[$cur_block_name] = isset($blocks[$cur_block_name]) ? $blocks[$cur_block_name] . $content : $content;
+                } elseif (strtoupper($block_word) == $this->block_end_word) {
+                    unset($block_names[$level--]);
 
-					// add {_BLOCK_.blockname} string to parent block
-					$blocks[$parent_name] .= str_replace('\\', '', $this->tag_start_delim) . '_BLOCK_.' . $cur_block_name . str_replace('\\', '', $this->tag_end_delim);
+                    $parent_name = implode('.', $block_names);
 
-					// store sub block names for autoresetting and recursive parsing
-					$this->sub_blocks[$parent_name][] = $cur_block_name;
+                    // add rest of block to parent block
+                    $blocks[$parent_name] .= $content;
+                }
+            } else {
+                // no block delimiters found
+                // Saves doing multiple implodes - less overhead
+                $tmp = implode('.', $block_names);
 
-					// store sub block names for autoresetting
-					$this->sub_blocks[$cur_block_name][] = '';
+                if ($k) {
+                    $blocks[$tmp] .= $this->block_start_delim;
+                }
 
-				} else if (strtoupper($block_word) == $this->block_end_word) {
+                // trinary operator eliminates assign error in E_ALL reporting
+                $blocks[$tmp] = isset($blocks[$tmp]) ? $blocks[$tmp] . $v : $v;
+            }
+        }
 
-					unset($block_names[$level--]);
+        return $blocks;
+    }
 
-					$parent_name = implode('.', $block_names);
-
-					// add rest of block to parent block
-					$blocks[$parent_name] .= $content;
-				}
-			} else {
-
-				// no block delimiters found
-				// Saves doing multiple implodes - less overhead
-				$tmp = implode('.', $block_names);
-
-				if ($k) {
-					$blocks[$tmp] .= $this->block_start_delim;
-				}
-
-				// trinary operator eliminates assign error in E_ALL reporting
-				$blocks[$tmp] = isset($blocks[$tmp]) ? $blocks[$tmp] . $v : $v;
-			}
-		}
-
-		return $blocks;
-	}
-
-	/**
+    /**
      * Sub processing for assign_file method
      *
      * @access private
      * @param string $name
      * @param string $val
      */
-	private function _assign_file_sub ($name, $val) {
+    private function _assign_file_sub($name, $val)
+    {
 
-		if (isset($this->filevar_parent[$name])) {
+        if (isset($this->filevar_parent[$name])) {
+            if ($val != '') {
+                $val = $this->_r_getfile($val);
 
-			if ($val != '') {
+                foreach ($this->filevar_parent[$name] as $parent) {
+                    if (isset($this->preparsed_blocks[$parent]) && !isset($this->filevars[$name])) {
+                        $copy = $this->preparsed_blocks[$parent];
 
-				$val = $this->_r_getfile($val);
+                    } elseif (isset($this->blocks[$parent])) {
+                        $copy = $this->blocks[$parent];
+                    }
 
-				foreach($this->filevar_parent[$name] as $parent) {
+                    $res = array();
 
-					if (isset($this->preparsed_blocks[$parent]) && !isset($this->filevars[$name])) {
+                    preg_match_all($this->filevar_delim, $copy, $res, PREG_SET_ORDER);
 
-						$copy = $this->preparsed_blocks[$parent];
+                    if (is_array($res) && isset($res[0])) {
+                        // Changed as per solution in SF bug ID #1261828
+                        foreach ($res as $v) {
+                            // Changed as per solution in SF bug ID #1261828
+                            if ($v[1] == $name) {
+                                // Changed as per solution in SF bug ID #1261828
+                                $copy = preg_replace("/" . preg_quote($v[0]) . "/", "$val", $copy);
+                                $this->preparsed_blocks = array_merge($this->preparsed_blocks, $this->_maketree($copy, $parent));
+                                $this->filevar_parent = array_merge($this->filevar_parent, $this->_store_filevar_parents($this->preparsed_blocks));
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
-					} elseif (isset($this->blocks[$parent])) {
+        $this->filevars[$name] = $val;
+    }
 
-						$copy = $this->blocks[$parent];
-					}
-
-					$res = array();
-
-					preg_match_all($this->filevar_delim, $copy, $res, PREG_SET_ORDER);
-
-					if (is_array($res) && isset($res[0])) {
-
-						// Changed as per solution in SF bug ID #1261828
-						foreach ($res as $v) {
-
-							// Changed as per solution in SF bug ID #1261828
-							if ($v[1] == $name) {
-
-								// Changed as per solution in SF bug ID #1261828
-								$copy = preg_replace("/" . preg_quote($v[0]) . "/", "$val", $copy);
-								$this->preparsed_blocks = array_merge($this->preparsed_blocks, $this->_maketree($copy, $parent));
-								$this->filevar_parent = array_merge($this->filevar_parent, $this->_store_filevar_parents($this->preparsed_blocks));
-							}
-						}
-					}
-				}
-			}
-		}
-
-		$this->filevars[$name] = $val;
-	}
-
-	/**
+    /**
      * store container block's name for file variables
      *
      * @access public - aiming for private
      * @param array $blocks
      * @return array
      */
-	public function _store_filevar_parents ($blocks){
+    public function _store_filevar_parents($blocks)
+    {
 
-		$parents = array();
+        $parents = array();
 
-		foreach ($blocks as $bname => $con) {
+        foreach ($blocks as $bname => $con) {
+            $res = array();
 
-			$res = array();
+            preg_match_all($this->filevar_delim, $con, $res);
 
-			preg_match_all($this->filevar_delim, $con, $res);
+            foreach ($res[1] as $k => $v) {
+                $parents[$v][] = $bname;
+            }
+        }
+        return $parents;
+    }
 
-			foreach ($res[1] as $k => $v) {
-
-				$parents[$v][] = $bname;
-			}
-		}
-		return $parents;
-	}
-
-	/**
+    /**
      * Set the error string
      *
      * @access private
      * @param string $str
      */
-	private function _set_error ($str)    {
+    private function _set_error($str)
+    {
 
-		// JRC: 3/1/2003 Made to append the error messages
-		$this->_error .= '* ' . $str . " *\n";
-		// JRC: 3/1/2003 Removed trigger error, use this externally if you want it eg. trigger_error($xtpl->get_error())
-		//trigger_error($this->get_error());
-	}
+        // JRC: 3/1/2003 Made to append the error messages
+        $this->_error .= '* ' . $str . " *\n";
+        // JRC: 3/1/2003 Removed trigger error, use this externally if you want it eg. trigger_error($xtpl->get_error())
+        //trigger_error($this->get_error());
+    }
 
-	/**
+    /**
      * returns the contents of a file
      *
      * @access protected
      * @param string $file
      * @return string
      */
-	protected function _getfile ($file) {
+    protected function _getfile($file)
+    {
 
-		if (!isset($file)) {
-			// JC 19/12/02 added $file to error message
-			$this->_set_error('!isset file name!' . $file);
+        if (!isset($file)) {
+            // JC 19/12/02 added $file to error message
+            $this->_set_error('!isset file name!' . $file);
 
-			return '';
-		}
+            return '';
+        }
 
-		// check if filename is mapped to other filename
-		if (isset($this->files)) {
+        // check if filename is mapped to other filename
+        if (isset($this->files)) {
+            if (isset($this->files[$file])) {
+                $file = $this->files[$file];
+            }
+        }
 
-			if (isset($this->files[$file])) {
+        // prepend template dir
+        if (!empty($this->tpldir)) {
+            /**
+             * Support hierarchy of file locations to search
+             *
+             * @example Supply array of filepaths when instantiating
+             *          First path supplied that has the named file is prioritised
+             *          $xtpl = new XTemplate('myfile.xtpl', array('.','/mypath', '/mypath2'));
+             * @since 29/05/2007
+             */
+            if (is_array($this->tpldir)) {
+                foreach ($this->tpldir as $dir) {
+                    if (is_readable($dir . DIRECTORY_SEPARATOR . $file)) {
+                        $file = $dir . DIRECTORY_SEPARATOR . $file;
+                        break;
+                    }
+                }
+            } else {
+                $file = $this->tpldir. DIRECTORY_SEPARATOR . $file;
+            }
+        }
 
-				$file = $this->files[$file];
-			}
-		}
+        $file_text = '';
 
-		// prepend template dir
-		if (!empty($this->tpldir)) {
+        if (isset($this->filecache[$file])) {
+            $file_text .= $this->filecache[$file];
 
-			/**
-			 * Support hierarchy of file locations to search
-			 *
-			 * @example Supply array of filepaths when instantiating
-			 * 			First path supplied that has the named file is prioritised
-			 * 			$xtpl = new XTemplate('myfile.xtpl', array('.','/mypath', '/mypath2'));
-			 * @since 29/05/2007
-			 */
-			if (is_array($this->tpldir)) {
+            if ($this->debug) {
+                $file_text = '<!-- XTemplate debug cached: ' . realpath($file) . ' -->' . "\n" . $file_text;
+            }
 
-				foreach ($this->tpldir as $dir) {
+        } else {
+            if (is_file($file) && is_readable($file)) {
+                if (filesize($file)) {
+                    if (!($fh = fopen($file, 'r'))) {
+                        $this->_set_error('Cannot open file: ' . realpath($file));
+                        return '';
+                    }
 
-					if (is_readable($dir . DIRECTORY_SEPARATOR . $file)) {
-						$file = $dir . DIRECTORY_SEPARATOR . $file;
-						break;
-					}
-				}
-			} else {
+                    $file_text .= fread($fh, filesize($file));
+                    fclose($fh);
 
-				$file = $this->tpldir. DIRECTORY_SEPARATOR . $file;
-			}
-		}
+                }
 
-		$file_text = '';
+                if ($this->debug) {
+                    $file_text = '<!-- XTemplate debug: ' . realpath($file) . ' -->' . "\n" . $file_text;
+                }
 
-		if (isset($this->filecache[$file])) {
+            } elseif (str_replace('.', '', phpversion()) >= '430' && $file_text = @file_get_contents($file, true)) {
+                // Enable use of include path by using file_get_contents
+                // Implemented at suggestion of SF Feature Request ID #1529478 michaelgroh
+                if ($file_text === false) {
+                    $this->_set_error("[" . realpath($file) . "] ($file) does not exist");
+                    $file_text = "<b>__XTemplate fatal error: file [$file] does not exist in the include path__</b>";
+                } elseif ($this->debug) {
+                    $file_text = '<!-- XTemplate debug: ' . realpath($file) . ' (via include path) -->' . "\n" . $file_text;
+                }
+            } elseif (!is_file($file)) {
+                // NW 17 Oct 2002 : Added realpath around the file name to identify where the code is searching.
+                $this->_set_error("[" . realpath($file) . "] ($file) does not exist");
+                $file_text .= "<b>__XTemplate fatal error: file [$file] does not exist__</b>";
 
-			$file_text .= $this->filecache[$file];
+            } elseif (!is_readable($file)) {
+                $this->_set_error("[" . realpath($file) . "] ($file) is not readable");
+                $file_text .= "<b>__XTemplate fatal error: file [$file] is not readable__</b>";
+            }
 
-			if ($this->debug) {
-				$file_text = '<!-- XTemplate debug cached: ' . realpath($file) . ' -->' . "\n" . $file_text;
-			}
+            $this->filecache[$file] = $file_text;
+        }
 
-		} else {
+        return $file_text;
+    }
 
-			if (is_file($file) && is_readable($file)) {
-
-				if (filesize($file)) {
-
-					if (!($fh = fopen($file, 'r'))) {
-
-						$this->_set_error('Cannot open file: ' . realpath($file));
-						return '';
-					}
-
-					$file_text .= fread($fh,filesize($file));
-					fclose($fh);
-
-				}
-
-				if ($this->debug) {
-					$file_text = '<!-- XTemplate debug: ' . realpath($file) . ' -->' . "\n" . $file_text;
-				}
-
-			} elseif (str_replace('.', '', phpversion()) >= '430' && $file_text = @file_get_contents($file, true)) {
-				// Enable use of include path by using file_get_contents
-				// Implemented at suggestion of SF Feature Request ID #1529478 michaelgroh
-				if ($file_text === false) {
-					$this->_set_error("[" . realpath($file) . "] ($file) does not exist");
-					$file_text = "<b>__XTemplate fatal error: file [$file] does not exist in the include path__</b>";
-				} elseif ($this->debug) {
-					$file_text = '<!-- XTemplate debug: ' . realpath($file) . ' (via include path) -->' . "\n" . $file_text;
-				}
-			} elseif (!is_file($file)) {
-
-				// NW 17 Oct 2002 : Added realpath around the file name to identify where the code is searching.
-				$this->_set_error("[" . realpath($file) . "] ($file) does not exist");
-				$file_text .= "<b>__XTemplate fatal error: file [$file] does not exist__</b>";
-
-			} elseif (!is_readable($file)) {
-
-				$this->_set_error("[" . realpath($file) . "] ($file) is not readable");
-				$file_text .= "<b>__XTemplate fatal error: file [$file] is not readable__</b>";
-			}
-
-			$this->filecache[$file] = $file_text;
-		}
-
-		return $file_text;
-	}
-
-	/**
+    /**
      * recursively gets the content of a file with {FILE "filename.tpl"} directives
      *
      * @access public - aiming for private
      * @param string $file
      * @return string
      */
-	public function _r_getfile ($file) {
+    public function _r_getfile($file)
+    {
 
-		$text = $this->_getfile($file);
+        $text = $this->_getfile($file);
 
-		$res = array();
+        $res = array();
 
-		while (preg_match($this->file_delim,$text,$res)) {
+        while (preg_match($this->file_delim, $text, $res)) {
+            $text2 = $this->_getfile($res[1]);
+            $text = preg_replace("'".preg_quote($res[0])."'", $text2, $text);
+        }
 
-			$text2 = $this->_getfile($res[1]);
-			$text = preg_replace("'".preg_quote($res[0])."'",$text2,$text);
-		}
-
-		return $text;
-	}
+        return $text;
+    }
 
 
-	/**
+    /**
      * add an outer block delimiter set useful for rtfs etc - keeps them editable in word
      *
      * @access private
      */
-	private function _add_outer_block () {
+    private function _add_outer_block()
+    {
 
-		$before = $this->block_start_delim . $this->block_start_word . ' ' . $this->mainblock . ' ' . $this->block_end_delim;
-		$after = $this->block_start_delim . $this->block_end_word . ' ' . $this->mainblock . ' ' . $this->block_end_delim;
+        $before = $this->block_start_delim . $this->block_start_word . ' ' . $this->mainblock . ' ' . $this->block_end_delim;
+        $after = $this->block_start_delim . $this->block_end_word . ' ' . $this->mainblock . ' ' . $this->block_end_delim;
 
-		$this->filecontents = $before . "\n" . $this->filecontents . "\n" . $after;
-	}
+        $this->filecontents = $before . "\n" . $this->filecontents . "\n" . $after;
+    }
 
-	/**
+    /**
      * Debug function - var_dump wrapped in '<pre></pre>' tags
      *
      * @access private
      * @param multiple var_dumps all the supplied arguments
      */
-	private function _pre_var_dump ($args) {
+    private function _pre_var_dump($args)
+    {
 
-		if ($this->debug) {
-			echo '<pre>';
-			var_dump(func_get_args());
-			echo '</pre>';
-		}
-	}
+        if ($this->debug) {
+            echo '<pre>';
+            var_dump(func_get_args());
+            echo '</pre>';
+        }
+    }
 } /* end of XTemplate class. */
-
-?>
