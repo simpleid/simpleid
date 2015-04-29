@@ -40,7 +40,8 @@
  * @param $value mixed the value of the constant - only scalar and null values
  * are allowed
  */
-function define_default($name, $value) {
+function define_default($name, $value)
+{
     if (!defined($name)) {
         define($name, $value);
     }
@@ -57,5 +58,6 @@ define_default('SIMPLEID_LOCALE', 'en');
 define_default('SIMPLEID_LOGFILE', '');
 define_default('SIMPLEID_LOGLEVEL', 4);
 
-if (function_exists('date_default_timezone_set')) date_default_timezone_set(@date_default_timezone_get());
-?>
+if (function_exists('date_default_timezone_set')) {
+    date_default_timezone_set(@date_default_timezone_get());
+}

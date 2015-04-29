@@ -281,7 +281,7 @@ label.option { font-weight: normal; }
 
 select, textarea, input[type="text"], input[type="password"], input[type="number"] {
     display: inline-block;
-    padding: 0.5em;    
+    padding: 0.5em;
     border: 1px solid #AAAAAA;
     border-radius: 2px;
 }

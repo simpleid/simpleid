@@ -46,8 +46,9 @@ if (function_exists('gmp_init')) {
  * of these libraries are installed, the functions in this file will not work.
  *
  * @return bool true if either GMP or BCMath is installed.
- */ 
-function bignum_loaded() {
+ */
+function bignum_loaded()
+{
     return (function_exists('gmp_init') || function_exists('bcadd'));
 }
 
@@ -58,7 +59,8 @@ function bignum_loaded() {
  * @param int $base an integer between 2 and 36, or 256
  * @return resource a bignum
  */
-function bignum_new($str, $base = 10) {
+function bignum_new($str, $base = 10)
+{
     switch ($base) {
         case 10:
             if (BIGNUM_GMP) {
@@ -79,7 +81,9 @@ function bignum_new($str, $base = 10) {
             return $num;
             break;
         default:
-            if (!is_integer($base) || ($base < 2) || ($base > 36)) return FALSE;
+            if (!is_integer($base) || ($base < 2) || ($base > 36)) {
+                return false;
+            }
 
             $num = bignum_new(0);
 
@@ -90,7 +94,7 @@ function bignum_new($str, $base = 10) {
             return $num;
     }
 
-    return FALSE;
+    return false;
 }
 
 /**
@@ -101,7 +105,8 @@ function bignum_new($str, $base = 10) {
  * @param int $base an integer between 2 and 36, or 256
  * @return string the converted bignum
  */
-function bignum_val($num, $base = 10) {
+function bignum_val($num, $base = 10)
+{
     switch ($base) {
         case 10:
             if (BIGNUM_GMP) {
@@ -116,7 +121,7 @@ function bignum_val($num, $base = 10) {
         case 256:
             $cmp = bignum_cmp($num, 0);
             if ($cmp < 0) {
-                return FALSE;
+                return false;
             }
     
             if ($cmp == 0) {
@@ -142,11 +147,13 @@ function bignum_val($num, $base = 10) {
             return $byte_stream;
             break;
         default:
-            if (!is_integer($base) || ($base < 2) || ($base > 36)) return FALSE;
+            if (!is_integer($base) || ($base < 2) || ($base > 36)) {
+                return false;
+            }
 
             $cmp = bignum_cmp($num, 0);
             if ($cmp < 0) {
-                return FALSE;
+                return false;
             }
     
             if ($cmp == 0) {
@@ -163,7 +170,7 @@ function bignum_val($num, $base = 10) {
             return $str;
     }
     
-    return FALSE;
+    return false;
 }
 
 /**
@@ -173,7 +180,8 @@ function bignum_val($num, $base = 10) {
  * @param resource $b
  * @return resource a bignum representing a + b
  */
-function bignum_add($a, $b) {
+function bignum_add($a, $b)
+{
     if (BIGNUM_GMP) {
         return gmp_add($a, $b);
     } else {
@@ -188,7 +196,8 @@ function bignum_add($a, $b) {
  * @param resource $b
  * @return resource a bignum representing a * b
  */
-function bignum_mul($a, $b) {
+function bignum_mul($a, $b)
+{
     if (BIGNUM_GMP) {
         return gmp_mul($a, $b);
     } else {
@@ -203,7 +212,8 @@ function bignum_mul($a, $b) {
  * @param resource $b
  * @return resource a bignum representing a / b
  */
-function bignum_div($a, $b) {
+function bignum_div($a, $b)
+{
     if (BIGNUM_GMP) {
         return gmp_div($a, $b);
     } else {
@@ -218,9 +228,12 @@ function bignum_div($a, $b) {
  * @param mixed $exp the exponent, as an integer or a bignum
  * @return resource a bignum representing base ^ exp
  */
-function bignum_pow($base, $exp) {
+function bignum_pow($base, $exp)
+{
     if (BIGNUM_GMP) {
-        if (is_resource($exp) && (get_resource_type($exp) == 'gmp')) $exp = gmp_intval($exp);
+        if (is_resource($exp) && (get_resource_type($exp) == 'gmp')) {
+            $exp = gmp_intval($exp);
+        }
         return gmp_pow($base, $exp);
     } else {
         return bcpow($base, $exp);
@@ -234,7 +247,8 @@ function bignum_pow($base, $exp) {
  * @param resource $d
  * @return resource a bignum representing n mod d
  */
-function bignum_mod($n, $d) {
+function bignum_mod($n, $d)
+{
     if (BIGNUM_GMP) {
         return gmp_mod($n, $d);
     } else {
@@ -250,7 +264,8 @@ function bignum_mod($n, $d) {
  * @param resource $mod the modulo
  * @return resource a bignum representing base ^ exp mod mod
  */
-function bignum_powmod($base, $exp, $mod) {
+function bignum_powmod($base, $exp, $mod)
+{
     if (BIGNUM_GMP) {
         return gmp_powm($base, $exp, $mod);
     } elseif (function_exists('bcpowmod')) {
@@ -276,11 +291,11 @@ function bignum_powmod($base, $exp, $mod) {
  * @param resource $b
  * @return int positive value if a > b, zero if a = b and a negative value if a < b
  */
-function bignum_cmp($a, $b) {
+function bignum_cmp($a, $b)
+{
     if (BIGNUM_GMP) {
         return gmp_cmp($a, $b);
     } else {
         return bccomp($a, $b);
     }
 }
-?>

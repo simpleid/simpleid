@@ -42,15 +42,18 @@
  * @param mixed $data the data to store
  * @param int $time if present, sets the modification time of the cache file to this
  * time
- */ 
-function cache_set($type, $key, $data, $time = NULL) {
+ */
+function cache_set($type, $key, $data, $time = null)
+{
     $filename = _cache_get_name($type, $key);
-    if (!file_exists(dirname($filename))) mkdir(dirname($filename), 0775, true);
+    if (!file_exists(dirname($filename))) {
+        mkdir(dirname($filename), 0775, true);
+    }
     $file = fopen($filename, 'w');
     fwrite($file, serialize($data));
     fclose($file);
     
-    if ($time != NULL) {
+    if ($time != null) {
         touch($filename, $time);
     }
 }
@@ -63,10 +66,13 @@ function cache_set($type, $key, $data, $time = NULL) {
  * @return mixed the data associated with the type and key, or NULL if the cache
  * does not contain the requested data.
  */
-function cache_get($type, $key) {
+function cache_get($type, $key)
+{
     $filename = _cache_get_name($type, $key);
     
-    if (!file_exists($filename)) return NULL;
+    if (!file_exists($filename)) {
+        return null;
+    }
     
     return unserialize(file_get_contents($filename));
 }
@@ -78,7 +84,8 @@ function cache_get($type, $key) {
  * @return mixed an array of data associated with the type, or NULL if the cache
  * does not contain the requested data.
  */
-function cache_get_all($type) {
+function cache_get_all($type)
+{
     $r = array();
     
     $dir = opendir(CACHE_DIR . '/' . $type);
@@ -86,7 +93,9 @@ function cache_get_all($type) {
     while (($file = readdir($dir)) !== false) {
         $filename = CACHE_DIR . '/' . $type . '/' . $file;
         
-        if (filetype($filename) != "file") continue;
+        if (filetype($filename) != "file") {
+            continue;
+        }
         
         $r[] = unserialize(file_get_contents($filename));
     }
@@ -102,9 +111,12 @@ function cache_get_all($type) {
  * @param string $type the type of data in the cache
  * @param string $key an identifier
  */
-function cache_delete($type, $key) {
+function cache_delete($type, $key)
+{
     $filename = _cache_get_name($type, $key);
-    if (file_exists($filename)) unlink($filename);
+    if (file_exists($filename)) {
+        unlink($filename);
+    }
 }
 
 /**
@@ -117,22 +129,25 @@ function cache_delete($type, $key) {
  * @param string $type the type of data in the cache
  * @deprecated
  */
-function cache_gc($expiry, $type = NULL) {
-    if ($type == NULL) {
+function cache_gc($expiry, $type = null)
+{
+    if ($type == null) {
         $dir = opendir(CACHE_DIR);
 
         while (($file = readdir($dir)) !== false) {
             $filename = CACHE_DIR . '/' . $file;
-            if (in_array(filetype($filename), array('dir', 'link')))
+            if (in_array(filetype($filename), array('dir', 'link'))) {
                 cache_gc($expiry, $file);
+            }
         }
     } else {
         $dir = opendir(CACHE_DIR . '/' . $type);
         while (($file = readdir($dir)) !== false) {
             $filename = CACHE_DIR . '/' . $type . '/' . $file;
         
-            if ((filetype($filename) == "file") && (filectime($filename) < time() - $expiry))
+            if ((filetype($filename) == "file") && (filectime($filename) < time() - $expiry)) {
                 unlink($filename);
+            }
         }
     }
     
@@ -145,7 +160,7 @@ function cache_gc($expiry, $type = NULL) {
  *
  * The parameter to this function takes either an integer or an array.  If the
  * parameter is an integer, everything in the cache older than the specified
- * time (in seconds) will be deleted.  If the parameter is an array, 
+ * time (in seconds) will be deleted.  If the parameter is an array,
  * cache items of the type specified in the key to the array, older than the
  * corresponding value will be deleted.
  *
@@ -154,11 +169,12 @@ function cache_gc($expiry, $type = NULL) {
  * @param int|array $params the expiry time, in seconds, after which data will be deleted,
  * or an array specifiying the expiry time for each type
  */
-function cache_expire($params) {
+function cache_expire($params)
+{
     $dir = opendir(CACHE_DIR);
     
     while (($file = readdir($dir)) !== false) {
-        $expiry = NULL;
+        $expiry = null;
         $filename = CACHE_DIR . '/' . $file;
         
         if (is_int($params)) {
@@ -192,10 +208,13 @@ function cache_expire($params) {
  * or zero if the cache does not contain the requested data
  * @since 0.8
  */
-function cache_ttl($type, $key, $expiry) {
+function cache_ttl($type, $key, $expiry)
+{
     $filename = _cache_get_name($type, $key);
     
-    if (!file_exists($filename)) return 0;
+    if (!file_exists($filename)) {
+        return 0;
+    }
     
     return filectime($filename) - (time() - $expiry) - 1;
 }
@@ -207,8 +226,7 @@ function cache_ttl($type, $key, $expiry) {
  * @param string $key an identifier
  * @return string a file name
  */
-function _cache_get_name($type, $key) {
+function _cache_get_name($type, $key)
+{
     return CACHE_DIR . '/' . $type . '/' . md5($key) . '.cache';
 }
-
-?>

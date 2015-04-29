@@ -29,7 +29,7 @@
 
 /**
  * Implements the Simple Registration extension.
- * 
+ *
  *
  * @package simpleid
  * @subpackage extensions
@@ -42,15 +42,20 @@ define('OPENID_NS_SREG', 'http://openid.net/extensions/sreg/1.1');
 /**
  * @see hook_response()
  */
-function sreg_response($assertion, $request) {
+function sreg_response($assertion, $request)
+{
     global $user;
     global $version;
     
     // We only deal with positive assertions
-    if (!$assertion) return array();
+    if (!$assertion) {
+        return array();
+    }
     
     // We only respond if the extension is requested
-    if (!openid_extension_requested(OPENID_NS_SREG, $request)) return array();
+    if (!openid_extension_requested(OPENID_NS_SREG, $request)) {
+        return array();
+    }
     
     $request = openid_extension_filter_request(OPENID_NS_SREG, $request);
     $required = (isset($request['required'])) ? explode(',', $request['required']) : array();
@@ -59,12 +64,16 @@ function sreg_response($assertion, $request) {
     $alias = openid_extension_alias(OPENID_NS_SREG);
     $response = array();
     
-    if ($version == OPENID_VERSION_2) $response['openid.ns.' . $alias] = OPENID_NS_SREG;
+    if ($version == OPENID_VERSION_2) {
+        $response['openid.ns.' . $alias] = OPENID_NS_SREG;
+    }
     
     foreach ($fields as $field) {
         $value = _sreg_get_value($field);
         
-        if ($value != NULL) $response['openid.' . $alias . '.' .  $field] = $value;
+        if ($value != null) {
+            $response['openid.' . $alias . '.' .  $field] = $value;
+        }
     }
     
     return $response;
@@ -75,17 +84,24 @@ function sreg_response($assertion, $request) {
  *
  * @see hook_signed_fields()
  */
-function sreg_signed_fields($response) {
+function sreg_signed_fields($response)
+{
     // We only respond if the extension is requested
-    if (!openid_extension_requested(OPENID_NS_SREG, $response)) return array();
+    if (!openid_extension_requested(OPENID_NS_SREG, $response)) {
+        return array();
+    }
     
     $fields = array_keys(openid_extension_filter_request(OPENID_NS_SREG, $response));
     $alias = openid_extension_alias(OPENID_NS_SREG);
     $signed_fields = array();
 
-    if (isset($response['openid.ns.' . $alias])) $signed_fields[] = 'ns.' . $alias;
+    if (isset($response['openid.ns.' . $alias])) {
+        $signed_fields[] = 'ns.' . $alias;
+    }
     foreach ($fields as $field) {
-        if (isset($response['openid.' . $alias . '.' . $field])) $signed_fields[] = $alias . '.' . $field;
+        if (isset($response['openid.' . $alias . '.' . $field])) {
+            $signed_fields[] = $alias . '.' . $field;
+        }
     }
     
     return $signed_fields;
@@ -94,11 +110,14 @@ function sreg_signed_fields($response) {
 /**
  * @see hook_consent_form()
  */
-function sreg_consent_form($request, $response, $rp) {
+function sreg_consent_form($request, $response, $rp)
+{
     global $user;
     
     // We only respond if the extension is requested
-    if (!openid_extension_requested(OPENID_NS_SREG, $request)) return '';
+    if (!openid_extension_requested(OPENID_NS_SREG, $request)) {
+        return '';
+    }
     
     $request = openid_extension_filter_request(OPENID_NS_SREG, $request);
     $required = (isset($request['required'])) ? explode(',', $request['required']) : array();
@@ -110,20 +129,22 @@ function sreg_consent_form($request, $response, $rp) {
         
         $xtpl2->assign('alias', openid_extension_alias(OPENID_NS_SREG));
         
-        if (isset($request['policy_url'])) {            
-            $xtpl2->assign('policy', t('You can view the site\'s policy in relation to the use of this information at this URL: <a href="@url">@url</a>.', array('@url' => $request['policy_url'])));            
+        if (isset($request['policy_url'])) {
+            $xtpl2->assign('policy', t('You can view the site\'s policy in relation to the use of this information at this URL: <a href="@url">@url</a>.', array('@url' => $request['policy_url'])));
         }
         
         foreach ($fields as $field) {
             $value = _sreg_get_value($field);
         
-            if ($value != NULL) {
+            if ($value != null) {
                 $xtpl2->assign('name', htmlspecialchars($field, ENT_QUOTES, 'UTF-8'));
                 $xtpl2->assign('value', htmlspecialchars($value, ENT_QUOTES, 'UTF-8'));
                 
                 $xtpl2->assign('checked', (in_array($field, $required) || !isset($rp['sreg_consents']) || in_array($field, $rp['sreg_consents'])) ? 'checked="checked"' : '');
                 $xtpl2->assign('disabled', (in_array($field, $required)) ? 'disabled="disabled"' : '');
-                if (in_array($field, $required)) $xtpl2->parse('form.sreg.required');
+                if (in_array($field, $required)) {
+                    $xtpl2->parse('form.sreg.required');
+                }
                 
                 $xtpl2->parse('form.sreg');
             }
@@ -141,9 +162,12 @@ function sreg_consent_form($request, $response, $rp) {
 /**
  * @see hook_consent()
  */
-function sreg_consent($form_request, &$response, &$rp) {
+function sreg_consent($form_request, &$response, &$rp)
+{
     // We only respond if the extension is requested
-    if (!openid_extension_requested(OPENID_NS_SREG, $response)) return;
+    if (!openid_extension_requested(OPENID_NS_SREG, $response)) {
+        return;
+    }
     
     $fields = array_keys(openid_extension_filter_request(OPENID_NS_SREG, $response));
     $alias = openid_extension_alias(OPENID_NS_SREG);
@@ -167,7 +191,8 @@ function sreg_consent($form_request, &$response, &$rp) {
 /**
  * @see hook_page_profile()
  */
-function sreg_page_profile() {
+function sreg_page_profile()
+{
     global $user;
     $xtpl2 = new XTemplate('extensions/sreg/sreg.xtpl');
     
@@ -205,7 +230,8 @@ function sreg_page_profile() {
  * @param string $field the field to look up
  * @return string the value or NULL if not found
  */
-function _sreg_get_value($field) {
+function _sreg_get_value($field)
+{
     global $user;
     
     if (isset($user['sreg'][$field])) {
@@ -214,27 +240,33 @@ function _sreg_get_value($field) {
         switch ($field) {
             case 'nickname':
             case 'email':
-                if (isset($user['user_info'][$field])) return $user['user_info'][$field];
+                if (isset($user['user_info'][$field])) {
+                    return $user['user_info'][$field];
+                }
                 break;
             case 'fullname':
-                if (isset($user['user_info']['name'])) return $user['user_info']['name'];
+                if (isset($user['user_info']['name'])) {
+                    return $user['user_info']['name'];
+                }
                 break;
             case 'timezone':
-                if (isset($user['user_info']['zoneinfo'])) return $user['user_info']['zoneinfo'];
+                if (isset($user['user_info']['zoneinfo'])) {
+                    return $user['user_info']['zoneinfo'];
+                }
                 break;
             case 'gender':
-                if (isset($user['user_info']['gender'])) return strtoupper(substr($user['user_info']['gender'], 0, 1));
+                if (isset($user['user_info']['gender'])) {
+                    return strtoupper(substr($user['user_info']['gender'], 0, 1));
+                }
                 break;
             case 'postcode':
-                if (isset($user['user_info']['address']['postal_code'])) return $user['user_info']['address']['postcal_code'];
+                if (isset($user['user_info']['address']['postal_code'])) {
+                    return $user['user_info']['address']['postcal_code'];
+                }
                 break;
             default:
-                return NULL;
-        } 
-        return NULL;
+                return null;
+        }
+        return null;
     }
 }
-
-
-
-?>

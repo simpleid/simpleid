@@ -1,4 +1,4 @@
-<?php 
+<?php
 /*
  * SimpleID
  *
@@ -39,7 +39,8 @@
  *
  * @param string $msg the message to set
  */
-function set_message($msg) {
+function set_message($msg)
+{
     global $xtpl;
     
     $xtpl->assign('message', $msg);
@@ -51,7 +52,8 @@ function set_message($msg) {
  *
  * @param string $error the message to set
  */
-function indirect_fatal_error($error) {
+function indirect_fatal_error($error)
+{
     global $xtpl;
     
     set_message($error);
@@ -71,8 +73,9 @@ function indirect_fatal_error($error) {
  *
  * @param string $code the response code along
  */
-function header_response_code($code) {
-    if (substr(PHP_SAPI, 0,3) === 'cgi') {
+function header_response_code($code)
+{
+    if (substr(PHP_SAPI, 0, 3) === 'cgi') {
         header('Status: ' . $code);
     } else {
         header($_SERVER['SERVER_PROTOCOL'] . ' ' . $code);
@@ -91,7 +94,8 @@ function header_response_code($code) {
  *
  * @return bool true if the connection is via HTTPS
  */
-function is_https() {
+function is_https()
+{
     return (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on'))
         || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && (strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) == 'https'))
         || (isset($_SERVER['HTTP_FRONT_END_HTTPS']) && ($_SERVER['HTTP_FRONT_END_HTTPS'] == 'on'));
@@ -120,16 +124,21 @@ function is_https() {
  * @param boolean $strict whether HTTP Strict Transport Security is active
  * @see SIMPLEID_ALLOW_PLAINTEXT
  */
-function check_https($action = 'redirect', $allow_override = false, $redirect_url = null, $strict = true) {
+function check_https($action = 'redirect', $allow_override = false, $redirect_url = null, $strict = true)
+{
     if (is_https()) {
-        if ($strict) header('Strict-Transport-Security: max-age=3600');
+        if ($strict) {
+            header('Strict-Transport-Security: max-age=3600');
+        }
         return;
     }
     
-    if ($allow_override && SIMPLEID_ALLOW_PLAINTEXT) return;
+    if ($allow_override && SIMPLEID_ALLOW_PLAINTEXT) {
+        return;
+    }
     
     if ($action == 'error') {
-        if (substr(PHP_SAPI, 0,3) === 'cgi') {
+        if (substr(PHP_SAPI, 0, 3) === 'cgi') {
             header('Status: 426 Upgrade Required');
         } else {
             header($_SERVER['SERVER_PROTOCOL'] . ' 426 Upgrade Required');
@@ -141,9 +150,11 @@ function check_https($action = 'redirect', $allow_override = false, $redirect_ur
         return;
     }
     
-    if ($redirect_url == null) $redirect_url = simpleid_url('', $_SERVER['QUERY_STRING'], false, 'https');
+    if ($redirect_url == null) {
+        $redirect_url = simpleid_url('', $_SERVER['QUERY_STRING'], false, 'https');
+    }
     
-    if (substr(PHP_SAPI, 0,3) === 'cgi') {
+    if (substr(PHP_SAPI, 0, 3) === 'cgi') {
         header('Status: 301 Moved Permanently');
     } else {
         header($_SERVER['SERVER_PROTOCOL'] . ' 301 Moved Permanently');
@@ -159,14 +170,17 @@ function check_https($action = 'redirect', $allow_override = false, $redirect_ur
  * This function scans the original query string and POST parameters and fixes
  * them.
  */
-function fix_http_request() {
+function fix_http_request()
+{
     // Fix GET parameters
     if (isset($_SERVER['QUERY_STRING'])) {
         $get = parse_http_query($_SERVER['QUERY_STRING']);
         
         foreach ($get as $key => $value) {
             // We strip out array-like identifiers - PHP uses special processing for these
-            if ((strpos($key, '[') !== FALSE) && (strpos($key, ']') !== FALSE)) $key = substr($key, 0, strpos($key, '['));
+            if ((strpos($key, '[') !== false) && (strpos($key, ']') !== false)) {
+                $key = substr($key, 0, strpos($key, '['));
+            }
             
             // Replace special characters with underscore as per PHP processing
             $php_key = preg_replace('/[ .[\x80-\x9F]/', '_', $key);
@@ -183,12 +197,14 @@ function fix_http_request() {
     
     // Fix POST parameters
     $input = file_get_contents('php://input');
-    if ($input !== FALSE) {
+    if ($input !== false) {
         $post = parse_http_query($input);
         
         foreach ($post as $key => $value) {
             // We strip out array-like identifiers - PHP uses special processing for these
-            if ((strpos($key, '[') !== FALSE) && (strpos($key, ']') !== FALSE)) $key = substr($key, 0, strpos($key, '['));
+            if ((strpos($key, '[') !== false) && (strpos($key, ']') !== false)) {
+                $key = substr($key, 0, strpos($key, '['));
+            }
             
             // Replace special characters with underscore as per PHP processing
             $php_key = preg_replace('/[ .[\x80-\x9F]/', '_', $key);
@@ -212,11 +228,16 @@ function fix_http_request() {
  *
  * @since 0.7
  */
-function parse_http_query($query) {
+function parse_http_query($query)
+{
     $data = array();
     
-    if ($query === NULL) return array();
-    if ($query === '') return array();
+    if ($query === null) {
+        return array();
+    }
+    if ($query === '') {
+        return array();
+    }
     
     $pairs = explode('&', $query);
     
@@ -243,8 +264,11 @@ function parse_http_query($query) {
  *
  * @return string the UAID
  */
-function get_user_agent_id() {
-    if (isset($_COOKIE[simpleid_cookie_name('uaid')])) return $_COOKIE[simpleid_cookie_name('uaid')];
+function get_user_agent_id()
+{
+    if (isset($_COOKIE[simpleid_cookie_name('uaid')])) {
+        return $_COOKIE[simpleid_cookie_name('uaid')];
+    }
 
     $uaid = bin2hex(pack('LLLL', mt_rand(), mt_rand(), mt_rand(), mt_rand()));
     setcookie(simpleid_cookie_name('uaid'), $uaid, time() + 315360000, get_base_path(), '', false, true);
@@ -274,9 +298,12 @@ function get_user_agent_id() {
  * @since 0.8
  *
  */
-function negotiate_content_type($content_types, $accept_header = NULL) {
+function negotiate_content_type($content_types, $accept_header = null)
+{
     $content_types = array_map("strtolower", $content_types);
-    if (($accept_header == NULL) && isset($_SERVER['HTTP_ACCEPT'])) $accept_header = $_SERVER['HTTP_ACCEPT'];
+    if (($accept_header == null) && isset($_SERVER['HTTP_ACCEPT'])) {
+        $accept_header = $_SERVER['HTTP_ACCEPT'];
+    }
     
     if ($accept_header) {
         $acceptible = preg_split('/\s*,\s*/', strtolower(trim($accept_header)));
@@ -317,10 +344,10 @@ function negotiate_content_type($content_types, $accept_header = NULL) {
             reset($candidates);
             return key($candidates);
         }
-        return NULL;
+        return null;
     } else {
         // No headers
-        return FALSE;
+        return false;
     }
 }
 
@@ -331,7 +358,8 @@ function negotiate_content_type($content_types, $accept_header = NULL) {
  * @return string serialised data
  * @see unpickle()
  */
-function pickle($data) {
+function pickle($data)
+{
     return base64_encode(gzcompress(serialize($data)));
 }
 
@@ -342,7 +370,8 @@ function pickle($data) {
  * @return mixed the deserialised data
  * @see pickle()
  */
-function unpickle($pickle) {
+function unpickle($pickle)
+{
     return unserialize(gzuncompress(base64_decode($pickle)));
 }
 
@@ -355,12 +384,18 @@ function unpickle($pickle) {
  * @param string $str2
  * @return bool true if the two strings are equal
  */
-function secure_compare($str1, $str2) {
-    if (function_exists('hash_equals')) return hash_equals($str1, $str2);
+function secure_compare($str1, $str2)
+{
+    if (function_exists('hash_equals')) {
+        return hash_equals($str1, $str2);
+    }
 
     $xor = $str1 ^ $str2;
     $result = strlen($str1) ^ strlen($str2); //not the same length, then fail ($result != 0)
-    for ($i = strlen($xor) - 1; $i >= 0; $i--) $result += ord($xor[$i]);
+    for ($i = strlen($xor) - 1; $i >= 0;
+    $i--) {
+        $result += ord($xor[$i]);
+    }
     return !$result;
 }
 
@@ -370,7 +405,8 @@ function secure_compare($str1, $str2) {
  * @param string $base the base URI
  * @return string the request URI
  */
-function get_request_uri($base) {
+function get_request_uri($base)
+{
     $i = strpos($base, '//');
     $i = strpos($base, '/', $i + 2);
     
@@ -392,7 +428,8 @@ function get_request_uri($base) {
  * @since 0.8
  * @see SIMPLEID_BASE_URL
  */
-function get_base_path() {
+function get_base_path()
+{
     static $base_path;
     
     if (!$base_path) {
@@ -415,7 +452,8 @@ function get_base_path() {
  *
  * @return true if SIMPLEID_BASE_URL is a HTTPS URL
  */
-function is_base_https() {
+function is_base_https()
+{
     return (stripos(SIMPLEID_BASE_URL, 'https:') === 0);
 }
 
@@ -431,7 +469,8 @@ function is_base_https() {
  *
  * @since 0.7
  */
-function simpleid_url($q = '', $params = '', $relative = false, $secure = null) {
+function simpleid_url($q = '', $params = '', $relative = false, $secure = null)
+{
     if ($relative) {
         $url = get_base_path();
     } else {
@@ -476,7 +515,8 @@ function simpleid_url($q = '', $params = '', $relative = false, $secure = null) 
  * an unencrypted HTTP connection, or NULL to vary based on SIMPLEID_BASE_URL
  * @return string the url
  */
-function simpleid_host_url($secure = null) {
+function simpleid_host_url($secure = null)
+{
     $parts = parse_url(SIMPLEID_BASE_URL);
     
     if ($secure == 'https') {
@@ -490,11 +530,15 @@ function simpleid_host_url($secure = null) {
     $url = $scheme . '://';
     if (isset($parts['user'])) {
         $url .= $parts['user'];
-        if (isset($parts['pass'])) $url .= ':' . $parts['pass'];
+        if (isset($parts['pass'])) {
+            $url .= ':' . $parts['pass'];
+        }
         $url .= '@';
     }
     $url .= $parts['host'];
-    if (isset($parts['port'])) $url .= ':' . $parts['port'];
+    if (isset($parts['port'])) {
+        $url .= ':' . $parts['port'];
+    }
 
     return $url;
 }
@@ -506,11 +550,12 @@ function simpleid_host_url($secure = null) {
  * @param string $suffix the cookie name suffix
  * @return string the cookie name
  */
-function simpleid_cookie_name($suffix) {
-    static $prefix = NULL;
+function simpleid_cookie_name($suffix)
+{
+    static $prefix = null;
 
-    if ($prefix == NULL) {
-        $prefix = substr(get_form_token('cookie', FALSE), 0, 7) . '_';
+    if ($prefix == null) {
+        $prefix = substr(get_form_token('cookie', false), 0, 7) . '_';
     }
     return $prefix . $suffix;
 }
@@ -525,10 +570,11 @@ function simpleid_cookie_name($suffix) {
  * @param bool $bind_session whether to bind the form token to the current session
  * @return string a form token
  */
-function get_form_token($id, $bind_session = TRUE) {
+function get_form_token($id, $bind_session = true)
+{
     global $user;
 
-    if (store_get('site-token') == NULL) {
+    if (store_get('site-token') == null) {
         $site_token = pack('LLLL', mt_rand(), mt_rand(), mt_rand(), mt_rand());
         store_set('site-token', $site_token);
     } else {
@@ -546,7 +592,8 @@ function get_form_token($id, $bind_session = TRUE) {
  * @param bool $bind_session whether the token has been bound to the current session
  * @return bool true if the form token is valid
  */
-function validate_form_token($token, $id, $bind_session = TRUE) {
+function validate_form_token($token, $id, $bind_session = true)
+{
     global $user;
     
     $site_token = store_get('site-token');
@@ -554,10 +601,11 @@ function validate_form_token($token, $id, $bind_session = TRUE) {
     return ($token == _get_form_token($site_token, $id, $bind_session));
 }
 
-function _get_form_token($site_token, $id, $bind_session = TRUE) {
+function _get_form_token($site_token, $id, $bind_session = true)
+{
     global $user;
 
-    if (($user == NULL) || (!$bind_session)) {
+    if (($user == null) || (!$bind_session)) {
         $key = $site_token;
     } else {
         $key = session_id() . $site_token;
@@ -567,13 +615,13 @@ function _get_form_token($site_token, $id, $bind_session = TRUE) {
         return hash_hmac('sha1', $id, $key);
     } else {
         if (strlen($site_token) > 64) {
-            $site_token = sha1($site_token, TRUE);
+            $site_token = sha1($site_token, true);
         }
     
         $site_token = str_pad($site_token, 64, chr(0x00));
         $ipad = str_repeat(chr(0x36), 64);
         $opad = str_repeat(chr(0x5c), 64);
-        return bin2hex(sha1(($key ^ $opad) . sha1(($key ^ $ipad) . $text, TRUE), TRUE));
+        return bin2hex(sha1(($key ^ $opad) . sha1(($key ^ $ipad) . $text, true), true));
     }
 }
 
@@ -593,7 +641,8 @@ $simpleid_extensions = array();
  * to load in the {@link SIMPLEID_EXTENSIONS} constants, loads them, then
  * calls the ns hook.
  */
-function extension_init() {
+function extension_init()
+{
     global $simpleid_extensions;
     
     $simpleid_extensions = preg_split('/,\s*/', SIMPLEID_EXTENSIONS);
@@ -610,7 +659,8 @@ function extension_init() {
  * @param mixed $args the arguments to the hook
  * @return array the return values from the hook
  */
-function extension_invoke_all() {
+function extension_invoke_all()
+{
     global $simpleid_extensions;
     
     $args = func_get_args();
@@ -625,7 +675,7 @@ function extension_invoke_all() {
                 $return = array_merge($return, $result);
             } elseif (isset($result)) {
                 $return[] = $result;
-            } 
+            }
         }
     }
     
@@ -640,7 +690,8 @@ function extension_invoke_all() {
  * @param mixed $args the arguments to the hook
  * @return mixed the return value from the hook
  */
-function extension_invoke() {
+function extension_invoke()
+{
     $args = func_get_args();
     $extension = array_shift($args);
     $function = array_shift($args);
@@ -656,9 +707,9 @@ function extension_invoke() {
  *
  * @return array a list of the names of the currently loaded extensions.
  */
-function get_extensions() {
+function get_extensions()
+{
     global $simpleid_extensions;
     
     return $simpleid_extensions;
 }
-?>
