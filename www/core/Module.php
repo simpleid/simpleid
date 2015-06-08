@@ -236,24 +236,11 @@ abstract class Module extends \Prefab {
     protected function t($string, $variables = array()) {
         $i18n = LocaleManager::instance();
 
-        $translated = $i18n->dt($this->domain, $string);
+        $translated = $i18n->dt_raw($this->domain, $string);
         if (($translated == $string) && ($this->domain != LocaleManager::DEFAULT_DOMAIN))
-            $translated = $i18n->t($string);
+            $translated = $i18n->t_raw($string);
     
-        foreach ($variables as $variable => $value) {
-            switch ($variable[0]) {
-                case '@':
-                    $variables[$variable] = $this->f3->clean($value);
-                    break;
-                case '%':
-                default:
-                    $variables[$variable] = '<strong>' . $this->f3->clean($value) . '</strong>';
-                    break;
-                case '!':
-                // Pass-through.
-            }
-        }
-        return strtr($translated, $variables);
+        return $i18n->expand($translated, $variables);
     }
 }
 
