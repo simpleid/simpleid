@@ -32,7 +32,7 @@ use SimpleID\ModuleManager;
 class StoreManager extends Prefab {
     protected $stores = array();
 
-    private $settings;
+    private $cache = array();
 
     const REQUIRED_STORES = 'user:read user:write client:read client:write keyvalue:read keyvalue:write';
 
@@ -93,10 +93,19 @@ class StoreManager extends Prefab {
      * @return Storable data for the specified item
      */
     public function load($type, $id) {
-        $store = $this->getStore($type . ':read');
-        $storable = $store->read($type, $id);
-        $storable->setStoreID($id);
-        return $storable;
+        $cache_name = $type . ':' . $id;
+
+        if (!isset($this->cache[$cache_name])) {
+            $store = $this->getStore($type . ':read');
+            $storable = $store->read($type, $id);
+            if ($storable == null) return null;
+
+            $storable->setStoreID($id);
+
+            $this->cache[$cache_name] = $storable;
+        }
+        
+        return $this->cache[$cache_name];
     }
 
     /**
@@ -109,6 +118,8 @@ class StoreManager extends Prefab {
      * @since 0.7
      */
     public function save($type, $item) {
+        $this->cache[$type . ':' . $item->getStoreID()] = $item;
+
         $store = $this->getStore($type . ':write');
         $store->write($type, $item->getStoreID(), $item);
     }
@@ -121,7 +132,9 @@ class StoreManager extends Prefab {
      * @param Storable $item the item to delete
      */
     public function delete($type, $item) {
+        $cache_name = $type . ':' . $item->getStoreID();
         $store = $this->getStore($type . ':write');
+        if (isset($this->cache[$cache_name])) unset($this->cache[$cache_name]);
         $store->delete($type, $item->getStoreID());
     }
 
@@ -136,8 +149,7 @@ class StoreManager extends Prefab {
      * to be cast, nor null
      */
     public function loadClient($cid, $class_name = null) {
-        $store = $this->getStore('client:read');
-        $client = $store->read('client', $cid);
+        $client = $this->load('client', $cid);
 
         if ($client == null) return null;
 
@@ -157,17 +169,19 @@ class StoreManager extends Prefab {
      *
      */
     public function getSetting($name, $default = NULL) {
-        if (!isset($this->settings[$name])) {
+        $cache_name = 'setting:' . $name;
+
+        if (!isset($this->cache[$cache_name])) {
             $store = $this->getStore('keyvalue:read');
 
             if (!$store->exists('setting', $name)) return $default;
             $setting = $store->read('setting', $name);
             if ($setting === null) return $default;
 
-            $this->settings[$name] = $setting;
+            $this->cache[$cache_name] = $setting;
         }
         
-        return $this->settings[$name];
+        return $this->cache[$cache_name];
     }
 
     /**
@@ -177,8 +191,8 @@ class StoreManager extends Prefab {
      * @param mixed $value the value of the setting
      *
      */
-    public function setSetting($name, $value) {       
-        $this->settings[$name] = $value;
+    public function setSetting($name, $value) {
+        $this->cache['setting:' . $name] = $value;
 
         $store = $this->getStore('keyvalue:write');
         $store->write('setting', $name, $value);
@@ -191,8 +205,9 @@ class StoreManager extends Prefab {
      *
      */
     public function deleteSetting($name) {
+        $cache_name = 'setting:' . $name;
         $store = $this->getStore('keyvalue:write');
-        if (isset($this->settings[$name])) unset($this->settings[$name]);
+        if (isset($this->cache[$cache_name])) unset($this->cache[$cache_name]);
         $store->delete('setting', $name);
     }
 

@@ -36,6 +36,20 @@ class DefaultStoreModule extends StoreModule {
     public function __construct() {
         parent::__construct();
         $this->config = $this->f3->get('config');
+
+        $this->checkConfig();
+    }
+
+    protected function checkConfig() {
+        if (!is_dir($this->config['identities_dir'])) {
+            $this->f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'Identities directory not found.');
+            $this->f3->error(500, $this->t('Identities directory not found.  See the <a href="!url">manual</a> for instructions on how to set up SimpleID.', array('!url' => 'http://simpleid.koinic.net/documentation/getting-started')));
+        }
+
+        if (!is_dir($this->config['store_dir']) || !is_writeable($this->config['store_dir'])) {
+            $this->f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'Store directory not found or not writeable.');
+            $this->f3->error(500, $this->t('Store directory not found or not writeable.  See the <a href="!url">manual</a> for instructions on how to set up SimpleID.', array('!url' => 'http://simpleid.koinic.net/documentation/getting-started')));
+        }
     }
 
     /**
