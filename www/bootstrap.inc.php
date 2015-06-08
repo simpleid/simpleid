@@ -38,14 +38,7 @@ $default_config = array(
     'webfinger_rate_limit' => 1,
     'webfinger_access_control_allow_origin' => '*',
     'locale' => 'en',
-    'log_callback' => function() {
-        $f3 = \Base::instance();
-        $config = $f3->get('config');
-        if ($config['log_file'] == '') return new \Psr\Log\NullLogger();
-
-        $f3->set('LOGS', dirname($config['log_file']) . '/');
-        return new \SimpleID\Util\DefaultLogger(basename($config['log_file']), $config['log_level']);
-    },
+    'logger' => 'SimpleID\Util\DefaultLogger',
     'log_file' => '',
     'log_level' => 'info',
     'date_time_format' => '%Y-%m-%d %H:%M:%S %Z',
@@ -97,9 +90,14 @@ $cache = \Cache::instance();
 $cache->reset(null, SIMPLEID_LONG_TOKEN_EXPIRES_IN);
 
 // Logging
-$f3->set('logger', $config['log_callback']());
+if (!isset($config['logger']) || ($config['logger'] == '') || ($config['log_file'] == '')) {
+    $config['logger'] = 'Psr\Log\NullLogger';
+}
+$logger = new $config['logger']($config);
+$f3->set('logger', $logger);
+if (is_subclass_of($logger, '\Log')) $f3->set('LOGS', dirname($config['log_file']) . '/');
 
-$f3->set('DEBUG', 4);
+if (isset($config['f3_DEBUG'])) $f3->set('DEBUG', $config['f3_DEBUG']);
 
 // HTTP
 fix_http_request($f3);

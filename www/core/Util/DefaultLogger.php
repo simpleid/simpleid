@@ -58,13 +58,12 @@ class DefaultLogger extends Log implements LoggerInterface {
      * will be placed under the directory specified by the Fat-Free
      * LOGS variable
      *
-     * @param string $file the name of the log file
-     * @param string $log_level the minimum log level
+     * @param array $config the SimpleID configuration
      */
-    function __construct($file, $log_level) {
-        parent::__construct($file);
+    function __construct($config) {
+        parent::__construct(basename($config['log_file']));
 
-        $this->log_level = $log_level;
+        $this->log_level = $config['log_level'];
     }
 
     /**
