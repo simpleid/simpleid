@@ -101,7 +101,7 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
         if ($form_state['mode'] == AuthManager::MODE_CREDENTIALS) {
             $tpl = new \Template();
 
-            $this->f3->set('rememberme_label', $this->t('Remember me on this computer for two weeks.'));
+            $this->f3->set('rememberme_label', $this->t('Remember me on this device for two weeks.'));
 
             return array(
                 array(
