@@ -715,7 +715,7 @@ class OpenIDModule extends Module {
      * @param int $reason either CHECKID_APPROVAL_REQUIRED, CHECKID_RETURN_TO_SUSPECT,
      * CHECKID_IDENTITIES_NOT_MATCHING or CHECKID_IDENTITY_NOT_EXIST
      */
-    protected function consentForm($request, $response, $reason = CHECKID_APPROVAL_REQUIRED) {
+    protected function consentForm($request, $response, $reason = self::CHECKID_APPROVAL_REQUIRED) {
         $tpl = new \Template();
 
         $form_state = array(
