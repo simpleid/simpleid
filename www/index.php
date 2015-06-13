@@ -20,12 +20,6 @@
  * 
  */
 
-/**
- * Main SimpleID file.
- *
- * @package simpleid
- * @filesource
- */
 require_once "bootstrap.inc.php";
 
 $mgr = SimpleID\ModuleManager::instance();
@@ -33,15 +27,13 @@ $store = SimpleID\Store\StoreManager::instance();
 
 // Load modules
 $config = $f3->get('config');
-foreach ($config['required_modules'] as $module) {
-    $mgr->loadModule($module);
-}
-foreach ($config['modules'] as $module) {
-    $mgr->loadModule($module);
-}
+foreach ($config['required_modules'] as $module) $mgr->loadModule($module);
+foreach ($config['modules'] as $module) $mgr->loadModule($module);
 
 $store->checkStores();
 $mgr->initRoutes();
+
+$mgr->invokeAll('init');
 
 $f3->run();
 ?>

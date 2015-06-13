@@ -27,6 +27,7 @@ use \Serializable;
 use SimpleID\ModuleManager;
 use SimpleID\Store\Storable;
 use SimpleID\Util\ArrayWrapper;
+use SimpleID\Util\OpaqueIdentifier;
 use SimpleID\Base\UserModule;
 
 /**
@@ -47,6 +48,15 @@ class User extends ArrayWrapper implements Serializable, Storable {
     }
 
     /**
+     * Determines whether the user is an administrator
+     *
+     * @return bool true if the user is an administrator
+     */
+    public function isAdministrator() {
+        return ($this->container['administrator']);
+    }
+
+    /**
      * Determines whether the user has a local OpenID identity
      *
      * @return bool true if the user has a local OpenID identity
@@ -62,6 +72,11 @@ class User extends ArrayWrapper implements Serializable, Storable {
      */
     public function getLocalOpenIDIdentity() {
         return ($this->hasLocalOpenIDIdentity()) ? $this->container['openid']['identity'] : null;
+    }
+
+    public function getPairwiseIdentity($client_id) {
+        $opaque = new OpaqueIdentifier();
+        return 'pwid:' . $opaque->generate($this->uid, array('client_id' => $client_id));
     }
 
     /**

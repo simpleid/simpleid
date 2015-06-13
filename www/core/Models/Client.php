@@ -33,7 +33,7 @@ use SimpleID\Store\Storable;
  * Different protocols may call clients different names.  For example,
  * clients are known as *relying parties* in OpenID 2.
  */
-class Client extends ArrayWrapper {
+class Client extends ArrayWrapper implements Storable {
 
     public $cid;
 
@@ -61,6 +61,7 @@ class Client extends ArrayWrapper {
      * @return string the display name
      */
     public function getDisplayName() {
+        if (isset($this->container['client_name'])) return $this->container['client_name'];
         return $this->cid;
     }
 
