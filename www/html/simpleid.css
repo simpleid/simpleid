@@ -75,6 +75,7 @@ pre {
     white-space: nowrap;
     overflow: scroll;
 }
+pre.code { white-space: pre; overflow: initial; }
 
 /* Page layout ------------------------------------------------------------- */
 /*.sticky { position: fixed; }*/
