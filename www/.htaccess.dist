@@ -18,10 +18,12 @@
 
 
 # Protect files and directories from prying eyes.
-<FilesMatch "(\.(cache|store|identities|inc\.php|extension\.php)|config\.php)$">
-    Order deny,allow
-    Deny from all
-</FilesMatch>
+<IfModule !mod_authz_core.c>
+    <FilesMatch "(\.(cache|store|identities|inc\.php|extension\.php)|config\.php)$">
+        Order deny,allow
+        Deny from all
+    </FilesMatch>
+</IfModule>
 
 # Apache 2.4
 <IfModule mod_authz_host.c>
