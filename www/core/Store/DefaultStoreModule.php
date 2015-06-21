@@ -304,8 +304,7 @@ class DefaultStoreModule extends StoreModule {
         if (file_exists($client_file)) {
             $decoder = new JsonDecoder();
             $data = $decoder->decode(file_get_contents($client_file), true);
-            $client->loadData($data);
-            $client->dynamic = false;
+            if ($data != null) $client->loadData($data);
         }
 
         $client->cid = $cid;
