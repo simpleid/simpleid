@@ -796,8 +796,8 @@ class OpenIDModule extends Module {
         $reason = $form_state['code'];
 
         if (!$token->verify($this->f3->get('POST.tk'), 'openid_consent')) {
-            $this->logger->log(LogLevel::WARNING, 'Login attempt: Security token ' . $this->f3->get('POST.tk') . ' invalid.');
-            $this->f3->set('message', $this->t('SimpleID detected a potential security attack on your log in.  Please log in again.'));
+            $this->logger->log(LogLevel::WARNING, 'Security token ' . $this->f3->get('POST.tk') . ' invalid.');
+            $this->f3->set('message', $this->t('SimpleID detected a potential security attack.  Please try again.'));
             $this->consentForm($request, $response, $reason);
             return;
         }
