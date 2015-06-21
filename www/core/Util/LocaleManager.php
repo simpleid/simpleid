@@ -77,6 +77,8 @@ class LocaleManager extends Prefab {
     public function expand($string, $variables) {
         $f3 = Base::instance();
 
+        if ($variables == NULL) return $string;
+
         foreach ($variables as $variable => $value) {
             switch ($variable[0]) {
                 case '@':
