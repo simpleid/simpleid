@@ -89,7 +89,7 @@ class ArrayWrapper implements ArrayAccess {
      * @param array $data the data
      */
     public function loadData($data) {
-        $this->container = array_replace_recursive($this->container, $data);
+        if (is_array($data)) $this->container = array_replace_recursive($this->container, $data);
     }
 
     /**
