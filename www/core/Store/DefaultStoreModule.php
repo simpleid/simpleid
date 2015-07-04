@@ -357,7 +357,7 @@ class DefaultStoreModule extends StoreModule {
      *
      */
     protected function readKeyValue($type, $name) {
-        if (!$this->isValidName($name)) return null;
+        if (!$this->isValidName($name) || !$this->hasKeyValue($type, $name)) return null;
         $file = $this->getKeyValueFile($type, $name);
         return $this->f3->mutex($file, function($f3, $file) {
             return $f3->unserialize(file_get_contents($file));
