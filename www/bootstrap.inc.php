@@ -71,6 +71,7 @@ if (function_exists('date_default_timezone_set')) date_default_timezone_set(@dat
 $f3 = \Base::instance();
 $f3->mset(array(
     'CASELESS' => false,
+    'CORS.origin' => '*',
     'JAR.domain' => '',
     'JAR.secure' => false,
     'PACKAGE' => 'SimpleID/' . SIMPLEID_VERSION,
