@@ -93,9 +93,9 @@ $cache->reset(null, SIMPLEID_LONG_TOKEN_EXPIRES_IN);
 if (!isset($config['logger']) || ($config['logger'] == '') || ($config['log_file'] == '')) {
     $config['logger'] = 'Psr\Log\NullLogger';
 }
+if (is_subclass_of($config['logger'], '\Log', true)) $f3->set('LOGS', dirname($config['log_file']) . '/');
 $logger = new $config['logger']($config);
 $f3->set('logger', $logger);
-if (is_subclass_of($logger, '\Log')) $f3->set('LOGS', dirname($config['log_file']) . '/');
 
 if (isset($config['f3_DEBUG'])) $f3->set('DEBUG', $config['f3_DEBUG']);
 
