@@ -42,7 +42,7 @@ class HTTPResponse {
      * 
      * @param array $response the response from the HTTP request
      */
-    function __construct($response) {
+    public function __construct($response) {
         if ($response === false) {
             $this->isNetworkError = true;
             $this->isHTTPError = true;
@@ -81,7 +81,7 @@ class HTTPResponse {
             list($header, $value) = explode(':', $field, 2);
             
             // Headers are case insensitive
-            $header = strtolower($header);
+            $header = self::httpCase($header);
             
             if (isset($headers[$header])) {
                 // RFC 2616, section 4.2: Multiple headers with the same field
@@ -99,7 +99,7 @@ class HTTPResponse {
      *
      * @return bool true if there is a network error
      */
-    function isNetworkError() {
+    public function isNetworkError() {
         return $this->isNetworkError;
     }
 
@@ -108,7 +108,7 @@ class HTTPResponse {
      *
      * @return bool true if there is a HTTP or network error
      */
-    function isHTTPError() {
+    public function isHTTPError() {
         return $this->isHTTPError;
     }
 
@@ -117,7 +117,7 @@ class HTTPResponse {
      *
      * @return string the body of the HTTP response
      */
-    function getBody() {
+    public function getBody() {
         if ($this->hasHeader('Content-Encoding')) {
             switch ($this->getHeader('Content-Encoding')) {
                 case 'gzip':
@@ -134,7 +134,7 @@ class HTTPResponse {
      *
      * @return string the HTTP response code
      */
-    function getResponseCode() {
+    public function getResponseCode() {
         return $this->responseCode;
     }
 
@@ -143,7 +143,7 @@ class HTTPResponse {
      *
      * @return float the HTTP version
      */
-    function getVersion() {
+    public function getVersion() {
         return $this->version;
     }
 
@@ -153,8 +153,8 @@ class HTTPResponse {
      * @param string $header the header to return
      * @return string the value of the header
      */
-    function getHeader($header) {
-        return $this->headers[strtolower($header)];
+    public function getHeader($header) {
+        return $this->headers[self::httpCase($header)];
     }
 
     /**
@@ -163,10 +163,21 @@ class HTTPResponse {
      * @param string $header the header
      * @return bool true if the header exists
      */
-    function hasHeader($header) {
-        return array_key_exists(strtolower($header), $this->headers);
+    public function hasHeader($header) {
+        return array_key_exists(self::httpCase($header), $this->headers);
     }
 
+
+    /**
+     * Returns a string formatted in HTTP case.  In HTTP case, the first letter
+     * after each hyphen is capitalised
+     *
+     * @param string $str the string to convert
+     * @return string the converted string
+     */
+    static public function httpCase($str) {
+        return implode('-', array_map('ucfirst', explode('-', strtolower($str))));
+    }
 }
 
 ?>
