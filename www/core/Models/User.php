@@ -74,9 +74,9 @@ class User extends ArrayWrapper implements Serializable, Storable {
         return ($this->hasLocalOpenIDIdentity()) ? $this->container['openid']['identity'] : null;
     }
 
-    public function getPairwiseIdentity($client_id) {
+    public function getPairwiseIdentity($sector_identifier) {
         $opaque = new OpaqueIdentifier();
-        return 'pwid:' . $opaque->generate($this->uid, array('client_id' => $client_id));
+        return 'pwid:' . $opaque->generate($sector_identifier . ':' . $this->uid);
     }
 
     /**

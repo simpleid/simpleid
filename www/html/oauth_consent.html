@@ -1,0 +1,47 @@
+<form action="{{ @base_path }}oauth/consent" method="post" enctype="application/x-www-form-urlencoded" id="oauth-consent-form">
+    <input type="hidden" name="fs" value="{{ @@fs }}">
+    <input type="hidden" name="tk" value="{{ @@tk }}">
+    
+    <check if="{{ @@logo_url }}">
+    <div class="icon">
+        <img src="{{ @logo_url }}" alt="{{ @application_name }}" />
+    </div>
+    </check>
+    
+    <p>{{ @request_label | raw }}</p>
+    
+    <ul>
+        <repeat group="{{ @scope_list }}" key="{{ @scope }}" value="{{ @description }}">
+        <li>{{ @description }}<input name="prefs[consents][oauth][]" value="{{ @scope }}" type="hidden"></li>
+        </repeat>
+    </ul>
+    
+    <check if="{{ @@client_dynamic }}">
+    <div class="message unsecure">
+        <p>{{ @dynamic_label }}</p>
+    </div>
+    </check>
+    
+    <p>{{ @dashboard_label | raw }}</p>
+
+    <check if="{{ @@client_info }}">
+    <div class="client-info">
+        <h2 class="client-info-heading collapsed">{{ @@client_info_label }}</h2>
+        <div class="client-info-details">
+            <ul>
+                <repeat group="{{ @client_info }}" value="{{ @item }}"><li>{{ @item | raw }}</li></repeat>
+            </ul>
+        </div>
+    </div>
+    </check>
+    
+    <div class="form-item">
+        <label class="option">
+            <input class="{{ @@client_dynamic }}" type="checkbox" name="prefs[oauth][prompt_none]" value="true">
+            {{ @@oauth_consent_label | raw }}
+        </label>
+    </div>
+    
+    <input name="op" id="edit-allow" value="{{ @allow_button }}" class="form-default" type="submit">
+    <input name="op" id="edit-deny" value="{{ @deny_button }}" type="submit">
+</form>

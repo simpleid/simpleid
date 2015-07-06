@@ -37,10 +37,15 @@ class Client extends ArrayWrapper implements Storable {
 
     public $cid;
 
-    protected $dynamic = true;
+    protected $dynamic;
 
     public function __construct($data = array()) {
         parent::__construct($data);
+    }
+
+    public function loadFieldsFrom($from) {
+        $this->cid = $from->cid;
+        $this->dynamic = $from->dynamic;
     }
 
     /**
