@@ -235,6 +235,15 @@ class Response extends ArrayWrapper {
         $f3->set('params', $this->container);
         print $tpl->render('post.html');
     }
+
+    /**
+     * Returns the response modes supported by this class.
+     *
+     * @return array list of response modes
+     */
+    public static function getResponseModesSupported() {
+        return array(self::QUERY_RESPONSE_MODE, self::FRAGMENT_RESPONSE_MODE, self::FORM_POST_RESPONSE_MODE);
+    }
 }
 
 ?>
