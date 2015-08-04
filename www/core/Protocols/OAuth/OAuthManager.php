@@ -158,7 +158,7 @@ class OAuthManager extends Prefab {
     public function initAccessToken($include_request_body = false) {
         $this->logger->log(LogLevel::DEBUG, 'SimpleID\Protocols\OAuth\OAuthManager->initAccessToken');
 
-        $bearer_token = array($this->initBearerAccessToken($include_request_body));
+        $bearer_token = $this->initBearerAccessToken($include_request_body);
         if ($bearer_token) {
             $this->access_token = AccessToken::decode($bearer_token);
             return;
