@@ -156,7 +156,7 @@ class AXOpenIDExtensionModule extends Module {
                 if (in_array($field, $required)) {
                     $form_field['required'] = true;
                 } else {
-                    $form_field['required'] = true;
+                    $form_field['required'] = false;
                     $form_field['checked'] = (!isset($prefs['consents']['ax']) || in_array($field, $prefs['consents']['ax'])) ;
                 }
                 
