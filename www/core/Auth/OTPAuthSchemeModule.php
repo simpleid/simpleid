@@ -120,7 +120,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
 
         $this->f3->set('about_otp', $this->t('Login verification adds an extra layer of protection to your account. When enabled, you will need to enter an additional security code whenever you log into SimpleID.'));
         $this->f3->set('otp_warning', $this->t('<strong>WARNING:</strong> If you enable login verification and lose your authenticator app, you will need to <a href="!url">edit your identity file manually</a> before you can log in again.',
-            array('!url' => 'http://simpleid.koinic.net/documentation/troubleshooting/login-verification-recovery')
+            array('!url' => 'http://simpleid.koinic.net/docs/2/common_problems/#otp')
         ));
 
         $this->f3->set('setup_otp', $this->t('To set up login verification, following these steps.'));
@@ -197,7 +197,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             // Note this is called from user_login(), so $_POST is always filled
             $this->f3->set('otp_instructions_label', $this->t('To verify your identity, enter the verification code.'));
             $this->f3->set('otp_recovery_label', $this->t('If you have lost your verification code, you can <a href="!url">recover your account</a>.',
-                array('!url' => 'http://simpleid.koinic.net/documentation/troubleshooting/login-verification-recovery')
+                array('!url' => 'http://simpleid.koinic.net/docs/2/common_problems/#otp')
             ));
             $this->f3->set('otp_remember_label', $this->t('Do not ask for verification codes again on this browser.'));
 
