@@ -95,6 +95,7 @@ class MyModule extends Module {
         $tpl = new \Template();
         $this->f3->set('tk', $token->generate('apps', SecurityToken::OPTION_BIND_SESSION));
         $this->f3->set('title', $this->t('My Apps'));
+        $this->f3->set('delete_label', $this->t('Delete'));
         $this->f3->set('layout', 'my_apps.html');
         print $tpl->render('page.html');
     }
