@@ -90,7 +90,7 @@ class OAuthManager extends Prefab {
         }
         $this->f3->set('oauth_client', $client);
 
-        $this->logger->log(LogLevel::INFO, 'OAuth client: ' . $client_id);
+        $this->logger->log(LogLevel::INFO, 'OAuth client: ' . $client_id . ' [' . $this->client_auth_method . ']');
     }
 
 
@@ -102,14 +102,19 @@ class OAuthManager extends Prefab {
      * not present
      *
      * @param bool $send_challenge if a challenge is to be sent
-     * @param array $auth_method expected authentication method
+     * @param array $auth_methods expected authentication method
      * @return bool true if an authenticated OAuth client is present
      */
-    public function isClientAuthenticated($send_challenge = false, $auth_method = null) {
+    public function isClientAuthenticated($send_challenge = false, $auth_methods = null) {
+        $this->logger->log(LogLevel::DEBUG, 'SimpleID\Protocols\OAuth\OAuthManager->isClientAuthenticated');
+
         $result = $this->f3->exists('oauth_client');
-        if ($result && ($auth_method != null)) {
-            if (!is_array($auth_method)) $auth_method = array($auth_method);
-            $result = in_array($this->client_auth_method, $auth_method);
+        if ($result && ($auth_methods != null)) {
+            if (!is_array($auth_methods)) $auth_methods = array($auth_methods);
+            $result = in_array($this->client_auth_method, $auth_methods);
+            if (!$result) {
+                $this->logger->log(LogLevel::ERROR, 'Unexpected authentication method: ' . $this->client_auth_method . '; expecting ' . implode(',', $auth_methods));
+            }
         }
 
         if ($result) {
