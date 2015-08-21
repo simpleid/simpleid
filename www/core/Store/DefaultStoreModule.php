@@ -204,7 +204,12 @@ class DefaultStoreModule extends StoreModule {
         $identity_file = $this->config['identities_dir'] . "/$uid.user.json";
         $decoder = new JsonDecoder();
         $data = $decoder->decode(file_get_contents($identity_file), true);
-        $user->loadData($data);
+
+        if (($data == null) && ($decoder->getError())) {
+            $this->f3->get('logger')->log(\Psr\Log\LogLevel::ERROR, 'Cannot read user file ' . $identity_file . ': ' . $decoder->getError());
+        } elseif ($data != null) {
+            $user->loadData($data);
+        }
         
         return $user;
     }
@@ -304,7 +309,12 @@ class DefaultStoreModule extends StoreModule {
         if (file_exists($client_file)) {
             $decoder = new JsonDecoder();
             $data = $decoder->decode(file_get_contents($client_file), true);
-            if ($data != null) $client->loadData($data);
+
+            if (($data == null) && ($decoder->getError())) {
+                $this->f3->get('logger')->log(\Psr\Log\LogLevel::ERROR, 'Cannot read client file ' . $client_file . ' :' . $decoder->getError());
+            } elseif ($data != null) {
+                $client->loadData($data);
+            }
         }
 
         $client->cid = $cid;

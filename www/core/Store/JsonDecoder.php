@@ -37,6 +37,12 @@ class JsonDecoder {
     /** Internal state constant */
     const STATE_STRING = 3;
 
+    /** @var string source JSON after stripping comments */
+    private $src;
+
+    /** @var string JSON error */
+    protected $error;
+
     /**
      * Decodes an extended JSON string.
      *
@@ -45,15 +51,57 @@ class JsonDecoder {
      * @link http://php.net/json_decode
      */
     public function decode($json, $assoc = false, $depth = 512, $options = 0) {
-        $src = $this->strip($json);
+        $this->src = $this->strip($json);
 
         if (version_compare(phpversion(), '5.4.0', '>=')) {
-            return json_decode($src, $assoc, $depth, $options);
+            $result = json_decode($this->src, $assoc, $depth, $options);
         } elseif (version_compare(phpversion(), '5.3.0', '>=')) {
-            return json_decode($src, $assoc, $depth);
+            $result = json_decode($this->src, $assoc, $depth);
         } else {
-            return json_decode($src, $assoc);
+            $result = json_decode($this->src, $assoc);
         }
+
+        $this->error = json_last_error();
+        return $result;
+    }
+
+    /**
+     * Returns the error in decoding the JSON string, if any.
+     *
+     * @return bool|string the error, or false
+     */
+    public function getError() {
+        if ($this->error == JSON_ERROR_NONE) return false;
+
+        switch ($this->error) {
+            case JSON_ERROR_DEPTH:
+                return 'Maximum stack depth exceeded';
+                break;
+            case JSON_ERROR_STATE_MISMATCH:
+                return 'Underflow or the modes mismatch';
+                break;
+            case JSON_ERROR_CTRL_CHAR:
+                return 'Unexpected control character found';
+                break;
+            case JSON_ERROR_SYNTAX:
+                return 'Syntax error, malformed JSON';
+                break;
+            case JSON_ERROR_UTF8:
+                return 'Malformed UTF-8 characters, possibly incorrectly encoded';
+                break;
+            default:
+                return 'Other error';
+                break;
+        }
+    }
+
+    /**
+     * Gets the JSON string after stripping comments
+     *
+     * @return string the JSON string
+     */
+    public function getJSON() {
+        return $this->src;
     }
 
     /**
