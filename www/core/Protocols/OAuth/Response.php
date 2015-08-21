@@ -215,7 +215,8 @@ class Response extends ArrayWrapper {
         $f3->status($status);
         $f3->expire(0);
     
-        header('Content-Type: application/json');
+        header('Content-Type: application/json;charset=UTF-8');
+        header('Pragma: no-cache');
         print json_encode($this->container);
     }
 
