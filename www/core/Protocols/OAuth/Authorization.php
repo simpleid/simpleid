@@ -310,7 +310,7 @@ class Authorization implements Storable {
 
         $results['access_token'] = $token->getEncoded();
         $results['token_type'] = $token->getTokenType();
-        $results['expires_in'] = $expires_in;
+        if ($expires_in != Token::TTL_PERPETUAL) $results['expires_in'] = $expires_in;
 
         return $results;
     }
