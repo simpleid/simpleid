@@ -12,7 +12,8 @@
     
     <ul>
         <repeat group="{{ @scope_list }}" key="{{ @scope }}" value="{{ @description }}">
-        <li>{{ @description }}<input name="prefs[consents][oauth][]" value="{{ @scope }}" type="hidden"></li>
+        <input name="prefs[consents][oauth][]" value="{{ @scope }}" type="hidden">
+        <check if="{{ @@description }}"><li>{{ @description }}</li></check>
         </repeat>
     </ul>
     
