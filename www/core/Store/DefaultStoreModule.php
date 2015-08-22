@@ -207,6 +207,7 @@ class DefaultStoreModule extends StoreModule {
 
         if (($data == null) && ($decoder->getError())) {
             $this->f3->get('logger')->log(\Psr\Log\LogLevel::ERROR, 'Cannot read user file ' . $identity_file . ': ' . $decoder->getError());
+            trigger_error('Cannot read user file ' . $identity_file . ': ' . $decoder->getError(), E_USER_ERROR);
         } elseif ($data != null) {
             $user->loadData($data);
         }
@@ -312,6 +313,7 @@ class DefaultStoreModule extends StoreModule {
 
             if (($data == null) && ($decoder->getError())) {
                 $this->f3->get('logger')->log(\Psr\Log\LogLevel::ERROR, 'Cannot read client file ' . $client_file . ' :' . $decoder->getError());
+                trigger_error('Cannot read client file ' . $client_file . ' :' . $decoder->getError(), E_USER_ERROR);
             } elseif ($data != null) {
                 $client->loadData($data);
             }
