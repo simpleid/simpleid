@@ -378,7 +378,7 @@ class OpenIDModule extends Module {
         // Choose the identity URL for the user automatically
         if ($request['openid.identity'] == Request::OPENID_IDENTIFIER_SELECT) {
             $test_user = $store->loadUser($uid);
-            $identity = $test_user['identity'];
+            $identity = $test_user['openid']['identity'];
             
             $this->logger->log(LogLevel::INFO, 'OpenID identifier selection: Selected ' . $uid . ' [' . $identity . ']');
         } else {
