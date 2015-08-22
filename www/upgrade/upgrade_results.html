@@ -1,3 +1,11 @@
+<p>{{ @@upgrade_complete }}</p>
+            
+<check if="{{ @@edit_upgrade_php }}">
+    <div class="message unsecure">
+        <p>{{ @edit_upgrade_php }}</p>
+    </div>
+</check>
+
 <div class="upgrade-results">
-{results}
+{{ @@results }}
 </div>

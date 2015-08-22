@@ -1,16 +1,25 @@
-<p>{{ @applying_upgrade }} <span id="upgrade-progress">{{ @@progress }}</span></p>
+<p>{{ @applying_upgrade }} <span id="upgrade-progress"></span></p>
+
+<div id="upgrade-error">
+    <p></p>
+</div>
 
 <div id="upgrade-data" data-step="{{ @step }}"></div>
 
 <script type="text/javascript">
     (function ($) {
         var upgrade_callback = function(data) {
-            // Error, next or complete
             if (data.status == 'step') {
-                // data.progress
-                upgrade_apply(data.step);
+                $('#upgrade-progress').html('(' + data.progress + ')');
+                upgrade_apply(data.next);
             } else if (data.status == 'complete') {
-                //window.location.href
+                // Convert relative to absolute URL
+                resolver = document.createElement('a');
+                resolver.href = data.redirect;
+                window.location.replace(resolver.href);
+            } else if (data.status == 'error') {
+                $('#upgrade-error p').html(data.error_description);
+                $('#upgrade-error').show();
             }
         }
 
@@ -20,8 +29,9 @@
                 data: { step: step },
                 dataType: 'json',
                 type: 'POST'
-            }).then(upgrade_callback, function (xhr) {
-                //xhr.responseJSON
+            }).then(upgrade_callback, function(xhr, msg, err) {
+                $('#upgrade-error p').html(msg);
+                $('#upgrade-error').show();
             });
         }
 

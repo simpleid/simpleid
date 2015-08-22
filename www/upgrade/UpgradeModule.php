@@ -167,19 +167,40 @@ class UpgradeModule extends Module {
         $cache = \Cache::instance();
 
         $token = new SecurityToken();
-        /*if (!$this->f3->exists('GET.tk') || !$token->verify($this->f3->get('GET.tk'), 'apps')) {
+        if (!$this->f3->exists('POST.step')) {
             $this->f3->status(401);
             print json_encode(array(
+                'status' => 'error',
                 'error' => 'unauthorized',
                 'error_description' => $this->t('Unauthorized')
             ));
             return;
-        }*/
+        }
         
-        $upgrade = $cache->get($upgid . '.upgrade');
+        $payload = $token->getPayload($this->f3->get('POST.step'));
+        if ($payload == null) {
+            $this->f3->status(401);
+            print json_encode(array(
+                'status' => 'error',
+                'error' => 'unauthorized',
+                'error_description' => $this->t('Unauthorized')
+            ));
+            return;
+        }
+
+        $upgid = $payload['upgid'];
+        $step = $payload['step'];
+
+        $upgrade = $cache->get($payload['upgid'] . '.upgrade');
 
         if ($upgrade === false) {
-
+            $this->f3->status(500);
+            print json_encode(array(
+                'status' => 'error',
+                'error' => 'upgrade_error',
+                'error_description' => $this->t('Upgrade not found')
+            ));
+            return;
         }
 
         $function = $upgrade['list'][$step];
@@ -190,13 +211,12 @@ class UpgradeModule extends Module {
             print json_encode(array(
                 'status' => 'next',
                 'next' => $next,
-                'progress' => ($step + 1) / count($upgrade['list'])
+                'progress' => $this->f3->format('{0,number,percent}', ($step + 1) / count($upgrade['list']))
             ));
         } else {
             print json_encode(array(
                 'status' => 'complete',
-                'step' => $next,
-                'redirect' => ''
+                'redirect' => 'complete?tk=' . rawurlencode($next)
             ));
         }
     }
@@ -210,20 +230,27 @@ class UpgradeModule extends Module {
         $cache = \Cache::instance();
 
         $token = new SecurityToken();
-        /*if (!$this->f3->exists('GET.tk') || !$token->verify($this->f3->get('GET.tk'), 'apps')) {
+        if (!$this->f3->exists('GET.tk')) {
             $this->f3->status(401);
-            print json_encode(array(
-                'error' => 'unauthorized',
-                'error_description' => $this->t('Unauthorized')
-            ));
+            $this->fatalError($this->t('SimpleID detected a potential security attack.  Please try again.'));
             return;
-        }*/
+        }
+
+        $payload = $token->getPayload($this->f3->get('POST.step'));
+        if ($payload == null) {
+            $this->f3->status(401);
+            $this->fatalError($this->t('SimpleID detected a potential security attack.  Please try again.'));
+            return;
+        }
+
+        $upgid = $payload['upgid'];
         
         $upgrade = $cache->get($upgid . '.upgrade');
         $cache->reset('.upgrade');
 
         if ($upgrade === false) {
-
+            $this->f3->status(500);
+            $this->fatalError($this->t('Upgrade not found'));
         }
 
         if (!$upgrade_access_check) {
