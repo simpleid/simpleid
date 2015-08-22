@@ -59,11 +59,13 @@ class UserModule extends Module {
             } else {
                 header('Vary: Accept');
                 
-                $content_type = $web->acceptable(array('text/html', 'application/xml', 'application/xhtml+xml', 'application/xrds+xml'));
+                $content_type = $web->acceptable(array('text/html', 'application/xml', 'application/xhtml+xml', 'application/xrds+xml', 'application/json'));
                 
                 if (($content_type == 'application/xrds+xml') && ($mgr->isModuleLoaded('SimpleID\Protocols\OpenID\OpenIDModule'))) {
                     $mgr->getModule('SimpleID\Protocols\OpenID\OpenIDModule')->userXRDS($f3, $params);
                     return;
+                } elseif (($content_type == 'application/json') && ($mgr->isModuleLoaded('SimpleID\Protocols\Connect\OpenID2MigrationModule'))) {
+                    $mgr->getModule('SimpleID\Protocols\Connect\OpenID2MigrationModule')->userJSON($f3, $params);
                 } else {
                     $xrds_location = $this->getCanonicalURL('@openid_user_xrds');
                     header('X-XRDS-Location: ' . $xrds_location);
