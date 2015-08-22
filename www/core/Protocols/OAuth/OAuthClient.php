@@ -59,17 +59,6 @@ class OAuthClient extends Client {
 
         return (isset($this->container['oauth']['client_secret']));
     }
-
-    /*public function getSectorIdentifier() {
-        if (isset($this->container['connect']['sector_identifier_uri'])) {
-
-        } elseif (isset($this->container['oauth']['redirect_uris'])) {
-
-        } else {
-            return $this->getStoreID();
-        }
-    }*/
-
 }
 
 ?>
