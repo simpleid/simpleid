@@ -484,7 +484,7 @@ class OAuthModule extends Module {
         $response->loadData($authorization->issueTokens($scope, SIMPLEID_SHORT_TOKEN_EXPIRES_IN, $code));
 
         // Call modules
-        $this->mgr->invokeAll('oAuthToken', $grant_type, $authorization, $request, $response, $scope);
+        $this->mgr->invokeAll('oAuthToken', 'authorization_code', $authorization, $request, $response, $scope);
 
         return $authorization;
     }
@@ -531,7 +531,7 @@ class OAuthModule extends Module {
         $response->loadData($authorization->issueTokens($scope, SIMPLEID_SHORT_TOKEN_EXPIRES_IN, $refresh_token));
 
         // Call modules
-        $this->mgr->invokeAll('oAuthToken', $grant_type, $authorization, $request, $response, $scope);
+        $this->mgr->invokeAll('oAuthToken', 'refresh_token', $authorization, $request, $response, $scope);
 
         return $authorization;
     }
