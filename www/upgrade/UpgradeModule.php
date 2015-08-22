@@ -22,12 +22,12 @@
 
 namespace SimpleID\Upgrade;
 
+use \Spyc;
 use SimpleID\Module;
 use SimpleID\ModuleManager;
 use SimpleID\Auth\AuthManager;
 use SimpleID\Crypt\Random;
 use SimpleID\Store\StoreManager;
-use SimpleID\Store\JsonDecoder;
 use SimpleID\Util\SecurityToken;
 
 /**
@@ -333,8 +333,7 @@ class UpgradeModule extends Module {
     }
 
     public function upgradeListHook() {
-        $decoder = new JsonDecoder();
-        return $decoder->decode(file_get_contents(__DIR__ . '/upgrade.json'), true);
+        return Spyc::YAMLLoad(__DIR__ . '/upgrade.yaml');
     }
 }
 

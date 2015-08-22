@@ -9,6 +9,7 @@
         "kelvinmo/simplei18n": "0.1.*",
         "kelvinmo/fernet-php": "0.2.*",
         "bcosca/fatfree-core": "3.5.*",
+        "mustangostang/spyc": "0.5.*",
         "psr/log": "1.*"
     },
     "require-dev": {

@@ -22,6 +22,7 @@
 
 namespace SimpleID\Store;
 
+use \Spyc;
 use SimpleID\Models\User;
 use SimpleID\Models\Client;
 
@@ -143,7 +144,7 @@ class DefaultStoreModule extends StoreModule {
             $filename = $this->config['identities_dir'] . '/' . $file;
             
             if (is_link($filename)) $filename = readlink($filename);
-            if ((filetype($filename) != "file") || (!preg_match('/^(.+)\.user\.json$/', $file, $matches))) continue;
+            if ((filetype($filename) != "file") || (!preg_match('/^(.+)\.user\.yaml$/', $file, $matches))) continue;
             
             $uid = $matches[1];
             $test_user = $this->readUser($uid);
@@ -180,7 +181,7 @@ class DefaultStoreModule extends StoreModule {
      */
     protected function hasUser($uid) {
         if ($this->isValidName($uid)) {
-            $identity_file = $this->config['identities_dir'] . "/$uid.user.json";
+            $identity_file = $this->config['identities_dir'] . "/$uid.user.yaml";
             return (file_exists($identity_file));
         } else {
             return false;
@@ -201,16 +202,16 @@ class DefaultStoreModule extends StoreModule {
 
         $user = $this->readSavedUserData($uid);
         
-        $identity_file = $this->config['identities_dir'] . "/$uid.user.json";
-        $decoder = new JsonDecoder();
-        $data = $decoder->decode(file_get_contents($identity_file), true);
+        $identity_file = $this->config['identities_dir'] . "/$uid.user.yaml";
 
-        if (($data == null) && ($decoder->getError())) {
-            $this->f3->get('logger')->log(\Psr\Log\LogLevel::ERROR, 'Cannot read user file ' . $identity_file . ': ' . $decoder->getError());
-            trigger_error('Cannot read user file ' . $identity_file . ': ' . $decoder->getError(), E_USER_ERROR);
-        } elseif ($data != null) {
-            $user->loadData($data);
+        try {
+            $data =Spyc::YAMLLoad($identity_file);
+        } catch (Exception $e) {
+            $this->f3->get('logger')->log(\Psr\Log\LogLevel::ERROR, 'Cannot read user file ' . $identity_file . ': ' . $e->getMessage());
+            trigger_error('Cannot read user file ' . $identity_file . ': ' . $e->getMessage(), E_USER_ERROR);
         }
+            
+        if ($data != null) $user->loadData($data);
         
         return $user;
     }
@@ -274,7 +275,7 @@ class DefaultStoreModule extends StoreModule {
      */
     protected function hasClient($cid) {
         if ($this->isValidName($cid)) {
-            $client_file = $this->config['identities_dir'] . "/$cid.client.json";
+            $client_file = $this->config['identities_dir'] . "/$cid.client.yaml";
             if (file_exists($client_file)) return true;
 
             $store_file = $this->config['store_dir'] . "/$cid.client";
@@ -306,17 +307,16 @@ class DefaultStoreModule extends StoreModule {
             $client = new Client();
         }
 
-        $client_file = $this->config['identities_dir'] . "/$cid.client.json";
+        $client_file = $this->config['identities_dir'] . "/$cid.client.yaml";
         if (file_exists($client_file)) {
-            $decoder = new JsonDecoder();
-            $data = $decoder->decode(file_get_contents($client_file), true);
-
-            if (($data == null) && ($decoder->getError())) {
-                $this->f3->get('logger')->log(\Psr\Log\LogLevel::ERROR, 'Cannot read client file ' . $client_file . ' :' . $decoder->getError());
-                trigger_error('Cannot read client file ' . $client_file . ' :' . $decoder->getError(), E_USER_ERROR);
-            } elseif ($data != null) {
-                $client->loadData($data);
+            try {
+                $data = Spyc::YAMLLoad($client_file);
+            } catch (Exception $e) {
+                $this->f3->get('logger')->log(\Psr\Log\LogLevel::ERROR, 'Cannot read client file ' . $client_file . ' :' . $e->getMessage());
+                trigger_error('Cannot read client file ' . $client_file . ' :' . $e->getMessage(), E_USER_ERROR);
             }
+
+            if ($data != null) $client->loadData($data);
         }
 
         $client->cid = $cid;
