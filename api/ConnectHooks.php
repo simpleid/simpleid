@@ -20,6 +20,14 @@ abstract class ConnectHooks {
      * @return array an array of claims
      */
     abstract function connectbuildClaimsHook($user, $client, $context, $scopes, $claims_requested = NULL);
+
+    /**
+     * Returns additional OpenID Connect configuration parameters.  These are used
+     * in the OpenID Provider Configuration endpoint.
+     *
+     * @see SimpleID\Protocols\Connect\ConnectModule::openid_configuration()
+     */
+    abstract function connectConfigurationHook();
 }
 
 ?>
