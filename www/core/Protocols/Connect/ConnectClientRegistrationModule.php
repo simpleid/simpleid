@@ -102,7 +102,7 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
         $this->logger->log(LogLevel::DEBUG, 'SimpleID\Protocols\Connect\ConnectClientRegistrationModule->register');
 
         // Access token OR rate limit
-        if (!$this->oauth->isAuthorized(self::CLIENT_REGISTRATION_INIT_SCOPE)) {
+        if (!$this->isTokenAuthorized(self::CLIENT_REGISTRATION_INIT_SCOPE)) {
             $limiter = new RateLimiter('connect_register');
 
             if (!$limiter->throttle()) {
@@ -153,9 +153,9 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
         
         // Verify sector_identifier_url
         $subject_type = (isset($request['subject_type'])) ? $request['subject_type'] : 'public';
-        if (isset($request['sector_identifier_uri']) && ($subject_type == 'pairwise')) {
+        if (isset($request['sector_identifier_uri'])) {
             if (!$this->verifySectorIdentifier($request['sector_identifier_uri'], $request['redirect_uris'])) {
-                $response->setError('invalid_client_metadata', 'cannot parse sector_identifier_uri')->renderJSON();
+                $response->setError('invalid_client_metadata', 'cannot verify sector_identifier_uri')->renderJSON();
                 return;
             }
         }
@@ -173,6 +173,7 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
 
         $client->fetchJWKs();
 
+        $response->loadData($request);
         $response->loadData(array(
             'client_id' => $client->getStoreID(),            
             'registration_client_uri' => $this->getCanonicalURL('connect/client/' . $client->getStoreID()),
@@ -195,6 +196,7 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
         $token = $auth->issueAccessToken(array(self::CLIENT_REGISTRATION_ACCESS_SCOPE));
         $response['registration_access_token'] = $token['access_token'];
 
+        $this->f3->status(201);
         $response->renderJSON();
     }
 
