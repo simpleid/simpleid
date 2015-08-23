@@ -359,8 +359,7 @@ class ConnectModule extends OAuthProtectedResource {
         if ($context == 'id_token') {
             $now = time();
             $claims['exp'] = $now + SIMPLEID_LONG_TOKEN_EXPIRES_IN - SIMPLEID_LONG_TOKEN_EXPIRES_BUFFER;
-            $claims['iat'] = $now;            
-            $claims['azp'] = $client->getStoreID();
+            $claims['iat'] = $now;
             $claims['auth_time'] = $auth->getAuthTime();
         }
 
