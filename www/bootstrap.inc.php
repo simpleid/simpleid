@@ -22,7 +22,7 @@
 include_once 'autoload.inc.php';
 include_once 'version.inc.php';
 
-// 2. Configuration
+// 1. Constants
 const SIMPLEID_INSTANT_TOKEN_EXPIRES_IN = 60;
 const SIMPLEID_SHORT_TOKEN_EXPIRES_IN = 3600;
 const SIMPLEID_HUMAN_TOKEN_EXPIRES_IN = 43200;
@@ -30,6 +30,8 @@ const SIMPLEID_LONG_TOKEN_EXPIRES_IN = 1209600;
 const SIMPLEID_LONG_TOKEN_EXPIRES_BUFFER = 300;
 const SIMPLEID_ETERNAL_TOKEN_EXPIRES_IN = 315360000;
 
+
+// 2. Load configuration
 $default_config = array(
     'allow_plaintext' => false,
     'allow_autocomplete' => false,
@@ -57,6 +59,11 @@ $default_config = array(
     ),
 );
 
+// Check if the configuration file has been defined
+if (!file_exists('config.php')) {
+    die('No configuration file found.  See <http://simpleid.koinic.net/docs/2/installing/> for instructions on how to set up a configuration file.');
+}
+
 include_once 'config.php';
 
 $config = array_replace_recursive($default_config, $config);
@@ -82,7 +89,12 @@ $f3->set('version', SIMPLEID_VERSION);
 $f3->set('base_path', $f3->get('BASE') . '/');
 $f3->set('config', $config);
 
-// Cache
+// 3. Temp directory
+if (!is_dir($f3->get('TEMP')) || !is_writable($f3->get('TEMP'))) {
+    die('Temp directory not found or not writeable.  Make sure temp_dir is set up properly in config.php.');
+}
+
+// 4. Cache
 if (preg_match('/^folder\h*=\h*(.+)/', $config['cache']) && substr($config['cache'], -1) != '/') {
     $config['cache'] .= '/';
 }
@@ -90,7 +102,7 @@ $f3->set('CACHE', $config['cache']);
 $cache = \Cache::instance();
 $cache->reset(null, SIMPLEID_LONG_TOKEN_EXPIRES_IN);
 
-// Logging
+// 5. Logging
 if (!isset($config['logger']) || ($config['logger'] == '') || ($config['log_file'] == '')) {
     $config['logger'] = 'Psr\Log\NullLogger';
 }
@@ -100,7 +112,7 @@ $f3->set('logger', $logger);
 
 if (isset($config['f3_DEBUG'])) $f3->set('DEBUG', $config['f3_DEBUG']);
 
-// HTTP
+// 6. Fix up HTTP request
 fix_http_request($f3);
 
 // For SimpleID 1.x compatibility
@@ -109,7 +121,7 @@ if (isset($_GET['q'])) {
     unset($_GET['q']);
 }
 
-// 3. Check for configuration errors
+// 7. Check for other configuration errors
 $i18n = \SimpleID\Util\LocaleManager::instance();
 
 if ((@ini_get('register_globals') === 1) || (@ini_get('register_globals') === '1') || (strtolower(@ini_get('register_globals')) == 'on')) {
