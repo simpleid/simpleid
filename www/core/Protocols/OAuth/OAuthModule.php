@@ -259,13 +259,17 @@ class OAuthModule extends Module {
                 } else {
                     $token = new SecurityToken();
                     $state = array('rt' => '/oauth/auth', 'rq' => $request->toArray());
-                    $form_state = array('rq' => $request->toArray());
+                    $form_state = array(
+                        'rq' => $request->toArray(),
+                        'mode' => AuthManager::MODE_CREDENTIALS,
+                        'auth_skip_activity' => true
+                    );
                     if ($result == self::CHECKID_REENTER_CREDENTIALS) $form_state['mode'] = AuthManager::MODE_REENTER_CREDENTIALS;
 
                     $auth_module = $this->mgr->getModule('SimpleID\Auth\AuthModule');
                     $auth_module->loginForm(array(
                         'destination' => 'continue/' . rawurlencode($token->generate($state))
-                    ), array('mode' => AuthManager::MODE_CREDENTIALS, 'auth_skip_activity' => true));
+                    ), $form_state);
                     exit;
                 }
                 break;
