@@ -172,8 +172,13 @@ class OAuthModule extends Module {
         if (isset($request['redirect_uri'])) {
             // Validate against client registration for public clients and implicit grant types
             $redirect_uri_found = false;
+
+            $request_redirect_uri_has_query = (parse_url($request['redirect_uri'], PHP_URL_QUERY) != null);
             
             foreach ($client['oauth']['redirect_uris'] as $test_redirect_uri) {
+                $test_redirect_uri_has_query = (parse_url($test_redirect_uri, PHP_URL_QUERY) != null);
+                if (!$test_redirect_uri_has_query && $request_redirect_uri_has_query) continue;
+
                 if (strcasecmp(substr($request['redirect_uri'], 0, strlen($test_redirect_uri)), $test_redirect_uri) === 0) {
                     $redirect_uri_found = true;
                     break;
@@ -182,7 +187,7 @@ class OAuthModule extends Module {
             
             if (!$redirect_uri_found) {
                 $this->logger->log(LogLevel::ERROR, 'Incorrect redirect URI: ' . $request['redirect_uri']);
-                $response->setError('unauthorized_client', 'incorrect redirect URI')->renderRedirect();
+                $this->fatalError($this->t('Protocol Error: Incorrect redirect URI'));
                 return;
             }
         } elseif (isset($client['oauth']['redirect_uris'])) {
