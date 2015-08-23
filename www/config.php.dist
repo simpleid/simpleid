@@ -80,6 +80,18 @@ $config = array(
     'store_dir' => '../store',
 
     /*
+     * JSON Web Key Set files.  These contain the public and private keys
+     * used for JSON web tokens.  These are mandatory if you want to
+     * use OpenID Connect.
+     *
+     * See http://simpleid.koinic.net/docs/2/installing/#keys on how
+     * to create a key pair and convert them to JSON Web Key Set format.
+     *
+     */
+    'public_jwks_file' => '/etc/simpleid/public_jwks.json',
+    'private_jwks_file' => '/etc/simpleid/private_jwks.json',
+
+    /*
      * Allows use of unencrypted connections.
      *
      * SimpleID and the protocols it implements generally mandate the use of HTTPS
