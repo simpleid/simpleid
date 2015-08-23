@@ -34,6 +34,16 @@ $config = array(
     'identities_dir' => '@@IDENTITIES_DIR@@',
 
     /*
+     * Location to store temporary files.
+     *
+     * This directory must exist and be readable by the web server.
+     *
+     * Depending on your system's security policies, you can use the
+     * system temporary directory (/tmp), or another directory.
+     */
+    'temp_dir' => '/tmp',
+
+    /*
      * Location to store cache data.
      *
      * For filesystem based cache, use folder=<cache_directory>

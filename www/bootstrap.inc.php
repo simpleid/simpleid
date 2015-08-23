@@ -75,7 +75,7 @@ $f3->mset(array(
     'JAR.domain' => '',
     'JAR.secure' => false,
     'PACKAGE' => 'SimpleID/' . SIMPLEID_VERSION,
-    'TEMP' => getenv('TEMP') . '/',
+    'TEMP' => $config['temp_dir'] . '/',
     'UI' => 'html/'
 ));
 $f3->set('version', SIMPLEID_VERSION);
