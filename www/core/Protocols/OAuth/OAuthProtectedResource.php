@@ -40,6 +40,11 @@ class OAuthProtectedResource extends Module {
      */
     protected $oauth;
 
+    /**
+     * @var bool whether to detect access tokens from the request body
+     */
+    protected $oauth_include_request_body = false;
+
 
     public function __construct() {
         parent::__construct();
@@ -54,7 +59,7 @@ class OAuthProtectedResource extends Module {
      *
      */
     public function beforeroute() {
-        $this->oauth->initAccessToken();
+        $this->oauth->initAccessToken($this->oauth_include_request_body);
     }
 
     /**

@@ -45,6 +45,11 @@ class ConnectModule extends OAuthProtectedResource {
 
     static private $scope_settings = NULL;
 
+    /**
+     * @see SimpleID\Protocols\OAuth\OAuthProtectedResource::$oauth_include_request_body
+     */
+    protected $oauth_include_request_body = true;
+
     static function routes($f3) {
         $f3->route('GET /.well-known/openid-configuration', 'SimpleID\Protocols\Connect\ConnectModule->openid_configuration');
         $f3->route('GET|POST @connect_userinfo: /connect/userinfo', 'SimpleID\Protocols\Connect\ConnectModule->userinfo');
