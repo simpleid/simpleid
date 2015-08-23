@@ -525,7 +525,7 @@ class ConnectModule extends OAuthProtectedResource {
 
         header('Content-Type: application/jwk-set+json');
         header('Content-Disposition: inline; filename=jwks.json');
-        print $set->toJSON();
+        print $set->toJWKS();
     }
 
     /**
