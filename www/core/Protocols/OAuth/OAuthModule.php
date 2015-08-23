@@ -171,24 +171,30 @@ class OAuthModule extends Module {
         // 3. redirect_uri
         if (isset($request['redirect_uri'])) {
             // Validate against client registration for public clients and implicit grant types
-            if (!$client->isConfidential() || in_array('implicit', $client['oauth']['grant_types'])) {
-                $redirect_uri_found = false;
-                
-                foreach ($client['oauth']['redirect_uris'] as $test_redirect_uri) {
-                    if (strcasecmp(substr($request['redirect_uri'], 0, strlen($test_redirect_uri)), $test_redirect_uri) === 0) {
-                        $redirect_uri_found = true;
-                        break;
-                    }
-                }
-                
-                if (!$redirect_uri_found) {
-                    log_warn('Incorrect redirect URI: ' . $request['redirect_uri']);
-                    $response->setError('unauthorized_client', 'incorrect redirect URI')->renderRedirect();
-                    return;
+            $redirect_uri_found = false;
+            
+            foreach ($client['oauth']['redirect_uris'] as $test_redirect_uri) {
+                if (strcasecmp(substr($request['redirect_uri'], 0, strlen($test_redirect_uri)), $test_redirect_uri) === 0) {
+                    $redirect_uri_found = true;
+                    break;
                 }
             }
+            
+            if (!$redirect_uri_found) {
+                $this->logger->log(LogLevel::ERROR, 'Incorrect redirect URI: ' . $request['redirect_uri']);
+                $response->setError('unauthorized_client', 'incorrect redirect URI')->renderRedirect();
+                return;
+            }
         } elseif (isset($client['oauth']['redirect_uris'])) {
-            $response->setRedirectURI($client['oauth']['redirect_uris'][0]);
+            if (is_string($client['oauth']['redirect_uris'])) {
+                $response->setRedirectURI($client['oauth']['redirect_uris']);
+            } elseif (count($client['oauth']['redirect_uris']) == 1) {
+                $response->setRedirectURI($client['oauth']['redirect_uris'][0]);
+            } else {
+                $this->logger->log(LogLevel::ERROR, 'Protocol Error: redirect_uri not specified in request when multiple redirect_uris are registered');
+                $this->fatalError($this->t('Protocol Error: redirect_uri not specified in request when multiple redirect_uris are registered'));
+                return;
+            }
         } else {
             $this->logger->log(LogLevel::ERROR, 'Protocol Error: redirect_uri not specified in request or client registration');
             $this->fatalError($this->t('Protocol Error: redirect_uri not specified in request or client registration'));
