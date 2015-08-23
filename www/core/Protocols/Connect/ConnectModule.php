@@ -284,7 +284,7 @@ class ConnectModule extends OAuthProtectedResource {
 
         $error = '';
         if (!$this->isTokenAuthorized('openid', $error)) {
-            $this->unAuthorizedError($error);
+            $this->unAuthorizedError($error, null, array(), 'json');
         }
 
         $authorization = $this->getAuthorization();
