@@ -597,10 +597,10 @@ class OAuthModule extends Module {
             
             if (is_array($client['oauth']['contacts'])) {
                 foreach ($client['oauth']['contacts'] as $contact) {
-                    $contacts[] = '<a href="mailto:' . rfc3986_urlencode($contact) . '">' . $this->f3->clean($contact) . '</a>';
+                    $contacts[] = '<a href="mailto:' . $this->rfc3986_urlencode($contact) . '">' . $this->f3->clean($contact) . '</a>';
                 }
             } else {
-                $contacts[] = '<a href="mailto:' . rfc3986_urlencode($client['oauth']['contacts']) . '">' . $this->f3->clean($client['oauth']['contacts']) . '</a>';
+                $contacts[] = '<a href="mailto:' . $this->rfc3986_urlencode($client['oauth']['contacts']) . '">' . $this->f3->clean($client['oauth']['contacts']) . '</a>';
             }
             
             $client_info[] = $this->t('You can email the developer of this application at: !contacts.', array('!contacts' => implode(', ', $contacts)));
@@ -738,6 +738,25 @@ class OAuthModule extends Module {
             $store->deleteAuth($authorization);
         }
     }
+
+
+    /**
+     * Encodes a URL using RFC 3986.
+     *
+     * PHP's rawurlencode function encodes a URL using RFC 1738.  RFC 1738 has been
+     * updated by RFC 3986, which change the list of characters which needs to be
+     * encoded.
+     *
+     * Strictly correct encoding is required for various purposes, such as OAuth
+     * signature base strings.
+     *
+     * @param string $s the URL to encode
+     * @return string the encoded URL
+     */
+    private function rfc3986_urlencode($s) {
+        return str_replace('%7E', '~', rawurlencode($s));
+    }
+
 
     /**
      * A callback function for use by usort() to sort scopes to be displayed on
