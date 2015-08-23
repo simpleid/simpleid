@@ -57,6 +57,20 @@ class ConnectModule extends OAuthProtectedResource {
         
         $mgr = ModuleManager::instance();
         $mgr->loadModule('SimpleID\Protocols\OAuth\OAuthModule');
+
+        $this->checkConfig();
+    }
+
+    protected function checkConfig() {
+        if (!is_readable($this->config['public_jwks_file'])) {
+            $this->f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'Public JSON web key file not found.');
+            $this->f3->error(500, $this->t('Public JSON web key file.  See the <a href="!url">manual</a> for instructions on how to set up OpenID Connect on SimpleID.', array('!url' => 'http://simpleid.koinic.net/docs/2/installing/#keys')));
+        }
+
+        if (!is_readable($this->config['private_jwks_file'])) {
+            $this->f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'Private JSON web key file not found.');
+            $this->f3->error(500, $this->t('Private JSON web key file not found.  See the <a href="!url">manual</a> for instructions on how to set up OpenID Connect on SimpleID.', array('!url' => 'http://simpleid.koinic.net/docs/2/installing/#keys')));
+        }
     }
 
     /**
