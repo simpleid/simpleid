@@ -177,9 +177,9 @@ class ConnectModule extends OAuthProtectedResource {
 
             // If the last time we logged on actively (i.e. using a password) is greater than
             // max_age, we then require the user to log in again
-            if (($auth_level <= AuthManager::AUTH_LEVEL_CREDENTIALS) 
+            if (($auth_level < AuthManager::AUTH_LEVEL_CREDENTIALS) 
                 || ((time() - $auth->getAuthTime()) > $max_age)) {
-                $this->f3->set('message', $this->t('This web site\'s policy requires you to log in again to confirm your identity.'));
+                $this->f3->set('message', $this->t('This app\'s policy requires you to log in again to confirm your identity.'));
                 return OAuthModule::CHECKID_REENTER_CREDENTIALS;
             }
         }

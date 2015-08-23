@@ -85,7 +85,7 @@ class PAPEOpenIDExtensionModule extends Module {
 
             // If the last time we logged on actively (i.e. using a password) is greater than
             // max_auth_age, we then require the user to log in again
-            if (($auth_level <= AuthLevel::AUTH_LEVEL_CREDENTIALS) 
+            if (($auth_level < AuthLevel::AUTH_LEVEL_CREDENTIALS) 
                 || ((time() - $auth->getAuthTime()) > $pape_request['max_auth_age'])) {
                 $this->f3->set('message', $this->t('This web site\'s policy requires you to log in again to confirm your identity.'));
                 return OpenIDModule::CHECKID_REENTER_CREDENTIALS;
