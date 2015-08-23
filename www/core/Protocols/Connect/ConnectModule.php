@@ -62,12 +62,14 @@ class ConnectModule extends OAuthProtectedResource {
     }
 
     protected function checkConfig() {
-        if (!is_readable($this->config['public_jwks_file'])) {
+        $config = $this->f3->get('config');
+
+        if (!is_readable($config['public_jwks_file'])) {
             $this->f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'Public JSON web key file not found.');
-            $this->f3->error(500, $this->t('Public JSON web key file.  See the <a href="!url">manual</a> for instructions on how to set up OpenID Connect on SimpleID.', array('!url' => 'http://simpleid.koinic.net/docs/2/installing/#keys')));
+            $this->f3->error(500, $this->t('Public JSON web key file not found.  See the <a href="!url">manual</a> for instructions on how to set up OpenID Connect on SimpleID.', array('!url' => 'http://simpleid.koinic.net/docs/2/installing/#keys')));
         }
 
-        if (!is_readable($this->config['private_jwks_file'])) {
+        if (!is_readable($config['private_jwks_file'])) {
             $this->f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'Private JSON web key file not found.');
             $this->f3->error(500, $this->t('Private JSON web key file not found.  See the <a href="!url">manual</a> for instructions on how to set up OpenID Connect on SimpleID.', array('!url' => 'http://simpleid.koinic.net/docs/2/installing/#keys')));
         }
@@ -478,7 +480,7 @@ class ConnectModule extends OAuthProtectedResource {
             'response_types_supported' => array('code', 'token', 'id_token', 'id_token token', 'code token', 'code id_token', 'code id_token token'),
             'response_modes_supported' => Response::getResponseModesSupported(),
             'grant_types_supported' => array('authorization_code', 'refresh_token'),
-            'acr_values_supported' => range(1, SIMPLEID_ISO29115_LEVEL),
+            'acr_values_supported' => array(),
             'subject_types_supported' => array('public', 'pairwise'),
             'userinfo_signing_alg_values_supported' => $jwt_signing_algs,
             'userinfo_encryption_alg_values_supported' => $jwt_encryption_algs,
