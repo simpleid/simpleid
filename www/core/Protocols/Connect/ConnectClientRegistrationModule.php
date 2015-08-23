@@ -136,13 +136,21 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
         foreach ($request['redirect_uris'] as $redirect_uri) {
             $parts = parse_url($redirect_uri);
 
+            if (isset($parts['fragment'])) {
+                $response->setError('invalid_redirect_uri', 'redirect_uris cannot contain a fragment')->renderJSON();
+                return;
+            }
+
             if (($application_type == 'web') && in_array('implicit', $grant_types)) {
                 if ((strtolower($parts['scheme']) != 'https') || (strtolower($parts['host']) == 'localhost') && ($parts['host'] == '127.0.0.1')) {
                     $response->setError('invalid_redirect_uri', 'implicit grant type must use https URIs')->renderJSON();
                     return;
                 }
             } elseif ($application_type == 'native') {
-                // Native Clients MUST only register redirect_uris using custom URI schemes or URLs using the http: scheme with localhost as the hostname. Authorization Servers MAY place additional constraints on Native Clients. Authorization Servers MAY reject Redirection URI values using the http scheme, other than the localhost case for Native Clients. The Authorization Server MUST verify that all the registered redirect_uris conform to these constraints. This prevents sharing a Client ID across different types of Clients. 
+                // Native Clients MUST only register redirect_uris using custom URI schemes or URLs using the http: scheme with localhost as the hostname.
+                // Authorization Servers MAY place additional constraints on Native Clients.
+                // Authorization Servers MAY reject Redirection URI values using the http scheme, other than the localhost case for Native Clients.
+                // The Authorization Server MUST verify that all the registered redirect_uris conform to these constraints. This prevents sharing a Client ID across different types of Clients.
                 if (((strtolower($parts['scheme']) == 'http') && ((strtolower($parts['host']) != 'localhost') || ($parts['host'] != '127.0.0.1')))
                     || (strtolower($parts['scheme']) == 'https')) {
                     $response->setError('invalid_redirect_uri', 'native clients cannot use https URIs')->renderJSON();
