@@ -34,7 +34,7 @@ class Request extends ArrayWrapper {
     protected $headers = array();
 
     /** @var bool whether the request prohibits user intervention */
-    public $immediate = false;
+    private $immediate = false;
 
     /**
      * Creates a HTTP request.
@@ -65,6 +65,26 @@ class Request extends ArrayWrapper {
         } else {
             foreach ($headers as $name => $value) $this->headers[HTTPResponse::httpCase($name)] = $value;
         }
+    }
+
+    /**
+     * Returns whether the request requires that no user
+     * interaction is to be made.
+     *
+     * @return bool true if no user interaction is to be made
+     */
+    public function isImmediate() {
+        return $this->immediate;
+    }
+
+    /**
+     * Sets whether the request requires that no user
+     * interaction is to be made.
+     *
+     * @param bool $immediate true if no user interaction is to be made
+     */
+    public function setImmediate($immediate) {
+        $this->immediate = $immediate;
     }
 
     /**

@@ -256,7 +256,7 @@ class OAuthModule extends Module {
                 break;
             case self::CHECKID_APPROVAL_REQUIRED:
                 $this->logger->log(LogLevel::INFO, 'CHECKID_APPROVAL_REQUIRED');
-                if ($request->immediate) {
+                if ($request->isImmediate()) {
                     $response->setError('consent_required', 'Consent required')->renderRedirect();
                 } else {
                     $this->consentForm($request, $response);
@@ -265,7 +265,7 @@ class OAuthModule extends Module {
             case self::CHECKID_REENTER_CREDENTIALS:
             case self::CHECKID_LOGIN_REQUIRED:
                 $this->logger->log(LogLevel::INFO, 'CHECKID_LOGIN_REQUIRED');
-                if ($request->immediate) {
+                if ($request->isImmediate()) {
                     $response->setError('login_required', 'Login required')->renderRedirect();
                 } else {
                     $token = new SecurityToken();
