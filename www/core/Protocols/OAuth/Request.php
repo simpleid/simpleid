@@ -164,6 +164,25 @@ class Request extends ArrayWrapper {
         return in_array($contains, $items);
     }
 
+    /**
+     * Remove a specified value from a parameter consisting of space-delimited
+     * values
+     *
+     * @param string $param the parameter name to check
+     * @param string $contains the value to remove
+     * @param string $delimiter a regular expression to determine
+     * the delimiter between values
+     */
+    public function paramRemove($param, $value, $delimiter = '/\s+/') {
+        if (!isset($this->container[$param])) return null;
+        if (!$this->paramContains($param, $value)) return $this->container[$param];
+
+        $items = preg_split($delimiter, $this->container[$param]);
+        $items = array_diff($items, array($value));
+
+        preg_match($delimiter, $this->container[$param], $matches);
+        $this->container[$param] = implode($matches[0], $items);
+    }
 }
 
 ?>

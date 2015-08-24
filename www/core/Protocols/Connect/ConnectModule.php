@@ -152,14 +152,16 @@ class ConnectModule extends OAuthProtectedResource {
         $client = $store->loadClient($request['client_id'], 'SimpleID\Protocols\OAuth\OAuthClient');
 
         // Check 1: Check whether the prompt parameter is present in the request
-        $request->immediate = $request->paramContains('prompt', 'none');
+        $request->setImmediate($request->paramContains('prompt', 'none'));
 
         if ($request->paramContains('prompt', 'login')) {
             $this->f3->set('message', $this->t('This app\'s policy requires you to log in again to confirm your identity.'));
+            $request->paramRemove('prompt', 'login');
             return OAuthModule::CHECKID_REENTER_CREDENTIALS;
         }
 
         if ($request->paramContains('prompt', 'consent')) {
+            $request->paramRemove('prompt', 'consent');
             return OAuthModule::CHECKID_APPROVAL_REQUIRED;
         }
         
