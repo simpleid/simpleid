@@ -80,9 +80,6 @@ class AuthModule extends Module {
         $token = new SecurityToken();
         $token->gc();
 
-        // If the user is already logged in, return
-        if ($this->auth->isLoggedIn()) $this->f3->reroute('/');
-
         // Require HTTPS or return an error
         $this->checkHttps('error', true);
 
@@ -128,6 +125,9 @@ class AuthModule extends Module {
             }
             return;
         }
+
+        // If the user is already logged in, return
+        if (($mode == AuthManager::MODE_CREDENTIALS) && $this->auth->isLoggedIn()) $this->f3->reroute('/');
 
         $results = $this->mgr->invokeRefAll('loginFormValidate', $form_state);
         if (!array_reduce($results, function($overall, $result) { return (($result !== null) && ($result === false)) ? false : $overall; }, true)) {
