@@ -46,7 +46,7 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
      * @return array
      */
     public function loginFormHook(&$form_state) {
-        if ($form_state['mode'] == AuthManager::MODE_CREDENTIALS) {
+        if ($form_state['mode'] == AuthManager::MODE_CREDENTIALS || $form_state['mode'] == AuthManager::MODE_REENTER_CREDENTIALS) {
             $tpl = new \Template();
 
             $this->f3->set('name_label', $this->t('User name:'));

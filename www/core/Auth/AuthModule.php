@@ -201,17 +201,10 @@ class AuthModule extends Module {
         $tpl = new \Template();
         $config = $this->f3->get('config');
 
+        // 1. Check for HTTPS
         $this->checkHttps('redirect', true);
 
-        if (($form_state['mode'] == AuthManager::MODE_VERIFY) && isset($form_state['verify_forms'])) {
-            $forms = $form_state['verify_forms'];
-            unset($form_state['verify_forms']);
-        } else {
-            $forms = $this->mgr->invokeRefAll('loginForm', $form_state);
-            uasort($forms, function($a, $b) { if ($a['weight'] == $b['weight']) { return 0; } return ($a['weight'] < $b['weight']) ? -1 : 1; });
-        }
-        $this->f3->set('forms', $forms);
-
+        // 2. Build the buttons and security messaging
         switch ($form_state['mode']) {
             case AuthManager::MODE_REENTER_CREDENTIALS:
                 // Follow through
@@ -234,7 +227,17 @@ class AuthModule extends Module {
             $this->f3->set('cancel_button', t('Cancel'));
         }
 
-        // We can't use SecurityToken::BIND_SESSION here because the PHP session is not
+        // 3. Build the forms
+        if (($form_state['mode'] == AuthManager::MODE_VERIFY) && isset($form_state['verify_forms'])) {
+            $forms = $form_state['verify_forms'];
+            unset($form_state['verify_forms']);
+        } else {
+            $forms = $this->mgr->invokeRefAll('loginForm', $form_state);
+            uasort($forms, function($a, $b) { if ($a['weight'] == $b['weight']) { return 0; } return ($a['weight'] < $b['weight']) ? -1 : 1; });
+        }
+        $this->f3->set('forms', $forms);
+
+        // 4. We can't use SecurityToken::BIND_SESSION here because the PHP session is not
         // yet stable
         $token = new SecurityToken();
         $this->f3->set('tk', $token->generate('login', SecurityToken::OPTION_NONCE));

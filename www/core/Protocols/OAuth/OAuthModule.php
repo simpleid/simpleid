@@ -275,7 +275,12 @@ class OAuthModule extends Module {
                         'mode' => AuthManager::MODE_CREDENTIALS,
                         'auth_skip_activity' => true
                     );
-                    if ($result == self::CHECKID_REENTER_CREDENTIALS) $form_state['mode'] = AuthManager::MODE_REENTER_CREDENTIALS;
+                    if ($result == self::CHECKID_REENTER_CREDENTIALS) {
+                        $auth = AuthManager::instance();
+                        $user = $auth->getUser();
+                        $form_state['uid'] = $user['uid'];
+                        $form_state['mode'] = AuthManager::MODE_REENTER_CREDENTIALS;
+                    }
 
                     $auth_module = $this->mgr->getModule('SimpleID\Auth\AuthModule');
                     $auth_module->loginForm(array(
