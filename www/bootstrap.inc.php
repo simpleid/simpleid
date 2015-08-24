@@ -63,8 +63,9 @@ $default_config = array(
 if (!file_exists('config.php')) {
     die('No configuration file found.  See <http://simpleid.koinic.net/docs/2/installing/> for instructions on how to set up a configuration file.');
 }
-
 include_once 'config.php';
+
+$f3 = \Base::instance();
 
 $config = array_replace_recursive($default_config, $config);
 if (!isset($config['canonical_base_path'])) {
@@ -75,7 +76,6 @@ if (!isset($config['canonical_base_path'])) {
 
 if (function_exists('date_default_timezone_set')) date_default_timezone_set(@date_default_timezone_get());
 
-$f3 = \Base::instance();
 $f3->mset(array(
     'CASELESS' => false,
     'CORS.origin' => '*',
