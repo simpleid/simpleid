@@ -42,6 +42,7 @@ $default_config = array(
     'log_file' => '',
     'log_level' => 'info',
     'date_time_format' => '%Y-%m-%d %H:%M:%S %Z',
+    'acr' => 1,
     'required_modules' => array(
         'SimpleID\Base\IndexModule',
         'SimpleID\Store\DefaultStoreModule',

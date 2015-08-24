@@ -149,6 +149,24 @@ class AuthManager extends Prefab {
     }
 
     /**
+     * Returns the authentication context class references in relation
+     * to the current authentication session.
+     *
+     * @return string the ACR
+     */
+    public function getACR() {
+        $default_acr = $this->f3->get('config.acr');
+
+        if (isset($this->auth_info['modules'])) {
+            foreach ($this->auth_info['modules'] as $module) {
+                $module_acr = $this->mgr->invoke($module, 'acr');
+            }
+        }
+
+        return ($module_acr) ? $module_acr : $default_acr;
+    }
+
+    /**
      * Sets the user specified by the parameter as the active user.
      *
      * @param User $user the user to log in

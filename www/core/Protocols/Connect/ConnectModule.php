@@ -33,6 +33,7 @@ use SimpleID\Protocols\OAuth\OAuthDynamicClient;
 use SimpleID\Protocols\OAuth\Response;
 use SimpleID\Store\StoreManager;
 use SimpleJWT\Util\Helper;
+use SimpleJWT\JWT;
 use SimpleJWT\Crypt\Algorithm;
 use SimpleJWT\Crypt\AlgorithmFactory;
 use SimpleJWT\Keys\KeySet;
@@ -164,8 +165,22 @@ class ConnectModule extends OAuthProtectedResource {
             $request->paramRemove('prompt', 'consent');
             return OAuthModule::CHECKID_APPROVAL_REQUIRED;
         }
+
+        // Check 2: If id_token_hint is provided, check that it refers to the current logged-in user
+        if (isset($request['id_token_hint'])) {
+            try {
+                $jwt = JWT::decode($request['id_token_hint']);
+                $user_match = ($jwt->getClaim('sub') == $this->getSubject($auth->getUser(), $client));
+            } catch (CryptException $e) {
+                $user_match = false;
+            }
+            if (!$user_match) {
+                $auth->logout();
+                return OAuthModule::LOGIN_REQUIRED;
+            }
+        }
         
-        // Check 2: Check whether the max_age or acr parameters are present in the client defaults
+        // Check 3: Check whether the max_age or acr parameters are present in the client defaults
         // or the request parameters
         if (isset($request['max_age'])) {
             $max_age = $request['max_age'];
@@ -328,7 +343,7 @@ class ConnectModule extends OAuthProtectedResource {
             foreach ($claims_requested as $claim => $properties) {
                 switch ($claim) {
                     case 'acr':
-                        // Not allowed
+                        // Processed later
                         break;
                     case 'updated_at':
                         // Not supported
@@ -368,6 +383,7 @@ class ConnectModule extends OAuthProtectedResource {
             $claims['exp'] = $now + SIMPLEID_LONG_TOKEN_EXPIRES_IN - SIMPLEID_LONG_TOKEN_EXPIRES_BUFFER;
             $claims['iat'] = $now;
             $claims['auth_time'] = $auth->getAuthTime();
+            $claims['acr'] = $auth->getACR();
         }
 
         $hook_claims = $mgr->invokeAll('connectBuildClaims', $user, $client, $context, $scopes, $claims_requested);

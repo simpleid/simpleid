@@ -133,6 +133,15 @@ abstract class AuthHooks {
      * @return array of data paths.
      */
     abstract function secretUserDataPathsHook();
+
+    /**
+     * Returns an authentication context class reference
+     * the authentication scheme module implemented in relation
+     * to the current user.
+     *
+     * @return string the authentication context class reference
+     */
+    abstract function acrHook();
 }
 
 

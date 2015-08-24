@@ -159,6 +159,19 @@ locale: 'en'
 date_time_format: '%Y-%m-%d %H:%M:%S %Z'
 
 #
+# Authentication context class reference.
+#
+# Specify the reference to the *minimum* authentication context class
+# with which your SimpleID server complies.  Note that authentication
+# scheme modules may replace this with a higher authentication context class.
+#
+# Examples:
+# 1
+# 'http://id.incommon.org/assurance/bronze'
+#
+acr: 1
+
+#
 # The logger class.
 #
 # The default logger class writes log entries to the file system,
