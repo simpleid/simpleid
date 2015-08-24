@@ -21,8 +21,6 @@
   -  $Id$
   -->
 <project default="dist" basedir=".">
-    <taskdef name="d51pearpkg2" classname="phing.tasks.ext.d51PearPkg2Task"/>
-
     <property name="dist.dir" value="../dist" /> <!-- dist.dir defined here is a default value and should be overwritten -->
     <property file="build.properties" />
     <property file="simpleid.properties" />
@@ -64,70 +62,6 @@
     
     <target name="check-dist-dir">
         <fail unless="dist.dir" message="Property dist.dir is not defined" />
-    </target>
-    
-    <target name="pear-package" depends="check-dist-dir">
-        <d51pearpkg2 dir="${dist.dir}/${dist.sub.dir}/simpleid/" baseinstalldir="/" addhiddenfiles="true">
-            <name>SimpleID</name>
-            <summary>SimpleID is a simple, personal OpenID provider</summary>
-            <description>SimpleID is a simple, personal OpenID provider written in PHP.</description>
-            <!-- We use the default PEAR channel here to avoid annoying channel validation errors.
-            We change it later in the reflexive task below. -->
-            <channel>pear.php.net</channel>
-            <lead user="kmo" name="Kelvin Mo" email="kmo@users.sourceforge.net"/>
-            <license>GPL</license>
-            <version release="${build.version}" api="${build.version}"/>
-            <stability release="${build.stability}" api="${build.stability}"/>
-            <notes>See README.txt</notes>
-            <dependencies>
-                <php minimum_version="5.2.0"/>
-                <pear minimum_version="1.8.1"/>
-                <extension name="bcmath"/>
-                <extension name="pcre"/>
-                <extension name="session"/>
-                <extension name="xml"/>
-                <extension name="hash"/>
-            </dependencies>
-            <!-- map directory (key) to role -->
-            <dirroles key="/">doc</dirroles>
-            <dirroles key="/www">www</dirroles>
-            <dirroles key="/cache">data</dirroles>
-            <dirroles key="/identities">data</dirroles>
-            <dirroles key="/store">data</dirroles>
-            <dirroles key="/extensions">doc</dirroles>
-            <!-- do not add the following files to the package. copied from excludes above -->
-            <ignore>**/.gitignore</ignore>
-            
-            <!-- replacement -->
-            <replacement path="www/config.php.dist" type="pear-config" from="@data_dir@" to="data_dir" />
-        </d51pearpkg2>
-        <!-- time to fix the package.xml file since the task does not
-        allow everything we need:
-        - change the channel so that it validates
-        - strip the base directory names like src, data and www
-        - remove baseinstalldir from files
-        - md5sums are generated automatically when packaging
-        -->
-        <!-- yes, we need to generate a 2nd file and move it back -->
-        <reflexive file="${dist.dir}/${dist.sub.dir}/simpleid/package.xml">
-            <filterchain>
-                <replaceregexp>
-                    <!-- change the channel -->
-                    <regexp pattern="&lt;channel&gt;pear.php.net&lt;/channel&gt;" replace="&lt;channel&gt;simpleid.koinic.net&lt;/channel&gt;" />
-                    <!-- remove md5sums -->
-                    <regexp pattern="md5sum=&quot;[a-z0-9]{32}&quot; " replace="" />
-                    <!-- remove baseinstalldir for files -->
-                    <regexp pattern="&lt;file baseinstalldir=&quot;/&quot;" replace="&lt;file"/>
-                    <!-- install-as for different directories -->
-                    <regexp pattern="(&lt;file name=&quot;/www/(.+?)&quot;)" replace="\1 install-as=&quot;simpleid/\2&quot;"/>
-                    <!-- install-as for .htaccess -->
-                    <regexp pattern="(install-as=&quot;simpleid/.htaccess.dist&quot;)" replace="install-as=&quot;simpleid/.htaccess&quot;"/>
-                    <!-- replace configuration files -->
-                    <regexp pattern="(install-as=&quot;simpleid/config.pear.php&quot;)" replace="install-as=&quot;simpleid/config.php&quot;"/>
-                    <regexp pattern="(&lt;file name=&quot;/www/config.php.dist&quot;) install-as=&quot;simpleid/config.php.dist&quot; role=&quot;www&quot;[^&gt;]+/&gt;" replace="\1 install-as=&quot;simpleid/config.php.dist&quot; role=&quot;cfg&quot;&gt;&lt;tasks:replace type=&quot;pear-config&quot; from=&quot;@data_dir@&quot; to=&quot;data_dir&quot; /&gt;&lt;/file&gt;"/>
-                </replaceregexp>
-            </filterchain>
-        </reflexive>
     </target>
     
     <target name="dist-clean" depends="check-dist-dir">
@@ -182,28 +116,6 @@
             <tarfileset dir="${dist.dir}/${dist.tar.dir}" includes="**/*" defaultexcludes="no" />
         </tar>
         <echo message="${build.version}" file="${dist.dir}/current-version.txt"/>
-    </target>
-    
-    <!-- Creates a tar file for PEAR distribution -->
-    <target name="dist-pear" depends="dist-clean">
-        <phingcall target="dist-copy">
-            <property name="dist.sub.dir" value="${dist.pear.dir}" />
-            <property name="config.identities.dir" value="@data_dir@/simpleid/identities" />
-            <property name="config.cache.dir" value="@data_dir@/simpleid/cache" />
-            <property name="config.store.dir" value="@data_dir@/simpleid/store" />
-        </phingcall>
-        
-        <!-- Creates files in empty directories so that they get packaged up -->
-        <echo file="${dist.dir}/${dist.pear.dir}/simpleid/cache/README">This is the SimpleID cache directory.</echo>
-        <echo file="${dist.dir}/${dist.pear.dir}/simpleid/store/README">This is the SimpleID store directory.</echo>
-        
-        <phingcall target="pear-package">
-            <property name="dist.sub.dir" value="${dist.pear.dir}" />
-        </phingcall>
-        
-        <exec dir="${dist.dir}" executable="pear">
-            <arg line="package ${dist.pear.dir}/simpleid/package.xml" />
-        </exec>
     </target>
     
     <!-- Creates OpenShift distribution -->
