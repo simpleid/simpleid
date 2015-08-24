@@ -144,7 +144,7 @@ class DefaultStoreModule extends StoreModule {
             $filename = $this->config['identities_dir'] . '/' . $file;
             
             if (is_link($filename)) $filename = readlink($filename);
-            if ((filetype($filename) != "file") || (!preg_match('/^(.+)\.user\.yaml$/', $file, $matches))) continue;
+            if ((filetype($filename) != "file") || (!preg_match('/^(.+)\.user\.yml$/', $file, $matches))) continue;
             
             $uid = $matches[1];
             $test_user = $this->readUser($uid);
@@ -181,7 +181,7 @@ class DefaultStoreModule extends StoreModule {
      */
     protected function hasUser($uid) {
         if ($this->isValidName($uid)) {
-            $identity_file = $this->config['identities_dir'] . "/$uid.user.yaml";
+            $identity_file = $this->config['identities_dir'] . "/$uid.user.yml";
             return (file_exists($identity_file));
         } else {
             return false;
@@ -202,7 +202,7 @@ class DefaultStoreModule extends StoreModule {
 
         $user = $this->readSavedUserData($uid);
         
-        $identity_file = $this->config['identities_dir'] . "/$uid.user.yaml";
+        $identity_file = $this->config['identities_dir'] . "/$uid.user.yml";
 
         try {
             $data =Spyc::YAMLLoad($identity_file);
@@ -275,7 +275,7 @@ class DefaultStoreModule extends StoreModule {
      */
     protected function hasClient($cid) {
         if ($this->isValidName($cid)) {
-            $client_file = $this->config['identities_dir'] . "/$cid.client.yaml";
+            $client_file = $this->config['identities_dir'] . "/$cid.client.yml";
             if (file_exists($client_file)) return true;
 
             $store_file = $this->config['store_dir'] . "/$cid.client";
@@ -307,7 +307,7 @@ class DefaultStoreModule extends StoreModule {
             $client = new Client();
         }
 
-        $client_file = $this->config['identities_dir'] . "/$cid.client.yaml";
+        $client_file = $this->config['identities_dir'] . "/$cid.client.yml";
         if (file_exists($client_file)) {
             try {
                 $data = Spyc::YAMLLoad($client_file);
