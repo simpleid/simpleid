@@ -125,6 +125,7 @@ class ConnectModule extends OAuthProtectedResource {
             $builder = new KeySetBuilder($client);
             $set = $builder->addClientSecret()->addClientPublicKeys()->addServerPrivateKeys()->toKeySet();
             try {
+                AlgorithmFactory::addNoneAlg();
                 $helper = new Helper($request['request']);
                 $jwt = $helper->getJWTObject($set, $jwe_alg, $jwt_alg);
                 $request->loadData($jwt->getClaims());
@@ -134,6 +135,7 @@ class ConnectModule extends OAuthProtectedResource {
                 return;
             }
         }
+        AlgorithmFactory::removeNoneAlg();
 
         // 3. nonce
         if ($request->paramContains('scope', 'openid') && $request->paramContains('response_type', 'token') && !isset($request['nonce'])) {
@@ -510,7 +512,7 @@ class ConnectModule extends OAuthProtectedResource {
             'id_token_signing_alg_values_supported' => $jwt_signing_algs,
             'id_token_encrpytion_alg_values_supported' => $jwt_encryption_algs,
             'id_token_encrpytion_enc_alg_values_supported' => $jwt_encryption_enc_algs,
-            'request_object_signing_alg_values_supported' => $jwt_signing_algs,
+            'request_object_signing_alg_values_supported' => array_merge($jwt_signing_algs, array('none')),
             'request_object_encryption_alg_values_supported' => $jwt_encryption_algs,
             'request_object_encryption_enc_alg_values_supported' => $jwt_encryption_enc_algs,
             'token_endpoint_auth_methods_supported' => $token_endpoint_auth_methods_supported,
