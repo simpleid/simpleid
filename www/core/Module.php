@@ -70,7 +70,8 @@ abstract class Module extends \Prefab {
         $this->f3 = \Base::instance();
         $this->logger = $this->f3->get('logger');
 
-        $info = autoload_get_module_info(get_class($this));
+        $mgr = ModuleManager::instance();
+        $info = $mgr->getModuleInfo(get_class($this));
         if (isset($info['asset_domain'])) {
             $this->domain = $info['asset_domain'];
         } else {

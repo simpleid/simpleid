@@ -56,7 +56,7 @@ class ModuleManager extends Prefab {
 
         if (isset($this->modules[$name])) return;
         
-        $info = autoload_get_module_info($name);
+        $info = $this->getModuleInfo($name);
         $module = new $name();
         $this->modules[$name] = $module;
         
@@ -197,6 +197,44 @@ class ModuleManager extends Prefab {
         }
         
         return $return;
+    }
+
+    /**
+     * Retrieves information on a SimpleID module
+     *
+     * @param string $name the fully qualified class name of the module
+     */
+    public function getModuleInfo($class) {
+        $loader = $this->f3->get('class_loader');
+        $root_dir = strtr(dirname(__DIR__), '\\', '/'); // Cross-platform way of getting a parent directory
+
+        $results = array();
+
+        $class_file = $loader->findFile($class);
+        $class_dir = strtr(dirname($class_file), '\\', '/');
+
+        if (strncmp($root_dir, $class_dir, strlen($root_dir)) === 0) {
+            $relative_dir = substr($class_dir, strlen($root_dir) + 1);
+            list ($base_dir, $module_dir, $dummy) = explode('/', $relative_dir, 3);
+
+            switch ($base_dir) {
+                case 'core':
+                    break;
+                case 'upgrade':
+                    $results['asset_dir'] = $base_dir . '/';
+                    $results['asset_domain'] = $base_dir;
+                    break;
+                case 'site':
+                    $results['asset_dir'] = $base_dir . '/' . $module_dir . '/';
+                    $results['asset_domain'] = $module_dir;
+                    break;
+            }
+        }
+
+        $results['file'] = $class_file;
+        $results['dir'] = $class_dir;
+
+        return $results;
     }
 }
 

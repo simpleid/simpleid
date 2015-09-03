@@ -19,8 +19,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  * 
  */
-include_once 'autoload.inc.php';
 include_once 'version.inc.php';
+$class_loader = include_once('autoload.inc.php');
 
 // 1. Constants
 const SIMPLEID_INSTANT_TOKEN_EXPIRES_IN = 60;
@@ -89,6 +89,7 @@ $f3->mset(array(
 $f3->set('version', SIMPLEID_VERSION);
 $f3->set('base_path', $f3->get('BASE') . '/');
 $f3->set('config', $config);
+$f3->set('class_loader', $class_loader);
 
 // 3. Temp directory
 if (!is_dir($f3->get('TEMP')) || !is_writable($f3->get('TEMP'))) {
