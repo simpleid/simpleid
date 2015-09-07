@@ -23,6 +23,7 @@
 namespace SimpleID\Protocols\OAuth;
 
 use SimpleID\Crypt\Random;
+use SimpleID\Util\HTTPResponse;
 
 /**
  * A class representing an OAuth dynamic client.

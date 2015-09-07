@@ -23,7 +23,6 @@
 namespace SimpleID\Protocols\Connect;
 
 use SimpleID\Protocols\OAuth\OAuthDynamicClient;
-use SimpleID\Net\HTTPResponse;
 
 /**
  * A class representing an OpenID Connect dynamic client.

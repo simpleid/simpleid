@@ -23,7 +23,7 @@
 namespace SimpleID\Protocols\XRDS;
 
 use \Prefab;
-use SimpleID\Net\HTTPResponse;
+use SimpleID\Util\HTTPResponse;
 
 /**
  * Utility class for XRDS discovery.
@@ -292,7 +292,7 @@ class XRDSDiscovery extends Prefab {
      *
      * @param string $url the URL
      * @param array $headers HTTP headers containing name => value pairs
-     * @return HTTPResponse
+     * @return SimpleID\Util\HTTPResponse
      */
     protected function request($url, $headers = '') {
         $web = \Web::instance();

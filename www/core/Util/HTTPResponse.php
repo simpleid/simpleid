@@ -20,7 +20,7 @@
  * 
  */
 
-namespace SimpleID\Net;
+namespace SimpleID\Util;
 
 /**
  * Class representing a response from a HTTP request made using the
