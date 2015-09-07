@@ -67,7 +67,7 @@ class AuthModule extends Module {
     }
 
     /**
-     * Attempts to log in a user, using the user name and password specified in the
+     * Attempts to log in a user, using the credentials specified in the
      * HTTP request.
      *
      * @param \Base $f3

@@ -34,6 +34,38 @@ use SimpleID\Util\OpaqueIdentifier;
 
 /**
  * The authentication manager.
+ *
+ * This simpleton class is responsible for managing the user's
+ * authentication session with SimpleID.
+ *
+ * ## Key concepts
+ *
+ * The authentication system involves the following key concepts:
+ *
+ * - **Authentication level.** This is the highest level of user interaction
+ *   used to authenticate the user in the current session.  The higher
+ *   the authentication level, the more user interaction is required.
+ * - **Authentication scheme.** A SimpleID module that implements a way
+ *   for a user to authenticate by checking credentials presented against
+ *   some data store.
+ * - **Authentication mode.** The type of user interaction required for
+ *   authentication.
+ *
+ * ## Process
+ *
+ * The authentication process works as follows:
+ *
+ * 1. The PHP session is initialised
+ * 2. The session variables are checked for authentication information.
+ *    If the information does not exist, the user is not logged in.
+ * 3. Invokes each authentication scheme module to see if the user
+ *    can be logged in using credentials already stored in the browser
+ *    (e.g. cookie, SSL certificate).  Otherwise the user is not
+ *    logged in.
+ * 4. The user may attempt to log in using the routes presented by
+ *    the {@link AuthModule}.
+ * 
+ *
  */
 class AuthManager extends Prefab {
     const AUTH_LEVEL_SESSION = 0;
@@ -122,7 +154,7 @@ class AuthManager extends Prefab {
     /**
      * Returns the current logged in user
      *
-     * @return User the current logged in user
+     * @return SimpleID\Models\User the current logged in user
      */
     public function getUser() {
         if ($this->isLoggedIn()) return $this->f3->get('user');
@@ -169,12 +201,12 @@ class AuthManager extends Prefab {
     /**
      * Sets the user specified by the parameter as the active user.
      *
-     * @param User $user the user to log in
+     * @param SimpleID\Models\User $user the user to log in
      * @param int $level the level of authentication achieved in this
      * session
      * @param array $modules array of authentication modules used to
      * authenticate the user in this session
-     *
+     * @param array $form_state
      */
     public function login($user, $level, $modules = array(), $form_state = array()) {
         $store = StoreManager::instance();

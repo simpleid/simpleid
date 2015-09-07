@@ -37,8 +37,10 @@ class User extends ArrayWrapper implements Serializable, Storable {
 
     const ACTIVITY_LOG_SIZE = 10;
 
+    /** @var string the user ID */
     protected $uid;
 
+    /** @var array the activity log */
     protected $activities = array();
 
     public $clients = array();
@@ -74,6 +76,18 @@ class User extends ArrayWrapper implements Serializable, Storable {
         return ($this->hasLocalOpenIDIdentity()) ? $this->container['openid']['identity'] : null;
     }
 
+    /**
+     * Generates a pairwise identity for this user, based on a specified
+     * sector identifier.
+     *
+     * A *pairwise identity* is an opaque string that is unique to one or more clients
+     * (identified by a common `$sector_identifier` parameter) which identifies the
+     * user to those clients.  Issuing a pairwise identity means that the user's
+     * SimpleID user name is not exposed to the clients.
+     *
+     * @param string $sector_identifier the client's sector identifier.
+     * @return string the pairwise identity
+     */
     public function getPairwiseIdentity($sector_identifier) {
         $opaque = new OpaqueIdentifier();
         return 'pwid:' . $opaque->generate($sector_identifier . ':' . $this->uid);
