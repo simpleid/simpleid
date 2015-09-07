@@ -85,5 +85,12 @@ class CertAuthSchemeModule extends AuthSchemeModule {
         
         return true;
     }
+
+    /**
+     * @see SimpleID\API\AuthHooks::secretUserDataPathsHook()
+     */
+    public function secretUserDataPathsHook() {
+        return array('cert.certs');
+    }
 }
 ?>
