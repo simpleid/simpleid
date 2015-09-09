@@ -14,11 +14,11 @@ Upgrading
 
 General upgrade instructions can be found in UPGRADE.txt.
 
-IMPORTANT: SimpleID version 2.0 is almost rewrite of SimpleID and is not
-backwards compatible with previous versions.  It is recommended that you
-reinstall SimpleID completely and manually migrate configuration and identity
-files.  For further information on migrating from previous versions, see
-<http://simpleid.koinic.net/docs/2/migrating/>.
+IMPORTANT: SimpleID version 2.0 is almost a complete rewrite of SimpleID and
+is not backwards compatible with previous versions.  It is recommended that
+you reinstall SimpleID completely and manually migrate configuration and
+identity files.  For further information on migrating from previous versions,
+see <http://simpleid.koinic.net/docs/2/migrating/>.
 
 
 Installation

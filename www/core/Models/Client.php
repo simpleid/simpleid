@@ -43,6 +43,11 @@ class Client extends ArrayWrapper implements Storable {
         parent::__construct($data);
     }
 
+    /**
+     * Loads fields from another client.
+     *
+     * @param Client $from the client from which fields are to be loaded
+     */
     public function loadFieldsFrom($from) {
         $this->cid = $from->cid;
         $this->dynamic = $from->dynamic;
