@@ -64,7 +64,7 @@ class CertAuthSchemeModule extends AuthSchemeModule {
      * - the certificate has not been revoked
      * - the certificate contains a serial number and a valid issuer
      *
-     * @return true if the user agent has supplied a valid SSL certificate
+     * @return bool true if the user agent has supplied a valid SSL certificate
      */
     protected function hasClientCert() {
         // False if we are not in HTTP

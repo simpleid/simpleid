@@ -26,7 +26,7 @@ use SimpleID\Module;
 use SimpleID\ModuleManager;
 
 /**
- * An authentication scheme module.
+ * An abstract authentication scheme module.
  *
  * This module contains convenience variables, `$auth`
  * and `$mgr`, pointing to instances of
@@ -35,7 +35,10 @@ use SimpleID\ModuleManager;
  */
 abstract class AuthSchemeModule extends Module {
 
+    /** @var AuthManager */
     protected $auth;
+
+    /** @var SimpleID\ModuleManager */
     protected $mgr;
 
     public function __construct() {

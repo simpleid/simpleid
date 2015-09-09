@@ -154,6 +154,7 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
 }
 
 if (!function_exists('hash_pbkdf2') && function_exists('hash_hmac')) {
+    /** @ignore **/
     function hash_pbkdf2($algo, $password, $salt, $iterations, $length = 0, $raw_output = false) {
         $result = '';
         $hLen = strlen(hash($algo, '', true));

@@ -66,6 +66,14 @@ abstract class Module extends \Prefab {
 
     }
 
+    /**
+     * Creates a module.
+     *
+     * This default constructor performs the following:
+     *
+     * - sets the {@link $logger} variable to the current logger
+     * - sets the locale domain
+     */
     public function __construct() {
         $this->f3 = \Base::instance();
         $this->logger = $this->f3->get('logger');
