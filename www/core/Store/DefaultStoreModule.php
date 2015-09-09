@@ -27,7 +27,7 @@ use SimpleID\Models\User;
 use SimpleID\Models\Client;
 
 /**
- * A store module that uses the file system for all of
+ * A data store module that uses the file system for all of
  * its storage requirements.
  */
 class DefaultStoreModule extends StoreModule {
@@ -53,16 +53,10 @@ class DefaultStoreModule extends StoreModule {
         }
     }
 
-    /**
-     * Implementation of StoreModule
-     */
     public function getStores() {
         return array('user:default', 'client:default', 'keyvalue:default');
     }
 
-    /**
-     * Implementation of StoreModule
-     */
     public function find($type, $criteria, $value) {
         switch ($type) {
             case 'user':
@@ -70,9 +64,6 @@ class DefaultStoreModule extends StoreModule {
         }
     }
 
-    /**
-     * Implementation of StoreModule
-     */
     public function exists($type, $id) {
         switch ($type) {
             case 'client':
@@ -84,9 +75,6 @@ class DefaultStoreModule extends StoreModule {
         }
     }
 
-    /**
-     * Implementation of StoreModule
-     */
     public function read($type, $id) {
         switch ($type) {
             case 'client':
@@ -98,24 +86,19 @@ class DefaultStoreModule extends StoreModule {
         }
     }
 
-    /**
-     * Implementation of StoreModule
-     */
     public function write($type, $id, $value) {
         switch ($type) {
             case 'client':
                 return $this->writeClient($id, $value);
             case 'user':
-                return $this->writeUser($id, $value);
+                // user settings are written using the keyvalue:write store
+                return;
             default:
                 return $this->writeKeyValue($type, $id, $value);
         }
 
     }
 
-    /**
-     * Implementation of StoreModule
-     */
     public function delete($type, $id) {
         switch ($type) {
             default:
@@ -199,71 +182,17 @@ class DefaultStoreModule extends StoreModule {
      */
     protected function readUser($uid) {
         if (!$this->isValidName($uid) || !$this->hasUser($uid)) return null;
-
-        $user = $this->readSavedUserData($uid);
         
         $identity_file = $this->config['identities_dir'] . "/$uid.user.yml";
 
         try {
-            $data =Spyc::YAMLLoad($identity_file);
+            $data = Spyc::YAMLLoad($identity_file);
         } catch (Exception $e) {
             $this->f3->get('logger')->log(\Psr\Log\LogLevel::ERROR, 'Cannot read user file ' . $identity_file . ': ' . $e->getMessage());
             trigger_error('Cannot read user file ' . $identity_file . ': ' . $e->getMessage(), E_USER_ERROR);
         }
             
-        if ($data != null) $user->loadData($data);
-        
-        return $user;
-    }
-
-
-    /**
-     * Loads saved user data for a specified user name.
-     *
-     * The user name must exist.  You should check whether the user name exists with
-     * the {@link store_user_exists()} function
-     *
-     * @param string $uid the name of the user to load
-     * @return User data for the specified user
-     */
-    protected function readSavedUserData($uid) {
-        if (!$this->isValidName($uid)) return null;
-
-        $store_file = $this->config['store_dir'] . "/$uid.user";
-        
-        if (file_exists($store_file)) {
-            $user = $this->f3->mutex($store_file, function($f3, $store_file) {
-                return $f3->unserialize(file_get_contents($store_file));
-            }, array($this->f3, $store_file));
-        } else {
-            $user = new User();
-        }
-        
-        return $user;
-    }
-
-    /**
-     * Saves user data for a specific user name.
-     *
-     * This data is stored in the user store file.
-     *
-     * @param string $uid the name of the user
-     * @param User $data the data to save
-     *
-     * @since 0.7
-     */
-    protected function writeUser($uid, $user) {
-        if (!$this->isValidName($uid)) {
-            trigger_error("Invalid user name for filesystem store", E_USER_ERROR);
-            return;
-        }
-        
-        $store_file = $this->config['store_dir'] . "/$uid.user";
-        $this->f3->mutex($store_file, function($f3, $store_file, $user) {
-            $file = fopen($store_file, 'w');
-            fwrite($file, $f3->serialize($user));
-            fclose($file);
-        }, array($this->f3, $store_file, $user));
+        return new User($data);
     }
 
 
@@ -427,6 +356,8 @@ class DefaultStoreModule extends StoreModule {
     }
 
     private function getKeyValueFile($type, $name) {
+        $name = str_replace('%7E', '~', rawurlencode($name));
+        if (preg_match('/^\.+$/', $name)) $name = str_replace('.', '%2E', $name);
         return $this->config['store_dir'] . '/' . $name . '.' . $type;
     }
 }

@@ -25,21 +25,77 @@ namespace SimpleID\Store;
 use \Base;
 use \Prefab;
 use SimpleID\ModuleManager;
+use SimpleID\Models\User;
 
 /**
- * Storage manager.
+ * Singleton class that manages data storage.
+ *
+ * Each item that can be stored in SimpleID is identified using an
+ * *item type* and an *identifier* unique to that type.  An item
+ * is typically (but is not required to be) represented by a class
+ * implementing the {@link Storable} interface.
+ *
+ * A mechanism used to store or retrieve an item (such as a file
+ * system, a LDAP directory or a database) is called a *store*.
+ * A store is identified using the format <var>name</var>:<var>method</var>,
+ * where <var>name</var> represents the item type or the group of item
+ * types it is able to store or retrieve and <var>method</var> represents
+ * the operation (`read` or `write`).  `default` is used as a special
+ * method to denote the store to use when no other stores with `read` or
+ * `write` operation can be found for that store name.
+ *
+ * A *store module* is a subclass of {@link StoreModule} that
+ * implements one or more stores.  The stores that a store module implements
+ * can be found using the {@link StoreModule::getStores()} method.
+ *
+ * The use of stores means that multiple store modules can be enabled, with
+ * each handling a particular store, with a `default` store acting as a
+ * fallback for each type.
+ *
+ * Currently the following stores a defined.  The stores in bold are
+ * required to be implemented for SimpleID to function.
+ *
+ * - **user:read** (read from a directory of users)
+ * - user:write
+ * - **client:read** (read client data)
+ * - **client:write** (write client data)
+ * - **keyvalue:read** (read key-value data)
+ * - **keyvalue:write** (write key-value data)
+ *
+ * These stores are implemented by {@link DefaultStoreModule}.
+ *
+ * Data can be loaded and saved using the methods `loadXX()`, `saveXX()`
+ * `deleteXX()`, where XX is the item type in camel case.  These
+ * are implemented using the magic method {@link __call()}, which
+ * calls {@link load()}, {@link save()} and {@link delete()}.
+ *
+ * ## Special cases
+ *
+ * - **Users.**  User data are split across two stores: user:read/write
+ *   and user_cfg:read/write (which defaults to keyvalue:read/write).  user_cfg
+ *   is the store used by SimpleID to write its own data on users (e.g. user
+ *   preferences and past activity).  Splitting user data across two stores
+ *   enable the use of a read-only directory service (e.g. LDAP) for directory
+ *   information (user:read) while using another storage mechanism for
+ *   preferences (user_cfg:read/write).
+ *
+ * - **Settings.** Convenience methods {@link getSetting()}, {@link setSetting()}
+ *   and {@link deleteSetting()} are provided.
+ *
  */
 class StoreManager extends Prefab {
+    /** @var array a mapping between the identifier of a store and its store module */
     protected $stores = array();
 
     private $cache = array();
 
-    const REQUIRED_STORES = 'user:read user:write client:read client:write keyvalue:read keyvalue:write';
+    /** @var string a space delimited list of stores that must be implemented */
+    const REQUIRED_STORES = 'user:read client:read client:write keyvalue:read keyvalue:write';
 
     /**
      * Adds a store module to the store manager.
      *
-     * This is called by {@link StoreModule::__construct()}, so this
+     * This is called by {@link SimpleID\Store\StoreModule::__construct()}, so this
      * function should generally not needed to be called
      *
      * @param StoreModule a store module
@@ -89,7 +145,7 @@ class StoreManager extends Prefab {
      * the {@link exists()} function
      *
      * @param string $item the item type
-     * @param string $uid the name of the user to load
+     * @param string $id the identifier of the item to load
      * @return Storable data for the specified item
      */
     public function load($type, $id) {
@@ -113,6 +169,7 @@ class StoreManager extends Prefab {
      *
      * This data is stored in the store file.
      *
+     * @param string $type the item type
      * @param Storable $item the item to save
      *
      * @since 0.7
@@ -129,6 +186,7 @@ class StoreManager extends Prefab {
      *
      * This data is stored in the store file.
      *
+     * @param string $type the item type
      * @param Storable $item the item to delete
      */
     public function delete($type, $item) {
@@ -136,6 +194,36 @@ class StoreManager extends Prefab {
         $store = $this->getStore($type . ':write');
         if (isset($this->cache[$cache_name])) unset($this->cache[$cache_name]);
         $store->delete($type, $item->getStoreID());
+    }
+
+    /**
+     * Loads a user.
+     *
+     * @param string $uid the user ID
+     * @return SimpleID\Models\User the user or null
+     */
+    public function loadUser($uid) {
+        $user = $this->load('user', $uid);
+        if ($user == null) return null;
+
+        $user_config = $this->load('user_cfg', $uid);
+        if ($user_config != null) {
+            $user->loadData($user_config);
+        }
+
+        return $user;
+    }
+
+    /**
+     * Saves a user.
+     * 
+     * @param SimpleID\Models\User the user to save
+     */
+    public function saveUser($user) {
+        if ($this->getStore('user:write', false) != null) {
+            $this->save('user', $user);
+        }
+        $this->save('user_cfg', $user);
     }
 
     /**
@@ -147,10 +235,10 @@ class StoreManager extends Prefab {
      * @param string $cid the client ID
      * @param string $class_name the name of the class in which the data is
      * to be cast, nor null
+     * @return SimpleID\Models\Client the client or null
      */
     public function loadClient($cid, $class_name = null) {
         $client = $this->load('client', $cid);
-
         if ($client == null) return null;
 
         if (($class_name == null) || !is_subclass_of($class_name, get_class($client), true)) {
@@ -213,6 +301,12 @@ class StoreManager extends Prefab {
         $store->delete('setting', $name);
     }
 
+    /**
+     * Magic method which calls {@link load()}, {@link save()} and {@link delete()}.
+     *
+     * @param string $method
+     * @param array $args
+     */
     public function __call($method, $args) {
         $f3 = Base::instance();
         list($verb, $type) = explode('_', $f3->snakecase($method), 2);
@@ -226,10 +320,13 @@ class StoreManager extends Prefab {
      * Obtains a store module for a specified store.
      *
      * @param string $store the name of the store
+     * @param bool $use_defaults if true, also search for default
+     * stores
      * @return StoreModule the store module
      */
-    protected function getStore($store) {
+    protected function getStore($store, $use_defaults = true) {
         if (isset($this->stores[$store])) return $this->stores[$store];
+        if (!$use_defaults) return null;
 
         list($type, $op) = explode(':', $store);
         $store = $type . ':default';
