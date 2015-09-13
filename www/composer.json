@@ -10,6 +10,7 @@
         "kelvinmo/fernet-php": "0.3.*",
         "bcosca/fatfree-core": "3.5.*",
         "mustangostang/spyc": "0.5.*",
+        "composer/semver": "0.1.*",
         "psr/log": "1.*"
     },
     "require-dev": {

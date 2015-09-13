@@ -23,6 +23,8 @@
 namespace SimpleID\Upgrade;
 
 use \Spyc;
+use Composer\Semver\Comparator;
+use Composer\Semver\Semver;
 use SimpleID\Module;
 use SimpleID\ModuleManager;
 use SimpleID\Auth\AuthManager;
@@ -291,10 +293,10 @@ class UpgradeModule extends Module {
     /**
      * Detects the current installed version of SimpleID
      *
-     * The current installed version of SimpleID is taken from the {@link store_get() version}
+     * The current installed version of SimpleID is taken from the `version`
      * application setting.
      *
-     * @return string the detected version'
+     * @return string the detected version
      */
     protected function getVersion() {
         $store = StoreManager::instance();
@@ -304,7 +306,7 @@ class UpgradeModule extends Module {
     /**
      * Sets the current version of SimpleID.
      *
-     * This function sets the version application setting via {@link store_get()}.
+     * This function sets the version application setting via {@link \SimpleID\Store\StoreManager::setSetting()}.
      * A specific version can be specified, or it can be taken from {@link SIMPLEID_VERSION}.
      *
      * @param string $version the version to set
@@ -318,18 +320,18 @@ class UpgradeModule extends Module {
     /**
      * Selects the upgrade functions applicable for this upgrade.
      *
-     * The upgrade functions are specified by the {@link $upgrade_functions}
-     * variable.  This variable is an associative array containing version numbers
+     * The upgrade functions are specified by the `upgradeList`
+     * hook.  This variable is an associative array containing version numbers
      * as keys and an array of upgrade function names as values.  This function
      * merges all the upgrade function names of the version between the current
      * installed version and the upgraded version.
      *
      * @param string $version the version of SimpleID to upgrade from, calls
-     * {@link upgrade_get_version()} if not specified
+     * {@link getVersion()} if not specified
      * @return array an array of strings, containing the list of upgrade functions
      * to call.  The functions should be called in the same order as they appear
      * in this array
-     *
+     * @see SimpleID\API\ModuleHooks::upgradeListHook()
      */
     protected function getUpgradeList($version = NULL) {
         $mgr = ModuleManager::instance();
@@ -344,23 +346,23 @@ class UpgradeModule extends Module {
         if ($version == NULL) $version = $this->getVersion();
         $list = array();
         
-        uksort($upgrade_data, function($a, $b) {
-            return -version_compare($a, $b);
-        });
+        // Sorts versions from newest to oldest
+        $versions = array_keys($upgrade_data);
+        $versions = Semver::rsort($versions);
         
-        foreach ($upgrade_data as $upgrade_version => $upgrades) {
-            if (version_compare($version, $upgrade_version, '<')) {
-                $list = array_merge($list, $upgrades);
+        foreach ($versions as $upgrade_version) {
+            if (Comparator::lessThan($version, $upgrade_version)) {
+                $list = array_merge($list, $upgrade_data[$upgrade_version]);
             }
         }
         
-        if (version_compare($version, SIMPLEID_VERSION, '<')) $list[] = 'SimpleID\Upgrade->setVersion';
+        if (Comparator::lessThan($version, SIMPLEID_VERSION)) $list[] = 'SimpleID\Upgrade->setVersion';
         
         return $list;
     }
 
     public function upgradeListHook() {
-        return Spyc::YAMLLoad(__DIR__ . '/upgrade.yaml');
+        return Spyc::YAMLLoad(__DIR__ . '/upgrade.yml');
     }
 }
 
