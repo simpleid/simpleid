@@ -18,23 +18,100 @@
   -  License along with this program; if not, write to the Free
   -  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
   -  
-  -  $Id$
   -->
 <project default="dist" basedir=".">
-    <property name="dist.dir" value="../dist" /> <!-- dist.dir defined here is a default value and should be overwritten -->
+    <includepath classpath="${env.PHP_PEAR_INSTALL_DIR}" />
+
+    <!-- Default properties -->
     <property file="build.properties" />
-    <property file="simpleid.properties" />
+
+    <!-- Override properties -->
+    <property file="${user.home}/phing.properties" override="true" />
     
+    <!-- Derived properties -->
+    <property name="dist.dir" value="${build.dir}/dist" />
     <property name="dist.tar.dir" value="tar" />
-    <property name="dist.pear.dir" value="pear" />
-    
-    <target name="gettext">
-        <echo file="gettext-filelist.txt">
+
+    <!-- Distribution -->
+    <target name="dist" depends="dist-tar">
+    </target>
+
+    <target name="clean" depends="_check-dist-dir">
+        <delete>
+            <fileset dir="${dist.dir}"></fileset>
+        </delete>
+    </target>
+
+    <!-- Creates a tar file for non-PEAR distribution -->
+    <target name="dist-tar" depends="clean">
+        <phingcall target="_dist-copy">
+            <property name="dist.sub.dir" value="${dist.tar.dir}" />
+            <property name="config.identities.dir" value="../identities" />
+            <property name="config.cache.dir" value="../cache" />
+            <property name="config.store.dir" value="../store" />
+            <property name="config.etc.dir" value="/etc/simpleid" />
+        </phingcall>
+        
+        <tar destfile="${dist.dir}/simpleid-${build.version}.tar.gz" compression="gzip">
+            <tarfileset dir="${dist.dir}/${dist.tar.dir}" includes="**/*" defaultexcludes="no" />
+        </tar>
+    </target>
+
+    <!-- Copies the source to the distribution directory -->
+    <target name="_dist-copy" depends="_check-dist-dir">
+        <copy todir="${dist.dir}/${dist.sub.dir}/simpleid">
+            <fileset dir=".">
+                <exclude name=".git/**" />
+                <exclude name="apidoc/**/*" />
+                <exclude name="build/**/*" />
+                <exclude name="cache/*" />
+                <exclude name="cache/**/*.cache" />
+                <exclude name="store/*" />
+                <exclude name="openshift/**" />
+                <exclude name="identities/*.yml" />
+                <exclude name="log/*.log" />
+                <exclude name="www/.htaccess" />
+                <exclude name="www/config.php" />
+                <exclude name="www/composer.lock" />
+                <exclude name="www/test/**" />
+                <exclude name="www/vendor/**" />
+                <exclude name="build.xml" />
+                <exclude name="*.properties" />
+            </fileset>
+            <filterchain>
+                <replacetokens begintoken="@@" endtoken="@@">
+                    <token key="BUILD_VERSION" value="${build.version}" />
+                    <token key="IDENTITIES_DIR" value="${config.identities.dir}" />
+                    <token key="CACHE_DIR" value="${config.cache.dir}" />
+                    <token key="STORE_DIR" value="${config.store.dir}" />
+                    <token key="ETC_DIR" value="${config.etc.dir}" />
+                </replacetokens>
+            </filterchain>
+        </copy>
+        <delete dir="${dist.dir}/${dist.sub.dir}/simpleid/apidoc" includeemptydirs="true" />
+        <delete dir="${dist.dir}/${dist.sub.dir}/simpleid/build" includeemptydirs="true" />
+    </target>
+
+    <!-- apidocs -->
+    <target name="apidocs">
+        <delete includeemptydirs="true">
+            <fileset dir="apidoc">
+                <include name="**/*" />
+            </fileset>
+        </delete>
+        <exec command="${apigen.cmd} generate -q" passthru="true" />
+    </target>
+
+    <!-- Internationalisation -->    
+    <target name="gettext" depends="_check-build-dir">
+        <property name="xgettext.filelist" value="${build.dir}/xgettext-filelist.txt" />
+        <echo file="${xgettext.filelist}">
             <fileset dir="www">
                 <include name="**/*.php" />
+                <exclude name="vendor/**/*" />
             </fileset>
         </echo>
-        <reflexive file="gettext-filelist.txt">
+        <reflexive file="${xgettext.filelist}">
             <filterchain>
                 <striplinecomments>
                     <comment value="Directory: " />
@@ -44,79 +121,23 @@
 	            </replaceregexp>
             </filterchain>
         </reflexive>
-        <exec command="&quot;${xgettext.path}&quot; -kt --from-code utf-8 -o www/locale/messages.pot -L PHP --no-wrap -f gettext-filelist.txt" passthru="true" />
-        <delete file="gettext-filelist.txt"/>
-    </target>
-    
-    <target name="msgfmt-exec">
-        <exec command="&quot;${msgfmt.path}&quot; -D www/locale/${lang} -o www/locale/${lang}/messages.mo messages.po" passthru="true" />
+        <exec command="${xgettext.cmd} -kt --from-code utf-8 -o www/locale/messages.pot -L PHP --no-wrap -f ${xgettext.filelist}" passthru="true" />
+        <delete file="${xgettext.filelist}"/>
     </target>
 
     <target name="msgfmt">
-        <foreach param="lang" target="msgfmt-exec">
+        <foreach param="lang" target="_msgfmt-exec">
             <fileset dir="www/locale">
                 <include name="**/LC_MESSAGES" />
             </fileset>
         </foreach>
     </target>
-    
-    <target name="check-dist-dir">
-        <fail unless="dist.dir" message="Property dist.dir is not defined" />
+
+    <target name="_msgfmt-exec">
+        <exec command="${msgfmt.cmd} -D www/locale/${lang} -o www/locale/${lang}/messages.mo messages.po" passthru="true" />
     </target>
     
-    <target name="dist-clean" depends="check-dist-dir">
-        <delete>
-            <fileset dir="${dist.dir}"></fileset>
-        </delete>
-    </target>
-    
-    <!-- Copies the source to the distribution directory -->
-    <target name="dist-copy" depends="check-dist-dir">
-        <copy todir="${dist.dir}/${dist.sub.dir}/simpleid">
-            <fileset dir=".">
-                <exclude name="cache/*" />
-                <exclude name="cache/**/*.cache" />
-                <exclude name="store/*" />
-                <exclude name="openshift/**" />
-                <exclude name="www/.htaccess" />
-                <exclude name="www/config.inc" />
-                <exclude name="www/config.php" />
-                <exclude name="identities/*.identity" />
-                <exclude name="www/test/**" />
-                <exclude name="www/test-suite/**" />
-                <exclude name="tutorials/**" />
-                <exclude name=".git/**" />
-                <exclude name="*.xml" />
-                <exclude name="*.xsl" />
-                <exclude name="*.properties" />
-            </fileset>
-            <filterchain>
-                <replacetokens begintoken="@@" endtoken="@@">
-                    <token key="BUILD_VERSION" value="${build.version}" />
-                    <token key="IDENTITIES_DIR" value="${config.identities.dir}" />
-                    <token key="CACHE_DIR" value="${config.cache.dir}" />
-                    <token key="STORE_DIR" value="${config.store.dir}" />
-                </replacetokens>
-            </filterchain>
-        </copy>
-    </target>
-    
-    <!-- Creates a tar file for non-PEAR distribution -->
-    <target name="dist-tar" depends="dist-clean">
-        <phingcall target="dist-copy">
-            <property name="dist.sub.dir" value="${dist.tar.dir}" />
-            <property name="config.identities.dir" value="../identities" />
-            <property name="config.cache.dir" value="../cache" />
-            <property name="config.store.dir" value="../store" />
-        </phingcall>
-        
-        <delete file="${dist.dir}/${dist.tar.dir}/simpleid/www/config.pear.php"/>
-    
-        <tar destfile="${dist.dir}/simpleid-${build.version}.tar.gz" compression="gzip">
-            <tarfileset dir="${dist.dir}/${dist.tar.dir}" includes="**/*" defaultexcludes="no" />
-        </tar>
-        <echo message="${build.version}" file="${dist.dir}/current-version.txt"/>
-    </target>
+
     
     <!-- Creates OpenShift distribution -->
     <target name="openshift">
@@ -154,7 +175,16 @@
             </fileset>
         </copy>
     </target>
-    
-    <target name="dist" depends="dist-tar,dist-pear,openshift">
+
+    <!-- Utility tasks -->
+    <target name="_check-build-dir">
+        <fail unless="build.dir" message="Property build.dir is not defined" />
+        <mkdir dir="${build.dir}" />
     </target>
+
+    <target name="_check-dist-dir" depends="_check-build-dir">
+        <fail unless="dist.dir" message="Property dist.dir is not defined" />
+        <mkdir dir="${dist.dir}" />
+    </target>
+    
 </project>
