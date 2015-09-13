@@ -2,7 +2,7 @@
 
 namespace SimpleID\Protocols\XRDS;
 
-use SimpleID\Net\HTTPResponse;
+use SimpleID\Util\HTTPResponse;
 
 class XRDSDiscoveryStub extends XRDSDiscovery {
     protected function request($url, $headers = '') {

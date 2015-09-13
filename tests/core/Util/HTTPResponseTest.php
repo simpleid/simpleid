@@ -1,6 +1,6 @@
 <?php
 
-namespace SimpleID\Net;
+namespace SimpleID\Util;
 
 class HTTPResponseTest extends \PHPUnit_Framework_TestCase {
     protected function getOKResponse() {
