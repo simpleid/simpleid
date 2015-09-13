@@ -6,3 +6,6 @@ destination: apidoc
 
 exclude:
     - vendor
+
+title: SimpleID API Documentation
+main: simpleid
