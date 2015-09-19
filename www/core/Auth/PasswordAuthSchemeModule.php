@@ -25,6 +25,7 @@ namespace SimpleID\Auth;
 use \Bcrypt;
 use Psr\Log\LogLevel;
 use SimpleID\Auth\AuthManager;
+use SimpleID\Crypt\PBKDF2;
 use SimpleID\Store\StoreManager;
 
 /**
@@ -136,7 +137,7 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
                 parse_str($param_string, $params);
                 if (!isset($params['f'])) $params['f'] = 'sha256';
                 if (!isset($params['dk'])) $params['dk'] = 0;
-                return $this->secureCompare(hash_pbkdf2($params['f'], $credentials['password']['password'], base64_decode($salt), $params['c'], $params['dk'], true),
+                return $this->secureCompare(PBKDF2::hash($params['f'], $credentials['password']['password'], base64_decode($salt), $params['c'], $params['dk'], true),
                     base64_decode($hash));
                 break;
             default:
@@ -150,30 +151,6 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
      */
     public function secretUserDataPathsHook() {
         return array('password.password');
-    }
-}
-
-if (!function_exists('hash_pbkdf2') && function_exists('hash_hmac')) {
-    /** @ignore **/
-    function hash_pbkdf2($algo, $password, $salt, $iterations, $length = 0, $raw_output = false) {
-        $result = '';
-        $hLen = strlen(hash($algo, '', true));
-        if ($length == 0) {
-            $length = $hLen;
-            if (!$raw_output) $length *= 2;
-        }
-        $l = ceil($length / $hLen);
-
-        for ($i = 1; $i <= $l; $i++) {
-            $U = hash_hmac($algo, $salt . pack('N', $i), $password, true);
-            $T = $U;
-            for ($j = 1; $j < $iterations; $j++) {
-                $T ^= ($U = hash_hmac($algo, $U, $password, true));
-            }
-            $result .= $T;
-        }
-
-        return substr(($raw_output) ? $result : bin2hex($result), 0, $length);
     }
 }
 ?>
