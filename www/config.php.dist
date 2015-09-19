@@ -221,7 +221,7 @@ modules:
     - 'SimpleID\Auth\OTPAuthSchemeModule'
 
     # OpenID 1.x and 2.x
-    - 'SimpleID\Protocols\OpenID\OpenIDModule',
+    - 'SimpleID\Protocols\OpenID\OpenIDModule'
     - 'SimpleID\Protocols\OpenID\Extensions\SRegOpenIDExtensionModule'
     - 'SimpleID\Protocols\OpenID\Extensions\PAPEOpenIDExtensionModule'
 
