@@ -20,7 +20,7 @@ $config = Spyc::YAMLLoadString(<<<_END_YAML_
 # https:#www.example.com:8888/simpleid'
 #
 #
-canonical_base_path: 'http:#www.example.com'
+canonical_base_path: 'http://www.example.com'
 
 #
 # Directory to store identity information.
