@@ -1,0 +1,22 @@
+{
+    "name": "simpleid/simpleid-tool",
+    "description": "A simple, personal OpenID provider written in PHP",
+    "require": {
+        "php": ">=5.4.0",
+        "mustangostang/spyc": "dev-master",
+        "symfony/console": "2.*"
+    },
+    "require-dev": {
+        "phing/phing": "2.*"
+    },
+    "license": "GPL-2.0+",
+    "authors": [
+        {
+            "name": "Kelvin Mo",
+            "email": "kmo@users.sourceforge.net"
+        }
+    ],
+    "autoload": {
+        "psr-4": { "SimpleIDTool\\": "." }
+    }
+}

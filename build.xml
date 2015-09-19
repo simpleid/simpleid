@@ -32,6 +32,11 @@
     <property name="dist.dir" value="${build.dir}/dist" />
     <property name="dist.tar.dir" value="tar" />
 
+    <!-- Tool -->
+    <target name="tool">
+        <phing dir="tool" target="phar" />
+    </target>
+
     <!-- Distribution -->
     <target name="dist" depends="dist-tar">
     </target>
