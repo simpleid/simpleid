@@ -79,8 +79,17 @@ class PasswordCommand extends Command {
 
                 return $value;
             });
-
             $password = $helper->ask($input, $output, $question);
+
+            $question = new Question('Re-type password: ');
+            $question->setHidden(true);
+            $question->setHiddenFallback(false);
+            $verify_password = $helper->ask($input, $output, $question);
+
+            if ($password != $verify_password) {
+                $output->writeln('<error>Passwords do not match</error>');
+                return 1;
+            }
         } else {
             $output->writeln('Password required');
             return 1;
