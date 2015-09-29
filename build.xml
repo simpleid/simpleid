@@ -47,7 +47,6 @@
         </delete>
     </target>
 
-    <!-- Creates a tar file for non-PEAR distribution -->
     <target name="dist-tar" depends="clean">
         <phingcall target="_dist-copy">
             <property name="dist.sub.dir" value="${dist.tar.dir}" />
@@ -62,8 +61,8 @@
         </tar>
     </target>
 
-    <!-- Copies the source to the distribution directory -->
     <target name="_dist-copy" depends="_check-dist-dir">
+        <!-- Copies the source to the distribution directory -->
         <copy todir="${dist.dir}/${dist.sub.dir}/simpleid">
             <fileset dir=".">
                 <exclude name=".git/**" />
@@ -95,6 +94,12 @@
         </copy>
         <delete dir="${dist.dir}/${dist.sub.dir}/simpleid/apidoc" includeemptydirs="true" />
         <delete dir="${dist.dir}/${dist.sub.dir}/simpleid/build" includeemptydirs="true" />
+    </target>
+
+
+    <!-- tests -->
+    <target name="tests">
+        <phpunit pharlocation="${phpunit.cmd}" />
     </target>
 
     <!-- apidocs -->
