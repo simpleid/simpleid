@@ -1,0 +1,15 @@
+<p>{{ @intro }}</p>
+
+<p>{{ @simpleid_docs | raw }}</p>
+
+<ol>
+    <li>{{ @step1 | raw }}</li>
+    <li>{{ @step2 | raw }}</li>
+</ol>
+
+<p>{{ @click_continue | raw }}</p>
+
+<form method="post" action="{{ @base_path }}upgrade/index.php/select">
+    <input type="hidden" name="tk" value="{{ @tk }}" />
+    <input type="submit" value="{{ @continue_button }}" />
+</form>

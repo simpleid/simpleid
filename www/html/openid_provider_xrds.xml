@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xrds:XRDS xmlns="xri://$xrd*($v*2.0)" xmlns:xrds="xri://$xrds" xmlns:simple="http://xrds-simple.net/core/1.0">
+    <XRD version="2.0">
+        <Service>
+            <Type>http://specs.openid.net/auth/2.0/server</Type>
+            <Type>http://simpleid.koinic.net/type/version#{{ @version }}</Type>
+            <repeat group="{{ @types }}" value="{{ @uri }}"><Type>{{ @uri }}</Type></repeat>
+            <URI>{{ rtrim(@config.canonical_base_path, '/') }}/</URI>
+        </Service>
+    </XRD>
+</xrds:XRDS>

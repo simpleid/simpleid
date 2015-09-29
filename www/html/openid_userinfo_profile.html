@@ -1,0 +1,14 @@
+<p>{{ @userinfo_label }}</p>
+
+<table>
+    <tr>
+        <th>{{ @name_label }}</th>
+        <th>{{ @value_label }}</th>
+    </tr>
+    <repeat group="{{ @info }}" key="{{ @name }}" value="{{ @value }}">
+        <tr>
+            <td>{{ @name }}</td>
+            <td>{{ @value }}</td>
+        </tr>
+    </repeat>
+</table>

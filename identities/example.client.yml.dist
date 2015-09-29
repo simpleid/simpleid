@@ -1,0 +1,261 @@
+#
+# SimpleID client file.
+#
+# This file contains all the data associated with a client that is registered with
+# this SimpleID server.  It should always be named client_id.client.json, where
+# client_id is the client identifier that the client will use when communicating with
+# SimpleID.  The client_id must not begin with an underscore (_).
+#
+
+#
+# OPTIONAL - name of the client application.
+#
+#client_name: "My Sample Application"
+
+#
+# OPTIONAL - the home page of the client application.
+#
+#client_uri: "http://client.example.com/"
+
+oauth:
+    #
+    # OPTIONAL - the client secret.
+    #
+    # The client secret should be a cryptically strong random string which is
+    # difficult for attackers to guess.
+    #
+    # A number of random string generators is available on the Internet.  An example
+    # is:
+    # https://www.fourmilab.ch/cgi-bin/Hotbits?nbytes=32&fmt=hex
+    #
+    # The client MUST be able to store this client_secret in a confidential manner.
+    # If the client is not able to do this (e.g. phone app or Javascript app), then
+    # client_secret MUST be commented out and token_endpoint_auth_method MUST be set
+    # to none
+    #
+    client_secret: "67A470DE4A75A449F453F316803DFA2D10F248D5133633FB20B9A666C36EE7C1"
+
+    #
+    # REQUIRED - redirect URIs
+    #
+    # A list of redirect URIs to which SimpleID can redirect the user back to the
+    # client.
+    #
+    # The first redirect URI in the list will be used if there is no redirect_uri
+    # parameter specified in the authorisation request.
+    #
+    # If application_type is "web" (default) and "grant_types" includes "implicit",
+    # the each redirect URI must be an absolute HTTPS URI.  It may include a query
+    # component (?) but must not include a fragment component (#).  In addition, the
+    # host part of the redirect URI must not be "localhost".
+    #
+    # If application_type is "native", each redirect URI must either be using a
+    # custom URI scheme OR "http" scheme with "localhost" as host
+    #
+    #
+    redirect_uris: 
+        - "https://server1.client.example.com/oauth"
+        - "https://server2.client.example.com/oauth"
+    
+
+    #
+    # OPTIONAL - the client application type
+    #
+    # This must be one of the following:
+    #
+    #   web
+    #     A client running on a web server.  The client credentials (e.g. the value
+    #     of client_secret above) as well as any access token issued to the
+    #     client are stored on the web server.
+    #
+    #   native
+    #     A native application is client installed and executed on the user's
+    #     device.  Protocol data and credentials are accessible by decompilation
+    #     or other means.
+    #
+    #
+    #application_type: "web"
+
+    #
+    # OPTIONAL - how to client will present its credentials to get an access token.
+    #
+    # The options are client_secret_basic (default) and client_secret_post
+    #
+    #"token_endpoint_auth_method": "client_secret_basic",
+
+    #
+    # OPTIONAL - response_types that the client will use
+    #
+    #response_types: 
+    #    - code
+
+    #
+    # OPTIONAL - grant_types that the client will use
+    #
+    #grant_types: 
+    #    - authorization_code
+    #    - implicit
+    #    - refresh_token
+
+    #
+    # OPTIONAL - e-mail contacts
+    #
+    # A list of e-mail addresses for people allowed to administer the information
+    # for this Client.
+    #
+    #
+    #contacts:
+    #    - "a@client.example.com"
+    #    - "b@client.example.com"
+
+    #
+    # OPTIONAL - URI of a logo representing the client application.
+    #
+    # This URI will be presented to the user when they are asked to approve
+    # any OAuth/OpenID Connect authorisation request.  As this will be presented
+    # using HTTPS, the URI must be HTTPS.
+    #
+    #
+    #logo_uri: "https://sample.application.example.com/images/icon.png"
+
+    #
+    # OPTIONAL - URI of the client's policy on the use of personal data
+    #
+    #policy_uri: "https://sample.application.example.com/privacy"
+
+    #
+    # OPTIONAL - URI of the client's terms of service
+    #
+    #tos_uri: "https://sample.application.example.com/terms"
+
+    #
+    # OPTIONAL - the application's JSON web key used to sign its requests.
+    #
+    # This cannot be used with jwks_uri
+    #
+    #jwks: {}
+},
+
+connect: {} # Remove empty baces if you wish to fill in this section
+    #
+    # OPTIONAL - URI used to calculate pairwise pseudononymous identifiers.
+    #
+    # This URI must be HTTPS.  It must return a JSON array of the redirect_uri values
+    # specified above.
+    #
+    #sector_identifier_uri: "https://sample.application.example.com/sector_identifier.json"
+
+    #
+    # OPTIONAL - The subject_type requested for responses to this application.
+    #
+    # This must be one of the following:
+    #
+    #   public (default)
+    #     The user_id returned by SimpleID is a public identifier
+    #
+    #   pairwise
+    #     The user_id returned by SimpleID is a pairwise pseudononymous identifier.
+    #
+    #     The sector_identifier_uri must be specified.
+    #
+    #subject_type: public
+
+    #
+    # OPTIONAL - The JWS signature algorithms required for ID tokens.
+    #
+    #id_token_signed_response_alg": HS256
+
+    #
+    # OPTIONAL - The JWE key encryption algorithm required for ID tokens.
+    #
+    # This must be commented out if the client does not require encryption.
+    #
+    #id_token_encrypted_response_alg: ""
+
+    #
+    # OPTIONAL - The JWE encryption algorithm required for ID tokens.
+    #
+    # This must be commented out if the client does not require encryption.
+    #
+    #id_token_encrypted_response_enc: ""
+
+    #
+    # OPTIONAL - The JWS signature algorithm required for UserInfo responses.
+    #
+    #userinfo_signed_response_alg: HS256
+
+    #
+    # OPTIONAL - The JWE key encryption algorithm required for UserInfo responses.
+    #
+    # This must be commented out if the client does not require encryption.
+    #
+    #userinfo_encrypted_response_alg: ""
+
+    #
+    # OPTIONAL - The JWE encryption algorithm required for UserInfo responses.
+    #
+    # This must be commented out if the client does not require encryption.
+    #
+    #userinfo_encrypted_response_enc: ""
+
+    #
+    # OPTIONAL - The JWS signature algorithm used when signing request objects.
+    #
+    #request_object_signing_alg: HS256
+
+    #
+    # OPTIONAL - The JWE key encryption algorithm used when signing request objects.
+    #
+    # This must be commented out if the client does not require encryption.
+    #
+    #request_object_encryption_alg: ""
+
+    #
+    # OPTIONAL - The JWE encryption algorithm used when signing request objects.
+    #
+    # This must be commented out if the client does not require encryption.
+    #
+    #request_object_encryption_enc: ""
+
+    #
+    # OPTIONAL - The JWS signature algorithm used when the JWT when authenticating
+    # at the token endpoint using private_key_jwt or client_secret_jwt.
+    #
+    #token_endpoint_auth_signing_alg: HS256
+
+    #
+    # OPTIONAL - Default maximum authentication age that specifies that the
+    # user must be actively re-authenticated by SimpleID.
+    #
+    #default_max_age: 123
+
+    #
+    # OPTIONAL - Whether the auth_time claim in the id_token is required
+    #
+    # NOTE - This must be a string "true" or "false" rather than a boolean
+    #
+    #require_auth_time: "false"
+
+    #
+    # OPTIONAL - Default authentication context class reference value.
+    # Note that SimpleID by default does not support ACRs greater than zero.
+    #
+    #default_acr_values: 0
+
+    #
+    # OPTIONAL - The URI using the https: scheme that SimpleID
+    # can call to initiate a login at the client.
+    #
+    #initiate_login_uri: "https://sample.application.example.com/login"
+
+    #
+    # OPTIONAL - request_uri values that the client can specify
+    #
+    #request_uris:
+    #    - "https://sample.application.example.com/connect/request"
+
+    #
+    # OPTIONAL - The URI to redirect to after the user has logged out of
+    # SimpleID
+    #
+    #post_logout_redirect_uri: https://sample.application.example.com/logout

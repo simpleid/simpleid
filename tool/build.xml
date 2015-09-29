@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project default="phar" basedir=".">
+    <property name="bin.dir" value="../bin" />
+    <property name="stub" value="stub.php" />
+
+    <target name="phar">
+        <pharpackage destfile="${bin.dir}/simpleid-tool.phar" basedir="./" stub="${stub}" compression="bzip2">
+            <fileset dir=".">
+                <include name="*.php" />
+                <exclude name="${stub}" />
+            </fileset>
+            <fileset dir="vendor">
+                <include name="**/*" />
+                <exclude name="symfony/console/Tests/**/**" />
+            </fileset>
+        </pharpackage>
+    </target>
+</project>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xrds:XRDS xmlns="xri://$xrd*($v*2.0)" xmlns:xrds="xri://$xrds" xmlns:simple="http://xrds-simple.net/core/1.0">
+    <XRD version="2.0">
+        <Service priority="10">
+            <Type>http://specs.openid.net/auth/2.0/signon</Type>
+            <URI>{{ rtrim(@config.canonical_base_path, '/') }}/</URI>
+            <check if="{{ @@local_id }}"><LocalID>{{ @local_id }}</LocalID></check>
+        </Service>
+        <Service priority="20" xmlns:openid="http://openid.net/xmlns/1.0">
+            <Type>http://openid.net/signon/1.0</Type>
+            <URI>{{ rtrim(@config.canonical_base_path, '/') }}/</URI>
+            <check if="{{ @@local_id }}"><openid:Delegate>{{ @local_id }}</openid:Delegate></check>
+        </Service>
+    </XRD>
+</xrds:XRDS>

@@ -1,0 +1,15 @@
+<table>
+    <tr><th>{{ @access_type }}</th><th>{{ @location }}</th><th>{{ @time }}</tr>
+    <repeat group="{{ @user->getActivities() }}" key="{{ @id }}" value="{{ @info }}">
+        <tr>
+            <td><switch expr="{{ @info.type }}">
+                <case value="browser">
+                    {{ @browser_label }} ({{ @info.ua }})
+                </case>
+                <case value="app">
+                    {{ @app_label }} ({{ @info.id }})
+                </case>
+            </switch></td>
+            <td>{{ @@info.remote }}</td><td> {{ '{0,date} {0,time}',@info.time | format }}</td></tr>
+    </repeat>
+</table>
