@@ -224,7 +224,7 @@ class AuthModule extends Module {
 
         if (isset($form_state['cancel'])) {
             $this->f3->set('cancellable', true);
-            $this->f3->set('cancel_button', t('Cancel'));
+            $this->f3->set('cancel_button', $this->t('Cancel'));
         }
 
         // 3. Build the forms
