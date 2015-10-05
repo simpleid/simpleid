@@ -5,7 +5,7 @@
         "php": ">=5.4.0",
         "ext-xmlreader": "*",
         "kelvinmo/simplexrd": "3.*",
-        "kelvinmo/simplejwt": "dev-master",
+        "kelvinmo/simplejwt": "0.1.*",
         "kelvinmo/simplei18n": "0.2.*",
         "kelvinmo/fernet-php": "0.3.*",
         "bcosca/fatfree-core": "3.5.*",
