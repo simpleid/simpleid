@@ -25,7 +25,7 @@ Installation
 ------------
 
 For installation instructions, please see the SimpleID Getting Started Guide at
-<http://simpleid.koinic.net/docs/2/getting-started/>.
+<http://simpleid.koinic.net/docs/2/#getting-started>.
 
 Documentation
 -------------
