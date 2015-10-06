@@ -1,3 +1,13 @@
+SimpleID 1.0
+------------
+
+- Security enhancements:
+    * #149 Add ​PBKDF2 to available password hashing algorithms to improve
+      hashing security
+    * #150 Changed hash string comparison function to mitigate against
+      timing attacks
+
+
 SimpleID 0.9.1
 --------------
 
