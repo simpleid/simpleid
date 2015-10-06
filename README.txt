@@ -6,6 +6,10 @@ SimpleID is a simple, personal OpenID provider written in PHP.
 Latest Version
 --------------
 
+Version 1.0 is the final version of the original series of SimpleID.
+SimpleID 2.0 is almost a complete rewrite of SimpleID and is not
+backwards compatible this version.
+
 The latest version of SimpleID can be found in the SimpleID web page at
 <http://simpleid.koinic.net/>
 
