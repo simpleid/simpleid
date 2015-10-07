@@ -49,20 +49,29 @@ class LocaleManager extends Prefab {
         if (method_exists($this->i18n, $method)) {
             $raw = false;
             $raw_method = $method;
-            $variables = array_pop($args);
         } elseif ((substr($method, -4) == '_raw') && method_exists($this->i18n, substr($method, 0, -4))) {
-            $raw = false;
+            $raw = true;
             $raw_method = substr($method, 0, -4);
         } else {
             return null;
         }
 
-        $translated = call_user_func_array(array($this->i18n, $raw_method), $args);
+        switch ($raw_method) {
+            case 't':
+            case 'nt':
+            case 'dt':
+            case 'dnt':
+                if (!$raw) $variables = array_pop($args);
+                $translated = call_user_func_array(array($this->i18n, $raw_method), $args);
 
-        if ($raw) return $translated;
-
-        return $this->expand($translated, $variables);
+                if ($raw) return $translated;
+                return $this->expand($translated, $variables);
+                break;
+            default:
+                return call_user_func_array(array($this->i18n, $raw_method), $args);
+        }
     }
+
 
     /**
      * Expands a string.
