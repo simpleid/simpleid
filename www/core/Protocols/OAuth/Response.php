@@ -23,6 +23,7 @@ namespace SimpleID\Protocols\OAuth;
 
 use \Base;
 use SimpleID\Util\ArrayWrapper;
+use SimpleID\Util\FormResponse;
 
 /**
  * A class representing an OAuth authorization or token (or similar)
@@ -227,14 +228,9 @@ class Response extends ArrayWrapper {
      * 
      */
     public function renderFormPost($url = NULL) {
-        $f3 = Base::instance();
-        $tpl = new \Template();
-
+        $form = new FormResponse($this->container);
         if ($url == NULL) $url = $this->redirect_uri;
-
-        $f3->set('url', $url);
-        $f3->set('params', $this->container);
-        print $tpl->render('post.html');
+        $form->render($url);
     }
 
     /**
