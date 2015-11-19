@@ -27,22 +27,14 @@ use SimpleID\Auth\AuthManager;
 use SimpleID\Crypt\Random;
 use SimpleID\Module;
 use SimpleID\ModuleManager;
+use SimpleID\Protocols\ProtocolResult;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
 
 /**
  * The module for authentication under OpenID version 1.1 and 2.0
  */
-class OpenIDModule extends Module {
-
-    const CHECKID_OK = 127;
-    const CHECKID_RETURN_TO_SUSPECT = 3;
-    const CHECKID_APPROVAL_REQUIRED = 2;
-    const CHECKID_REENTER_CREDENTIALS = -1;
-    const CHECKID_LOGIN_REQUIRED = -2;
-    const CHECKID_IDENTITIES_NOT_MATCHING = -3;
-    const CHECKID_IDENTITY_NOT_EXIST = -4;
-    const CHECKID_PROTOCOL_ERROR = -127;
+class OpenIDModule extends Module implements ProtocolResult {
 
     /** Constant for the XRDS service type for return_to verification */
     const OPENID_RETURN_TO = 'http://specs.openid.net/auth/2.0/return_to';

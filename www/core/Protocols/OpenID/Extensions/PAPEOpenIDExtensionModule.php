@@ -24,6 +24,7 @@ namespace SimpleID\Protocols\OpenID\Extensions;
 
 use SimpleID\Auth\AuthManager;
 use SimpleID\Module;
+use SimpleID\Protocols\ProtocolResult;
 use SimpleID\Protocols\OpenID\OpenIDModule;
 use SimpleID\Protocols\OpenID\Message;
 use SimpleID\Protocols\OpenID\Request;
@@ -33,7 +34,7 @@ use SimpleID\Util\OpaqueIdentifier;
 /**
  * Implements the Provider Authentication Policy Extension
  */
-class PAPEOpenIDExtensionModule extends Module {
+class PAPEOpenIDExtensionModule extends Module implements ProtocolResult {
 
     /** Namespace for the PAPE extension */
     const OPENID_NS_PAPE = 'http://specs.openid.net/extensions/pape/1.0';
@@ -88,7 +89,7 @@ class PAPEOpenIDExtensionModule extends Module {
             if (($auth_level < AuthLevel::AUTH_LEVEL_CREDENTIALS) 
                 || ((time() - $auth->getAuthTime()) > $pape_request['max_auth_age'])) {
                 $this->f3->set('message', $this->t('This web site\'s policy requires you to log in again to confirm your identity.'));
-                return OpenIDModule::CHECKID_REENTER_CREDENTIALS;
+                return self::CHECKID_REENTER_CREDENTIALS;
             }
         }
     }

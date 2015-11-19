@@ -26,6 +26,7 @@ use Fernet\Fernet;
 use Psr\Log\LogLevel;
 use SimpleID\Auth\AuthManager;
 use SimpleID\ModuleManager;
+use SimpleID\Protocols\ProtocolResult;
 use SimpleID\Protocols\OAuth\OAuthModule;
 use SimpleID\Protocols\OAuth\OAuthProtectedResource;
 use SimpleID\Protocols\OAuth\OAuthDynamicClient;
@@ -42,7 +43,7 @@ use \Web;
 /**
  * Module for authenticating with OpenID Connect.
  */
-class ConnectModule extends OAuthProtectedResource {
+class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
 
     static private $scope_settings = NULL;
 
@@ -160,12 +161,12 @@ class ConnectModule extends OAuthProtectedResource {
         if ($request->paramContains('prompt', 'login')) {
             $this->f3->set('message', $this->t('This app\'s policy requires you to log in again to confirm your identity.'));
             $request->paramRemove('prompt', 'login');
-            return OAuthModule::CHECKID_REENTER_CREDENTIALS;
+            return self::CHECKID_REENTER_CREDENTIALS;
         }
 
         if ($request->paramContains('prompt', 'consent')) {
             $request->paramRemove('prompt', 'consent');
-            return OAuthModule::CHECKID_APPROVAL_REQUIRED;
+            return self::CHECKID_APPROVAL_REQUIRED;
         }
 
         // Check 2: If id_token_hint is provided, check that it refers to the current logged-in user
@@ -178,7 +179,7 @@ class ConnectModule extends OAuthProtectedResource {
             }
             if (!$user_match) {
                 $auth->logout();
-                return OAuthModule::LOGIN_REQUIRED;
+                return self::CHECKID_LOGIN_REQUIRED;
             }
         }
         
@@ -204,7 +205,7 @@ class ConnectModule extends OAuthProtectedResource {
             if (($auth_level < AuthManager::AUTH_LEVEL_CREDENTIALS) 
                 || ((time() - $auth->getAuthTime()) > $max_age)) {
                 $this->f3->set('message', $this->t('This app\'s policy requires you to log in again to confirm your identity.'));
-                return OAuthModule::CHECKID_REENTER_CREDENTIALS;
+                return self::CHECKID_REENTER_CREDENTIALS;
             }
         }
 
@@ -217,7 +218,7 @@ class ConnectModule extends OAuthProtectedResource {
         }
 
         if ($acr > -1) {
-            return OAuthModule::CHECKID_INSUFFICIENT_TRUST;
+            return self::CHECKID_INSUFFICIENT_TRUST;
         }
 
         return null;
