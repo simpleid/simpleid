@@ -41,30 +41,33 @@ if (!defined('SIMPLEID_RAND_SOURCE')) {
  * Obtains a number of random bytes.  This function uses an entropy source specified
  * in SIMPLEID_RAND_SOURCE.  If SIMPLEID_RAND_SOURCE is not available, the mt_rand()
  * PHP function is used
+ * If the native PHP random_bytes function exists (PHP 7+), this function won't be defined here.
  *
  * @param int $num_bytes the number of bytes to generate
  * @return string a string containing random bytes
  */
-function random_bytes($num_bytes) {
-    static $f = null;
-    $bytes = '';
-    if ($f === null) {
-        if (SIMPLEID_RAND_SOURCE === null) {
-            $f = FALSE;
-        } else {
-            $f = @fopen(SIMPLEID_RAND_SOURCE, "r");
-        }
-    }
-    if ($f === FALSE) {
+if(!function_exists('random_bytes')) {
+    function random_bytes($num_bytes) {
+        static $f = null;
         $bytes = '';
-        for ($i = 0; $i < $num_bytes; $i += 4) {
-            $bytes .= pack('L', mt_rand());
+        if ($f === null) {
+            if (SIMPLEID_RAND_SOURCE === null) {
+                $f = FALSE;
+            } else {
+                $f = @fopen(SIMPLEID_RAND_SOURCE, "r");
+            }
         }
-        $bytes = substr($bytes, 0, $num_bytes);
-    } else {
-        $bytes = fread($f, $num_bytes);
+        if ($f === FALSE) {
+            $bytes = '';
+            for ($i = 0; $i < $num_bytes; $i += 4) {
+                $bytes .= pack('L', mt_rand());
+            }
+            $bytes = substr($bytes, 0, $num_bytes);
+        } else {
+            $bytes = fread($f, $num_bytes);
+        }
+        return $bytes;
     }
-    return $bytes;
 }
 
 /**
