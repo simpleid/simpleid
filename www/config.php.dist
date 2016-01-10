@@ -174,6 +174,8 @@ acr: 1
 #
 # The logger class.
 #
+# You can use any PSR-3 compliant logger, as long as it has been loaded.
+#
 # The default logger class writes log entries to the file system,
 # as specified in the log_file variable.
 #
@@ -182,10 +184,10 @@ acr: 1
 logger: 'SimpleID\Util\DefaultLogger'
 
 #*
-# Log file.
+# Log file for default logger.
 #
-# You can specify a file into which SimpleID will log various diagnostic
-# messages.
+# You can specify a file into which the SimpleID default logger will log
+# various diagnostic messages.
 #
 # The log file's directory must exist and must be writable by the web server.
 #

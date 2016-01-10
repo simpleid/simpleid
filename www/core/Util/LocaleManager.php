@@ -29,7 +29,12 @@ use SimpleI18N\SimpleI18N;
 /**
  * The locale manager.
  *
+ * This is a singleton class which uses SimpleI18N to manage
+ * string translations for the SimpleID user interface.
+ *
  * It is also a wrapper for SimpleI18N.
+ *
+ * @link https://github.com/kelvinmo/simplei18n
  */
 class LocaleManager extends Prefab {
     const DEFAULT_DOMAIN = SimpleI18N::DEFAULT_DOMAIN;

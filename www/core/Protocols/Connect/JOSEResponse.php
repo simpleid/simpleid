@@ -38,7 +38,7 @@ use SimpleJWT\Crypt\CryptException;
  * of the specified client.
  *
  * This class is a subclass of {@link ArrayWrapper}.  Token claims
- * are stored in {@link ArrayWrapper->container} and are accessed
+ * are stored in {@link ArrayWrapper->$container} and are accessed
  * using array syntax.  Token headers are set using the {@link setHeaders()}
  * and {@link setHeader()} methods.
  */
@@ -114,6 +114,24 @@ class JOSEResponse extends ArrayWrapper {
         $this->headers[$header] = $value;
     }
 
+    /**
+     * Sets a claim to be the short hash of a particular value.
+     *
+     * The OpenID Connect specification requires, in certain circumstances, the
+     * short hash of OAuth response parameters to be included in an ID token.
+     * This function calculates the short hash of the OAuth response parameter
+     * (specified in `$value`) and places it as a claim with a name specified
+     * by `$claim`.  Normally `$claim` will be `c_hash` or `at_hash` and `$value`
+     * will be the authorisation code or access token respectively.
+     *
+     * The short hash is the left-most half of the hash, with the hash algorithm
+     * being the one underlying the signature algorithm.  For instance, if the signature
+     * algorithm is RS256, the underlying hash algorithm is SHA-256, and this function
+     * will return the encoded value of the left-most 128 bits of the SHA-256 hash.
+     *
+     * @param string $name the name of the claim
+     * @param string $value the value over which the short hash to be calculated
+     */
     function setShortHashClaim($claim, $value) {
         $alg = ($this->signed_response_alg) ? $this->signed_response_alg : 'HS256';
         $signer = AlgorithmFactory::create($alg);

@@ -83,6 +83,9 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
     }
 
     /**
+     * Resolves an OpenID Connect authorisation request by decoding any
+     * `request` and `request_uri` parameters.
+     *
      * @see SimpleID\API\OAuthHooks::oAuthResolveAuthRequestHook()
      */
     public function oAuthResolveAuthRequestHook($request, $response) {
@@ -147,6 +150,13 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
     }
 
     /**
+     * Processes an OpenID Connect authorisation request.
+     *
+     * This hook is called as part of the OAuth authorisation process.  This
+     * function performs additional checks required by the OpenID Connect
+     * protocol, including processing the `prompt`, `max_age` and
+     * `acr` paramters.
+     *
      * @see SimpleID\API\OAuthHooks::oAuthProcessAuthRequestHook()
      */
     function oAuthProcessAuthRequestHook($request, $response) {
@@ -226,6 +236,21 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
 
 
     /**
+     * Builds the OpenID Connect authentication response on a successful
+     * authentication.
+     *
+     * The OpenID Connect authentication response is built on top of the OAuth
+     * authorisation response and token responses.  It may include an ID token
+     * containing the claims requested by the OpenID Connect client.
+     * 
+     * This function prepares the OpenID Connect claims to be returned by calling
+     * the {@link buildClaims()} function with an `id_token` parameter.  This
+     * function will then:
+     *
+     * - encode the claims in an ID token and return it as part of the authorisation
+     *   response; and/or
+     * - save the claims to be returned as part of the token response.
+     * 
      * @see SimpleID\API\OAuthHooks::oAuthGrantAuthHook()
      */
     function oAuthGrantAuthHook($authorization, $request, $response, $scopes) {
@@ -279,6 +304,13 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
         }
     }
 
+    /**
+     * Processes an OpenID Connect token response.  An OpenID Connect token
+     * response may contain an ID token containing the claims that the
+     * OpenID Connect client requested earlier.
+     * 
+     * @see SimpleID\API\OAuthHooks::oAuthTokenHook()
+     */
     function oAuthTokenHook($grant_type, $auth, $request, $response, $scopes) {
         if (($grant_type == 'authorization_code') && isset($auth->additional['id_token_claims'])) {
             $client = $this->oauth->getClient();
@@ -299,6 +331,10 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
         return array('id_token');
     }
 
+    /**
+     * The UserInfo endpoint.  The UserInfo endpoint returns a set
+     * of claims requested by the OpenID Connect client.
+     */
     public function userinfo() {
         $this->checkHttps('error');
 

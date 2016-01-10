@@ -45,7 +45,7 @@ class KeySetBuilder {
     /**
      * Creates a key set builder for the specified client.
      *
-     * @param SimpleID\Protocols\OAuth\OAuthClient the client
+     * @param SimpleID\Protocols\OAuth\OAuthClient $client the client
      */
     function __construct($client) {
         $this->set = new KeySet();

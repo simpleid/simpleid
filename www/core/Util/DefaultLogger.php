@@ -31,7 +31,7 @@ use \Psr\Log\LoggerTrait;
  *
  * This logger extends the logger included in the PSR-3 framework
  * by implementing the PSR-3 specification.  In addition, it retains the
- * same log file format as per SimpleID 0.1.
+ * same log file format as per SimpleID 1.
  *
  * You can replace this logger with any PSR-3 compliant logger.
  * 

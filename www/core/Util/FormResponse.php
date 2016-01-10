@@ -30,7 +30,7 @@ use \Base;
  */
 class FormResponse extends ArrayWrapper {
     /**
-     * Creates an form response.
+     * Creates a form response.
      *
      * @param array $data the initial response parameters
      */

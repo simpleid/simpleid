@@ -19,7 +19,7 @@ abstract class ConnectHooks {
      * or null if the request object is not present
      * @return array an array of claims
      */
-    abstract function connectbuildClaimsHook($user, $client, $context, $scopes, $claims_requested = NULL);
+    abstract function connectBuildClaimsHook($user, $client, $context, $scopes, $claims_requested = NULL);
 
     /**
      * Returns additional OpenID Connect configuration parameters.  These are used

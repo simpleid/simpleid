@@ -70,7 +70,7 @@ abstract class OAuthHooks {
      * @return int one of CHECKID_OK, CHECKID_APPROVAL_REQUIRED, CHECKID_LOGIN_REQUIRED, CHECKID_INSUFFICIENT_TRUST
      * or CHECKID_USER_DENIED
      */
-    abstract function oAuthProcessAuthRequest($request, $response);
+    abstract function oAuthProcessAuthRequestHook($request, $response);
 
     /**
      * Returns the response types available.
