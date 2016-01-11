@@ -232,7 +232,6 @@ modules:
 
     # OpenID Connect
     - 'SimpleID\Protocols\Connect\ConnectModule'
-    - 'SimpleID\Protocols\Connect\ConnectSessionModule'
     - 'SimpleID\Protocols\Connect\ConnectClientRegistrationModule'
     
 _END_YAML_

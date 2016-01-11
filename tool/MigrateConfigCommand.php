@@ -61,7 +61,7 @@ class MigrateConfigCommand extends Command {
             'SimpleID\Protocols\OpenID\Extensions\PAPEOpenIDExtensionModule',
             'SimpleID\Protocols\WebFinger\WebFingerModule',
             'SimpleID\Protocols\Connect\ConnectModule',
-            'SimpleID\Protocols\Connect\ConnectSessionModule',
+//            'SimpleID\Protocols\Connect\ConnectSessionModule',
             'SimpleID\Protocols\Connect\ConnectClientRegistrationModule',
         )
     );
