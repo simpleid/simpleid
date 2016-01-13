@@ -4,7 +4,7 @@
     "require": {
         "php": ">=5.4.0",
         "mustangostang/spyc": "dev-master",
-        "symfony/console": "2.*"
+        "symfony/console": "2.7.*"
     },
     "require-dev": {
         "phing/phing": "2.*"
@@ -17,6 +17,6 @@
         }
     ],
     "autoload": {
-        "psr-4": { "SimpleIDTool\\": "." }
+        "psr-4": { "SimpleIDTool\\": ".." }
     }
 }
