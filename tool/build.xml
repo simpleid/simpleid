@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project default="phar" basedir=".">
     <property name="bin.dir" value="../bin" />
+    <property name="phar.file" value="${bin.dir}/simpleid-tool.phar" /> 
     <property name="stub" value="stub.php" />
 
     <target name="phar">
-        <pharpackage destfile="${bin.dir}/simpleid-tool.phar" basedir="./" stub="${stub}" compression="bzip2">
+        <pharpackage destfile="${phar.file}" basedir="./" stub="${stub}" compression="bzip2">
             <fileset dir=".">
                 <include name="*.php" />
                 <exclude name="${stub}" />
@@ -14,5 +15,6 @@
                 <exclude name="symfony/console/Tests/**/**" />
             </fileset>
         </pharpackage>
+        <chmod file="${phar.file}" mode="0755" />
     </target>
 </project>
