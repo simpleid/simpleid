@@ -410,7 +410,11 @@ class OpenIDModule extends Module implements ProtocolResult {
             $verified = FALSE;
             
             $relying_party = $this->loadRelyingParty($realm);
-            $services = $relying_party->getServices()->getByType(self::OPENID_RETURN_TO);
+            if ($relying_party->getServices() == null) {
+                $services = array();
+            } else {
+                $services = $relying_party->getServices()->getByType(self::OPENID_RETURN_TO);
+            }
             
             $this->logger->log(LogLevel::INFO, 'OpenID 2 discovery: ' . count($services) . ' matching services');
             
