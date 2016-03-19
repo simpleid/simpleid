@@ -22,6 +22,12 @@
 
 namespace SimpleID\Protocols\XRDS;
 
+/**
+ * A collection of discovered XRDS services.
+ *
+ * The collection can be queried using the {@link getByType()} and
+ * {@link getById()} functions.
+ */
 class XRDSServices {
 
     /** Array of discovered services */
@@ -40,7 +46,7 @@ class XRDSServices {
     /**
      * Returns the number of services.
      *
-     * @return int
+     * @return int the number of services
      */
     public function getLength() {
         return count($this->services);

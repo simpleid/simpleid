@@ -30,7 +30,7 @@ use \XMLReader;
  * This parser uses the classic expat functions available in PHP to parse the
  * XRDS Simple XML document.
  *
- * The result is an array of discovered services.
+ * The result is a {@link XRDSServices} object.
  *
  * @link http://xrds-simple.net/
  */
