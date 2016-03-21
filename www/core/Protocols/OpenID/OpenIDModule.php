@@ -987,7 +987,7 @@ class OpenIDModule extends Module implements ProtocolResult {
             $tpl = new \Template();
 
             if ($user->hasLocalOpenIDIdentity()) {
-                $this->f3->set('local_id', $user["identity"]);
+                $this->f3->set('local_id', $user['openid']["identity"]);
             }
             header('Content-Disposition: inline; filename=yadis.xml');
             print $tpl->render('openid_user_xrds.xml', 'application/xrds+xml');
