@@ -723,6 +723,7 @@ class OpenIDModule extends Module implements ProtocolResult {
      */
     protected function consentForm($request, $response, $reason = self::CHECKID_APPROVAL_REQUIRED) {
         $tpl = new \Template();
+        $token = new SecurityToken();
 
         $form_state = array(
             'rq' => $request,
@@ -736,7 +737,7 @@ class OpenIDModule extends Module implements ProtocolResult {
         if ($cancel) {
             $this->f3->set('unable_label', $this->t('Unable to log into <strong class="realm">@realm</strong>.', array('@realm' => $realm)));
             $this->f3->set('identity_not_matching_label', $this->t('Your current identity does not match the requested identity %identity.', array('%identity' => $request['openid.identity'])));
-            $this->f3->set('switch_user_label', $this->t('<a href="!url">Switch to a different user</a> and try again.', array('!url' => simpleid_url('logout', 'destination=continue&s=' . rawurlencode($request_state), true))));
+            $this->f3->set('switch_user_label', $this->t('<a href="!url">Switch to a different user</a> and try again.', array('!url' => $this->getCanonicalURL('auth/logout/continue/' .  rawurlencode($token->generate($request->toArray())), '', true))));
         } else {
             $base_path = $this->f3->get('base_path');
             
@@ -760,7 +761,6 @@ class OpenIDModule extends Module implements ProtocolResult {
             
         }
         
-        $token = new SecurityToken();
         $this->f3->set('tk', $token->generate('openid_consent', SecurityToken::OPTION_BIND_SESSION));
         $this->f3->set('fs', $token->generate($form_state));
 
