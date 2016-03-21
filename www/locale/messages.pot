@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-13 14:16+1000\n"
+"POT-Creation-Date: 2016-03-21 20:35+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -41,8 +41,8 @@ msgid "You seem to be attempting to log in from another web page.  You must use 
 msgstr ""
 
 #: www/core/Auth/AuthModule.php:120 www/core/Auth/AuthModule.php:227
-#: www/core/Protocols/OpenID/OpenIDModule.php:772
-#: www/core/Protocols/OpenID/OpenIDModule.php:818
+#: www/core/Protocols/OpenID/OpenIDModule.php:768
+#: www/core/Protocols/OpenID/OpenIDModule.php:814
 msgid "Cancel"
 msgstr ""
 
@@ -76,8 +76,8 @@ msgstr ""
 
 #: www/core/Auth/OTPAuthSchemeModule.php:64
 #: www/core/Auth/OTPAuthSchemeModule.php:81
-#: www/core/Protocols/OAuth/OAuthModule.php:680
-#: www/core/Protocols/OpenID/OpenIDModule.php:810
+#: www/core/Protocols/OAuth/OAuthModule.php:671
+#: www/core/Protocols/OpenID/OpenIDModule.php:806
 #: www/upgrade/UpgradeModule.php:98 www/upgrade/UpgradeModule.php:147
 #: www/upgrade/UpgradeModule.php:237 www/upgrade/UpgradeModule.php:244
 msgid "SimpleID detected a potential security attack.  Please try again."
@@ -163,19 +163,19 @@ msgstr ""
 msgid "You need to enter the verification code in order to log in."
 msgstr ""
 
-#: www/core/Auth/PasswordAuthSchemeModule.php:52
+#: www/core/Auth/PasswordAuthSchemeModule.php:53
 msgid "User name:"
 msgstr ""
 
-#: www/core/Auth/PasswordAuthSchemeModule.php:53
+#: www/core/Auth/PasswordAuthSchemeModule.php:54
 msgid "Password:"
 msgstr ""
 
-#: www/core/Auth/PasswordAuthSchemeModule.php:79
+#: www/core/Auth/PasswordAuthSchemeModule.php:80
 msgid "You need to supply the user name and the password in order to log in."
 msgstr ""
 
-#: www/core/Auth/PasswordAuthSchemeModule.php:99
+#: www/core/Auth/PasswordAuthSchemeModule.php:100
 msgid "The user name or password is not correct."
 msgstr ""
 
@@ -280,7 +280,7 @@ msgstr ""
 
 #: www/core/Base/UserModule.php:58
 #: www/core/Protocols/Connect/OpenID2MigrationModule.php:66
-#: www/core/Protocols/OpenID/OpenIDModule.php:1001
+#: www/core/Protocols/OpenID/OpenIDModule.php:997
 #, php-format
 msgid "User %uid not found."
 msgstr ""
@@ -334,129 +334,129 @@ msgstr ""
 msgid "Client not found."
 msgstr ""
 
-#: www/core/Protocols/Connect/ConnectModule.php:75
+#: www/core/Protocols/Connect/ConnectModule.php:76
 msgid "Public JSON web key file not found.  See the <a href=\"!url\">manual</a> for instructions on how to set up OpenID Connect on SimpleID."
 msgstr ""
 
-#: www/core/Protocols/Connect/ConnectModule.php:80
+#: www/core/Protocols/Connect/ConnectModule.php:81
 msgid "Private JSON web key file not found.  See the <a href=\"!url\">manual</a> for instructions on how to set up OpenID Connect on SimpleID."
 msgstr ""
 
-#: www/core/Protocols/Connect/ConnectModule.php:161
-#: www/core/Protocols/Connect/ConnectModule.php:206
+#: www/core/Protocols/Connect/ConnectModule.php:172
+#: www/core/Protocols/Connect/ConnectModule.php:217
 msgid "This app's policy requires you to log in again to confirm your identity."
 msgstr ""
 
-#: www/core/Protocols/Connect/ConnectModule.php:446
-#: www/core/Protocols/OAuth/OAuthModule.php:730
-#: www/core/Protocols/OpenID/OpenIDModule.php:1015
+#: www/core/Protocols/Connect/ConnectModule.php:483
+#: www/core/Protocols/OAuth/OAuthModule.php:721
+#: www/core/Protocols/OpenID/OpenIDModule.php:1011
 msgid "know who you are"
 msgstr ""
 
-#: www/core/Protocols/Connect/ConnectModule.php:450
+#: www/core/Protocols/Connect/ConnectModule.php:487
 msgid "view your profile information (excluding e-mail and address information)"
 msgstr ""
 
-#: www/core/Protocols/Connect/ConnectModule.php:454
+#: www/core/Protocols/Connect/ConnectModule.php:491
 msgid "view your e-mail address"
 msgstr ""
 
-#: www/core/Protocols/Connect/ConnectModule.php:458
+#: www/core/Protocols/Connect/ConnectModule.php:495
 msgid "view your address information"
 msgstr ""
 
-#: www/core/Protocols/Connect/ConnectModule.php:462
+#: www/core/Protocols/Connect/ConnectModule.php:499
 msgid "view your phone number"
 msgstr ""
 
-#: www/core/Protocols/Connect/ConnectModule.php:541
+#: www/core/Protocols/Connect/ConnectModule.php:578
 msgid "No web key file found."
 msgstr ""
 
-#: www/core/Protocols/Connect/ConnectModule.php:549
+#: www/core/Protocols/Connect/ConnectModule.php:586
 msgid "Web key file not public."
 msgstr ""
 
-#: www/core/Protocols/OAuth/OAuthModule.php:107
-#: www/core/Protocols/OAuth/OAuthModule.php:119
+#: www/core/Protocols/OAuth/OAuthModule.php:98
+#: www/core/Protocols/OAuth/OAuthModule.php:110
 #, php-format
 msgid "Protocol Error: %error_code"
 msgstr ""
 
-#: www/core/Protocols/OAuth/OAuthModule.php:141
+#: www/core/Protocols/OAuth/OAuthModule.php:132
 msgid "Protocol Error: response_type not set."
 msgstr ""
 
-#: www/core/Protocols/OAuth/OAuthModule.php:155
+#: www/core/Protocols/OAuth/OAuthModule.php:146
 msgid "Protocol Error: client_id not set"
 msgstr ""
 
-#: www/core/Protocols/OAuth/OAuthModule.php:166
+#: www/core/Protocols/OAuth/OAuthModule.php:157
 msgid "Protocol Error: Client not found"
 msgstr ""
 
-#: www/core/Protocols/OAuth/OAuthModule.php:190
+#: www/core/Protocols/OAuth/OAuthModule.php:181
 msgid "Protocol Error: Incorrect redirect URI"
 msgstr ""
 
-#: www/core/Protocols/OAuth/OAuthModule.php:200
+#: www/core/Protocols/OAuth/OAuthModule.php:191
 msgid "Protocol Error: redirect_uri not specified in request when multiple redirect_uris are registered"
 msgstr ""
 
-#: www/core/Protocols/OAuth/OAuthModule.php:205
+#: www/core/Protocols/OAuth/OAuthModule.php:196
 msgid "Protocol Error: redirect_uri not specified in request or client registration"
 msgstr ""
 
-#: www/core/Protocols/OAuth/OAuthModule.php:601
+#: www/core/Protocols/OAuth/OAuthModule.php:592
 msgid "Warning: %application_name did not pre-register with SimpleID.  Its identity has not been confirmed."
 msgstr ""
 
-#: www/core/Protocols/OAuth/OAuthModule.php:607
+#: www/core/Protocols/OAuth/OAuthModule.php:598
 #, php-format
 msgid "You can visit this application's web site at <a href=\"%url\">%url</a>."
 msgstr ""
 
-#: www/core/Protocols/OAuth/OAuthModule.php:610
+#: www/core/Protocols/OAuth/OAuthModule.php:601
 #, php-format
 msgid "You can view this application's policy on the use of your data at <a href=\"%url\">%url</a>."
 msgstr ""
 
-#: www/core/Protocols/OAuth/OAuthModule.php:613
+#: www/core/Protocols/OAuth/OAuthModule.php:604
 #, php-format
 msgid "You can view this application's terms of service at <a href=\"%url\">%url</a>."
 msgstr ""
 
-#: www/core/Protocols/OAuth/OAuthModule.php:626
+#: www/core/Protocols/OAuth/OAuthModule.php:617
 msgid "You can email the developer of this application at: !contacts."
 msgstr ""
 
-#: www/core/Protocols/OAuth/OAuthModule.php:629
-#: www/core/Protocols/OpenID/OpenIDModule.php:1052
+#: www/core/Protocols/OAuth/OAuthModule.php:620
+#: www/core/Protocols/OpenID/OpenIDModule.php:1048
 msgid "More information"
 msgstr ""
 
-#: www/core/Protocols/OAuth/OAuthModule.php:631
+#: www/core/Protocols/OAuth/OAuthModule.php:622
 msgid "<strong class=\"@application_type\">%application_name</strong> is requesting access to:"
 msgstr ""
 
-#: www/core/Protocols/OAuth/OAuthModule.php:632
+#: www/core/Protocols/OAuth/OAuthModule.php:623
 msgid "You can revoke access at any time under <strong>Dashboard</strong>."
 msgstr ""
 
-#: www/core/Protocols/OAuth/OAuthModule.php:633
+#: www/core/Protocols/OAuth/OAuthModule.php:624
 msgid "Don't ask me again for %application_name."
 msgstr ""
 
-#: www/core/Protocols/OAuth/OAuthModule.php:634
+#: www/core/Protocols/OAuth/OAuthModule.php:625
 msgid "Allow"
 msgstr ""
 
-#: www/core/Protocols/OAuth/OAuthModule.php:635
-#: www/core/Protocols/OAuth/OAuthModule.php:685
+#: www/core/Protocols/OAuth/OAuthModule.php:626
+#: www/core/Protocols/OAuth/OAuthModule.php:676
 msgid "Deny"
 msgstr ""
 
-#: www/core/Protocols/OAuth/OAuthModule.php:644
+#: www/core/Protocols/OAuth/OAuthModule.php:635
 msgid "OAuth Login"
 msgstr ""
 
@@ -482,7 +482,7 @@ msgstr ""
 msgid "Attribute Exchange Extension"
 msgstr ""
 
-#: www/core/Protocols/OpenID/Extensions/PAPEOpenIDExtensionModule.php:90
+#: www/core/Protocols/OpenID/Extensions/PAPEOpenIDExtensionModule.php:91
 msgid "This web site's policy requires you to log in again to confirm your identity."
 msgstr ""
 
@@ -503,107 +503,107 @@ msgstr ""
 msgid "Simple Registration Extension"
 msgstr ""
 
-#: www/core/Protocols/OpenID/OpenIDModule.php:116
+#: www/core/Protocols/OpenID/OpenIDModule.php:108
 msgid "Invalid OpenID message."
 msgstr ""
 
-#: www/core/Protocols/OpenID/OpenIDModule.php:232
+#: www/core/Protocols/OpenID/OpenIDModule.php:224
 msgid "Protocol Error: openid.return_to not set."
 msgstr ""
 
-#: www/core/Protocols/OpenID/OpenIDModule.php:237
+#: www/core/Protocols/OpenID/OpenIDModule.php:229
 msgid "Protocol Error: openid.identity not set."
 msgstr ""
 
-#: www/core/Protocols/OpenID/OpenIDModule.php:245
+#: www/core/Protocols/OpenID/OpenIDModule.php:237
 msgid "Protocol Error: openid.identity set, but not openid.claimed_id."
 msgstr ""
 
-#: www/core/Protocols/OpenID/OpenIDModule.php:251
+#: www/core/Protocols/OpenID/OpenIDModule.php:243
 msgid "Protocol Error: openid.return_to not set when openid.realm is not set."
 msgstr ""
 
-#: www/core/Protocols/OpenID/OpenIDModule.php:741
+#: www/core/Protocols/OpenID/OpenIDModule.php:737
 msgid "Unable to log into <strong class=\"realm\">@realm</strong>."
 msgstr ""
 
-#: www/core/Protocols/OpenID/OpenIDModule.php:742
+#: www/core/Protocols/OpenID/OpenIDModule.php:738
 msgid "Your current identity does not match the requested identity %identity."
 msgstr ""
 
-#: www/core/Protocols/OpenID/OpenIDModule.php:743
+#: www/core/Protocols/OpenID/OpenIDModule.php:739
 msgid "<a href=\"!url\">Switch to a different user</a> and try again."
 msgstr ""
 
-#: www/core/Protocols/OpenID/OpenIDModule.php:755
+#: www/core/Protocols/OpenID/OpenIDModule.php:751
 msgid "Warning: This web site has not confirmed its identity and might be fraudulent.  Do not share any personal information with this web site unless you are sure it is legitimate. See the <a href=\"!url\" class=\"popup\">SimpleID documentation for details</a> (OpenID version 2.0 return_to discovery failure)"
 msgstr ""
 
-#: www/core/Protocols/OpenID/OpenIDModule.php:757
+#: www/core/Protocols/OpenID/OpenIDModule.php:753
 msgid "This web site has not confirmed its identity and might be fraudulent."
 msgstr ""
 
-#: www/core/Protocols/OpenID/OpenIDModule.php:757
+#: www/core/Protocols/OpenID/OpenIDModule.php:753
 msgid "Are you sure you wish to automatically send your information to this site for any future requests?"
 msgstr ""
 
-#: www/core/Protocols/OpenID/OpenIDModule.php:761
+#: www/core/Protocols/OpenID/OpenIDModule.php:757
 msgid "You are being logged into <strong class=\"realm\">@realm</strong>."
 msgstr ""
 
-#: www/core/Protocols/OpenID/OpenIDModule.php:762
+#: www/core/Protocols/OpenID/OpenIDModule.php:758
 msgid "Automatically send my information to this site for any future requests."
 msgstr ""
 
-#: www/core/Protocols/OpenID/OpenIDModule.php:763
+#: www/core/Protocols/OpenID/OpenIDModule.php:759
 msgid "OK"
 msgstr ""
 
-#: www/core/Protocols/OpenID/OpenIDModule.php:777
+#: www/core/Protocols/OpenID/OpenIDModule.php:773
 msgid "OpenID Login"
 msgstr ""
 
-#: www/core/Protocols/OpenID/OpenIDModule.php:820
+#: www/core/Protocols/OpenID/OpenIDModule.php:816
 msgid "Log in cancelled."
 msgstr ""
 
-#: www/core/Protocols/OpenID/OpenIDModule.php:828
+#: www/core/Protocols/OpenID/OpenIDModule.php:824
 msgid "You were logged in successfully."
 msgstr ""
 
-#: www/core/Protocols/OpenID/OpenIDModule.php:1032
+#: www/core/Protocols/OpenID/OpenIDModule.php:1028
 msgid "<em>You need to set at least one of OpenID 1.x or OpenID 2 to generate the code.</em>"
 msgstr ""
 
-#: www/core/Protocols/OpenID/OpenIDModule.php:1038
+#: www/core/Protocols/OpenID/OpenIDModule.php:1034
 msgid "<link> tags"
 msgstr ""
 
-#: www/core/Protocols/OpenID/OpenIDModule.php:1039
+#: www/core/Protocols/OpenID/OpenIDModule.php:1035
 msgid "OpenID 1.x"
 msgstr ""
 
-#: www/core/Protocols/OpenID/OpenIDModule.php:1040
+#: www/core/Protocols/OpenID/OpenIDModule.php:1036
 msgid "OpenID 2.x"
 msgstr ""
 
-#: www/core/Protocols/OpenID/OpenIDModule.php:1041
+#: www/core/Protocols/OpenID/OpenIDModule.php:1037
 msgid "Claim a different identifier"
 msgstr ""
 
-#: www/core/Protocols/OpenID/OpenIDModule.php:1042
+#: www/core/Protocols/OpenID/OpenIDModule.php:1038
 msgid "YADIS"
 msgstr ""
 
-#: www/core/Protocols/OpenID/OpenIDModule.php:1043
+#: www/core/Protocols/OpenID/OpenIDModule.php:1039
 msgid "Write your own or <a href=\"!url\">download</a> your YADIS document"
 msgstr ""
 
-#: www/core/Protocols/OpenID/OpenIDModule.php:1044
+#: www/core/Protocols/OpenID/OpenIDModule.php:1040
 msgid "Add HTTP headers or <meta> tag, e.g.:"
 msgstr ""
 
-#: www/core/Protocols/OpenID/OpenIDModule.php:1050
+#: www/core/Protocols/OpenID/OpenIDModule.php:1046
 msgid "OpenID 2"
 msgstr ""
 

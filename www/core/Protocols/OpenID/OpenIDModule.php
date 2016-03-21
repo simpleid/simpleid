@@ -734,9 +734,9 @@ class OpenIDModule extends Module implements ProtocolResult {
         $realm = $request->getRealm();
 
         if ($cancel) {
-            $this->f3->set('unable_label', t('Unable to log into <strong class="realm">@realm</strong>.', array('@realm' => $realm)));
-            $this->f3->set('identity_not_matching_label', t('Your current identity does not match the requested identity %identity.', array('%identity' => $request['openid.identity'])));
-            $this->f3->set('switch_user_label', t('<a href="!url">Switch to a different user</a> and try again.', array('!url' => simpleid_url('logout', 'destination=continue&s=' . rawurlencode($request_state), true))));
+            $this->f3->set('unable_label', $this->t('Unable to log into <strong class="realm">@realm</strong>.', array('@realm' => $realm)));
+            $this->f3->set('identity_not_matching_label', $this->t('Your current identity does not match the requested identity %identity.', array('%identity' => $request['openid.identity'])));
+            $this->f3->set('switch_user_label', $this->t('<a href="!url">Switch to a different user</a> and try again.', array('!url' => simpleid_url('logout', 'destination=continue&s=' . rawurlencode($request_state), true))));
         } else {
             $base_path = $this->f3->get('base_path');
             
@@ -748,9 +748,9 @@ class OpenIDModule extends Module implements ProtocolResult {
             
             if ($reason == self::CHECKID_RETURN_TO_SUSPECT) {
                 $this->f3->set('return_to_suspect', true);
-                $this->f3->set('suspect_label', t('Warning: This web site has not confirmed its identity and might be fraudulent.  Do not share any personal information with this web site unless you are sure it is legitimate. See the <a href="!url" class="popup">SimpleID documentation for details</a> (OpenID version 2.0 return_to discovery failure)',
+                $this->f3->set('suspect_label', $this->t('Warning: This web site has not confirmed its identity and might be fraudulent.  Do not share any personal information with this web site unless you are sure it is legitimate. See the <a href="!url" class="popup">SimpleID documentation for details</a> (OpenID version 2.0 return_to discovery failure)',
                     array('!url' => 'http://simpleid.koinic.net/documentation/troubleshooting/returnto-discovery-failure')));
-                $this->f3->set('js_locale', array('openid_suspect' => addslashes(t('This web site has not confirmed its identity and might be fraudulent.')) . '\n\n' . addslashes(t('Are you sure you wish to automatically send your information to this site for any future requests?'))));
+                $this->f3->set('js_locale', array('openid_suspect' => addslashes($this->t('This web site has not confirmed its identity and might be fraudulent.')) . '\n\n' . addslashes($this->t('Are you sure you wish to automatically send your information to this site for any future requests?'))));
                 $this->f3->set('realm_class', 'return-to-suspect');
             }
             
