@@ -55,3 +55,4 @@ Options -Indexes
 
 # Switch register_globals to off
 php_value register_globals 0
+php_flag short_open_tag 0
