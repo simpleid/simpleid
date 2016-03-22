@@ -81,6 +81,7 @@ function cache_get($type, $key) {
 function cache_get_all($type) {
     $r = array();
     
+    if (!is_dir(CACHE_DIR . '/' . $type)) return $r;
     $dir = opendir(CACHE_DIR . '/' . $type);
     
     while (($file = readdir($dir)) !== false) {
@@ -127,6 +128,7 @@ function cache_gc($expiry, $type = NULL) {
                 cache_gc($expiry, $file);
         }
     } else {
+        if (!is_dir(CACHE_DIR . '/' . $type)) return;
         $dir = opendir(CACHE_DIR . '/' . $type);
         while (($file = readdir($dir)) !== false) {
             $filename = CACHE_DIR . '/' . $type . '/' . $file;
