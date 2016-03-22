@@ -101,9 +101,9 @@ class Response extends Message {
     public function set($field, $value, $signed = NULL) {
         $this->container[$field] = $value;
 
-        if ($signed === null) $signed = (!in_array($field, array('sign', 'signature')));
+        if ($signed === null) $signed = (!in_array($field, array('signed', 'sig')));
 
-        if ($signed) $signed_fields[] = $field;
+        if ($signed) $this->signed_fields[] = $field;
     }
 
     /**
@@ -225,6 +225,12 @@ class Response extends Message {
      * @link http://openid.net/specs/openid-authentication-2_0.html#anchor11
      */
     public function getSignatureBaseString() {
+        // Remove duplicates
+        $this->signed_fields = array_keys(array_flip($this->signed_fields));
+
+        // Update signed
+        $this->set('signed', implode(',', $this->signed_fields), false);
+
         return $this->buildSignatureBaseString($this->signed_fields);
     }
 
