@@ -118,14 +118,6 @@ class HTTPResponse {
      * @return string the body of the HTTP response
      */
     public function getBody() {
-        if ($this->hasHeader('Content-Encoding')) {
-            switch ($this->getHeader('Content-Encoding')) {
-                case 'gzip':
-                    return gzdecode($this->body);
-                case 'deflate':
-                    return gzinflate($this->body);
-            }
-        }
         return $this->body;
     }
 
