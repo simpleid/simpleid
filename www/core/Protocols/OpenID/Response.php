@@ -101,7 +101,7 @@ class Response extends Message {
     public function set($field, $value, $signed = NULL) {
         $this->container[$field] = $value;
 
-        if ($signed === null) $signed = (!in_array($field, array('signed', 'sig')));
+        if ($signed === null) $signed = (!in_array($field, array('mode', 'signed', 'sig')));
 
         if ($signed) $this->signed_fields[] = $field;
     }

@@ -146,7 +146,7 @@ class Request extends Message {
     public function getSignatureBaseString() {
         if (!isset($this->container['openid.signed'])) return null;
         $signed_fields = explode(',', $this->container['openid.signed']);
-        return $this->buildSignatureBaseString($this->signed_fields, 'openid.');
+        return $this->buildSignatureBaseString($signed_fields, 'openid.');
     }
 
     /**
