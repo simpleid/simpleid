@@ -228,7 +228,7 @@ function _http_make_request_fsock($url, $headers = array(), $body = NULL, $metho
         $host = $parts['host'];
     } elseif ($parts['scheme'] == 'https') {
         $port = isset($parts['port']) ? $parts['port'] : 443;
-        $host = 'ssl://' . $uri['host'];
+        $host = 'ssl://' . $parts['host'];
     } else {
         $result['error-code'] = 1;
         $result['error'] = 'Unsupported protocol';
@@ -259,7 +259,7 @@ function _http_make_request_fsock($url, $headers = array(), $body = NULL, $metho
     );
 
     if (isset($parts['user']) && isset($parts['pass'])) {
-        $headers['Authorization'] = 'Basic '. base64_encode($uri['user'] . (!empty($uri['pass']) ? ":". $uri['pass'] : ''));
+        $headers['Authorization'] = 'Basic '. base64_encode($parts['user'] . (!empty($parts['pass']) ? ":". $parts['pass'] : ''));
     }
     
     $request = $method . ' '. $path ." HTTP/1.0\r\n";
