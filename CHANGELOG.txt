@@ -1,3 +1,9 @@
+SimpleID 1.0.2
+--------------
+
+- Bug fixes:
+    * #158 Incorrect handling of fsock-based HTTP requests
+
 SimpleID 1.0.1
 --------------
 
