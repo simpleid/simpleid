@@ -134,13 +134,28 @@ allow_autocomplete: false
 #
 openid_verify_return_url: true
 
+# Performs strict verification of realm URLs against return URLs.
+#
+# Under the OpenID specifications, where a realm is specified, it must
+# match the return URL.  However, in some instances, the realm is specified
+# using a http scheme, whereas the return URL is specified using a https
+# scheme, which would fail this verification process.  Setting this option
+# to true will allow for some leniency in this check, allowing for a
+# http/https mismatch.
+#
+# The default is set to true for security reasons.  However, for some
+# misconfigured relying parties, this may need to be set to false.
+#
+openid_strict_realm_check: true
+
+
 #
 # Allowable origins for WebFinger queries.
 #
 # This specifies the origins allowed to access the WebFinger service included
 # with SimpleID.  WebFinger is required for OpenID Connect to function.
 #
-webfinger_access_control_allow_origin: '*'
+webfinger_access_control_allow_origin: '#'
 
 #
 # The locale for the SimpleID user interface.
@@ -161,7 +176,7 @@ date_time_format: '%Y-%m-%d %H:%M:%S %Z'
 #
 # Authentication context class reference.
 #
-# Specify the reference to the *minimum* authentication context class
+# Specify the reference to the#minimum* authentication context class
 # with which your SimpleID server complies.  Note that authentication
 # scheme modules may replace this with a higher authentication context class.
 #

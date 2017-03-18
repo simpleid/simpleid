@@ -101,7 +101,7 @@ class Request extends Message {
      * @return bool true if the URL matches the realm
      * @since 0.6
      */
-    function returnToMatches($realm) {
+    function returnToMatches($realm, $strict = true) {
         $url = parse_url($this->container['openid.return_to']);
         $realm = parse_url($realm);
         
@@ -110,7 +110,11 @@ class Request extends Message {
                 return false;
         }
         
-        if ($url['scheme'] != $realm['scheme']) return false;
+        if ($url['scheme'] != $realm['scheme']) {
+            if ($strict) return false;
+            if ($url['scheme'] != 'https') return false;
+            if ($realm['scheme'] != 'http') return false;
+        }
         
         if (!isset($url['port']))
             $url['port'] = '';

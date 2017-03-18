@@ -425,7 +425,7 @@ class OpenIDModule extends Module implements ProtocolResult {
                     $return_to_uris = array_merge($return_to_uris, $service['uri']);
                 }
                 foreach ($return_to_uris as $return_to) {
-                    if ($request->returnToMatches($return_to)) {
+                    if ($request->returnToMatches($return_to, $config['openid_strict_realm_check'])) {
                         $this->logger->log(LogLevel::INFO, 'OpenID 2 discovery: verified');
                         $verified = TRUE;
                         break;
