@@ -155,7 +155,7 @@ openid_strict_realm_check: true
 # This specifies the origins allowed to access the WebFinger service included
 # with SimpleID.  WebFinger is required for OpenID Connect to function.
 #
-webfinger_access_control_allow_origin: '#'
+webfinger_access_control_allow_origin: '*'
 
 #
 # The locale for the SimpleID user interface.
