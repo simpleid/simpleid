@@ -26,6 +26,7 @@ use Psr\Log\LogLevel;
 use SimpleID\Auth\AuthManager;
 use SimpleID\Module;
 use SimpleID\ModuleManager;
+use SimpleID\Protocols\ProtocolResult;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
 
@@ -35,7 +36,7 @@ use SimpleID\Util\SecurityToken;
  * This module contains basic functions for process authorisation
  * requests and granting access tokens.
  */
-class OAuthModule extends Module {
+class OAuthModule extends Module implements ProtocolResult {
 
     const DEFAULT_SCOPE = 'tag:simpleid.sf.net,2014:oauth:default';
 
