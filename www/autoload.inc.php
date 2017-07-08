@@ -24,7 +24,8 @@ namespace SimpleID\Loader;
 
 $loader = include_once('vendor/autoload.php');
 
-$loader->addPsr4('SimpleID\\', array(__DIR__ . '/core', __DIR__ . '/upgrade'));
+$loader->addPsr4('SimpleID\\Upgrade\\', __DIR__ . '/upgrade');
+$loader->addPsr4('SimpleID\\', __DIR__ . '/core');
 
 return $loader;
 ?>

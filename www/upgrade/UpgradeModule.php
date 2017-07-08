@@ -59,7 +59,7 @@ class UpgradeModule extends Module {
         }
 
         $this->f3->set('upgrade_access_check', $upgrade_access_check);
-        $this->f3->set('@import url(' . $this->f3->get('base_path') . 'upgrade/upgrade.css);');
+        $this->f3->set('css', '@import url(' . $this->f3->get('base_path') . 'upgrade/upgrade.css);');
     }
 
     /**
