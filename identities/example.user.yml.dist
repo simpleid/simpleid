@@ -106,7 +106,7 @@ cert:
     # These two values are then joined together using a semicolon.
     #
     # This option is for advanced users only.  Please see the documentation at
-    # http://simpleid.koinic.net/documentation/advanced-topics/logging-using-client-ssl-certificates
+    # http://simpleid.koinic.net/docs/1/certauth/
     # for details on how to set this up.
     #
     # Note, you must also enable the CertAuthSchemeModule in SimpleID.  To

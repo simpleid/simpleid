@@ -750,7 +750,7 @@ class OpenIDModule extends Module implements ProtocolResult {
             if ($reason == self::CHECKID_RETURN_TO_SUSPECT) {
                 $this->f3->set('return_to_suspect', true);
                 $this->f3->set('suspect_label', $this->t('Warning: This web site has not confirmed its identity and might be fraudulent.  Do not share any personal information with this web site unless you are sure it is legitimate. See the <a href="!url" class="popup">SimpleID documentation for details</a> (OpenID version 2.0 return_to discovery failure)',
-                    array('!url' => 'http://simpleid.koinic.net/documentation/troubleshooting/returnto-discovery-failure')));
+                    array('!url' => 'http://simpleid.koinic.net/docs/1/return_to/')));
                 $this->f3->set('js_locale', array('openid_suspect' => addslashes($this->t('This web site has not confirmed its identity and might be fraudulent.')) . '\n\n' . addslashes($this->t('Are you sure you wish to automatically send your information to this site for any future requests?'))));
                 $this->f3->set('realm_class', 'return-to-suspect');
             }
@@ -1045,7 +1045,7 @@ class OpenIDModule extends Module implements ProtocolResult {
             'id' => 'discovery',
             'title' => $this->t('OpenID 2'),
             'content' => $tpl->render('openid_profile.html', false, $hive),
-            'links' => array(array('href' => 'http://simpleid.koinic.net/documentation/getting-started/setting-identity/claim-your-identifier', 'name' => $this->t('More information'))),
+            'links' => array(array('href' => 'http://simpleid.koinic.net/docs/1/identity-claim/', 'name' => $this->t('More information'))),
             'weight' => 1
         ));
     }
