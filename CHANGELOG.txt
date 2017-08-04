@@ -1,3 +1,18 @@
+SimpleID 1.0.2 - 2016-12-27
+---------------------------
+
+- Bug fixes:
+    * #158 Incorrect handling of fsock-based HTTP requests
+
+SimpleID 1.0.1 - 2016-03-26
+---------------------------
+
+- Bug fixes:
+    * #154 Duplicate random_bytes() function as it is now also a native
+      function in PHP7
+    * #155 Infinite loop in cache.inc if a particular cache type has not been
+      created
+
 SimpleID 1.0
 ------------
 
