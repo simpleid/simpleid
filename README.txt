@@ -36,13 +36,13 @@ Installation
 ------------
 
 For installation instructions, please see the SimpleID Getting Started Guide at
-<http://simpleid.koinic.net/documentation/getting-started>.
+<http://simpleid.koinic.net/docs/1/#getting-started>.
 
 Documentation
 -------------
 
 Documentation for SimpleID can be found at
-<http://simpleid.koinic.net/documentation>.
+<http://simpleid.koinic.net/docs/1/>.
 
 Licensing
 ---------

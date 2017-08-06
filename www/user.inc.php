@@ -529,7 +529,7 @@ function user_login_form($destination = '', $state = NULL, $fixed_uid = NULL, $m
             // Note this is called from user_login(), so $_POST is always filled
             $xtpl->assign('otp_instructions_label', t('To verify your identity, enter the verification code.'));
             $xtpl->assign('otp_recovery_label', t('If you have lost your verification code, you can <a href="!url">recover your account</a>.',
-                array('!url' => 'http://simpleid.koinic.net/documentation/troubleshooting/login-verification-recovery')
+                array('!url' => 'http://simpleid.koinic.net/docs/1/common-problems/#otp')
             ));
 
             $xtpl->assign('otp_label', t('Verification code:'));
@@ -624,7 +624,7 @@ function user_otp_page() {
 
     $xtpl->assign('about_otp', t('Login verification adds an extra layer of protection to your account. When enabled, you will need to enter an additional security code whenever you log into SimpleID.'));
     $xtpl->assign('otp_warning', t('<strong>WARNING:</strong> If you enable login verification and lose your authenticator app, you will need to <a href="!url">edit your identity file manually</a> before you can log in again.',
-        array('!url' => 'http://simpleid.koinic.net/documentation/troubleshooting/login-verification-recovery')
+        array('!url' => 'http://simpleid.koinic.net/docs/1/common-problems/#otp')
     ));
 
     $xtpl->assign('setup_otp', t('To set up login verification, following these steps.'));
@@ -776,7 +776,7 @@ function _user_page_profile() {
     global $user;
     
     $html = '<p>' . t('SimpleID may, with your consent, send the following information to sites which supports OpenID Connect.') . '</p>';    
-    $html .= '<p>' . t('To change these, <a href="!url">edit your identity file</a>.', array('!url' => 'http://simpleid.koinic.net/documentation/getting-started/setting-identity/identity-files')) . '</p>';
+    $html .= '<p>' . t('To change these, <a href="!url">edit your identity file</a>.', array('!url' => 'http://simpleid.koinic.net/docs/1/identity-files/')) . '</p>';
     
     $html .= "<table><tr><th>" . t('Member') . "</th><th>" . t('Value') . "</th></tr>";
     

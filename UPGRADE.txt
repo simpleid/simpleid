@@ -9,7 +9,7 @@ As a result, it is very important to upgrade SimpleID when a new version is
 released.
 
 General information on upgrading can be found at
-<http://simpleid.koinic.net/documentation/getting-started/upgrading>.
+<http://simpleid.koinic.net/docs/1/upgrading/>.
 
 This document sets out the additional steps which may need to be performed to
 upgrade to a specific version of SimpleID.
@@ -42,7 +42,7 @@ changes are:
         certificate to the server at no extra cost.
 
 For further information on the revised system requirements, see the SimpleID
-web site at http://simpleid.koinic.net/node/58
+web site at <http://simpleid.koinic.net/docs/1/system-requirements/>
 
 2. Enhanced password security
 
