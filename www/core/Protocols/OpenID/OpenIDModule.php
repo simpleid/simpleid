@@ -65,7 +65,7 @@ class OpenIDModule extends Module implements ProtocolResult {
             $this->start(new Request($_request));
             return true;
         } elseif ($content_type == 'application/xrds+xml') {
-            $this->xrds();
+            $this->providerXRDS();
             return true;
         } else {
             // Point to SimpleID's XRDS document
