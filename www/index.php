@@ -38,11 +38,14 @@ include_once "version.inc.php";
 include_once "locale.inc.php";
 
 // Check if the configuration file has been defined
-if (!file_exists('config.php')) {
+if (file_exists('conf/config.php')) {
+    include_once 'conf/config.php';
+} elseif (file_exists('config.php')) {
+    include_once 'config.php';
+} else {
     die(t('No configuration file found.  See the <a href="!url">manual</a> for instructions on how to set up a configuration file.', array('!url' => 'http://simpleid.koinic.net/docs/1/installing/')));
 }
 
-include_once "config.php";
 include_once "config.default.php";
 include_once "log.inc.php";
 include_once "common.inc.php";
