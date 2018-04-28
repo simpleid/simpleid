@@ -51,6 +51,9 @@ class ConnectSessionModule extends Module {
         print $tpl->render('connect_check_session.html');
     }
 
+    /**
+     * Logout endpoint
+     */
     public function logout($f3, $params) {
         $token = new SecurityToken();
 
@@ -81,6 +84,10 @@ class ConnectSessionModule extends Module {
                 }*/
             }
             // Save state [post_logout_redirect_uri, state], set destination and prompts
+            $form_state = array(
+                'r' => $this->f3->get('REQUEST.post_logout_redirect_uri'),
+                's' => $this->f3->get('REQUEST.state')
+            );
 
             // logout form
             
@@ -89,11 +96,19 @@ class ConnectSessionModule extends Module {
         }
     }
 
-
+    /**
+     * Builds the OpenID Connect Session Management response on a successful
+     * authentication.
+     * 
+     * @see SimpleID\API\OAuthHooks::oAuthGrantAuthHook()
+     */
     public function oAuthGrantAuthHook($authorization, $request, $response, $scopes) {
         $response['session_state'] = $this->buildSessionState($request['client_id'], $request['redirect_uri']);
     }
 
+    /**
+     * @see SimpleID\API\ConnectHooks::connectConfigurationHook()
+     */
     public function connectConfigurationHook() {
         return array(
             'check_session_iframe' => $this->getCanonicalURL('@connect_check_session', '', 'https'),
