@@ -22,6 +22,7 @@
 
 namespace SimpleID\Protocols\OAuth;
 
+use Fernet\Fernet;
 use Psr\Log\LogLevel;
 use SimpleID\Auth\AuthManager;
 use SimpleID\Module;
@@ -370,7 +371,12 @@ class OAuthModule extends Module implements ProtocolResult {
         $user->addActivity($cid, $activity);
 
         if ($request->paramContains('response_type', 'code')) {
-            $response['code'] = $authorization->issueCode((isset($request['redirect_uri'])) ? $request['redirect_uri'] : NULL);
+            $additional = array();
+            if (isset($request['code_challenge'])) {
+                $additional['code_challenge'] = $request['code_challenge'];
+                $additional['code_challenge_method'] = (isset($request['code_challenge_method'])) ? $request['code_challenge_method'] : 'plain';
+            }
+            $response['code'] = $authorization->issueCode((isset($request['redirect_uri'])) ? $request['redirect_uri'] : NULL, NULL, $additional);
         }
 
         if ($request->paramContains('response_type', 'token')) {
@@ -488,6 +494,37 @@ class OAuthModule extends Module implements ProtocolResult {
                 return;
             }
         }
+
+        // 5. PKCE
+        $additional = $code->getAdditional();
+        if (isset($additional['code_challenge'])) {
+            if (!isset($request['code_verifier'])) {
+                $this->logger->log(LogLevel::ERROR, 'Token request failed: code_verifier not found');
+                $response->setError('invalid_grant', 'code_verifier not found');
+                return;
+            }
+
+            $code_verified = false;
+            switch ($additional['code_challenge_method']) {
+                case 'plain':
+                    $test_code_challenge = $request['code_verifier'];
+                    break;
+                case 'S256':
+                    $test_code_challenge = Fernet::base64url_encode(hash('sha256', $request['code_verifier'], true));                    
+                    break;
+                default:
+                    $this->logger->log(LogLevel::ERROR, 'Token request failed: unknown code_challenge_method: ' . $additional['code_challenge_method']);
+                    $response->setError('invalid_grant', 'unknown code_challenge_method');
+                    return;
+            }
+            $code_verified = $this->secureCompare($test_code_challenge, $additional['code_challenge']);
+            if (!$code_verified) {
+                $this->logger->log(LogLevel::ERROR, 'Token request failed: code_challenge in request <' . $test_code_challenge . '> does not match stored code_challenge <' . $additional['code_challenge'] . '>');
+                $response->setError('invalid_grant', 'code_verifier does not match');
+                return;
+            }
+        }
+
         $scope = $code->getScope();
 
         // If we issue, we delete the code so that it can't be used again
