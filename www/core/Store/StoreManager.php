@@ -222,8 +222,9 @@ class StoreManager extends Prefab {
     public function saveUser($user) {
         if ($this->getStore('user:write', false) != null) {
             $this->save('user', $user);
+        } else {
+            $this->save('user_cfg', $user);
         }
-        $this->save('user_cfg', $user);
     }
 
     /**
@@ -334,7 +335,7 @@ class StoreManager extends Prefab {
         if (isset($this->stores[$store])) return $this->stores[$store];
         if ($type != 'keyvalue') return $this->getStore('keyvalue:' . $op);
 
-        return NULL;
+        return null;
     }
 }
 

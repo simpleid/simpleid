@@ -46,23 +46,5 @@ abstract class AuthSchemeModule extends Module {
         $this->auth = AuthManager::instance();
         $this->mgr = ModuleManager::instance();
     }
-
-    /**
-     * Compares two strings using the same time whether they're equal or not.
-     * This function should be used to mitigate timing attacks when, for
-     * example, comparing password hashes
-     *
-     * @param string $str1
-     * @param string $str2
-     * @return bool true if the two strings are equal
-     */
-    public function secureCompare($str1, $str2) {
-        if (function_exists('hash_equals')) return hash_equals($str1, $str2);
-
-        $xor = $str1 ^ $str2;
-        $result = strlen($str1) ^ strlen($str2); //not the same length, then fail ($result != 0)
-        for ($i = strlen($xor) - 1; $i >= 0; $i--) $result += ord($xor[$i]);
-        return !$result;
-    }
 }
 ?>

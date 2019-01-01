@@ -154,8 +154,13 @@ class SecurityToken {
      * Deletes any expired tokens.
      */
     public function gc() {
-        $cache = \Cache::instance();
-        $cache->reset('.token', SIMPLEID_HUMAN_TOKEN_EXPIRES_IN);
+        /* FatFree 3.6.1 removed the $lifetime parameter in $cache->reset() as
+         * part of its support for memcached.  Garbage collection occurs
+         * automatically in $cache->exists() and $cache->get(), so this is
+         * strictly not necessary
+         */
+        //$cache = \Cache::instance();
+        //$cache->reset('.token', SIMPLEID_HUMAN_TOKEN_EXPIRES_IN);
     }
 
     /**

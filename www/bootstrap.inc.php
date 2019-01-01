@@ -62,10 +62,14 @@ $default_config = array(
 );
 
 // Check if the configuration file has been defined
-if (!file_exists('config.php')) {
+if (file_exists('conf/config.php')) {
+    include_once 'conf/config.php';
+} elseif (file_exists('config.php')) {
+    include_once 'config.php';
+} else {
     die('No configuration file found.  See <http://simpleid.koinic.net/docs/2/installing/> for instructions on how to set up a configuration file.');
 }
-include_once 'config.php';
+
 
 $f3 = \Base::instance();
 
