@@ -94,6 +94,21 @@ abstract class AuthHooks {
     abstract function loginFormCancelled($form_state);
 
     /**
+     * Provides additional user interface actions after a user has been logged out.
+     * User interface actions can include redirecting to a different URI, or
+     * displaying another form.     
+     *
+     * Note that this hook is invoked only if the log out is initiated by the user.
+     * It is not invoked if the user is logged out automatically.
+     *
+     * The hook is responsible for all aspects of the rendering of the user
+     * interface.
+     *
+     * @return bool|null the result of the processing
+     */
+    abstract function logoutCompleteHook();
+
+    /**
      * Logs in a user.
      *
      * This hook is triggered when all the authentication components are completed.
