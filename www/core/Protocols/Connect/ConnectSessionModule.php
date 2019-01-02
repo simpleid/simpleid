@@ -116,18 +116,38 @@ class ConnectSessionModule extends Module {
         );
     }
 
+    /**
+     * Builds a session state.  The session state is bound to:
+     *
+     * - the client ID
+     * - the origin of the redirect URI
+     * - the user agent login state {@link \SimpleID\Auth\AuthManager::assignUALoginState()}
+     *
+     * @param string $client_id the client ID
+     * @param string $redirect_uri the redirect URI
+     * @return string the session state
+     * @link https://openid.net/specs/openid-connect-session-1_0.html#CreatingUpdatingSessions
+     */
     private function buildSessionState($client_id, $redirect_uri) {
         $auth = AuthManager::instance();
         $rand = new Random();
 
         $origin = $this->getOrigin($redirect_uri);
+
         $uals = $auth->assignUALoginState();
         $salt = $rand->secret(8);
         return hash_hmac('sha256', $client_id . ' ' . $origin . ' ' . $salt, $uals) . '.' . $salt;
     }
 
-    private function getOrigin($redirect_uri) {
-        $parts = parse_url($redirect_uri);
+    /**
+     * Gets the origin of a URI
+     *
+     * @param string $uri the URI
+     * @return string the origin
+     * @link https://www.rfc-editor.org/rfc/rfc6454.txt
+     */
+    private function getOrigin($uri) {
+        $parts = parse_url($uri);
         
         $origin = $parts['scheme'] . '://';
         $origin .= $parts['host'];

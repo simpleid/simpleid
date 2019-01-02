@@ -51,6 +51,7 @@
 
                 var uals = cookies[cookie_name];
 
+                // This needs to match ConnectSessionModule::buildSessionState
                 var expected_session_state = CryptoJS.HmacSHA256(client_id + ' ' + ev.origin + ' ' + salt, uals) + '.' + salt;
 
                 if (secure_compare(session_state, expected_session_state)) {
