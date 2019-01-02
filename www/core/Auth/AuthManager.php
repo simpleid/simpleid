@@ -253,7 +253,7 @@ class AuthManager extends Prefab {
     public function logout() {
         $user = $this->getUser();
     
-        $this->mgr->invokeAll('logout');
+        $this->mgr->invokeAll('logout', $user);
 
         $this->cache->clear(rawurlencode($user['uid']) . '.login');
         $this->f3->clear('user');

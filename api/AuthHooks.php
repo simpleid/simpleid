@@ -119,9 +119,10 @@ abstract class AuthHooks {
      * This hook can be used to clean up any saved information when a user
      * logs out
      *
+     * @param SimpleID\Models\User $user the user to be logged out
      * @since 2.0
      */
-    abstract function logoutHook();
+    abstract function logoutHook($user);
 
     /**
      * Returns an array of data paths from the User object that should

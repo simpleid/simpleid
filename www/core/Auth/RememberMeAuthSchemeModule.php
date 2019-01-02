@@ -147,7 +147,7 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
      *
      * @see SimpleID\API\AuthHooks::logoutHook()
      */
-    public function logoutHook() {
+    public function logoutHook($user) {
         if ($this->f3->exists('COOKIE.' . $this->cookie_name)) {
             $cookie = $this->f3->clear('COOKIE.' . $this->cookie_name);
         }
