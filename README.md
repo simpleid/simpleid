@@ -74,6 +74,11 @@ by Jerome Etienne.
 Licensing information for this library can be found at
 <https://github.com/jeromeetienne/jquery-qrcode/blob/master/MIT-LICENSE.txt>.
 
+SimpleID uses the [crypto-js library](https://github.com/brix/crypto-js),
+by Jeff Mott and Evan Vosberg.
+Licensing information for this library can be found at
+<https://raw.githubusercontent.com/brix/crypto-js/master/LICENSE>.
+
 SimpleID uses [normalize.css style sheet](http://necolas.github.io/normalize.css/),
 by Nicolas Gallagher and Jonathan Neal.
 Licensing information for this library can be found at
