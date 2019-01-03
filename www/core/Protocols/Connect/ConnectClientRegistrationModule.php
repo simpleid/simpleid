@@ -86,7 +86,7 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
                 'default_acr_values' => 'connect.default_acr_values',
                 'initiate_login_uri' => 'connect.initiate_login_uri',
                 'request_uris' => 'connect.request_uris',
-                'post_logout_redirect_uri' => 'connect.post_logout_redirect_uri',
+                'post_logout_redirect_uris' => 'connect.post_logout_redirect_uris',
             );
         }
     }

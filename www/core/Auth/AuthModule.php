@@ -188,10 +188,14 @@ class AuthModule extends Module {
         $this->auth->logout();
 
         $results = $this->mgr->invokeAll('logoutComplete');
-    
+
         if (!$results) {
-            $this->f3->set('message', $this->t('You have been logged out.'));
-            $this->loginForm($params);            
+            if ($params['destination']) {
+                $this->f3->reroute('/' . $params['destination']);
+            } else {
+                $this->f3->set('message', $this->t('You have been logged out.'));
+                $this->loginForm($params);
+            }
         }
     }
 

@@ -25,16 +25,18 @@ namespace SimpleID\Protocols\Connect;
 use Psr\Log\LogLevel;
 use SimpleID\Auth\AuthManager;
 use SimpleID\Crypt\Random;
+use SimpleID\Protocols\Connect\ConnectModule;
 use SimpleID\Protocols\OAuth\Response;
+use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
 use SimpleID\Module;
-use SimpleJWT\JWT;
+use SimpleJWT\InvalidTokenException;
 
 class ConnectSessionModule extends Module {
     static function routes($f3) {
         $f3->route('GET @connect_check_session: /connect/session', 'SimpleID\Protocols\Connect\ConnectSessionModule->check_session');
-        $f3->route('GET @connect_logout: /connect/logout', 'SimpleID\Protocols\Connect\ConnectSessionModule->logout');
-        $f3->route('GET /connect/logout/@token', 'SimpleID\Protocols\Connect\ConnectSessionModule->logout');
+        $f3->route('GET|POST @connect_logout: /connect/logout', 'SimpleID\Protocols\Connect\ConnectSessionModule->logout');
+        $f3->route('GET @connect_logout_complete: /connect/logout_complete/@token', 'SimpleID\Protocols\Connect\ConnectSessionModule->logoutComplete');
     }
 
     /**
@@ -52,48 +54,133 @@ class ConnectSessionModule extends Module {
     }
 
     /**
-     * Logout endpoint
+     * Relying party-initiated logout endpoint
      */
     public function logout($f3, $params) {
-        $token = new SecurityToken();
+        $store = StoreManager::instance();
+        $auth = AuthManager::instance();
 
-        if (isset($params['token'])) {
-            // All done, redirect to post_logout_redirect_uri
-            $payload = $token->getPayload($params['token']);
+        if ($this->f3->exists('POST.fs') !== false) {            
+            $token = new SecurityToken();
+            $form_state = $token->getPayload($this->f3->get('POST.fs'));
 
-            if ($payload === null) {
-                $this->f3->fatalError($this->t('Invalid request.'));
+            if (!$token->verify($this->f3->get('POST.tk'), 'connect_logout')) {
+                $this->logger->log(LogLevel::WARNING, 'Security token ' . $this->f3->get('POST.tk') . ' invalid.');
+                $this->f3->set('message', $this->t('SimpleID detected a potential security attack.  Please try again.'));
+                $this->logoutForm($form_state);
                 return;
             }
 
-            $response = new Response();
-            if (isset($payload['s'])) $response['state'] = $payload['s'];
-            $response->renderRedirect($payload['r']);
+            if ($this->f3->get('POST.op') == $this->t('Cancel')) {
+                if ($form_state['connect_logout']['post_logout_redirect_uri']) {
+                    $response = new Response();
+                    if (isset($form_state['connect_logout']['state'])) $response['state'] = $form_state['connect_logout']['state'];
+                    $response->renderRedirect($form_state['connect_logout']['post_logout_redirect_uri']);
+                } else {
+                    $this->f3->set('message', $this->t('Log out cancelled.'));
+
+                    $index_module = $this->mgr->getModule('SimpleID\Base\IndexModule');
+                    $index_module->index();                    
+                }
+                return;
+            } else {
+                if ($form_state['connect_logout']['post_logout_redirect_uri']) {
+                    // set up continue param and redirect
+                    $state = array('rt' => 'connect/logout_complete/' . $token->generate($form_state['connect_logout']));
+
+                    $destination = 'continue/' . rawurlencode($token->generate($state));
+                    $this->f3->reroute('@auth_logout(1=' . $destination . ')');
+                } else {
+                    $this->f3->reroute('@auth_logout');
+                }
+            }
         } else {
-            // if id_token_hint AND current user, then do not prompt, otherwise, do
+            $form_state = array('connect_logout' => array());
+            if ($this->f3->exists('REQUEST.state')) $form_state['connect_logout']['state'] = $this->f3->get('REQUEST.state');
+
+            // Check for id_token_hint.  If it is a valid ID token AND it is the
+            // current logged in user, then we can proceed with log out.  Otherwise
+            // we ignore the logout request
             if ($this->f3->exists('REQUEST.id_token_hint')) {
                 try {
-                    $jwt = JWT::decode($request['id_token_hint']);
-                    $user_match = ($jwt->getClaim('sub') == $this->getSubject($auth->getUser(), $client));
-                } catch (CryptException $e) {
-                    $user_match = false;
-                }/*
-                if (!$user_match) {
-                    $auth->logout();
-                    return OAuthModule::LOGIN_REQUIRED;
-                }*/
-            }
-            // Save state [post_logout_redirect_uri, state], set destination and prompts
-            $form_state = array(
-                'r' => $this->f3->get('REQUEST.post_logout_redirect_uri'),
-                's' => $this->f3->get('REQUEST.state')
-            );
+                    $id_token_hint = $this->f3->get('REQUEST.id_token_hint');
+                    list($headers, $claims, $signing_input, $signature) = JWT::deserialise($id_token_hint);
 
-            // logout form
-            
-            $this->f3->set('destination', '/connect/logout/' . $token->generate($form_state));  // CHECK this
-            $this->f3->reroute('@auth_logout');
+                    $client_id = $claims['aud'];
+                    $sub = $claims['sub'];
+
+                    $client = $store->loadClient($client_id, 'SimpleID\Protocols\OAuth\OAuthClient');
+
+                    $user_match = $client && ($sub == ConnectModule::getSubject($auth->getUser(), $client));
+
+                    if ($client && $client['connect']['post_logout_redirect_uris'] && $this->f3->exists('REQUEST.post_logout_redirect_uri')) {
+                        $post_logout_redirect_uri = $this->f3->get('REQUEST.post_logout_redirect_uri');
+
+                        if (in_array($post_logout_redirect_uri, $client['connect']['post_logout_redirect_uris']))
+                            $form_state['connect_logout']['post_logout_redirect_uri'] = $post_logout_redirect_uri;
+                    }
+                } catch (InvalidTokenException $e) {
+                    $user_match = false;
+                }
+
+                if ($user_match) {
+                    $this->logoutForm($form_state);
+                } else {
+                    // The user that the id_token_hint points to is not the same user as the one
+                    // currently logged in.
+                    $this->fatalError($this->t('The requested user has already logged out of SimpleID.'));
+                }
+            } elseif ($auth->isLoggedIn()) {
+                // Prompt for log out
+                $this->logoutForm($form_state);
+            } else {
+                // User has already been logged out
+                $this->f3->set('message', $this->t('You have been logged out.'));
+                $auth_module = $this->mgr->getModule('SimpleID\Auth\AuthModule');
+                $auth_module->loginForm();
+                return;
+            }
         }
+    }
+
+    protected function logoutForm($form_state = array()) {
+        $tpl = new \Template();
+
+        $this->f3->set('logout_consent_label', $this->t('Do you wish to log out of SimpleID as well?');
+        
+        $token = new SecurityToken();
+        $this->f3->set('tk', $token->generate('connect_logout', SecurityToken::OPTION_BIND_SESSION));
+        $this->f3->set('fs', $token->generate($form_state));
+
+        // logout_label is already defined in Module
+        $this->f3->set('cancel_button', $this->t('Cancel'));
+
+        $this->f3->set('user_header', true);
+        $this->f3->set('framekiller', true);
+        $this->f3->set('title', $this->t('Log out'));
+        $this->f3->set('page_class', 'dialog-page');
+        $this->f3->set('layout', 'connect_logout.html');
+        
+        header('X-Frame-Options: DENY');
+        print $tpl->render('page.html');
+    }
+
+    /**
+     * 
+     */
+    public function logoutComplete($f3, $params) {
+        $token = new SecurityToken();
+
+        $payload = $token->getPayload($params['token']);
+
+        if ($payload === null) {
+            $this->f3->fatalError($this->t('Invalid request.'));
+            return;
+        }
+
+        $response = new Response();
+        if (isset($payload['state'])) $response['state'] = $payload['state'];
+        $response->renderRedirect($payload['post_logout_redirect_uri']);
     }
 
     /**

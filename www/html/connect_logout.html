@@ -1,0 +1,10 @@
+<form action="{{ @base_path }}connect/logout" method="post" enctype="application/x-www-form-urlencoded" id="rp-form">
+    <input type="hidden" name="fs" value="{{ @@fs }}">
+    <input type="hidden" name="tk" value="{{ @@tk }}">    
+    
+    <p>{{ @logout_consent_label | raw }}</p>
+    
+    <input type="submit" name="op" id="edit-submit" value="{{ @logout_label }}" class="form-default" />
+    <input type="submit" name="op" id="edit-cancel" value="{{ @cancel_button }}" />
+</form>
+

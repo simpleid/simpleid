@@ -35,6 +35,7 @@ use SimpleID\Store\StoreManager;
 use SimpleID\Util\HTTPResponse;
 use SimpleJWT\Util\Helper;
 use SimpleJWT\JWT;
+use SimpleJWT\InvalidTokenException;
 use SimpleJWT\Crypt\Algorithm;
 use SimpleJWT\Crypt\AlgorithmFactory;
 use SimpleJWT\Keys\KeySet;
@@ -182,9 +183,9 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
         // Check 2: If id_token_hint is provided, check that it refers to the current logged-in user
         if (isset($request['id_token_hint'])) {
             try {
-                $jwt = JWT::decode($request['id_token_hint']);
-                $user_match = ($jwt->getClaim('sub') == $this->getSubject($auth->getUser(), $client));
-            } catch (CryptException $e) {
+                list($headers, $claims, $signing_input, $signature) = JWT::deserialise($request['id_token_hint']);
+                $user_match = ($claims['sub'] == self::getSubject($auth->getUser(), $client));
+            } catch (InvalidTokenException $e) {
                 $user_match = false;
             }
             if (!$user_match) {
@@ -376,7 +377,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
 
         $claims = array();
 
-        $claims['sub'] = $this->getSubject($user, $client);
+        $claims['sub'] = self::getSubject($user, $client);
 
         if ($claims_requested != null) {
             foreach ($claims_requested as $claim => $properties) {
@@ -443,7 +444,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
      * ID token will be sent
      * @return string the subject
      */
-    protected function getSubject($user, $client) {
+    public static function getSubject($user, $client) {
         if (isset($client['connect']['sector_identifier_uri'])) {
             $sector_id = parse_url($client['connect']['sector_identifier_uri'], PHP_URL_HOST);
         } elseif (is_string($client['oauth']['redirect_uris'])) {
