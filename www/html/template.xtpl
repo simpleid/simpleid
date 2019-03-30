@@ -327,7 +327,7 @@
             <address>
                 SimpleID {version} &copy; Kelvin Mo &middot;
                 <a href="http://simpleid.koinic.net/docs/1/">{footer_doc}</a> &middot;
-                <a href="http://trac.simpleid.koinic.net/">{footer_support}</a>
+                <a href="http://github.com/simpleid/simpleid/">{footer_support}</a>
             </address>
         </div>
 
