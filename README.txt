@@ -11,7 +11,7 @@ SimpleID 2.0 is almost a complete rewrite of SimpleID and is not
 backwards compatible this version.
 
 The latest version of SimpleID can be found in the SimpleID web page at
-<http://simpleid.koinic.net/>
+<http://simpleid.org/>
 
 Upgrading
 ---------
@@ -36,13 +36,13 @@ Installation
 ------------
 
 For installation instructions, please see the SimpleID Getting Started Guide at
-<http://simpleid.koinic.net/docs/1/#getting-started>.
+<http://simpleid.org/docs/1/#getting-started>.
 
 Documentation
 -------------
 
 Documentation for SimpleID can be found at
-<http://simpleid.koinic.net/docs/1/>.
+<http://simpleid.org/docs/1/>.
 
 Licensing
 ---------
@@ -54,7 +54,7 @@ Donate
 
 If you enjoy using SimpleID, please consider making a donation to support the
 ongoing development work.  To find out more on how to donate, visit
-<http://simpleid.koinic.net/donate>.
+<http://simpleid.org/donate>.
 
 Your donation is very much appreciated.
 

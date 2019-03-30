@@ -111,7 +111,7 @@ pass="906ae7ffe4d00616daf099c74dcb51b86057f51531123c8039007b53176ae0e5:pbkdf2:sh
 ; These two values are then joined together using a semicolon.
 ;
 ; This option is for advanced users only.  Please see the documentation at
-; http://simpleid.koinic.net/docs/1/certauth/
+; http://simpleid.org/docs/1/certauth/
 ; for details on how to set this up.
 ;
 ; Note, you must also enable the certauth extension in SimpleID.  To
@@ -170,7 +170,7 @@ pass="906ae7ffe4d00616daf099c74dcb51b86057f51531123c8039007b53176ae0e5:pbkdf2:sh
 ; in your details.
 ;
 ; Further information on the Simple Registration Extension can be found at
-; http://simpleid.koinic.net/docs/1/extensions-bundled/#sreg
+; http://simpleid.org/docs/1/extensions-bundled/#sreg
 ;
 ; Note, you must also enable the Simple Registration Extension in SimpleID.  To
 ; do this, make sure the SIMPLEID_EXTENSIONS option in config.php contains
@@ -229,5 +229,5 @@ pass="906ae7ffe4d00616daf099c74dcb51b86057f51531123c8039007b53176ae0e5:pbkdf2:sh
 ;[ax]
 ;http://openid.net/schema/company/name="Example Company Limited"
 ;http://openid.net/schema/company/title="Managing Director"
-;http://openid.net/schema/contact/web/blog="http://simpleid.koinic.net/"
+;http://openid.net/schema/contact/web/blog="http://simpleid.org/"
 

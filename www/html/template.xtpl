@@ -43,7 +43,7 @@
         <div id="header"><div id="header-inner">
             <!-- BEGIN: nav_toggle --><div id="nav-toggle"><img src="{base_path}html/nav-toggle.png" /></div><!-- END: nav_toggle -->
             <div id="logo">
-                <h1><a href="http://simpleid.koinic.net/">SimpleID</a> <span class="version">{version}</span></h1>
+                <h1><a href="http://simpleid.org/">SimpleID</a> <span class="version">{version}</span></h1>
             </div>
             <!-- BEGIN: user -->
             <div id="user-toggle"><img src="{base_path}html/user-toggle.png" /></div>
@@ -326,7 +326,7 @@
         <div id="footer">
             <address>
                 SimpleID {version} &copy; Kelvin Mo &middot;
-                <a href="http://simpleid.koinic.net/docs/1/">{footer_doc}</a> &middot;
+                <a href="http://simpleid.org/docs/1/">{footer_doc}</a> &middot;
                 <a href="http://github.com/simpleid/simpleid/">{footer_support}</a>
             </address>
         </div>
@@ -391,6 +391,7 @@
         <!-- BEGIN: op_xrds -->
         <Service>
             <Type>http://specs.openid.net/auth/2.0/server</Type>
+            <!-- Keep old domain -->
             <Type>http://simpleid.koinic.net/type/version#{version}</Type>
             <!-- BEGIN: type --><Type>{uri}</Type><!-- END: type -->
             <URI>{simpleid_base_url}</URI>
