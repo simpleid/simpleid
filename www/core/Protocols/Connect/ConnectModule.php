@@ -74,12 +74,12 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
 
         if (!is_readable($config['public_jwks_file'])) {
             $this->f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'Public JSON web key file not found.');
-            $this->f3->error(500, $this->t('Public JSON web key file not found.  See the <a href="!url">manual</a> for instructions on how to set up OpenID Connect on SimpleID.', array('!url' => 'http://simpleid.koinic.net/docs/2/installing/#keys')));
+            $this->f3->error(500, $this->t('Public JSON web key file not found.  See the <a href="!url">manual</a> for instructions on how to set up OpenID Connect on SimpleID.', array('!url' => 'http://simpleid.org/docs/2/installing/#keys')));
         }
 
         if (!is_readable($config['private_jwks_file'])) {
             $this->f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'Private JSON web key file not found.');
-            $this->f3->error(500, $this->t('Private JSON web key file not found.  See the <a href="!url">manual</a> for instructions on how to set up OpenID Connect on SimpleID.', array('!url' => 'http://simpleid.koinic.net/docs/2/installing/#keys')));
+            $this->f3->error(500, $this->t('Private JSON web key file not found.  See the <a href="!url">manual</a> for instructions on how to set up OpenID Connect on SimpleID.', array('!url' => 'http://simpleid.org/docs/2/installing/#keys')));
         }
     }
 
@@ -560,7 +560,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
             'request_parameter_supported' => true,
             'request_uri_parameter_supported' => true,
             'require_request_uri_registration' => false,
-            'service_documentation' => 'http://simpleid.koinic.net/docs/'
+            'service_documentation' => 'http://simpleid.org/docs/'
         );
         
         $config = array_merge($config, $mgr->invokeAll('connectConfiguration'));

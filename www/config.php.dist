@@ -85,7 +85,7 @@ store_dir: '@@STORE_DIR@@'
 # used for JSON web tokens.  These are mandatory if you want to
 # use OpenID Connect.
 #
-# See http://simpleid.koinic.net/docs/2/installing/#keys on how
+# See http://simpleid.org/docs/2/installing/#keys on how
 # to create a key pair and convert them to JSON Web Key Set format.
 #
 #

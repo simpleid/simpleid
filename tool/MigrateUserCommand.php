@@ -77,7 +77,7 @@ class MigrateUserCommand extends Command {
             } else {
                 $stderr->writeln('<error>Password not converted as it no longer complies with SimpleID 2 requirements.</error>');
                 $stderr->writeln('<error>Use simpleid-tool passwd to encrypt a new password.</error>');
-                $stderr->writeln('<error>See http://simpleid.koinic.net/docs/2/migrating/#password for details</error>');
+                $stderr->writeln('<error>See http://simpleid.org/docs/2/migrating/#password for details</error>');
                 $user['password']['password'] = '[ENCODE YOUR NEW PASSWORD HERE]';
             }
         }

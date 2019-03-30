@@ -69,9 +69,9 @@ class UpgradeModule extends Module {
         $tpl = new \Template();
         
         $this->f3->set('intro',$this->t('Use this script to update your installation whenever you upgrade to a new version of SimpleID.'));
-        $this->f3->set('simpleid_docs', $this->t('For more detailed information, see the <a href="!url">SimpleID documentation</a>.', array('!url' => 'http://simpleid.koinic.net/documentation/getting-started/upgrading')));
+        $this->f3->set('simpleid_docs', $this->t('For more detailed information, see the <a href="!url">SimpleID documentation</a>.', array('!url' => 'http://simpleid.org/documentation/getting-started/upgrading')));
         $this->f3->set('step1', $this->t('<strong>Back up your installation</strong>. This process will change various files within your SimpleID installation and in case of emergency you may need to revert to a backup.'));
-        $this->f3->set('step2', $this->t('Install your new files in the appropriate location, as described in the <a href="!url">SimpleID documentation</a>.', array('!url' => 'http://simpleid.koinic.net/documentation/getting-started/installing-simpleid')));
+        $this->f3->set('step2', $this->t('Install your new files in the appropriate location, as described in the <a href="!url">SimpleID documentation</a>.', array('!url' => 'http://simpleid.org/documentation/getting-started/installing-simpleid')));
         $this->f3->set('click_continue', $this->t('When you have performed the steps above, click <strong>Continue</strong>.'));
         $this->f3->set('continue_button', $this->t('Continue'));
 
@@ -282,7 +282,7 @@ class UpgradeModule extends Module {
         $this->f3->set('edit_upgrade_php2', $this->t('There is a line inside your upgrade.php file that says <code>$upgrade_access_check = TRUE;</code>. Change it to <code>$upgrade_access_check = FALSE;</code>.'));
         $this->f3->set('edit_upgrade_php3', $this->t('As soon as the upgrade.php script is done, you must change the file back to its original form with <code>$upgrade_access_check = TRUE;</code>.'));
         $this->f3->set('edit_upgrade_php4', $this->t('To avoid having this problem in future, remember to log in to SimpleID as an administrator before you run this script.'));
-        $this->f3->set('simpleid_docs', $this->t('For more detailed information, see the <a href="!url">SimpleID documentation</a>.', array('!url' => 'http://simpleid.koinic.net/documentation/getting-started/upgrading/running-upgradephp')));
+        $this->f3->set('simpleid_docs', $this->t('For more detailed information, see the <a href="!url">SimpleID documentation</a>.', array('!url' => 'http://simpleid.org/documentation/getting-started/upgrading/running-upgradephp')));
         
         $this->f3->set('title', $this->t('Access Denied'));
         $this->f3->set('layout', 'upgrade_access_denied.html');

@@ -3,6 +3,7 @@
     <XRD version="2.0">
         <Service>
             <Type>http://specs.openid.net/auth/2.0/server</Type>
+            {* Keep old domain *}
             <Type>http://simpleid.koinic.net/type/version#{{ @version }}</Type>
             <repeat group="{{ @types }}" value="{{ @uri }}"><Type>{{ @uri }}</Type></repeat>
             <URI>{{ rtrim(@config.canonical_base_path, '/') }}/</URI>

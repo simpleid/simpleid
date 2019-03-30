@@ -67,7 +67,7 @@ if (file_exists('conf/config.php')) {
 } elseif (file_exists('config.php')) {
     include_once 'config.php';
 } else {
-    die('No configuration file found.  See <http://simpleid.koinic.net/docs/2/installing/> for instructions on how to set up a configuration file.');
+    die('No configuration file found.  See <http://simpleid.org/docs/2/installing/> for instructions on how to set up a configuration file.');
 }
 
 
@@ -133,36 +133,36 @@ $i18n = \SimpleID\Util\LocaleManager::instance();
 
 if ((@ini_get('register_globals') === 1) || (@ini_get('register_globals') === '1') || (strtolower(@ini_get('register_globals')) == 'on')) {
     $f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'register_globals is enabled in PHP configuration.');
-    $f3->error(500, $i18n->t('register_globals is enabled in PHP configuration, which is not supported by SimpleID.  See the <a href="!url">manual</a> for further information.', array('!url' => 'http://simpleid.koinic.net/docs/2/system-requirements/')));
+    $f3->error(500, $i18n->t('register_globals is enabled in PHP configuration, which is not supported by SimpleID.  See the <a href="!url">manual</a> for further information.', array('!url' => 'http://simpleid.org/docs/2/system-requirements/')));
 }
 
 if (!\SimpleID\Crypt\BigNum::loaded()) {
     $f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'gmp/bcmath PHP extension not loaded.');
-    $f3->error(500, $i18n->t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'gmp/bcmath', '!url' => 'http://simpleid.koinic.net/docs/2/system-requirements/')));
+    $f3->error(500, $i18n->t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'gmp/bcmath', '!url' => 'http://simpleid.org/docs/2/system-requirements/')));
 }
 if (!function_exists('preg_match')) {
     $f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'pcre PHP extension not loaded.');
-    $f3->error(500, $i18n->t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'pcre', '!url' => 'http://simpleid.koinic.net/docs/2/system-requirements/')));
+    $f3->error(500, $i18n->t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'pcre', '!url' => 'http://simpleid.org/docs/2/system-requirements/')));
 }
 if (!function_exists('session_start')) {
     $f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'session PHP extension not loaded.');
-    $f3->error(500, $i18n->t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'session', '!url' => 'http://simpleid.koinic.net/docs/2/system-requirements/')));
+    $f3->error(500, $i18n->t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'session', '!url' => 'http://simpleid.org/docs/2/system-requirements/')));
 }
 if (!function_exists('xml_parser_create_ns')) {
     $f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'xml PHP extension not loaded.');
-    $f3->error(500, $i18n->t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'xml', '!url' => 'http://simpleid.koinic.net/docs/2/system-requirements/')));
+    $f3->error(500, $i18n->t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'xml', '!url' => 'http://simpleid.org/docs/2/system-requirements/')));
 }
 if (!function_exists('hash')) {
     $f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'hash PHP extension not loaded.');
-    $f3->error(500, $i18n->t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'hash', '!url' => 'http://simpleid.koinic.net/docs/2/system-requirements/')));
+    $f3->error(500, $i18n->t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'hash', '!url' => 'http://simpleid.org/docs/2/system-requirements/')));
 }
 if (!function_exists('openssl_sign')) {
     $f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'openssl PHP extension not loaded.');
-    $f3->error(500, $i18n->t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'openssl', '!url' => 'http://simpleid.koinic.net/docs/2/system-requirements/')));
+    $f3->error(500, $i18n->t('One or more required PHP extensions (%extension) is not loaded.  See the <a href="!url">manual</a> for further information on system requirements.', array('%extension' => 'openssl', '!url' => 'http://simpleid.org/docs/2/system-requirements/')));
 }
 if (is_numeric(@ini_get('suhosin.get.max_value_length')) && (@ini_get('suhosin.get.max_value_length') < 1024)) {
     $f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'suhosin.get.max_value_length < 1024');
-    $f3->error(500, $i18n->t('suhosin.get.max_value_length is less than 1024, which will lead to problems. See the <a href="!url">manual</a> for further information on system requirements.', array('!url' => 'http://simpleid.koinic.net/docs/2/system-requirements/')));
+    $f3->error(500, $i18n->t('suhosin.get.max_value_length is less than 1024, which will lead to problems. See the <a href="!url">manual</a> for further information on system requirements.', array('!url' => 'http://simpleid.org/docs/2/system-requirements/')));
 }
 
 /* ------------------------------------------------------------------------- */
