@@ -35,6 +35,12 @@
 # Don't show directory listings for URLs which map to a directory.
 Options -Indexes
 
+# Security fixes
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options nosniff
+    RequestHeader unset Proxy
+</IfModule>
+
 # Various rewrite rules.
 <IfModule mod_rewrite.c>
     RewriteEngine on
@@ -54,5 +60,7 @@ Options -Indexes
 </IfModule>
 
 # Switch register_globals to off
-php_value register_globals 0
-php_flag short_open_tag 0
+<IfModule mod_php5.c>
+    php_value register_globals 0
+    php_flag short_open_tag 0
+</IfModule>
