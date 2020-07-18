@@ -1,255 +1,252 @@
 <?php
-#*
-# SimpleID configuration file.
-#
-# By default, the SimpleID configuration is formatted as YAML.  However
-# you can insert PHP code after the YAML section for further configuration.
-#
-$config = Spyc::YAMLLoadString(<<<_END_YAML_
-#
-# Base URL.
-#
-# This is the URL of the location you want to place your SimpleID
-# distribution.  It becomes the URL of the SimpleID server.
-#
-# Examples:
-#
-# http:#www.example.com'
-# http:#www.example.com:8888'
-# http:#www.example.com/simpleid'
-# https:#www.example.com:8888/simpleid'
-#
-#
-canonical_base_path: 'http://www.example.com'
+/*
+ * SimpleID configuration file.
+ */
 
-#
-# Directory to store identity information.
-#
-# This directory must exist and be readable by the web server.
-#
-# For maximum security, it is highly recommended to place this
-# directory outside your web browser's document root directory, so
-# that it is not visible to user agents.
-#
-#
-identities_dir: '@@IDENTITIES_DIR@@'
+return [
+    /*
+     * Base URL.
+     *
+     * This is the URL of the location you want to place your SimpleID
+     * distribution.  It becomes the URL of the SimpleID server.
+     *
+     * Examples:
+     *
+     * http://www.example.com
+     * http://www.example.com:8888
+     * http://www.example.com/simpleid
+     * https://www.example.com:8888/simpleid
+     *
+     */
+    'canonical_base_path' => 'http://www.example.com',
 
-#
-# Location to store temporary files.
-#
-# This directory must exist and be readable by the web server.
-#
-# Depending on your system's security policies, you can use the
-# system temporary directory (/tmp), or another directory.
-#
-temp_dir: '/tmp'
+    /*
+     * Directory to store identity information.
+     *
+     * This directory must exist and be readable by the web server.
+     *
+     * For maximum security, it is highly recommended to place this
+     * directory outside your web browser's document root directory, so
+     * that it is not visible to user agents.
+     *
+     */
+    'identities_dir' => '@@IDENTITIES_DIR@@',
 
-#
-# Location to store cache data.
-#
-# For filesystem based cache, use folder=<cache_directory>
-# This directory must exist and be readable and writable by the
-# web server.
-#
-# For maximum security, it is highly recommended to place this
-# directory outside your web browser's document root directory, so
-# that it is not visible to user agents.
-#
-# Other cache systems, such as memchache or redis, can also be used.
-# For more details on how to configure these systems, see
-# http:#fatfreeframework.com/quick-reference#CACHE and
-# http:#fatfreeframework.com/cache
-#
-cache: 'folder=@@CACHE_DIR@@'
+    /*
+     * Location to store temporary files.
+     *
+     * This directory must exist and be readable by the web server.
+     *
+     * Depending on your system's security policies, you can use the
+     * system temporary directory (/tmp), or another directory.
+     */
+    'temp_dir' => '/tmp',
 
-#
-# Directory to store persistent data.  This configuration is used
-# if the default store module (SimpleID\Store\DefaultStoreModule),
-# or its derivatives, is enabled
-#
-# This directory must exist and be readable and writable by the
-# web server.
-#
-# For maximum security, it is highly recommended to place this
-# directory outside your web browser's document root directory, so
-# that it is not visible to user agents.
-#
-# Other storage systems may also be used if the required module is
-# enabled.
-#
-#
-store_dir: '@@STORE_DIR@@'
+    /*
+     * Location to store cache data.
+     *
+     * For filesystem based cache, use folder=<cache_directory>
+     * This directory must exist and be readable and writable by the
+     * web server.
+     *
+     * For maximum security, it is highly recommended to place this
+     * directory outside your web browser's document root directory, so
+     * that it is not visible to user agents.
+     *
+     * Other cache systems, such as memchache or redis, can also be used.
+     * For more details on how to configure these systems, see
+     * http://fatfreeframework.com/quick-reference#CACHE and
+     * http://fatfreeframework.com/cache
+     */
+    'cache' => 'folder=@@CACHE_DIR@@',
 
-#
-# JSON Web Key Set files.  These contain the public and private keys
-# used for JSON web tokens.  These are mandatory if you want to
-# use OpenID Connect.
-#
-# See http://simpleid.org/docs/2/installing/#keys on how
-# to create a key pair and convert them to JSON Web Key Set format.
-#
-#
-public_jwks_file: '@@ETC_DIR@@/public_jwks.json'
-private_jwks_file: '@@ETC_DIR@@/private_jwks.json'
+    /*
+     * Directory to store persistent data.  This configuration is used
+     * if the default store module (SimpleID\Store\DefaultStoreModule),
+     * or its derivatives, is enabled
+     *
+     * This directory must exist and be readable and writable by the
+     * web server.
+     *
+     * For maximum security, it is highly recommended to place this
+     * directory outside your web browser's document root directory, so
+     * that it is not visible to user agents.
+     *
+     * Other storage systems may also be used if the required module is
+     * enabled.
+     *
+     */
+    'store_dir' => '@@STORE_DIR@@',
 
-#
-# Allows use of unencrypted connections.
-#
-# SimpleID and the protocols it implements generally mandate the use of HTTPS
-# for all connections.  However, for debug purposes, it may be necessary to allow
-# unencrypted connections to SimpleID.
-#
-# It is strongly recommended that this is set to false.  Setting this to true
-# will allow passwords to be sent as plaintext.  You should not change this
-# value unless it is absolutely necessary.
-#
-#
-allow_plaintext: false
+    /*
+     * JSON Web Key Set files.  These contain the public and private keys
+     * used for JSON web tokens.  These are mandatory if you want to
+     * use OpenID Connect.
+     *
+     * See http://simpleid.org/docs/2/installing/ *keys on how
+     * to create a key pair and convert them to JSON Web Key Set format.
+     *
+     */
+    'public_jwks_file' => '@@ETC_DIR@@/public_jwks.json',
+    'private_jwks_file' => '@@ETC_DIR@@/private_jwks.json',
 
-#
-# Allows web browsers to save passwords.
-#
-# SimpleID prevents web browsers from saving user passwords entered in a user
-# logs into SimpleID.  Setting this value to true will allow browsers to
-# ask the user whether the password should be saved in the browser's password
-# store.
-#
-# The default is set to false for security reasons.  You should not change
-# this value unless you are certain regarding the security of your browser's
-# password store.
-#
-allow_autocomplete: false
+    /*
+     * Allows use of unencrypted connections.
+     *
+     * SimpleID and the protocols it implements generally mandate the use of HTTPS
+     * for all connections.  However, for debug purposes, it may be necessary to allow
+     * unencrypted connections to SimpleID.
+     *
+     * It is strongly recommended that this is set to false.  Setting this to true
+     * will allow passwords to be sent as plaintext.  You should not change this
+     * value unless it is absolutely necessary.
+     *
+     */
+    'allow_plaintext' => false,
 
-#
-# Performs additional verification of relying party return URLs.
-#
-# When authenticating using OpenID version 2, SimpleID can perform additional
-# verification of the relying party's return URLs under section 9.2.1 of the
-# OpenID specification.
-#
-# The default is set to true for security reasons.  However, if your web server
-# is blocked by your web hosting provider's firewall from accessing outside
-# servers, then set this to false.
-#
-#
-openid_verify_return_url: true
+    /*
+     * Allows web browsers to save passwords.
+     *
+     * SimpleID prevents web browsers from saving user passwords entered in a user
+     * logs into SimpleID.  Setting this value to true will allow browsers to
+     * ask the user whether the password should be saved in the browser's password
+     * store.
+     *
+     * The default is set to false for security reasons.  You should not change
+     * this value unless you are certain regarding the security of your browser's
+     * password store.
+     */
+    'allow_autocomplete' => false,
 
-# Performs strict verification of realm URLs against return URLs.
-#
-# Under the OpenID specifications, where a realm is specified, it must
-# match the return URL.  However, in some instances, the realm is specified
-# using a http scheme, whereas the return URL is specified using a https
-# scheme, which would fail this verification process.  Setting this option
-# to true will allow for some leniency in this check, allowing for a
-# http/https mismatch.
-#
-# The default is set to true for security reasons.  However, for some
-# misconfigured relying parties, this may need to be set to false.
-#
-openid_strict_realm_check: true
+    /*
+     * Performs additional verification of relying party return URLs.
+     *
+     * When authenticating using OpenID version 2, SimpleID can perform additional
+     * verification of the relying party's return URLs under section 9.2.1 of the
+     * OpenID specification.
+     *
+     * The default is set to true for security reasons.  However, if your web server
+     * is blocked by your web hosting provider's firewall from accessing outside
+     * servers, then set this to false.
+     *
+     */
+    'openid_verify_return_url' => true,
+
+    /* Performs strict verification of realm URLs against return URLs.
+     *
+     * Under the OpenID specifications, where a realm is specified, it must
+     * match the return URL.  However, in some instances, the realm is specified
+     * using a http scheme, whereas the return URL is specified using a https
+     * scheme, which would fail this verification process.  Setting this option
+     * to true will allow for some leniency in this check, allowing for a
+     * http/https mismatch.
+     *
+     * The default is set to true for security reasons.  However, for some
+     * misconfigured relying parties, this may need to be set to false.
+     */
+    'openid_strict_realm_check' => true,
 
 
-#
-# Allowable origins for WebFinger queries.
-#
-# This specifies the origins allowed to access the WebFinger service included
-# with SimpleID.  WebFinger is required for OpenID Connect to function.
-#
-webfinger_access_control_allow_origin: '*'
+    /*
+     * Allowable origins for WebFinger queries.
+     *
+     * This specifies the origins allowed to access the WebFinger service included
+     * with SimpleID.  WebFinger is required for OpenID Connect to function.
+     */
+    'webfinger_access_control_allow_origin' => '*',
 
-#
-# The locale for the SimpleID user interface.
-#
-#
-locale: 'en'
+    /*
+     * The locale for the SimpleID user interface.
+     *
+     */
+    'locale' => 'en',
 
-#
-# Date and time format.
-#
-# The date and time format specified using the strftime() syntax.
-#
-# See http:#www.php.net/strftime for details.
-# 
-#
-date_time_format: '%Y-%m-%d %H:%M:%S %Z'
+    /*
+     * Date and time format.
+     *
+     * The date and time format specified using the strftime() syntax.
+     *
+     * See http://www.php.net/strftime for details.
+     * 
+     */
+    'date_time_format' => '%Y-%m-%d %H:%M:%S %Z',
 
-#
-# Authentication context class reference.
-#
-# Specify the reference to the#minimum* authentication context class
-# with which your SimpleID server complies.  Note that authentication
-# scheme modules may replace this with a higher authentication context class.
-#
-# Examples:
-# 1
-# 'http://id.incommon.org/assurance/bronze'
-#
-acr: 1
+    /*
+     * Authentication context class reference.
+     *
+     * Specify the reference to the *minimum* authentication context class
+     * with which your SimpleID server complies.  Note that authentication
+     * scheme modules may replace this with a higher authentication context class.
+     *
+     * Examples:
+     * 1
+     * 'http://id.incommon.org/assurance/bronze'
+     */
+    'acr' => 1,
 
-#
-# The logger class.
-#
-# You can use any PSR-3 compliant logger, as long as it has been loaded.
-#
-# The default logger class writes log entries to the file system,
-# as specified in the log_file variable.
-#
-# To disable logging altogether, use Psr\Log\NullLogger
-#
-logger: 'SimpleID\Util\DefaultLogger'
+    /*
+     * The logger class.
+     *
+     * You can use any PSR-3 compliant logger, as long as it has been loaded.
+     *
+     * The default logger class writes log entries to the file system,
+     * as specified in the log_file variable.
+     *
+     * To disable logging altogether, use Psr\Log\NullLogger
+     */
+    'logger' => 'SimpleID\\Util\\DefaultLogger',
 
-#*
-# Log file for default logger.
-#
-# You can specify a file into which the SimpleID default logger will log
-# various diagnostic messages.
-#
-# The log file's directory must exist and must be writable by the web server.
-#
-log_file: '../log/simpleid.log'
+    /*
+     * Log file for default logger.
+     *
+     * You can specify a file into which the SimpleID default logger will log
+     * various diagnostic messages.
+     *
+     * The log file's directory must exist and must be writable by the web server.
+     */
+    'log_file' => '../log/simpleid.log',
 
-#*
-# The level of detail for log messages.
-#
-# You can determine which messages are captured in the log file by specifying
-# the minimum log level: emergency, alert, critical, error, warning, notice
-# info, debug
-#
-# WARNING: Setting the log level to debug will result in security sensitive
-# information also being logged.
-#
-# This has effect only if logging is enabled.
-#
-log_level: 'debug'
+    /*
+     * The level of detail for log messages.
+     *
+     * You can determine which messages are captured in the log file by specifying
+     * the minimum log level: emergency, alert, critical, error, warning, notice
+     * info, debug
+     *
+     * WARNING: Setting the log level to debug will result in security sensitive
+     * information also being logged.
+     *
+     * This has effect only if logging is enabled.
+     */
+    'log_level' => 'debug',
 
-#
-# The SimpleID modules to be enabled.
-#
-# You can customise SimpleID's functionality by including and excluding
-# modules in this array.
-#
-modules:
-    # User-accessible user interface
-    - 'SimpleID\Base\MyModule'
+    /*
+     * The SimpleID modules to be enabled.
+     *
+     * You can customise SimpleID's functionality by including and excluding
+     * modules in this array.
+     */
+    'modules' => [
+        // User-accessible user interface
+        'SimpleID\\Base\\MyModule',
 
-    # User authentication schemes
-    - 'SimpleID\Auth\PasswordAuthSchemeModule'
-    - 'SimpleID\Auth\RememberMeAuthSchemeModule'
-    - 'SimpleID\Auth\OTPAuthSchemeModule'
+        // User authentication schemes
+        'SimpleID\\Auth\\PasswordAuthSchemeModule',
+        'SimpleID\\Auth\\RememberMeAuthSchemeModule',
+        'SimpleID\\Auth\\OTPAuthSchemeModule',
 
-    # OpenID 1.x and 2.x
-    - 'SimpleID\Protocols\OpenID\OpenIDModule'
-    - 'SimpleID\Protocols\OpenID\Extensions\SRegOpenIDExtensionModule'
-    - 'SimpleID\Protocols\OpenID\Extensions\PAPEOpenIDExtensionModule'
+        // OpenID 1.x and 2.x
+        'SimpleID\\Protocols\\OpenID\\OpenIDModule',
+        'SimpleID\\Protocols\\OpenID\\Extensions\\SRegOpenIDExtensionModule',
+        'SimpleID\\Protocols\\OpenID\\Extensions\\PAPEOpenIDExtensionModule',
 
-    # WebFinger (required by OpenID Connect)
-    - 'SimpleID\Protocols\WebFinger\WebFingerModule'
+        // WebFinger (required by OpenID Connect)
+        'SimpleID\\Protocols\\WebFinger\\WebFingerModule',
 
-    # OpenID Connect
-    - 'SimpleID\Protocols\Connect\ConnectModule'
-    - 'SimpleID\Protocols\Connect\ConnectClientRegistrationModule'
-    
-_END_YAML_
-);
-
+        // OpenID Connect
+        'SimpleID\\Protocols\\Connect\\ConnectModule',
+        'SimpleID\\Protocols\\Connect\\ConnectClientRegistrationModule',
+        
+    ]
+];
 ?>
