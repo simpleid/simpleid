@@ -1,0 +1,29 @@
+{
+    "name": "simpleid/simpleid",
+    "description": "A simple, personal OpenID provider written in PHP",
+    "type": "project",
+    "require": {
+        "php": "^5.3 | ^7.0",
+        "ext-bcmath": "*",
+        "ext-pcre": "*",
+        "ext-session": "*",
+        "ext-xml": "*",
+        "ext-hash": "*"
+    },
+    "suggest": {
+        "ext-gmp": "Better performance"
+    },
+    "require-dev": {
+        "phing/phing": "2.*"
+    },
+    "license": "GPL-2.0+",
+    "authors": [
+        {
+            "name": "Kelvin Mo",
+            "email": "kmo@users.sourceforge.net"
+        }
+    ],
+    "config": {
+        "vendor-dir": "www/vendor"
+    }
+}
