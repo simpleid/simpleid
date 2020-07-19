@@ -94,7 +94,7 @@ class IndexModule extends Module {
         
         if (!isset($payload['mt'])) $payload['mt'] = 'GET';
         if (!isset($payload['rt'])) $payload['rt'] = '/';
-        if (!isset($payload['rq'])) $payload['rq'] = array();
+        if (!isset($payload['rq'])) $payload['rq'] = [];
         
         $this->f3->mock($payload['mt'] . ' ' . $payload['rt'], $payload['rq']);
     }

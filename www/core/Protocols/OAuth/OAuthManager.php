@@ -82,7 +82,7 @@ class OAuthManager extends Prefab {
             $this->client_auth_method = $client_auth_method;
         } else {
             $results = $this->mgr->invokeAll('oAuthInitClient', $request);
-            $results = array_merge(array_diff($results, array(NULL)));
+            $results = array_merge(array_diff($results, [ NULL ]));
             if (count($results) == 1) {
                 $client = $results[0]['#client'];
                 $this->client_auth_method = $results[0]['#client_auth_method'];
@@ -110,7 +110,7 @@ class OAuthManager extends Prefab {
 
         $result = $this->f3->exists('oauth_client');
         if ($result && ($auth_methods != null)) {
-            if (!is_array($auth_methods)) $auth_methods = array($auth_methods);
+            if (!is_array($auth_methods)) $auth_methods = [ $auth_methods ];
             $result = in_array($this->client_auth_method, $auth_methods);
             if (!$result) {
                 $this->logger->log(LogLevel::ERROR, 'Unexpected authentication method: ' . $this->client_auth_method . '; expecting ' . implode(',', $auth_methods));
@@ -121,9 +121,9 @@ class OAuthManager extends Prefab {
             return true;
         } else {
             if ($send_challenge) {
-                $auth_method_map = array(
+                $auth_method_map = [
                     'client_secret_basic' => 'Basic'
-                );
+                ];
                 $http_auth_method = $auth_method_map[$auth_method];
                 $this->f3->status(401);
                 header('WWW-Authenticate: ' . $http_auth_method . ' realm="'. $this->f3->get('REALM') . '"');
@@ -171,7 +171,7 @@ class OAuthManager extends Prefab {
 
         // Try other token types
         $results = $this->mgr->invokeAll('oAuthInitAccessToken');
-        $results = array_merge(array_diff($results, array(NULL)));
+        $results = array_merge(array_diff($results, [ NULL ]));
         if (count($results) == 1) $this->access_token = $results[0];
     }
 

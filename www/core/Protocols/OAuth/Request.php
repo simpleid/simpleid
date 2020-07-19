@@ -31,7 +31,7 @@ use SimpleID\Util\HTTPResponse;
  */
 class Request extends ArrayWrapper {
     /** @var array the HTTP headers */
-    protected $headers = array();
+    protected $headers = [];
 
     /** @var bool whether the request prohibits user intervention */
     private $immediate = false;
@@ -129,7 +129,7 @@ class Request extends ArrayWrapper {
     public function getAuthorizationHeader($parse_credentials = false) {
         if (!$this->hasHeader('Authorization')) return null;
 
-        $results = array();
+        $results = [];
 
         $header = $this->getHeader('Authorization');
         list($scheme, $credentials) = preg_split('/\s+/', $header, 2);
@@ -143,7 +143,7 @@ class Request extends ArrayWrapper {
                 $results['#username'] = $username;
                 $results['#password'] = $password;
             } else {
-                $matches = array();
+                $matches = [];
                 preg_match_all('/([-a-zA-Z]+)=\"([^\"]+)\"/', $credentials, $matches, PREG_SET_ORDER);
                 foreach ($matches as $match) $results[$match[1]] = $match[2];
             }
@@ -198,7 +198,7 @@ class Request extends ArrayWrapper {
         if (!$this->paramContains($param, $value)) return $this->container[$param];
 
         $items = preg_split($delimiter, $this->container[$param]);
-        $items = array_diff($items, array($value));
+        $items = array_diff($items, [ $value ]);
 
         preg_match($delimiter, $this->container[$param], $matches);
         $this->container[$param] = implode($matches[0], $items);

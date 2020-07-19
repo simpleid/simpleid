@@ -118,7 +118,7 @@ class Code implements TokenSource {
      * @param array $additional additional data to be stored in the authorization code
      * @return Code the authorization code object
      */
-    static public function create($authorization, $redirect_uri, $scope, $additional = array()) {
+    static public function create($authorization, $redirect_uri, $scope, $additional = []) {
         $code = new Code();
         $rand = new Random();
         $cache = \Cache::instance();

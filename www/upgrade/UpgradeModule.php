@@ -69,9 +69,9 @@ class UpgradeModule extends Module {
         $tpl = new \Template();
         
         $this->f3->set('intro',$this->t('Use this script to update your installation whenever you upgrade to a new version of SimpleID.'));
-        $this->f3->set('simpleid_docs', $this->t('For more detailed information, see the <a href="!url">SimpleID documentation</a>.', array('!url' => 'http://simpleid.org/documentation/getting-started/upgrading')));
+        $this->f3->set('simpleid_docs', $this->t('For more detailed information, see the <a href="!url">SimpleID documentation</a>.', [ '!url' => 'http://simpleid.org/documentation/getting-started/upgrading' ]));
         $this->f3->set('step1', $this->t('<strong>Back up your installation</strong>. This process will change various files within your SimpleID installation and in case of emergency you may need to revert to a backup.'));
-        $this->f3->set('step2', $this->t('Install your new files in the appropriate location, as described in the <a href="!url">SimpleID documentation</a>.', array('!url' => 'http://simpleid.org/documentation/getting-started/installing-simpleid')));
+        $this->f3->set('step2', $this->t('Install your new files in the appropriate location, as described in the <a href="!url">SimpleID documentation</a>.', [ '!url' => 'http://simpleid.org/documentation/getting-started/installing-simpleid' ]));
         $this->f3->set('click_continue', $this->t('When you have performed the steps above, click <strong>Continue</strong>.'));
         $this->f3->set('continue_button', $this->t('Continue'));
 
@@ -113,7 +113,7 @@ class UpgradeModule extends Module {
             $rand = new Random();
 
             $upgid = $rand->id();
-            $cache->set($upgid . '.upgrade', array('list' => $list, 'results' => ''));
+            $cache->set($upgid . '.upgrade', [ 'list' => $list, 'results' => '' ]);
             $this->f3->set('upgid', $upgid);
 
             $this->f3->set('tk', $token->generate('upgrade_selection', SecurityToken::OPTION_BIND_SESSION));
@@ -149,7 +149,7 @@ class UpgradeModule extends Module {
             return;
         }
 
-        $step = $token->generate(array('upgid' => $this->f3->get('POST.upgid'), 'step' => 0), SecurityToken::OPTION_BIND_SESSION);
+        $step = $token->generate([ 'upgid' => $this->f3->get('POST.upgid'), 'step' => 0 ], SecurityToken::OPTION_BIND_SESSION);
         $this->f3->set('step', $step);
 
         $this->f3->set('applying_upgrade', $this->t('Applying upgrade...'));
@@ -171,22 +171,22 @@ class UpgradeModule extends Module {
         $token = new SecurityToken();
         if (!$this->f3->exists('POST.step')) {
             $this->f3->status(401);
-            print json_encode(array(
+            print json_encode([
                 'status' => 'error',
                 'error' => 'unauthorized',
                 'error_description' => $this->t('Unauthorized')
-            ));
+            ]);
             return;
         }
         
         $payload = $token->getPayload($this->f3->get('POST.step'));
         if ($payload == null) {
             $this->f3->status(401);
-            print json_encode(array(
+            print json_encode([
                 'status' => 'error',
                 'error' => 'unauthorized',
                 'error_description' => $this->t('Unauthorized')
-            ));
+            ]);
             return;
         }
 
@@ -197,29 +197,29 @@ class UpgradeModule extends Module {
 
         if ($upgrade === false) {
             $this->f3->status(500);
-            print json_encode(array(
+            print json_encode([
                 'status' => 'error',
                 'error' => 'upgrade_error',
                 'error_description' => $this->t('Upgrade not found')
-            ));
+            ]);
             return;
         }
 
         $function = $upgrade['list'][$step];
         $upgrade['results'] .= $this->f3->call($function);
         
-        $next = $token->generate(array('upgid' => $upgid, 'step' => $step + 1), SecurityToken::OPTION_BIND_SESSION);
+        $next = $token->generate([ 'upgid' => $upgid, 'step' => $step + 1 ], SecurityToken::OPTION_BIND_SESSION);
         if ($step < count($upgrade['list']) - 1) {
-            print json_encode(array(
+            print json_encode([
                 'status' => 'next',
                 'next' => $next,
                 'progress' => $this->f3->format('{0,number,percent}', ($step + 1) / count($upgrade['list']))
-            ));
+            ]);
         } else {
-            print json_encode(array(
+            print json_encode([
                 'status' => 'complete',
                 'redirect' => 'complete?tk=' . rawurlencode($next)
-            ));
+            ]);
         }
     }
 
@@ -282,7 +282,7 @@ class UpgradeModule extends Module {
         $this->f3->set('edit_upgrade_php2', $this->t('There is a line inside your upgrade.php file that says <code>$upgrade_access_check = TRUE;</code>. Change it to <code>$upgrade_access_check = FALSE;</code>.'));
         $this->f3->set('edit_upgrade_php3', $this->t('As soon as the upgrade.php script is done, you must change the file back to its original form with <code>$upgrade_access_check = TRUE;</code>.'));
         $this->f3->set('edit_upgrade_php4', $this->t('To avoid having this problem in future, remember to log in to SimpleID as an administrator before you run this script.'));
-        $this->f3->set('simpleid_docs', $this->t('For more detailed information, see the <a href="!url">SimpleID documentation</a>.', array('!url' => 'http://simpleid.org/documentation/getting-started/upgrading/running-upgradephp')));
+        $this->f3->set('simpleid_docs', $this->t('For more detailed information, see the <a href="!url">SimpleID documentation</a>.', [ '!url' => 'http://simpleid.org/documentation/getting-started/upgrading/running-upgradephp' ]));
         
         $this->f3->set('title', $this->t('Access Denied'));
         $this->f3->set('layout', 'upgrade_access_denied.html');
@@ -336,7 +336,7 @@ class UpgradeModule extends Module {
     protected function getUpgradeList($version = NULL) {
         $mgr = ModuleManager::instance();
 
-        $upgrade_data = array();
+        $upgrade_data = [];
 
         foreach ($mgr->getModules() as $name => $module) {
             $data = $mgr->invoke($name, 'upgradeList');
@@ -344,7 +344,7 @@ class UpgradeModule extends Module {
         }
         
         if ($version == NULL) $version = $this->getVersion();
-        $list = array();
+        $list = [];
         
         // Sorts versions from newest to oldest
         $versions = array_keys($upgrade_data);

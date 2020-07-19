@@ -74,12 +74,12 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
 
         if (!is_readable($config['public_jwks_file'])) {
             $this->f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'Public JSON web key file not found.');
-            $this->f3->error(500, $this->t('Public JSON web key file not found.  See the <a href="!url">manual</a> for instructions on how to set up OpenID Connect on SimpleID.', array('!url' => 'http://simpleid.org/docs/2/installing/#keys')));
+            $this->f3->error(500, $this->t('Public JSON web key file not found.  See the <a href="!url">manual</a> for instructions on how to set up OpenID Connect on SimpleID.', [ '!url' => 'http://simpleid.org/docs/2/installing/#keys' ]));
         }
 
         if (!is_readable($config['private_jwks_file'])) {
             $this->f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'Private JSON web key file not found.');
-            $this->f3->error(500, $this->t('Private JSON web key file not found.  See the <a href="!url">manual</a> for instructions on how to set up OpenID Connect on SimpleID.', array('!url' => 'http://simpleid.org/docs/2/installing/#keys')));
+            $this->f3->error(500, $this->t('Private JSON web key file not found.  See the <a href="!url">manual</a> for instructions on how to set up OpenID Connect on SimpleID.', [ '!url' => 'http://simpleid.org/docs/2/installing/#keys' ]));
         }
     }
 
@@ -100,7 +100,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
             
             $parts = parse_url($request['request_uri']);
             
-            $http_response = new HTTPResponse($web->request($request['request_uri'], array('headers' => array('Accept' => 'application/jwt,text/plain,application/octet-stream'))));        
+            $http_response = new HTTPResponse($web->request($request['request_uri'], [ 'headers' => [ 'Accept' => 'application/jwt,text/plain,application/octet-stream' ] ]));
 
             if ($http_response->isHTTPError()) {
                 $this->logger->log(LogLevel::ERROR, 'Cannot retrieve request file from request_uri:' . $request['request_uri']);
@@ -329,7 +329,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
 
     /** @see SimpleID\API\OAuthHooks::oAuthResponseTypesHook() */
     public function oAuthResponseTypesHook() {
-        return array('id_token');
+        return [ 'id_token' ];
     }
 
     /**
@@ -341,7 +341,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
 
         $error = '';
         if (!$this->isTokenAuthorized('openid', $error)) {
-            $this->unAuthorizedError($error, null, array(), 'json');
+            $this->unAuthorizedError($error, null, [], 'json');
         }
 
         $authorization = $this->getAuthorization();
@@ -375,7 +375,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
         $mgr = ModuleManager::instance();
         $scope_settings = $mgr->invokeAll('scopes');
 
-        $claims = array();
+        $claims = [];
 
         $claims['sub'] = self::getSubject($user, $client);
 
@@ -405,7 +405,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
                 }
             }
         } else {
-            foreach (array('profile', 'email', 'address', 'phone') as $scope) {
+            foreach ([ 'profile', 'email', 'address', 'phone' ] as $scope) {
                 if (in_array($scope, $scopes)) {
                     if (isset($scope_settings['oauth'][$scope]['claims'])) {
                         foreach ($scope_settings['oauth'][$scope]['claims'] as $claim) {
@@ -455,7 +455,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
             $sector_id = $client->getStoreID();
         }
 
-        $claims = array();
+        $claims = [];
 
         $subject_type = (isset($client['connect']['subject_type'])) ? $client['connect']['subject_type'] : 'pairwise';
         switch ($subject_type) {
@@ -478,30 +478,30 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
      */
     public function scopesHook() {
         if (self::$scope_settings == NULL) {
-            self::$scope_settings = array(
-                'oauth' => array(
-                    'openid' => array(
+            self::$scope_settings = [
+                'oauth' => [
+                    'openid' => [
                         'description' => $this->t('know who you are'),
                         'weight' => -1
-                    ),
-                    'profile' => array(
+                    ],
+                    'profile' => [
                         'description' => $this->t('view your profile information (excluding e-mail and address information)'),
-                        'claims' => array('name', 'family_name', 'given_name', 'middle_name', 'nickname', 'preferred_username', 'profile', 'picture', 'website', 'gender', 'birthdate', 'zoneinfo', 'locale')
-                    ),
-                    'email' => array(
+                        'claims' => ['name', 'family_name', 'given_name', 'middle_name', 'nickname', 'preferred_username', 'profile', 'picture', 'website', 'gender', 'birthdate', 'zoneinfo', 'locale' ]
+                    ],
+                    'email' => [
                         'description' => $this->t('view your e-mail address'),
-                        'claims' => array('email')
-                    ),
-                    'address' => array(
+                        'claims' => [ 'email' ]
+                    ],
+                    'address' => [
                         'description' => $this->t('view your address information'),
-                        'claims' => array('address')
-                    ),
-                    'phone' => array(
+                        'claims' => [ 'address' ]
+                    ],
+                    'phone' => [
                         'description' => $this->t('view your phone number'),
-                        'claims' => array('phone_number')
-                    )
-                )
-            );
+                        'claims' => [ 'phone_number' ]
+                    ]
+                ]
+            ];
         }
         return self::$scope_settings;
     }
@@ -523,45 +523,45 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
         $jwt_encryption_algs = AlgorithmFactory::getSupportedAlgs(Algorithm::KEY_ALGORITHM);
         $jwt_encryption_enc_algs = AlgorithmFactory::getSupportedAlgs(Algorithm::ENCRYPTION_ALGORITHM);
 
-        $claims_supported = array('sub', 'iss', 'auth_time', 'acr');
+        $claims_supported = [ 'sub', 'iss', 'auth_time', 'acr' ];
         foreach ($scopes['oauth'] as $scope => $settings) {
             if (isset($settings['claims'])) {
                 $claims_supporteds = array_merge($claims_supported, $settings['claims']);
             }
         }
 
-        $token_endpoint_auth_methods_supported = array('client_secret_basic', 'client_secret_post');
+        $token_endpoint_auth_methods_supported = [ 'client_secret_basic', 'client_secret_post' ];
         
-        $config = array(
+        $config = [
             'issuer' => $this->getCanonicalHost(),
             'authorization_endpoint' => $this->getCanonicalURL('@oauth_auth', '', 'https'),
             'token_endpoint' => $this->getCanonicalURL('@oauth_token', '', 'https'),
             'userinfo_endpoint' => $this->getCanonicalURL('@connect_userinfo', '', 'https'),
             'jwks_uri' => $this->getCanonicalURL('@connect_jwks', '', 'https'),
             'scopes_supported' => array_keys($scopes['oauth']),
-            'response_types_supported' => array('code', 'token', 'id_token', 'id_token token', 'code token', 'code id_token', 'code id_token token'),
+            'response_types_supported' => [ 'code', 'token', 'id_token', 'id_token token', 'code token', 'code id_token', 'code id_token token' ],
             'response_modes_supported' => Response::getResponseModesSupported(),
-            'grant_types_supported' => array('authorization_code', 'refresh_token'),
-            'acr_values_supported' => array(),
-            'subject_types_supported' => array('public', 'pairwise'),
+            'grant_types_supported' => [ 'authorization_code', 'refresh_token' ],
+            'acr_values_supported' => [],
+            'subject_types_supported' => [ 'public', 'pairwise' ],
             'userinfo_signing_alg_values_supported' => $jwt_signing_algs,
             'userinfo_encryption_alg_values_supported' => $jwt_encryption_algs,
             'userinfo_encryption_enc_alg_values_supported' => $jwt_encryption_enc_algs,
             'id_token_signing_alg_values_supported' => $jwt_signing_algs,
             'id_token_encrpytion_alg_values_supported' => $jwt_encryption_algs,
             'id_token_encrpytion_enc_alg_values_supported' => $jwt_encryption_enc_algs,
-            'request_object_signing_alg_values_supported' => array_merge($jwt_signing_algs, array('none')),
+            'request_object_signing_alg_values_supported' => array_merge($jwt_signing_algs, [ 'none' ]),
             'request_object_encryption_alg_values_supported' => $jwt_encryption_algs,
             'request_object_encryption_enc_alg_values_supported' => $jwt_encryption_enc_algs,
             'token_endpoint_auth_methods_supported' => $token_endpoint_auth_methods_supported,
-            'claim_types_supported' => array('normal'),
+            'claim_types_supported' => [ 'normal' ],
             'claims_supported' => $claims_supported,
             'claims_parameter_supported' => true,
             'request_parameter_supported' => true,
             'request_uri_parameter_supported' => true,
             'require_request_uri_registration' => false,
             'service_documentation' => 'http://simpleid.org/docs/'
-        );
+        ];
         
         $config = array_merge($config, $mgr->invokeAll('connectConfiguration'));
         print json_encode($config);

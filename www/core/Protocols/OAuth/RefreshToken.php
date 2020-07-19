@@ -70,7 +70,7 @@ class RefreshToken extends Token implements TokenSource {
      * @param array $additional any additional data to be stored on the server for this token
      * @return RefreshToken|null 
      */
-    static public function create($authorization, $scope = array(), $source = NULL, $additional = array()) {
+    static public function create($authorization, $scope = [], $source = NULL, $additional = []) {
         $token = new RefreshToken();
         $token->init($authorization, $scope, Token::TTL_PERPETUAL, $source, $additional);
         $token->encode();

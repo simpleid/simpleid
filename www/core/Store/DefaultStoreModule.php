@@ -44,17 +44,17 @@ class DefaultStoreModule extends StoreModule {
     protected function checkConfig() {
         if (!is_dir($this->config['identities_dir'])) {
             $this->f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'Identities directory not found.');
-            $this->f3->error(500, $this->t('Identities directory not found.  See the <a href="!url">manual</a> for instructions on how to set up SimpleID.', array('!url' => 'http://simpleid.org/docs/2/installing/')));
+            $this->f3->error(500, $this->t('Identities directory not found.  See the <a href="!url">manual</a> for instructions on how to set up SimpleID.', [ '!url' => 'http://simpleid.org/docs/2/installing/' ]));
         }
 
         if (!is_dir($this->config['store_dir']) || !is_writeable($this->config['store_dir'])) {
             $this->f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'Store directory not found or not writeable.');
-            $this->f3->error(500, $this->t('Store directory not found or not writeable.  See the <a href="!url">manual</a> for instructions on how to set up SimpleID.', array('!url' => 'http://simpleid.org/docs/2/installing/')));
+            $this->f3->error(500, $this->t('Store directory not found or not writeable.  See the <a href="!url">manual</a> for instructions on how to set up SimpleID.', [ '!url' => 'http://simpleid.org/docs/2/installing/' ]));
         }
     }
 
     public function getStores() {
-        return array('user:default', 'client:default', 'keyvalue:default');
+        return [ 'user:default', 'client:default', 'keyvalue:default' ];
     }
 
     public function find($type, $criteria, $value) {
@@ -116,7 +116,7 @@ class DefaultStoreModule extends StoreModule {
     protected function findUser($criteria, $value) {
         $cache = \Cache::instance();
         $index = $cache->get('users_' . rawurldecode($criteria) . '.storeindex');
-        if ($index === false) $index = array();
+        if ($index === false) $index = [];
         if (isset($index[$value])) return $index[$value];
 
         $result = NULL;
@@ -231,7 +231,7 @@ class DefaultStoreModule extends StoreModule {
         if (file_exists($store_file)) {
             $client = $this->f3->mutex($store_file, function($f3, $store_file) {
                 return $f3->unserialize(file_get_contents($store_file));
-            }, array($this->f3, $store_file));
+            }, [ $this->f3, $store_file ]);
         } else {
             $client = new Client();
         }
@@ -272,7 +272,7 @@ class DefaultStoreModule extends StoreModule {
             $file = fopen($store_file, 'w');
             fwrite($file, $f3->serialize($client));
             fclose($file);
-        }, array($this->f3, $store_file, $client));
+        }, [ $this->f3, $store_file, $client ]);
     }
 
     /**
@@ -302,7 +302,7 @@ class DefaultStoreModule extends StoreModule {
         $file = $this->getKeyValueFile($type, $name);
         return $this->f3->mutex($file, function($f3, $file) {
             return $f3->unserialize(file_get_contents($file));
-        }, array($this->f3, $file));
+        }, [ $this->f3, $file ]);
         
     }
 
@@ -322,7 +322,7 @@ class DefaultStoreModule extends StoreModule {
         $file = $this->getKeyValueFile($type, $name);
         $this->f3->mutex($file, function($f3, $file, $value) {
             file_put_contents($file, $f3->serialize($value), LOCK_EX);
-        }, array($this->f3, $file, $value));
+        }, [ $this->f3, $file, $value ]);
     }
 
     /**

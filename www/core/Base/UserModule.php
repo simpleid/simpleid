@@ -55,11 +55,11 @@ class UserModule extends Module {
             
             if ($user == NULL) {
                 $this->f3->status(404);
-                $this->f3->set('message', $this->t('User %uid not found.', array('%uid' => $params['uid'])));
+                $this->f3->set('message', $this->t('User %uid not found.', [ '%uid' => $params['uid'] ]));
             } else {
                 header('Vary: Accept');
                 
-                $content_type = $web->acceptable(array('text/html', 'application/xml', 'application/xhtml+xml', 'application/xrds+xml', 'application/json'));
+                $content_type = $web->acceptable([ 'text/html', 'application/xml', 'application/xhtml+xml', 'application/xrds+xml', 'application/json' ]);
                 
                 if (($content_type == 'application/xrds+xml') && ($mgr->isModuleLoaded('SimpleID\Protocols\OpenID\OpenIDModule'))) {
                     $mgr->getModule('SimpleID\Protocols\OpenID\OpenIDModule')->userXRDS($f3, $params);
@@ -70,7 +70,7 @@ class UserModule extends Module {
                     $xrds_location = $this->getCanonicalURL('@openid_user_xrds');
                     header('X-XRDS-Location: ' . $xrds_location);
                     
-                    $this->f3->set('message', $this->t('This is the user %uid\'s SimpleID page.  It contains hidden information for the use by OpenID consumers.', array('%uid' => $params['uid'])));
+                    $this->f3->set('message', $this->t('This is the user %uid\'s SimpleID page.  It contains hidden information for the use by OpenID consumers.', [ '%uid' => $params['uid'] ]));
                     
                     $this->f3->set('title', $user['uid']);
                     $this->f3->set('xrds', $xrds_location);
@@ -113,12 +113,12 @@ class UserModule extends Module {
         
         $html .= "</table>";
         
-        return array(array(
+        return [ [
             'id' => 'userinfo',
             'title' => $this->t('User information'),
             'content' => $html,
             'weight' => -1
-        ));
+        ] ];
     }
 }
 

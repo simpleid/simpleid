@@ -84,8 +84,8 @@ class AuthModule extends Module {
         $this->checkHttps('error', true);
 
         if (($this->f3->exists('POST.fs') === false)) {
-            $form_state = array('mode' => AuthManager::MODE_CREDENTIALS);
-            if (in_array($this->f3->get('GET.mode'), array(AuthManager::MODE_VERIFY, AuthManager::MODE_REENTER_CREDENTIALS))) {
+            $form_state = [ 'mode' => AuthManager::MODE_CREDENTIALS ];
+            if (in_array($this->f3->get('GET.mode'), [ AuthManager::MODE_VERIFY, AuthManager::MODE_REENTER_CREDENTIALS ])) {
                 $form_state['mode'] = $this->f3->get('GET.mode');
             }
             $this->loginForm($params, $form_state);
@@ -93,9 +93,9 @@ class AuthModule extends Module {
         }
 
         $form_state = $token->getPayload($this->f3->get('POST.fs'));
-        if ($form_state === false) $form_state = array('mode' => AuthManager::MODE_CREDENTIALS);
+        if ($form_state === false) $form_state = [ 'mode' => AuthManager::MODE_CREDENTIALS ];
         $mode = $form_state['mode'];
-        if (!in_array($mode, array(AuthManager::MODE_CREDENTIALS, AuthManager::MODE_REENTER_CREDENTIALS, AuthManager::MODE_VERIFY))) {
+        if (!in_array($mode, [ AuthManager::MODE_CREDENTIALS, AuthManager::MODE_REENTER_CREDENTIALS, AuthManager::MODE_VERIFY ])) {
             $this->f3->set('message', $this->t('SimpleID detected a potential security attack on your log in.  Please log in again.'));
             $this->loginForm($params, $form_state);
             return;
@@ -147,7 +147,7 @@ class AuthModule extends Module {
                 if (isset($results['auth_level'])) {
                     $form_state['auth_level'] = (isset($form_state['auth_level'])) ? max($form_state['auth_level'], $results['auth_level']) : $results['auth_level'];
                 }
-                if (!isset($form_state['modules'])) $form_state['modules'] = array();
+                if (!isset($form_state['modules'])) $form_state['modules'] = [];
                 $form_state['modules'][] = $module;
             }
         }
@@ -205,7 +205,7 @@ class AuthModule extends Module {
      * @param array $params the F3 parameters
      * @param array $form_state the form state
      */
-    public function loginForm($params = array('destination' => null), $form_state = array('mode' => AuthManager::MODE_CREDENTIALS)) {
+    public function loginForm($params = [ 'destination' => null ], $form_state = [ 'mode' => AuthManager::MODE_CREDENTIALS ]) {
         $tpl = new \Template();
         $config = $this->f3->get('config');
 

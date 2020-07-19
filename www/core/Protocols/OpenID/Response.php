@@ -37,7 +37,7 @@ class Response extends Message {
     const OPENID_RESPONSE_FRAGMENT = 1;
 
     /** @var array an array of fields to be signed */
-    private $signed_fields = array();
+    private $signed_fields = [];
 
     /**
      * @var int the number suffix to use if an extension alias needs
@@ -101,7 +101,7 @@ class Response extends Message {
     public function set($field, $value, $signed = NULL) {
         $this->container[$field] = $value;
 
-        if ($signed === null) $signed = (!in_array($field, array('mode', 'signed', 'sig')));
+        if ($signed === null) $signed = (!in_array($field, [ 'mode', 'signed', 'sig' ]));
 
         if ($signed) $this->signed_fields[] = $field;
     }
@@ -179,9 +179,9 @@ class Response extends Message {
      */
     public function toIndirectURL($url) {
         // 1. Firstly, get the query string
-        $query_array = array();
+        $query_array = [];
         foreach ($this->container as $key => $value) $query_array['openid.' . $key] = $value;
-        $query = str_replace(array('+', '%7E'), array('%20', '~'), http_build_query($query_array));
+        $query = str_replace([ '+', '%7E' ], [ '%20', '~' ], http_build_query($query_array));
         
         // 2. If there is no query string, then we just return the URL
         if (!$query) return $url;
@@ -286,9 +286,9 @@ class Response extends Message {
      * message
      * @param Request $request the request
      */
-    static public function createError($error, $additional = array(), $request = NULL) {
+    static public function createError($error, $additional = [], $request = NULL) {
         $response = new Response($request);
-        $response->loadData(array_merge(array('error' => $error), $additional));
+        $response->loadData(array_merge([ 'error' => $error ], $additional));
         return $response;
     }
 
@@ -304,7 +304,7 @@ class Response extends Message {
     /** Signed fields*/
     public function offsetUnset($offset) {
         parent::offsetUnset($offset);
-        $this->signed_fields = array_diff($this->signed_fields, array($offset));
+        $this->signed_fields = array_diff($this->signed_fields, [ $offset ]);
     }
 }
 

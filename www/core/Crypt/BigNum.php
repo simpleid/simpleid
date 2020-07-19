@@ -132,7 +132,7 @@ class BigNum {
                     return "\x00";
                 }
         
-                $bytes = array();
+                $bytes = [];
                 $num = $this->value;
           
                 while ($this->_cmp($num, 0) > 0) {

@@ -51,7 +51,7 @@ class OpaqueIdentifier {
      * @param string $expected_id the expected identifier
      * @param array $context additional data that have been encoded
      */
-    public function verify($token, $expected_id, $context = array()) {
+    public function verify($token, $expected_id, $context = []) {
         return ($this->generate($id, $context) == $token);
     }
 
@@ -62,7 +62,7 @@ class OpaqueIdentifier {
      * @param array $context additional data to encode
      * @return string the opaque identifier token
      */
-    public function generate($id, $context = array()) {
+    public function generate($id, $context = []) {
         $base_string = $id . ' ' . $this->formatArray($context);
         $hash = hash_hmac('sha256', $base_string, self::$opaque_token, true);
         return trim(strtr(base64_encode($hash), '+/', '-_'), '=');
@@ -77,7 +77,7 @@ class OpaqueIdentifier {
      * @return string the converted string.
      */
     protected function formatArray($array) {
-        $output = array();
+        $output = [];
 
         ksort($array);
         $keys = array_keys($array);

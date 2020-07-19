@@ -119,10 +119,10 @@ class Association {
         $assoc_types = self::getAssociationTypes();
         $session_types = self::getSessionTypes();
         
-        $response = array(
+        $response = [
             'assoc_handle' => $this->assoc_handle,
             'assoc_type' => $this->assoc_type,
-        );
+        ];
         
         // If $session_type is '', then it must be using OpenID 1.1 (blank parameter
         // is not allowed for OpenID 2.0.  For OpenID 1.1 blank requests, we don't
@@ -176,8 +176,8 @@ class Association {
      * values
      */
     static function getAssociationTypes() {
-        $association_types = array('HMAC-SHA1' => array('mac_size' => 20, 'algo' => 'sha1'));
-        if (in_array('sha256', hash_algos())) $association_types['HMAC-SHA256'] = array('mac_size' => 32, 'algo' => 'sha256');
+        $association_types = [ 'HMAC-SHA1' => [ 'mac_size' => 20, 'algo' => 'sha1' ] ];
+        if (in_array('sha256', hash_algos())) $association_types['HMAC-SHA256'] = [ 'mac_size' => 32, 'algo' => 'sha256' ];
         return $association_types;
     }
 
@@ -196,15 +196,15 @@ class Association {
      * values
      */
     static function getSessionTypes($is_https = TRUE, $version = Message::OPENID_VERSION_2) {
-        $session_types = array(
-            'DH-SHA1' => array('algo' => 'sha1'),
-        );
-        if (in_array('sha256', hash_algos())) $session_types['DH-SHA256'] = array('algo' => 'sha256');
+        $session_types = [
+            'DH-SHA1' => [ 'algo' => 'sha1' ],
+        ];
+        if (in_array('sha256', hash_algos())) $session_types['DH-SHA256'] = [ 'algo' => 'sha256' ];
         if (($version >= Message::OPENID_VERSION_2) && ($is_https == TRUE)) {
             // Under OpenID 2.0 no-encryption is only allowed if TLS is used
-            $session_types['no-encryption'] = array();
+            $session_types['no-encryption'] = [];
         }
-        if ($version == Message::OPENID_VERSION_1_1) $session_types[''] = array();
+        if ($version == Message::OPENID_VERSION_1_1) $session_types[''] = [];
         return $session_types;
     }
 }

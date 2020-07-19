@@ -29,13 +29,13 @@ use SimpleID\Protocols\OAuth\OAuthDynamicClient;
  */
 class ConnectDynamicClient extends OAuthDynamicClient {
 
-    public function __construct($data = array()) {
-        parent::__construct(array_replace_recursive(array(
-            'connect' => array(
+    public function __construct($data = []) {
+        parent::__construct(array_replace_recursive([
+            'connect' => [
                 'id_token_signed_response_alg' => 'RS256',
                 'require_auth_time' => false,
-            )
-        ), $data));
+            ]
+        ], $data));
     }
 
     public function getDynamicClientInfo() {

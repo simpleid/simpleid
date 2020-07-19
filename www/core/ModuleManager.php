@@ -36,7 +36,7 @@ use SimpleID\Util\LocaleManager;
  */
 class ModuleManager extends Prefab {
     /** @var array array of all loaded modules */
-    private $modules = array();
+    private $modules = [];
 
     private $f3;
     private $logger;
@@ -105,7 +105,7 @@ class ModuleManager extends Prefab {
         foreach ($this->modules as $name => $module) {
             if (method_exists($name, 'routes')) {
                 $this->logger->log(LogLevel::DEBUG, 'SimpleID\ModuleManager->initRoutes: ' . $name);
-                call_user_func(array($name, 'routes'), $this->f3);
+                call_user_func([ $name, 'routes' ], $this->f3);
             }
         }
     }
@@ -125,7 +125,7 @@ class ModuleManager extends Prefab {
 
         if (method_exists($this->modules[$name], $function)) {
             $this->logger->log(LogLevel::DEBUG, 'SimpleID\ModuleManager->invoke: ' . $name . '->' . $function);
-            return call_user_func_array(array($this->modules[$name], $function), $args);
+            return call_user_func_array([ $this->modules[$name], $function ], $args);
         }
     }
 
@@ -139,12 +139,12 @@ class ModuleManager extends Prefab {
     public function invokeAll() {
         $args = func_get_args();
         $function = array_shift($args) . 'Hook';
-        $return = array();
+        $return = [];
 
         foreach ($this->modules as $name => $module) {
             if (method_exists($module, $function)) {
                 $this->logger->log(LogLevel::DEBUG, 'SimpleID\ModuleManager->invokeAll: ' . $name . '->' . $function);
-                $result = call_user_func_array(array($module, $function), $args);
+                $result = call_user_func_array([ $module, $function ], $args);
                 if (isset($result) && is_array($result)) {
                     $return = array_merge($return, $result);
                 } elseif (isset($result)) {
@@ -182,7 +182,7 @@ class ModuleManager extends Prefab {
      */
     public function invokeRefAll($hook, &$data) {
         $function = $hook . 'Hook';
-        $return = array();
+        $return = [];
 
         foreach ($this->modules as $name => $module) {
             if (method_exists($module, $function)) {
@@ -208,7 +208,7 @@ class ModuleManager extends Prefab {
         $loader = $this->f3->get('class_loader');
         $root_dir = strtr(dirname(__DIR__), '\\', '/'); // Cross-platform way of getting a parent directory
 
-        $results = array();
+        $results = [];
 
         $class_file = $loader->findFile($class);
         $class_dir = strtr(dirname($class_file), '\\', '/');

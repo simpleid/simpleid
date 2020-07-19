@@ -69,7 +69,7 @@ class Token {
     protected $source_ref = NULL;
 
     /** @var array additional data to be stored on the server in relation to the token */
-    protected $additional = array();
+    protected $additional = [];
 
     /** @var string the encoded token */
     protected $encoded = NULL;
@@ -93,7 +93,7 @@ class Token {
      * @param array $additional additional data to be stored on the
      * server
      */
-    protected function init($authorization, $scope = array(), $expires_in = self::TTL_PERPETUAL, $source = NULL, $additional = array()) {
+    protected function init($authorization, $scope = [], $expires_in = self::TTL_PERPETUAL, $source = NULL, $additional = []) {
         $rand = new Random();
 
         $this->id = $rand->id();
@@ -284,22 +284,22 @@ class Token {
      * @param array $token_data data to be encoded in the token
      *
      */
-    protected function encode($server_data = array(), $token_data = array()) {
+    protected function encode($server_data = [], $token_data = []) {
         $cache = \Cache::instance();
         
         $fqaid = $this->authorization->getFullyQualifiedID();
 
-        $server_data = array_merge(array(
+        $server_data = array_merge([
             'id' => $this->id,
             'fqaid' => $fqaid,
             'scope' => $this->scope,
             'additional' => $this->additional
-        ), $server_data);
-        $token_data = array_merge(array(
+        ], $server_data);
+        $token_data = array_merge([
             self::KEY_ID => $server_data['id'],
             self::KEY_FQAID => $server_data['fqaid'],
             self::KEY_SCOPEREF => $this->getScopeRef($this->scope),
-        ), $token_data);
+        ], $token_data);
 
         if ($this->expire != NULL) {
             $server_data['expire'] = $this->expire;
@@ -328,10 +328,10 @@ class Token {
      * @param string the compressed scope reference
      */
     protected function getScopeRef($scope) {
-        $ref = array();
+        $ref = [];
 
         $store = StoreManager::instance();
-        $scope_map = $store->getSetting('oauth_scope', array());
+        $scope_map = $store->getSetting('oauth_scope', []);
 
         foreach ($scope as $item) {
             $i = array_search($item, $scope_map);
@@ -355,10 +355,10 @@ class Token {
      * @return string a space-delimiated string of scope items
      */
     protected function resolveScope($ref) {
-        $scope = array();
+        $scope = [];
 
         $store = StoreManager::instance();
-        $scope_map = $store->getSetting('oauth_scope', array());
+        $scope_map = $store->getSetting('oauth_scope', []);
 
         $refs = explode(' ', $ref);
         foreach ($refs as $item) {
@@ -378,7 +378,7 @@ class Token {
      */
     static function getScopeRefMap() {
         $store = StoreManager::instance();
-        return $store->getSetting('oauth_scope', array());
+        return $store->getSetting('oauth_scope', []);
     }
 
     /**

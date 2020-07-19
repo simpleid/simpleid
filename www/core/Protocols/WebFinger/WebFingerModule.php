@@ -105,25 +105,25 @@ class WebFingerModule extends Module {
         }
         if ($user == null) return null;
 
-        $jrd = array(
+        $jrd = [
             'subject' => $user['identity'],
-            'links' => array(
-                array(
+            'links' => [
+                [
                     'rel' => 'http://specs.openid.net/auth/2.0/provider',
                     'href' => rtrim($this->f3->get('config.canonical_base_path'), '/')
-                ),
-                array(
+                ],
+                [
                     'rel' => 'http://openid.net/specs/connect/1.0/issuer',
                     'href' => rtrim($this->f3->get('config.canonical_base_path'), '/')
-                )
-            )
-        );
+                ]
+            ]
+        ];
         
         if (isset($user['aliases'])) {
             if (is_array($user['aliases'])) {
                 $jrd['aliases'] = $user['aliases'];
             } else {
-                $jrd['aliases'] = array($user['aliases']);
+                $jrd['aliases'] = [ $user['aliases'] ];
             }
         }
         
@@ -144,13 +144,13 @@ class WebFingerModule extends Module {
     protected function getResourceCriteria($resource) {
         $audit = \Audit::instance();
 
-        if ($audit->url($resource)) return array('openid.identity' => $resource);
+        if ($audit->url($resource)) return [ 'openid.identity' => $resource ];
 
         // If it begins with acct: or mailto:, strip it out
         if ((stristr($resource, 'acct:') !== false) || (stristr($resource, 'mailto:') !== false)) {
             list (, $email) = explode(':', $resource, 2);
             if ($audit->email($email)) {
-                return array('webfinger.acct' => $email, 'userinfo.email' => $email);
+                return [ 'webfinger.acct' => $email, 'userinfo.email' => $email ];
             }
         }
 
@@ -178,7 +178,7 @@ class WebFingerModule extends Module {
                 if (!$found) $jrd['aliases'][] = $resource;
             }
         } else {
-            $jrd['aliases'] = array($resource);
+            $jrd['aliases'] = [ $resource ];
         }
         return $jrd;
     }
@@ -193,10 +193,10 @@ class WebFingerModule extends Module {
      */
     protected function filterJRDRels($jrd, $rels) {
         if (isset($jrd['links'])) {
-            if (!is_array($rels))  $rels = array($rels);
+            if (!is_array($rels)) $rels = [ $rels ];
              
             $links = $jrd['links'];
-            $filtered_links = array();
+            $filtered_links = [];
             
             foreach ($links as $link) {
                 if (isset($link['rel']) && in_array($link['rel'], $rels)) {

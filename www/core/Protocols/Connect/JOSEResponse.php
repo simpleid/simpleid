@@ -51,7 +51,7 @@ class JOSEResponse extends ArrayWrapper {
     protected $encrypted_response_alg = null;
     protected $encrypted_response_enc = null;
 
-    protected $headers = array();
+    protected $headers = [];
 
     /**
      * Creates a response.
@@ -74,7 +74,7 @@ class JOSEResponse extends ArrayWrapper {
      * @param string $default_signed_response_alg the default `_signed_response_alg` value
      * if the client configuration is not found
      */
-    function __construct($issuer, $client, $path_prefix, $data = array(), $default_signed_response_alg = null) {
+    function __construct($issuer, $client, $path_prefix, $data = [], $default_signed_response_alg = null) {
         parent::__construct($data);
         $this->issuer = $issuer;
         $this->client = $client;
@@ -187,12 +187,12 @@ class JOSEResponse extends ArrayWrapper {
             $set = $builder->addClientSecret()->addClientPublicKeys()->addServerPrivateKeys()->toKeySet();
         }
 
-        $headers = array_merge($this->headers, array('alg' => $this->signed_response_alg));
-        $claims = array_merge($this->container, array(
+        $headers = array_merge($this->headers, [ 'alg' => $this->signed_response_alg ]);
+        $claims = array_merge($this->container, [
             'iss' => $this->issuer,
             'aud' => $this->client->getStoreID(),
             'jti' => $rand->id()
-        ));
+        ]);
 
         $jwt = new JWT($headers, $claims);
         try {
@@ -203,11 +203,11 @@ class JOSEResponse extends ArrayWrapper {
 
         if ($typ == 'jwt') return $token;
 
-        $headers = array(
+        $headers = [
             'alg' => $this->encrypted_response_alg,
             'enc' => $this->encrypted_response_enc,
             'cty' => 'JWT'
-        );
+        ];
 
         $jwe = new JWE($headers, $token);
         try {

@@ -86,7 +86,7 @@ class OAuthModule extends Module implements ProtocolResult {
     public function auth() {
         $this->checkHttps('redirect');
 
-        $request = new Request($this->f3->get('GET'), array());
+        $request = new Request($this->f3->get('GET'), []);
         
         $this->logger->log(LogLevel::INFO, 'OAuth authorisation request: ', $request->toArray());
         
@@ -97,7 +97,7 @@ class OAuthModule extends Module implements ProtocolResult {
             if (isset($request['redirect_uri'])) {
                 $response->renderRedirect();
             } else {
-                $this->fatalError($this->t('Protocol Error: %error_code', array('%error_code' => $response['error'])));
+                $this->fatalError($this->t('Protocol Error: %error_code', [ '%error_code' => $response['error'] ]));
             }
             return;
         }
@@ -109,7 +109,7 @@ class OAuthModule extends Module implements ProtocolResult {
             if (isset($request['redirect_uri'])) {
                 $response->renderRedirect();
             } else {
-                $this->fatalError($this->t('Protocol Error: %error_code', array('%error_code' => $response['error'])));
+                $this->fatalError($this->t('Protocol Error: %error_code', [ '%error_code' => $response['error'] ]));
             }
             return;
         }
@@ -230,7 +230,7 @@ class OAuthModule extends Module implements ProtocolResult {
         $results = $this->mgr->invokeAll('oAuthProcessAuthRequest', $request, $response);
         
         // Filter out nulls
-        $results = array_merge(array_diff($results, array(NULL)));
+        $results = array_merge(array_diff($results, [ NULL ]));
             
         // Prepend the core_result and take the lowest value
         array_unshift($results, $core_result);
@@ -243,7 +243,7 @@ class OAuthModule extends Module implements ProtocolResult {
                 if (isset($request['scope'])) {
                     $scopes = $request->paramToArray('scope');
                 } else {
-                    $scopes = array(self::DEFAULT_SCOPE);
+                    $scopes = [ self::DEFAULT_SCOPE ];
                 }
                 $this->grantAuth($request, $response, $scopes);
                 break;
@@ -262,12 +262,12 @@ class OAuthModule extends Module implements ProtocolResult {
                     $response->setError('login_required', 'Login required')->renderRedirect();
                 } else {
                     $token = new SecurityToken();
-                    $state = array('rt' => '/oauth/auth', 'rq' => $request->toArray());
-                    $form_state = array(
+                    $state = [ 'rt' => '/oauth/auth', 'rq' => $request->toArray() ];
+                    $form_state = [
                         'rq' => $request->toArray(),
                         'mode' => AuthManager::MODE_CREDENTIALS,
                         'auth_skip_activity' => true
-                    );
+                    ];
                     if ($result == self::CHECKID_REENTER_CREDENTIALS) {
                         $auth = AuthManager::instance();
                         $user = $auth->getUser();
@@ -276,9 +276,9 @@ class OAuthModule extends Module implements ProtocolResult {
                     }
 
                     $auth_module = $this->mgr->getModule('SimpleID\Auth\AuthModule');
-                    $auth_module->loginForm(array(
+                    $auth_module->loginForm([
                         'destination' => 'continue/' . rawurlencode($token->generate($state))
-                    ), $form_state);
+                    ], $form_state);
                     exit;
                 }
                 break;
@@ -325,7 +325,7 @@ class OAuthModule extends Module implements ProtocolResult {
         if (isset($request['scope'])) {
             $scopes = $request->paramToArray('scope');
         } else {
-            $scopes = array(self::DEFAULT_SCOPE);
+            $scopes = [ self::DEFAULT_SCOPE ];
         }
         if (count(array_diff($scopes, $consents)) > 0) return self::CHECKID_APPROVAL_REQUIRED;
 
@@ -350,7 +350,7 @@ class OAuthModule extends Module implements ProtocolResult {
             if (isset($request['scope'])) {
                 $scopes = $request->paramToArray('scope');
             } else {
-                $scopes = array(self::DEFAULT_SCOPE);
+                $scopes = [ self::DEFAULT_SCOPE ];
             }
         }
 
@@ -362,16 +362,16 @@ class OAuthModule extends Module implements ProtocolResult {
             $authorization->setScope($scopes);
         }
 
-        $activity = array(
+        $activity = [
             'type' => 'app',
             'id' => $client->getStoreID(),
             'time' => time()
-        );
+        ];
         if ($this->f3->exists('IP')) $activity['remote'] = $this->f3->get('IP');
         $user->addActivity($cid, $activity);
 
         if ($request->paramContains('response_type', 'code')) {
-            $additional = array();
+            $additional = [];
             if (isset($request['code_challenge'])) {
                 $additional['code_challenge'] = $request['code_challenge'];
                 $additional['code_challenge_method'] = (isset($request['code_challenge_method'])) ? $request['code_challenge_method'] : 'plain';
@@ -424,7 +424,7 @@ class OAuthModule extends Module implements ProtocolResult {
             return;
         }
 
-        $grant_types = (isset($client['oauth']['grant_types'])) ? $client['oauth']['grant_types'] : array('authorization_code');
+        $grant_types = (isset($client['oauth']['grant_types'])) ? $client['oauth']['grant_types'] : [ 'authorization_code' ];
         if (!in_array($request['grant_type'], $grant_types)) {
             $this->logger->log(LogLevel::ERROR, 'Grant type not registered by client');
             $response->setError('unauthorized_client', 'Grant type not registered by client');
@@ -599,10 +599,10 @@ class OAuthModule extends Module implements ProtocolResult {
 
         $client = $store->loadClient($request['client_id'], 'SimpleID\Protocols\OAuth\OAuthClient');
 
-        $form_state = array(
+        $form_state = [
             'rq' => $request,
             'rs' => $response,
-        );
+        ];
         
         $application_name = $client->getDisplayName();
         $application_type = (isset($client['oauth']['application_type'])) ? $client['oauth']['application_type'] : '';
@@ -616,33 +616,33 @@ class OAuthModule extends Module implements ProtocolResult {
         if (isset($request['scope'])) {
             $scopes = $request->paramToArray('scope');
         } else {
-            $scopes = array(self::DEFAULT_SCOPE);
+            $scopes = [ self::DEFAULT_SCOPE ];
         }
-        usort($scopes, array($this, 'sortScopes'));
+        usort($scopes, [ $this, 'sortScopes' ]);
         
-        $scope_list = array();
+        $scope_list = [];
         foreach ($scopes as $scope) {
             $scope_list[$scope] = (isset(self::$oauth_scope_settings[$scope]['description'])) ? self::$oauth_scope_settings[$scope]['description'] : 'scope ' . $scope;
         }
         $this->f3->set('scope_list', $scope_list);
 
         if ($client->isDynamic()) {
-            $this->f3->set('dynamic_label', $this->t('Warning: %application_name did not pre-register with SimpleID.  Its identity has not been confirmed.', array('%application_name' => $application_name)));
+            $this->f3->set('dynamic_label', $this->t('Warning: %application_name did not pre-register with SimpleID.  Its identity has not been confirmed.', [ '%application_name' => $application_name ]));
             $this->f3->set('client_dynamic', 'client-dynamic');
         }
 
-        $client_info = array();
+        $client_info = [];
         if (isset($client['oauth']['website'])) {
-            $client_info[] = $this->t('You can visit this application\'s web site at <a href="%url">%url</a>.', array('%url' => $client['oauth']['website']));
+            $client_info[] = $this->t('You can visit this application\'s web site at <a href="%url">%url</a>.', [ '%url' => $client['oauth']['website'] ]);
         }
         if (isset($client['oauth']['policy_url'])) {
-            $client_info[] = $this->t('You can view this application\'s policy on the use of your data at <a href="%url">%url</a>.', array('%url' => $client['oauth']['policy_url']));
+            $client_info[] = $this->t('You can view this application\'s policy on the use of your data at <a href="%url">%url</a>.', [ '%url' => $client['oauth']['policy_url'] ]);
         }
         if (isset($client['oauth']['tos_url'])) {
-            $client_info[] = $this->t('You can view this application\'s terms of service at <a href="%url">%url</a>.', array('%url' => $client['oauth']['tos_url']));
+            $client_info[] = $this->t('You can view this application\'s terms of service at <a href="%url">%url</a>.', [ '%url' => $client['oauth']['tos_url'] ]);
         }
         if (isset($client['oauth']['contacts'])) {
-            $contacts = array();
+            $contacts = [];
             
             if (is_array($client['oauth']['contacts'])) {
                 foreach ($client['oauth']['contacts'] as $contact) {
@@ -652,14 +652,14 @@ class OAuthModule extends Module implements ProtocolResult {
                 $contacts[] = '<a href="mailto:' . $this->rfc3986_urlencode($client['oauth']['contacts']) . '">' . $this->f3->clean($client['oauth']['contacts']) . '</a>';
             }
             
-            $client_info[] = $this->t('You can email the developer of this application at: !contacts.', array('!contacts' => implode(', ', $contacts)));
+            $client_info[] = $this->t('You can email the developer of this application at: !contacts.', [ '!contacts' => implode(', ', $contacts) ]);
         }
         $this->f3->set('client_info', $client_info);
         $this->f3->set('client_info_label', $this->t('More information'));
         
-        $this->f3->set('request_label', $this->t('<strong class="@application_type">%application_name</strong> is requesting access to:', array('@application_type' => $application_type, '%application_name' => $application_name)));
+        $this->f3->set('request_label', $this->t('<strong class="@application_type">%application_name</strong> is requesting access to:', [ '@application_type' => $application_type, '%application_name' => $application_name ]));
         $this->f3->set('dashboard_label', $this->t('You can revoke access at any time under <strong>Dashboard</strong>.'));
-        $this->f3->set('oauth_consent_label', $this->t('Don\'t ask me again for %application_name.', array('%application_name' => $application_name)));
+        $this->f3->set('oauth_consent_label', $this->t('Don\'t ask me again for %application_name.', [ '%application_name' => $application_name ]));
         $this->f3->set('allow_button', $this->t('Allow'));
         $this->f3->set('deny_button', $this->t('Deny'));
         
@@ -721,19 +721,19 @@ class OAuthModule extends Module implements ProtocolResult {
             $cid = $client->getStoreID();
             $now = time();
 
-            $consents = array('oauth' => $this->f3->get('POST.prefs.consents.oauth'));
+            $consents = [ 'oauth' => $this->f3->get('POST.prefs.consents.oauth') ];
 
             if (isset($user->clients[$cid])) {
                 $prefs = $user->clients[$cid];
             } else {
-                $prefs = array(
-                    'oauth' => array(),
+                $prefs = [
+                    'oauth' => [],
                     'store_id' => $client->getStoreID(),
                     'display_name' => $client->getDisplayName(),
                     'display_html' => $client->getDisplayHTML(),
                     'first_time' => $now,
-                    'consents' => array(),
-                );
+                    'consents' => [],
+                ];
             }
 
             $prefs['last_time'] = $now;
@@ -753,21 +753,21 @@ class OAuthModule extends Module implements ProtocolResult {
     /** @see SimpleID\API\OAuthHooks::scopesHook() */
     public function scopesHook() {
         if (self::$scope_settings == NULL) {
-            self::$scope_settings = array(
-                'oauth' => array(
-                    self::DEFAULT_SCOPE => array(
+            self::$scope_settings = [
+                'oauth' => [
+                    self::DEFAULT_SCOPE => [
                         'description' => $this->t('know who you are'),
                         //'required' => true
-                    )
-                )
-            );
+                    ]
+                ]
+            ];
         }
         return self::$scope_settings;
     }
 
     /** @see SimpleID\API\OAuthHooks::oAuthResponseTypesHook() */
     public function oAuthResponseTypesHook() {
-        return array('token', 'code');
+        return [ 'token', 'code' ];
     }
 
     /** @see SimpleID\API\MyHooks::revokeAppHook() */

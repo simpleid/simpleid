@@ -86,7 +86,7 @@ class AuthManager extends Prefab {
     protected $logger;
     protected $mgr;
 
-    private $auth_info = array();
+    private $auth_info = [];
 
     private $ua_login_state = null;
 
@@ -135,7 +135,7 @@ class AuthManager extends Prefab {
             foreach ($modules as $module) {
                 $test_user = $this->mgr->invoke($module, 'autoAuth');
                 if ($test_user != NULL) {
-                    $this->login($test_user, self::AUTH_LEVEL_AUTO, array($module));
+                    $this->login($test_user, self::AUTH_LEVEL_AUTO, [ $module ]);
                     return;
                 }
             }
@@ -208,7 +208,7 @@ class AuthManager extends Prefab {
      * authenticate the user in this session
      * @param array $form_state
      */
-    public function login($user, $level, $modules = array(), $form_state = array()) {
+    public function login($user, $level, $modules = [], $form_state = []) {
         $store = StoreManager::instance();
         if (is_string($user)) $user = $store->loadUser($user);
 
@@ -228,12 +228,12 @@ class AuthManager extends Prefab {
 
         if ($level > self::AUTH_LEVEL_AUTO) {
             if (!isset($form_state['auth_skip_activity'])) {
-                $activity = array(
+                $activity = [
                     'type' => 'browser',
                     'level' => $level,
                     'modules' => $modules,
                     'time' => $_SESSION['auth']['time'],
-                );
+                ];
                 if ($this->f3->exists('IP')) $activity['remote'] = $this->f3->get('IP');
                 if ($this->f3->exists('HEADERS.User-Agent')) $activity['ua'] = $this->f3->get('HEADERS.User-Agent');
 

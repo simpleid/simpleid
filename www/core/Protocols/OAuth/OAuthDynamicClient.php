@@ -32,7 +32,7 @@ class OAuthDynamicClient extends OAuthClient {
 
     protected $dynamic = true;
 
-    public function __construct($data = array()) {
+    public function __construct($data = []) {
         parent::__construct($data);
 
         $rand = new Random();
@@ -46,7 +46,7 @@ class OAuthDynamicClient extends OAuthClient {
         if (isset($this->container['oauth']['jwks_uri'])) {
             $web = \Web::instance();
 
-            $response = new HTTPResponse($web->request($this->container['oauth']['jwks_uri'], array('headers' => array('Accept' => 'application/jwk-set+json,application/json,text/plain,application/octet-stream'))));
+            $response = new HTTPResponse($web->request($this->container['oauth']['jwks_uri'], [ 'headers' => [ 'Accept' => 'application/jwk-set+json,application/json,text/plain,application/octet-stream' ] ]));
             if ($response->isHttpError()) return;
         
             $jwks = json_decode($response->getBody(), true);
@@ -62,9 +62,9 @@ class OAuthDynamicClient extends OAuthClient {
      * @return array the dynamic client's metadata
      */
     public function getDynamicClientInfo() {
-        $results = array_merge($this->container['oauth'], array(
+        $results = array_merge($this->container['oauth'], [
             'client_id' => $this->getStoreID()
-        ));
+        ]);
 
         // if jwk_uri exists, we delete jwks as we retreived this ourselves
         if (isset($results['jwk_uri'])) unset($results['jwks']);

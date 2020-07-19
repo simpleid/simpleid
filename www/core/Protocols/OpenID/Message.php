@@ -44,7 +44,7 @@ abstract class Message extends ArrayWrapper {
      * A mapping of Type URIs of OpenID extnesions to aliases provided in an OpenID
      * message.
      */
-    protected $extension_map = array("http://openid.net/extensions/sreg/1.1" => "sreg"); // For sreg 1.0 compatibility
+    protected $extension_map = [ "http://openid.net/extensions/sreg/1.1" => "sreg" ]; // For sreg 1.0 compatibility
     
     /**
      * The version of the OpenID specification associated with
@@ -76,11 +76,11 @@ abstract class Message extends ArrayWrapper {
      * openid.example.) stripped in the keys.
      */
     public function getParamsForExtension($ns) {
-        if (!isset($this->extension_map[$ns])) return array();
+        if (!isset($this->extension_map[$ns])) return [];
         
         $prefix = $this->getPrefix();
         $alias = $this->extension_map[$ns];
-        $return = array();
+        $return = [];
         
         if (is_array($this->container)) {
             foreach ($this->container as $key => $value) {
@@ -162,7 +162,7 @@ abstract class Message extends ArrayWrapper {
      * @link http://openid.net/specs/openid-authentication-2_0.html#anchor11
      */
     protected function buildSignatureBaseString($signed_fields, $prefix = '') {
-        $signed_data = array();
+        $signed_data = [];
         // Remove duplicates
         $signed_fields = array_keys(array_flip($signed_fields));
 

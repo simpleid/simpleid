@@ -59,11 +59,11 @@ class OpenID2MigrationModule extends Module {
         
         if ($user != NULL) {
             header('Content-Type: application/json');
-            print json_encode(array('iss' => $iss));
+            print json_encode([ 'iss' => $iss ]);
         } else {
             $this->f3->status(404);
             
-            $this->fatalError($this->t('User %uid not found.', array('%uid' => $uid)));
+            $this->fatalError($this->t('User %uid not found.', [ '%uid' => $uid ]));
         }
     }
 
@@ -73,7 +73,7 @@ class OpenID2MigrationModule extends Module {
     public function connectBuildClaimsHook($user, $client, $context, $scopes, $claims_requested = NULL) {
         if (($context == 'id_token') && in_array('openid2', $scope)) {            
             if (isset($user['openid']['identity'])) {
-                return array('openid2_id' => $user['openid']['identity']);
+                return [ 'openid2_id' => $user['openid']['identity'] ];
             }
         }
     }
@@ -83,14 +83,14 @@ class OpenID2MigrationModule extends Module {
      */
     public function scopesHook() {
         if (self::$scope_settings == NULL) {
-            self::$scope_settings = array(
-                'oauth' => array(
-                    'openid2' => array(
+            self::$scope_settings = [
+                'oauth' => [
+                    'openid2' => [
                         'description' => '',
                         'weight' => -1
-                    )
-                )
-            );
+                    ]
+                ]
+            ];
         }
         return self::$scope_settings;
     }

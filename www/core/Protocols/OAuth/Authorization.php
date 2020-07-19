@@ -77,7 +77,7 @@ class Authorization implements Storable {
     protected $issue_refresh_token = true;
 
     /** @var array additional data to be stored with the authorization */
-    public $additional = array();
+    public $additional = [];
 
     /**
      * Creates an authorisation.
@@ -140,13 +140,13 @@ class Authorization implements Storable {
      * @param array $args additional parameters
      * @return Storable the storable object or null
      */
-    protected function getStorable($ref, $args = array()) {
+    protected function getStorable($ref, $args = []) {
         $store = StoreManager::instance();
         $f3 = \Base::instance();
 
         list($type, $id) = explode(':', $ref, 2);
         array_unshift($args, $id);
-        return call_user_func_array(array($store, 'load' . ucfirst($f3->camelCase($type))), $args);
+        return call_user_func_array([ $store, 'load' . ucfirst($f3->camelCase($type)) ], $args);
     }
 
     /**
@@ -257,7 +257,7 @@ class Authorization implements Storable {
      * @param array $additional additional data to be stored in the code
      * @return string the authorisation code
      */
-    public function issueCode($redirect_uri, $scope = null, $additional = array()) {
+    public function issueCode($redirect_uri, $scope = null, $additional = []) {
         if ($scope == null) $scope = $this->available_scope;
         $code = Code::create($this, $redirect_uri, $scope, $additional);
 
@@ -281,7 +281,7 @@ class Authorization implements Storable {
      * @return array an array of parameters that can be included in the OAuth token
      * endpoint response
      */
-    public function issueTokens($scope = array(), $expires_in = Token::TTL_PERPETUAL, $source = null, $additional = array()) {
+    public function issueTokens($scope = [], $expires_in = Token::TTL_PERPETUAL, $source = null, $additional = []) {
         $results = $this->issueAccessToken($scope, $expires_in, $source, $additional);
         
         if ($this->issue_refresh_token) {
@@ -303,8 +303,8 @@ class Authorization implements Storable {
      * @return array an array of parameters that can be included in the OAuth token
      * endpoint response
      */
-    public function issueAccessToken($scope = array(), $expires_in = Token::TTL_PERPETUAL, $source = null, $additional = array()) {
-        $results = array();
+    public function issueAccessToken($scope = [], $expires_in = Token::TTL_PERPETUAL, $source = null, $additional = []) {
+        $results = [];
 
         $token = AccessToken::create($this, $scope, $expires_in, $source, $additional);
 
@@ -326,9 +326,9 @@ class Authorization implements Storable {
      * @return array an array of parameters that can be included in the OAuth token
      * endpoint response
      */
-    protected function issueRefreshToken($scope = array(), $source = NULL, $additional = array()) {
+    protected function issueRefreshToken($scope = [], $source = NULL, $additional = []) {
         $token = RefreshToken::create($this, $scope, $source, $additional);
-        return array('refresh_token' => $token->getEncoded());
+        return [ 'refresh_token' => $token->getEncoded() ];
     }
 
     /**

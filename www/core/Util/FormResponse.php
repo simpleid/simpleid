@@ -34,7 +34,7 @@ class FormResponse extends ArrayWrapper {
      *
      * @param array $data the initial response parameters
      */
-    public function __construct($data = array()) {
+    public function __construct($data = []) {
         parent::__construct($data);
     }
 

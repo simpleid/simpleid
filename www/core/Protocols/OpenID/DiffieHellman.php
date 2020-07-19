@@ -107,10 +107,10 @@ class DiffieHellman {
         // Generate the shared secret
         $ZZ = $this->getSharedSecret($dh_consumer_public);
 
-        return array(
+        return [
             'dh_server_public' => $this->getPublicKey(),
             'enc_mac_key' => $this->cryptMACKey($ZZ, $mac_key)
-        );
+        ];
     }
 
     /**
@@ -225,7 +225,7 @@ class DiffieHellman {
      * @return BigNum the random integer as a bignum
      */
     private function generateRandom($stop) {
-        $duplicate_cache = array();
+        $duplicate_cache = [];
         $rand = new Random();
       
         // Used as the key for the duplicate cache
@@ -248,10 +248,10 @@ class DiffieHellman {
             $duplicate = $mxrand->mod($stop);
 
             if (count($duplicate_cache) > 10) {
-                $duplicate_cache = array();
+                $duplicate_cache = [];
             }
         
-            $duplicate_cache[$rbytes] = array($duplicate, $nbytes);
+            $duplicate_cache[$rbytes] = [ $duplicate, $nbytes ];
         }
       
         do {

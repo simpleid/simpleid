@@ -65,7 +65,7 @@ class Response extends ArrayWrapper {
      * be made
      * @param array $data the initial response parameters
      */
-    public function __construct($request = NULL, $data = array()) {
+    public function __construct($request = NULL, $data = []) {
         parent::__construct($data);
 
         if ($request != NULL) {
@@ -133,7 +133,7 @@ class Response extends ArrayWrapper {
      * @param array $additional additional parameters to include
      * @return Response this object (for chaining)
      */
-    public function setError($error, $error_description = NULL, $additional = array()) {
+    public function setError($error, $error_description = NULL, $additional = []) {
         foreach (array_keys($this->container) as $key) {
             if ($key != 'state') unset($this->container[$key]);
         }
@@ -160,7 +160,7 @@ class Response extends ArrayWrapper {
         if ($this->response_mode == self::FORM_POST_RESPONSE_MODE) $this->renderFormPost($redirect_uri);
 
         // 1. Firstly, get the query string
-        $query = str_replace(array('+', '%7E'), array('%20', '~'), http_build_query($this->container));
+        $query = str_replace([ '+', '%7E' ], [ '%20', '~' ], http_build_query($this->container));
         
         // 2. If there is no query string, then we just return the URL
         if (!$query) return $redirect_uri;
@@ -239,7 +239,7 @@ class Response extends ArrayWrapper {
      * @return array list of response modes
      */
     public static function getResponseModesSupported() {
-        return array(self::QUERY_RESPONSE_MODE, self::FRAGMENT_RESPONSE_MODE, self::FORM_POST_RESPONSE_MODE);
+        return [ self::QUERY_RESPONSE_MODE, self::FRAGMENT_RESPONSE_MODE, self::FORM_POST_RESPONSE_MODE ];
     }
 }
 

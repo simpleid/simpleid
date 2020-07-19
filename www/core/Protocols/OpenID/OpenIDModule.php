@@ -59,7 +59,7 @@ class OpenIDModule extends Module implements ProtocolResult {
     public function indexHook($_request) {
         $web = \Web::instance();
 
-        $content_type = $web->acceptable(array('text/html', 'application/xml', 'application/xhtml+xml', 'application/xrds+xml'));
+        $content_type = $web->acceptable([ 'text/html', 'application/xml', 'application/xhtml+xml', 'application/xrds+xml' ]);
 
         if (isset($_request['openid.mode'])) {
             $this->start(new Request($_request));
@@ -95,7 +95,7 @@ class OpenIDModule extends Module implements ProtocolResult {
             case 'checkid_immediate':
             case 'checkid_setup':
                 $token = new SecurityToken();
-                $state = array('rq' => $request->toArray());
+                $state = [ 'rq' => $request->toArray() ];
                 $this->checkHttps('redirect', true, $this->getCanonicalURL('continue/' . rawurlencode($token->generate($state)), '', 'https'));
                 
                 return $this->checkid($request);
@@ -108,7 +108,7 @@ class OpenIDModule extends Module implements ProtocolResult {
                     $this->f3->fatalError($this->t('Invalid OpenID message.'));
                 } else {
                     // Direct communication
-                    $this->directError('Invalid OpenID message.', array(), $request);
+                    $this->directError('Invalid OpenID message.', [], $request);
                 }
         }
     }
@@ -144,28 +144,28 @@ class OpenIDModule extends Module implements ProtocolResult {
         
         if (!isset($request['openid.session_type']) || !isset($request['openid.assoc_type'])) {
             $this->logger->log(LogLevel::ERROR, 'Association failed: openid.session_type or openid.assoc_type not set');
-            $this->directError('openid.session_type or openid.assoc_type not set', array(), $request);
+            $this->directError('openid.session_type or openid.assoc_type not set', [], $request);
             return;
         }
         
         // Check if the assoc_type is supported
         if (!array_key_exists($assoc_type, $assoc_types)) {
-            $error = array(
+            $error = [
                 'error_code' => 'unsupported-type',
                 'session_type' => 'DH-SHA1',
                 'assoc_type' => 'HMAC-SHA1'
-            );
+            ];
             $this->logger->log(LogLevel::ERROR, 'Association failed: The association type is not supported by SimpleID.');
             $this->directError('The association type is not supported by SimpleID.', $error, $request);
             return;
         }
         // Check if the session_type is supported
         if (!array_key_exists($session_type, $session_types)) {
-            $error = array(
+            $error = [
                 'error_code' => 'unsupported-type',
                 'session_type' => 'DH-SHA1',
                 'assoc_type' => 'HMAC-SHA1'
-            );
+            ];
             $this->logger->log(LogLevel::ERROR, 'Association failed: The session type is not supported by SimpleID.');
             $this->directError('The session type is not supported by SimpleID.', $error, $request);
             return;
@@ -174,7 +174,7 @@ class OpenIDModule extends Module implements ProtocolResult {
         if ($session_type == 'DH-SHA1' || $session_type == 'DH-SHA256') {
             if (!$dh_consumer_public) {
                 $this->logger->log(LogLevel::ERROR, 'Association failed: openid.dh_consumer_public not set');
-                $this->directError('openid.dh_consumer_public not set', array(), $request);
+                $this->directError('openid.dh_consumer_public not set', [], $request);
                 return;
             }
         }
@@ -250,7 +250,7 @@ class OpenIDModule extends Module implements ProtocolResult {
             
             if (!$request->returnToMatches($realm)) {
                 $this->logger->log(LogLevel::ERROR, 'Protocol Error: openid.return_to does not match realm.');
-                $this->indirectError($request['openid.return_to'], 'Protocol Error: openid.return_to does not match realm.', array(), $request);
+                $this->indirectError($request['openid.return_to'], 'Protocol Error: openid.return_to does not match realm.', [], $request);
                 return;
             }
         }
@@ -265,7 +265,7 @@ class OpenIDModule extends Module implements ProtocolResult {
             $results = $this->mgr->invokeAll('openIDCheckExtension', $request, $immediate);
             
             // Filter out nulls
-            $results = array_merge(array_diff($results, array(NULL)));
+            $results = array_merge(array_diff($results, [ NULL ]));
             
             // If there are still results, it is the lowest value, otherwise, it is CHECKID_PROTOCOL_ERROR
             $result = ($results) ? min($results) : self::CHECKID_PROTOCOL_ERROR;
@@ -307,13 +307,13 @@ class OpenIDModule extends Module implements ProtocolResult {
                     $response->render($request['openid.return_to']);
                 } else {
                     $token = new SecurityToken();
-                    $state = array('rq' => $request->toArray());
-                    $form_state = array(
+                    $state = [ 'rq' => $request->toArray() ];
+                    $form_state = [
                         'cancel' => 'openid',
                         'rq' => $request->toArray(),
                         'mode' => AuthManager::MODE_CREDENTIALS,
                         'auth_skip_activity' => true
-                    );
+                    ];
                     if ($result == self::CHECKID_REENTER_CREDENTIALS) {
                         $auth = AuthManager::instance();
                         $user = $auth->getUser();
@@ -322,9 +322,9 @@ class OpenIDModule extends Module implements ProtocolResult {
                     }
 
                     $auth_module = $this->mgr->getModule('SimpleID\Auth\AuthModule');
-                    $auth_module->loginForm(array(
+                    $auth_module->loginForm([
                         'destination' => 'continue/' . rawurlencode($token->generate($state))
-                    ), $form_state);
+                    ], $form_state);
                     exit;
                 }
                 break;
@@ -395,7 +395,7 @@ class OpenIDModule extends Module implements ProtocolResult {
         
         // Pass the assertion to extensions
         $assertion_results = $this->mgr->invokeAll('openIDCheckIdentity', $request, $identity, $immediate);
-        $assertion_results = array_merge(array_diff($assertion_results, array(NULL)));
+        $assertion_results = array_merge(array_diff($assertion_results, [ NULL ]));
         
         // Populate the request with the selected identity
         if ($request['openid.identity'] == Request::OPENID_IDENTIFIER_SELECT) {
@@ -411,7 +411,7 @@ class OpenIDModule extends Module implements ProtocolResult {
             
             $relying_party = $this->loadRelyingParty($realm);
             if ($relying_party->getServices() == null) {
-                $services = array();
+                $services = [];
             } else {
                 $services = $relying_party->getServices()->getByType(self::OPENID_RETURN_TO);
             }
@@ -419,7 +419,7 @@ class OpenIDModule extends Module implements ProtocolResult {
             $this->logger->log(LogLevel::INFO, 'OpenID 2 discovery: ' . count($services) . ' matching services');
             
             if ($services) {
-                $return_to_uris = array();
+                $return_to_uris = [];
                 
                 foreach ($services as $service) {
                     $return_to_uris = array_merge($return_to_uris, $service['uri']);
@@ -452,7 +452,7 @@ class OpenIDModule extends Module implements ProtocolResult {
             $final_assertion_result = min($assertion_results);
             
             if ($final_assertion_result == self::CHECKID_OK) {
-                if (!isset($user->clients[$cid])) $user->clients[$cid] = array();
+                if (!isset($user->clients[$cid])) $user->clients[$cid] = [];
                 $user->clients[$cid]['last_time'] = time();
                 $store->saveUser($user);
             }
@@ -477,11 +477,11 @@ class OpenIDModule extends Module implements ProtocolResult {
         $rand = new Random();
 
         $response = new Response($request);
-        $response->setArray(array(
+        $response->setArray([
             'mode' => 'id_res',
             'op_endpoint' => $this->getCanonicalURL(),
             'response_nonce' => $rand->openIDNonce()
-        ));
+        ]);
         
         if (isset($request['openid.assoc_handle'])) $response['assoc_handle'] = $request['openid.assoc_handle'];
         if (isset($request['openid.identity'])) $response['identity'] = $request['openid.identity'];
@@ -513,13 +513,13 @@ class OpenIDModule extends Module implements ProtocolResult {
             $response['mode'] = 'setup_needed';
         } else {
             $token = new SecurityToken();
-            $state = array('rq' => $request->toArray());
+            $state = [ 'rq' => $request->toArray() ];
 
             $request['openid.mode'] = 'checkid_setup';
-            $response->setArray(array(
+            $response->setArray([
                 'mode' => 'id_res',
                 'user_setup_url' => $this->getCanonicalURL('auth/login/continue/' . rawurlencode($token->generate($state)))
-            ));
+            ]);
         }
         
         $this->mgr->invokeAll('openIDResponse', false, $request, $response);
@@ -545,13 +545,13 @@ class OpenIDModule extends Module implements ProtocolResult {
             $response['mode'] = 'setup_needed';
         } else {
             $token = new SecurityToken();
-            $state = array('rq' => $request->toArray());
+            $state = [ 'rq' => $request->toArray() ];
             $query = ($result == self::CHECKID_REENTER_CREDENTIALS) ? 'mode=' . AuthManager::MODE_REENTER_CREDENTIALS : '';
 
-            $response->setArray(array(
+            $response->setArray([
                 'mode' => 'id_res',
                 'user_setup_url' => $this->getCanonicalURL('auth/login/continue/' . rawurlencode($token->generate($state)), $query)
-            ));
+            ]);
         }
         
         $this->mgr->invokeAll('openIDResponse', false, $request, $response);
@@ -621,10 +621,10 @@ class OpenIDModule extends Module implements ProtocolResult {
         // If we are using stateless mode, then we need to cache the response_nonce
         // so that the RP can only verify once
         if ($assoc->isPrivate() && isset($response['response_nonce'])) {
-            $cache->set(rawurlencode($response['response_nonce']) . '.openid_response' , array(
+            $cache->set(rawurlencode($response['response_nonce']) . '.openid_response' , [
                 'response_nonce' => $response['response_nonce'],
-                'association' => $assoc),
-            SIMPLEID_SHORT_TOKEN_EXPIRES_IN);
+                'association' => $assoc
+            ], SIMPLEID_SHORT_TOKEN_EXPIRES_IN);
         }
         
         $response['sig'] = $assoc->sign($response);
@@ -725,23 +725,23 @@ class OpenIDModule extends Module implements ProtocolResult {
         $tpl = new \Template();
         $token = new SecurityToken();
 
-        $form_state = array(
+        $form_state = [
             'rq' => $request,
             'rs' => $response,
             'code' => $reason
-        );
+        ];
         $cancel = ($response['mode'] == 'cancel');
 
         $realm = $request->getRealm();
 
         if ($cancel) {
-            $this->f3->set('unable_label', $this->t('Unable to log into <strong class="realm">@realm</strong>.', array('@realm' => $realm)));
-            $this->f3->set('identity_not_matching_label', $this->t('Your current identity does not match the requested identity %identity.', array('%identity' => $request['openid.identity'])));
-            $this->f3->set('switch_user_label', $this->t('<a href="!url">Switch to a different user</a> and try again.', array('!url' => $this->getCanonicalURL('auth/logout/continue/' .  rawurlencode($token->generate($request->toArray())), '', true))));
+            $this->f3->set('unable_label', $this->t('Unable to log into <strong class="realm">@realm</strong>.', [ '@realm' => $realm ]));
+            $this->f3->set('identity_not_matching_label', $this->t('Your current identity does not match the requested identity %identity.', [ '%identity' => $request['openid.identity'] ]));
+            $this->f3->set('switch_user_label', $this->t('<a href="!url">Switch to a different user</a> and try again.', [ '!url' => $this->getCanonicalURL('auth/logout/continue/' .  rawurlencode($token->generate($request->toArray())), '', true) ]));
         } else {
             $base_path = $this->f3->get('base_path');
             
-            $form_state['prefs'] = (isset($user_clients[$realm])) ? $user_clients[$realm] : array();
+            $form_state['prefs'] = (isset($user_clients[$realm])) ? $user_clients[$realm] : [];
             
             $forms = $this->mgr->invokeAll('openIDConsentForm', $form_state);
             uasort($forms, function($a, $b) { if ($a['weight'] == $b['weight']) { return 0; } return ($a['weight'] < $b['weight']) ? -1 : 1; });
@@ -750,12 +750,12 @@ class OpenIDModule extends Module implements ProtocolResult {
             if ($reason == self::CHECKID_RETURN_TO_SUSPECT) {
                 $this->f3->set('return_to_suspect', true);
                 $this->f3->set('suspect_label', $this->t('Warning: This web site has not confirmed its identity and might be fraudulent.  Do not share any personal information with this web site unless you are sure it is legitimate. See the <a href="!url" class="popup">SimpleID documentation for details</a> (OpenID version 2.0 return_to discovery failure)',
-                    array('!url' => 'http://simpleid.org/documentation/troubleshooting/returnto-discovery-failure')));
-                $this->f3->set('js_locale', array('openid_suspect' => addslashes($this->t('This web site has not confirmed its identity and might be fraudulent.')) . '\n\n' . addslashes($this->t('Are you sure you wish to automatically send your information to this site for any future requests?'))));
+                    [ '!url' => 'http://simpleid.org/documentation/troubleshooting/returnto-discovery-failure' ]));
+                $this->f3->set('js_locale', [ 'openid_suspect' => addslashes($this->t('This web site has not confirmed its identity and might be fraudulent.')) . '\n\n' . addslashes($this->t('Are you sure you wish to automatically send your information to this site for any future requests?')) ]);
                 $this->f3->set('realm_class', 'return-to-suspect');
             }
             
-            $this->f3->set('realm_label', $this->t('You are being logged into <strong class="realm">@realm</strong>.', array('@realm' => $realm)));
+            $this->f3->set('realm_label', $this->t('You are being logged into <strong class="realm">@realm</strong>.', [ '@realm' => $realm ]));
             $this->f3->set('openid_consent_label', $this->t('Automatically send my information to this site for any future requests.'));
             $this->f3->set('ok_button', $this->t('OK'));
             
@@ -817,7 +817,7 @@ class OpenIDModule extends Module implements ProtocolResult {
         } else {
             $this->mgr->invokeRefAll('openIDConsentFormSubmit', $form_state);
 
-            $consents = array('openid' => ($this->f3->exists('POST.prefs.consents.openid') && ($this->f3->exists('POST.prefs.consents.openid') == 'true')));
+            $consents = [ 'openid' => ($this->f3->exists('POST.prefs.consents.openid') && ($this->f3->exists('POST.prefs.consents.openid') == 'true')) ];
             $this->logActivity($request, $consents);
             
             $this->signResponse($response, isset($response['assoc_handle']) ? $response['assoc_handle'] : NULL);
@@ -867,27 +867,27 @@ class OpenIDModule extends Module implements ProtocolResult {
 
         $now = time();
 
-        $activity = array(
+        $activity = [
             'type' => 'app',
             'id' => $realm,
             'time' => $now
-        );
+        ];
         if ($this->f3->exists('IP')) $activity['remote'] = $this->f3->get('IP');
         $user->addActivity($cid, $activity);
 
         if (isset($user->clients[$cid])) {
             $prefs = $user->clients[$cid];
         } else {
-            $prefs = array(
-                'openid' => array(
+            $prefs = [
+                'openid' => [
                     'version' => $request->getVersion()
-                ),
+                ],
                 'store_id' => $relying_party->getStoreID(),
                 'display_name' => $relying_party->getDisplayName(),
                 'display_html' => $relying_party->getDisplayHTML(),
                 'first_time' => $now,
-                'consents' => array()
-            );
+                'consents' => []
+            ];
         }
 
         $prefs['last_time'] = $now;
@@ -910,7 +910,7 @@ class OpenIDModule extends Module implements ProtocolResult {
      * message
      * @param Request $request the request in response to which the error is made
      */
-    protected function directError($error, $additional = array(), $request = NULL) {
+    protected function directError($error, $additional = [], $request = NULL) {
         $this->f3->status(400);
 
         $error = Response::createError($error, $additional, $request);
@@ -927,7 +927,7 @@ class OpenIDModule extends Module implements ProtocolResult {
      * message
      * @param Request $request the request in response to which the error is made
      */
-    protected function indirectError($url, $error, $additional = array(), $request = NULL) {
+    protected function indirectError($url, $error, $additional = [], $request = NULL) {
         $error = Response::createError($error, $additional, $request);
         $error->render($url);
     }
@@ -994,7 +994,7 @@ class OpenIDModule extends Module implements ProtocolResult {
         } else {
             $this->f3->status(404);
             
-            $this->fatalError($this->t('User %uid not found.', array('%uid' => $uid)));
+            $this->fatalError($this->t('User %uid not found.', [ '%uid' => $uid ]));
         }
     }
 
@@ -1006,11 +1006,11 @@ class OpenIDModule extends Module implements ProtocolResult {
      */
     public function scopesHook() {
         if (self::$scope_settings == NULL) {
-            self::$scope_settings = array(
-                'openid' => array(
+            self::$scope_settings = [
+                'openid' => [
                     'description' => $this->t('know who you are'),
-                )
-            );
+                ]
+            ];
         }
         return self::$scope_settings;
     }
@@ -1025,10 +1025,10 @@ class OpenIDModule extends Module implements ProtocolResult {
         $user = $auth->getUser();
         $tpl = new \Template();
         
-        $this->f3->set('js_locale', array('code' => addslashes($this->t('<em>You need to set at least one of OpenID 1.x or OpenID 2 to generate the code.</em>'))));
+        $this->f3->set('js_locale', [ 'code' => addslashes($this->t('<em>You need to set at least one of OpenID 1.x or OpenID 2 to generate the code.</em>')) ]);
 
         $xrds_url = $this->getCanonicalURL('user/'. $user['uid'] . '/xrds', '', true);
-        $hive = array(
+        $hive = [
             'config' => $this->f3->get('config'),
             'user' => $user,
             'link_tags_label' => $this->t('<link> tags'),
@@ -1036,18 +1036,18 @@ class OpenIDModule extends Module implements ProtocolResult {
             'openid2_label' => $this->t('OpenID 2.x'),
             'localid_label' => $this->t('Claim a different identifier'),
             'yadis_label' => $this->t('YADIS'),
-            'yadis_doc_label' => $this->t('Write your own or <a href="!url">download</a> your YADIS document', array('!url' => $xrds_url)),
+            'yadis_doc_label' => $this->t('Write your own or <a href="!url">download</a> your YADIS document', [ '!url' => $xrds_url ]),
             'yadis_add_label' => $this->t('Add HTTP headers or <meta> tag, e.g.:'),
             'xrds_url' => $xrds_url
-        );
+        ];
         
-        return array(array(
+        return [ [
             'id' => 'discovery',
             'title' => $this->t('OpenID 2'),
             'content' => $tpl->render('openid_profile.html', false, $hive),
-            'links' => array(array('href' => 'http://simpleid.org/documentation/getting-started/setting-identity/claim-your-identifier', 'name' => $this->t('More information'))),
+            'links' => [ [ 'href' => 'http://simpleid.org/documentation/getting-started/setting-identity/claim-your-identifier', 'name' => $this->t('More information') ] ],
             'weight' => 1
-        ));
+        ] ];
     }
 }
 

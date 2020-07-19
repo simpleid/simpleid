@@ -54,7 +54,7 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
         parent::__construct();
 
         if (self::$metadata_map == NULL) {
-            self::$metadata_map = array(
+            self::$metadata_map = [
                 'client_name' => 'client_name',
                 'client_uri' => 'client_uri',
                 'client_secret' => 'oauth.client_secret',
@@ -87,7 +87,7 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
                 'initiate_login_uri' => 'connect.initiate_login_uri',
                 'request_uris' => 'connect.request_uris',
                 'post_logout_redirect_uris' => 'connect.post_logout_redirect_uris',
-            );
+            ];
         }
     }
 
@@ -131,7 +131,7 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
 
         // Verify redirect_uri based on application_type
         $application_type = (isset($request['application_type'])) ? $request['application_type'] : 'web';
-        $grant_types = (isset($request['grant_types'])) ? $request['grant_types'] : array('authorization_code');
+        $grant_types = (isset($request['grant_types'])) ? $request['grant_types'] : [ 'authorization_code' ];
 
         foreach ($request['redirect_uris'] as $redirect_uri) {
             $parts = parse_url($redirect_uri);
@@ -182,11 +182,11 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
         $client->fetchJWKs();
 
         $response->loadData($request);
-        $response->loadData(array(
+        $response->loadData([
             'client_id' => $client->getStoreID(),            
             'registration_client_uri' => $this->getCanonicalURL('connect/client/' . $client->getStoreID()),
             'client_id_issued_at' => time(),
-        ));
+        ]);
 
         if ($client['oauth']['token_endpoint_auth_method'] != 'none') {
             $client->pathSet('oauth.client_secret', $rand->secret());
@@ -201,7 +201,7 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
 
         $auth = new Authorization($client, $client, self::CLIENT_REGISTRATION_ACCESS_SCOPE);
         $store->saveAuth($auth);
-        $token = $auth->issueAccessToken(array(self::CLIENT_REGISTRATION_ACCESS_SCOPE));
+        $token = $auth->issueAccessToken([ self::CLIENT_REGISTRATION_ACCESS_SCOPE ]);
         $response['registration_access_token'] = $token['access_token'];
 
         $this->f3->status(201);
@@ -239,7 +239,7 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
      * @see SimpleID\API\ConnectHooks::connectConfigurationHook()
      */
     public function connectConfigurationHook() {
-        return array('registration_endpoint' => $this->getCanonicalURL('@connect_client_register'));
+        return [ 'registration_endpoint' => $this->getCanonicalURL('@connect_client_register') ];
     }
 
     /**
@@ -263,7 +263,7 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
             return false;
         }
 
-        $response = new HTTPResponse($web->request($sector_identifier_uri, array('headers' => array('Accept' => 'application/json'))));
+        $response = new HTTPResponse($web->request($sector_identifier_uri, [ 'headers' => [ 'Accept' => 'application/json' ] ]));
         
         if ($response->isHttpError()) {
             $this->logger->log(LogLevel::ERROR, 'Cannot retrieve sector_identifier_uri:' . $sector_identifier_uri);

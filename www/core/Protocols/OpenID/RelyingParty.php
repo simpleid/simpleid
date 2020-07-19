@@ -40,9 +40,9 @@ class RelyingParty extends Client {
     private $store_id;
 
     public function __construct($realm) {
-        parent::__construct(array(
-            'openid' => array('realm' => $realm, 'services' => NULL, 'discovery_time' => 0)
-        ));
+        parent::__construct([
+            'openid' => [ 'realm' => $realm, 'services' => NULL, 'discovery_time' => 0 ]
+        ]);
         $this->cid = $realm;
         $this->store_id = self::buildID($realm);
     }
@@ -101,7 +101,7 @@ class RelyingParty extends Client {
      */
     protected static function getDiscoveryURL($realm) {
         $parts = parse_url($realm);
-        $host = strtr($parts['host'], array('*.' => 'www.'));;
+        $host = strtr($parts['host'], [ '*.' => 'www.' ]);
         
         $url = $parts['scheme'] . '://';
         if (isset($parts['user'])) {

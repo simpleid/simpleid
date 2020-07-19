@@ -85,9 +85,9 @@ use SimpleID\Models\User;
  */
 class StoreManager extends Prefab {
     /** @var array a mapping between the identifier of a store and its store module */
-    protected $stores = array();
+    protected $stores = [];
 
-    private $cache = array();
+    private $cache = [];
 
     /** @var string a space delimited list of stores that must be implemented */
     const REQUIRED_STORES = 'user:read client:read client:write keyvalue:read keyvalue:write';
@@ -313,7 +313,7 @@ class StoreManager extends Prefab {
         list($verb, $type) = explode('_', $f3->snakecase($method), 2);
         if (method_exists($this, $verb)) {
             array_unshift($args, $type);
-            return call_user_func_array(array($this, $verb), $args);
+            return call_user_func_array([ $this, $verb ], $args);
         }
     }
 

@@ -52,10 +52,10 @@ class PAPEOpenIDExtensionModule extends Module implements ProtocolResult {
      * @see hook_xrds_types()
      */
     public function xrdsTypesHook() {
-        return array(
+        return [
             self::OPENID_NS_PAPE,
             self::PAPE_LEVEL_NIST800_63
-        );
+        ];
     }
 
     /**
@@ -101,10 +101,10 @@ class PAPEOpenIDExtensionModule extends Module implements ProtocolResult {
         $auth = AuthManager::instance();
         
         // We only deal with positive assertions
-        if (!$assertion) return array();
+        if (!$assertion) return [];
         
         // We only respond if we are using OpenID 2 or later
-        if ($request->getVersion() < Message::OPENID_VERSION_2) return array();
+        if ($request->getVersion() < Message::OPENID_VERSION_2) return [];
         
         // Get what is requested
         $pape_request = $request->getParamsForExtension(self::OPENID_NS_PAPE);

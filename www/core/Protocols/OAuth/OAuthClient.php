@@ -32,14 +32,14 @@ class OAuthClient extends Client {
     protected $dynamic = false;
 
     public function __construct($data) {
-        parent::__construct(array_replace_recursive(array(
-            'oauth' => array(
+        parent::__construct(array_replace_recursive([
+            'oauth' => [
                 'token_endpoint_auth_method' => 'client_secret_basic',
-                'response_types' => array('code'),
-                'grant_types' => array('authorization_code'),
+                'response_types' => [ 'code' ],
+                'grant_types' => [ 'authorization_code' ],
                 'application_type' => 'web'
-            )
-        ), $data));
+            ]
+        ], $data));
     }
 
     /**

@@ -191,7 +191,7 @@ abstract class Module extends \Prefab {
 
                 if (!empty($aliases[$parts[1]])) {
                     $path = $aliases[$parts[1]];
-                    $path = $this->f3->build($path, isset($parts[2]) ? $this->f3->parse($parts[2]) : array());
+                    $path = $this->f3->build($path, isset($parts[2]) ? $this->f3->parse($parts[2]) : []);
                     $path = ltrim($path, '/');
                 }
             }
@@ -245,7 +245,7 @@ abstract class Module extends \Prefab {
      * and ! to replace as is
      * @return string the translated string
      */
-    protected function t($string, $variables = array()) {
+    protected function t($string, $variables = []) {
         $i18n = LocaleManager::instance();
 
         $translated = $i18n->dt_raw($this->domain, $string);

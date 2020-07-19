@@ -131,11 +131,11 @@ class SecurityToken {
      */
     public function generate($payload, $options = self::OPTION_DEFAULT) {
         $rand = new Random();
-        $this->data = array(
+        $this->data = [
             'i' => $rand->id(),
             'o' => $options,
             'p' => $payload
-        );
+        ];
         if (($options & self::OPTION_BIND_SESSION) == self::OPTION_BIND_SESSION) {
             $this->data['s'] = session_id();
         }

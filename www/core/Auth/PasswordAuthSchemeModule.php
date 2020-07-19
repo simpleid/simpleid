@@ -54,12 +54,12 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
             $this->f3->set('pass_label', $this->t('Password:'));
             $this->f3->set('login_form_module', 'password');
 
-            return array(
-                array(
+            return [
+                [
                     'content' => $tpl->render('auth_password.html', false),
                     'weight' => 0
-                )
-            );
+                ]
+            ];
         }
     }
 
@@ -101,10 +101,10 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
                 return false;
             }
 
-            return array(
+            return [
                 'uid' => $uid,
                 'auth_level' => $form_state['mode']
-            );
+            ];
         }
     }
 
@@ -132,7 +132,7 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
                 return $bcrypt->verify($credentials['password']['password'], $test_user['password']['password']);
                 break;
             case 'pbkdf2':
-                $params = array();
+                $params = [];
                 list($param_string, $hash, $salt) = explode('$', $content, 3);
                 parse_str($param_string, $params);
                 if (!isset($params['f'])) $params['f'] = 'sha256';
@@ -150,7 +150,7 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
      * @see SimpleID\API\AuthHooks::secretUserDataPathsHook()
      */
     public function secretUserDataPathsHook() {
-        return array('password.password');
+        return [ 'password.password' ];
     }
 }
 ?>

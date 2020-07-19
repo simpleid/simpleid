@@ -51,10 +51,10 @@ class MyModule extends Module {
             if ($this->f3->get('AJAX')) {
                 $this->f3->status(401);
                 header('Content-Type: application/json');
-                print json_encode(array(
+                print json_encode([
                     'error' => 'unauthorized',
                     'error_description' => $this->t('Unauthorized')
-                ));
+                ]);
                 exit;
             } else {
                 $route = ltrim($this->f3->get('PARAMS.0'), '/');
@@ -108,10 +108,10 @@ class MyModule extends Module {
         $token = new SecurityToken();
         if (!$this->f3->exists('GET.tk') || !$token->verify($this->f3->get('GET.tk'), 'apps')) {
             $this->f3->status(401);
-            print json_encode(array(
+            print json_encode([
                 'error' => 'unauthorized',
                 'error_description' => $this->t('Unauthorized')
-            ));
+            ]);
             return;
         }
 
@@ -123,9 +123,9 @@ class MyModule extends Module {
             return strcasecmp($a['display_name'], $b['display_name']);
         });
 
-        $results = array();
+        $results = [];
         foreach ($prefs as $cid => $client_prefs) {
-            $results[] = array_merge(array('cid' => $cid), $client_prefs);
+            $results[] = array_merge([ 'cid' => $cid ], $client_prefs);
         }
         print json_encode($results);
     }
@@ -138,10 +138,10 @@ class MyModule extends Module {
         $token = new SecurityToken();
         if (!$this->f3->exists('GET.tk') || !$token->verify($this->f3->get('GET.tk'), 'apps')) {
             $this->f3->status(401);
-            print json_encode(array(
+            print json_encode([
                 'error' => 'unauthorized',
                 'error_description' => $this->t('Unauthorized')
-            ));
+            ]);
             return;
         }
 
@@ -150,27 +150,27 @@ class MyModule extends Module {
         $clients = $user->clients;
         if (!isset($clients[$params['cid']])) {
             $this->f3->status(404);
-            print json_encode(array(
+            print json_encode([
                 'error' => 'not_found',
                 'error_description' => $this->t('Not found')
-            ));
+            ]);
             return;
         }
         
         $prefs = $clients[$params['cid']];
-        $results = array(
+        $results = [
             'first_time' => $this->f3->format('{0,date} {0,time}', $prefs['first_time']),
             'last_time' => $this->f3->format('{0,date} {0,time}', $prefs['last_time']),
-            't' => array(
+            't' => [
                 'first_time_label' => $this->t('First accessed:'),
                 'last_time_label' => $this->t('Last accessed:'),
                 'consents_label' => $this->t('You allowed this app to:'),
-            ),
-        );
+            ],
+        ];
 
         $mgr = ModuleManager::instance();
         $modules = $mgr->getModules();
-        $scope_info = array();
+        $scope_info = [];
         foreach ($this->modules as $module) {
             $result = $mgr->invoke($module, 'scopes');
             if (isset($result) && is_array($result)) {
@@ -178,20 +178,20 @@ class MyModule extends Module {
             }
         }
 
-        $consent_info = array();
+        $consent_info = [];
         foreach ($prefs['consents'] as $protocol => $consents) {
             if (is_array($consents)) {
                 foreach ($consents as $consent) {
-                    $consent_info[] = array(
+                    $consent_info[] = [
                         'description' => isset($scope_info[$protocol][$consent]['description']) ? $scope_info[$protocol][$consent]['description'] : $protocol . ':' . $consent,
                         'weight' => isset($scope_info[$protocol][$consent]['weight']) ? $scope_info[$protocol][$consent]['description'] : 0
-                    );
+                    ];
                 }
             } elseif ($consents) {
-                $consent_info[] = array(
+                $consent_info[] = [
                     'description' => isset($scope_info[$protocol]['description']) ? $scope_info[$protocol]['description'] : $protocol,
                     'weight' => isset($scope_info[$protocol]['weight']) ? $scope_info[$protocol]['description'] : 0
-                );
+                ];
             }
         }
 
@@ -212,10 +212,10 @@ class MyModule extends Module {
         $token = new SecurityToken();
         if (!isset($delete['tk']) || !$token->verify($delete['tk'], 'apps')) {
             $this->f3->status(401);
-            print json_encode(array(
+            print json_encode([
                 'error' => 'unauthorized',
                 'error_description' => $this->t('Unauthorized'),
-            ));
+            ]);
             return;
         }
 
@@ -224,10 +224,10 @@ class MyModule extends Module {
         $prefs = &$user->clients;
         if (!isset($prefs[$params['cid']])) {
             $this->f3->status(404);
-            print json_encode(array(
+            print json_encode([
                 'error' => 'not_found',
                 'error_description' => $this->t('Not found')
-            ));
+            ]);
             return;
         }
 
@@ -239,18 +239,18 @@ class MyModule extends Module {
         $store = StoreManager::instance();
         $store->saveUser($user);
 
-        print json_encode(array(
+        print json_encode([
             'result' => 'success',
             'result_description' => $this->t('App has been deleted.')
-        ));
+        ]);
     }
 
     public function navHook() {
-        return array(
-            array('name' => $this->t('Dashboard'), 'path' =>'my/dashboard', 'weight' => -10),
-            array('name' => $this->t('My Profile'), 'path' =>'my/profile', 'weight' => -9),
-            array('name' => $this->t('My Apps'), 'path' =>'my/apps', 'weight' => -8),
-        );
+        return [
+            [ 'name' => $this->t('Dashboard'), 'path' =>'my/dashboard', 'weight' => -10 ],
+            [ 'name' => $this->t('My Profile'), 'path' =>'my/profile', 'weight' => -9 ],
+            [ 'name' => $this->t('My Apps'), 'path' =>'my/apps', 'weight' => -8 ],
+        ];
     }
 
     /**
@@ -263,43 +263,43 @@ class MyModule extends Module {
         $user = $auth->getUser();
         $tpl = new \Template();
 
-        $blocks = array();
+        $blocks = [];
 
-        $blocks[] = array(
+        $blocks[] = [
             'id' => 'welcome',
             'title' => $this->t('Welcome'),
-            'content' => $this->t('You are logged in as %identity (%uid).', array('%uid' => $user['uid'], '%identity' => $user->getDisplayName())),
+            'content' => $this->t('You are logged in as %identity (%uid).', [ '%uid' => $user['uid'], '%identity' => $user->getDisplayName() ]),
             'weight' => -10
-        );
+        ];
 
-        $this->f3->mset(array(
+        $this->f3->mset([
             'access_type' => $this->t('Access type'),
             'location' => $this->t('Location'),
             'time' => $this->t('Date/time'),
             'browser_label' => $this->t('Browser'),
             'app_label' => $this->t('Authorized application'),
-        ));
-        $blocks[] = array(
+        ]);
+        $blocks[] = [
             'id' => 'activity',
             'title' => $this->t('Recent activity'),
             'content' => $tpl->render('my_activity.html', false),
             'weight' => 0
-        );
+        ];
 
         if ($this->f3->get('config.debug')) {
-            $blocks[] = array(
+            $blocks[] = [
                 'id' => 'auth',
                 'title' => $this->t('Authentication'),
                 'content' => '<pre class="code">' . $this->f3->encode($auth->toString()) . '</pre>',
                 'weight' => 10
-            );
+            ];
 
-            $blocks[] = array(
+            $blocks[] = [
                 'id' => 'user',
                 'title' => $this->t('User'),
                 'content' => '<pre class="code">' . $this->f3->encode($user->toString()) . '</pre>',
                 'weight' => 10
-            );
+            ];
         }
         
         return $blocks;

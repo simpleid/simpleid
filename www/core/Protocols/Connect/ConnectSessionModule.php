@@ -86,7 +86,7 @@ class ConnectSessionModule extends Module {
             } else {
                 if ($form_state['connect_logout']['post_logout_redirect_uri']) {
                     // set up continue param and redirect
-                    $state = array('rt' => 'connect/logout_complete/' . $token->generate($form_state['connect_logout']));
+                    $state = [ 'rt' => 'connect/logout_complete/' . $token->generate($form_state['connect_logout']) ];
 
                     $destination = 'continue/' . rawurlencode($token->generate($state));
                     $this->f3->reroute('@auth_logout(1=' . $destination . ')');
@@ -95,7 +95,7 @@ class ConnectSessionModule extends Module {
                 }
             }
         } else {
-            $form_state = array('connect_logout' => array());
+            $form_state = [ 'connect_logout' => [] ];
             if ($this->f3->exists('REQUEST.state')) $form_state['connect_logout']['state'] = $this->f3->get('REQUEST.state');
 
             // Check for id_token_hint.  If it is a valid ID token AND it is the
@@ -143,7 +143,7 @@ class ConnectSessionModule extends Module {
         }
     }
 
-    protected function logoutForm($form_state = array()) {
+    protected function logoutForm($form_state = []) {
         $tpl = new \Template();
 
         $this->f3->set('logout_consent_label', $this->t('Do you wish to log out of SimpleID as well?');
@@ -197,10 +197,10 @@ class ConnectSessionModule extends Module {
      * @see SimpleID\API\ConnectHooks::connectConfigurationHook()
      */
     public function connectConfigurationHook() {
-        return array(
+        return [
             'check_session_iframe' => $this->getCanonicalURL('@connect_check_session', '', 'https'),
             'end_session_endpoint' => $this->getCanonicalURL('@connect_logout', 'https')
-        );
+        ];
     }
 
     /**

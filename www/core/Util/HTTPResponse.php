@@ -34,7 +34,7 @@ class HTTPResponse {
     private $version;
     private $responseCode = null;
     private $body;
-    private $headers = array();
+    private $headers = [];
 
     /**
      * Constructs a HTTPResponse object from a response made using the
@@ -59,13 +59,13 @@ class HTTPResponse {
         $this->version = substr($protocol, strpos($protocol, '/') + 1);
         $this->responseCode = $code;
 
-        $valid_codes = array(
+        $valid_codes = [
             100, 101,
             200, 201, 202, 203, 204, 205, 206,
             300, 301, 302, 303, 304, 305, 307,
             400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416, 417,
             500, 501, 502, 503, 504, 505
-        );
+        ];
     
         // RFC 2616 states that all unknown HTTP codes must be treated the same as the
         // base code in their class.

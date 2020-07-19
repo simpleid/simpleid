@@ -96,15 +96,15 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
         } else {
             $rand = new Random();
 
-            $params = array(
+            $params = [
                 'type' => 'totp',
                 'secret' => $rand->bytes(10),
                 'algorithm' => 'sha1',
                 'digits' => 6,
                 'period' => 30,
                 'drift' => 0,
-                'remember' => array()
-            );
+                'remember' => []
+            ];
             $this->f3->set('otp_params', $token->generate($params, SecurityToken::OPTION_BIND_SESSION));
         }
 
@@ -120,13 +120,13 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
 
         $this->f3->set('about_otp', $this->t('Login verification adds an extra layer of protection to your account. When enabled, you will need to enter an additional security code whenever you log into SimpleID.'));
         $this->f3->set('otp_warning', $this->t('<strong>WARNING:</strong> If you enable login verification and lose your authenticator app, you will need to <a href="!url">edit your identity file manually</a> before you can log in again.',
-            array('!url' => 'http://simpleid.org/docs/2/common_problems/#otp')
+            [ '!url' => 'http://simpleid.org/docs/2/common_problems/#otp' ]
         ));
 
         $this->f3->set('setup_otp', $this->t('To set up login verification, following these steps.'));
         $this->f3->set('download_app', $this->t('Download an authenticator app that supports TOTP for your smartphone, such as Google Authenticator.'));
         $this->f3->set('add_account', $this->t('Add your SimpleID account to authenticator app using this key.  If you are viewing this page on your smartphone you can use <a href="!url">this link</a> or scan the QR code to add your account.',
-            array('!url' => $url)
+            [ '!url' => $url ]
         ));
         $this->f3->set('verify_code', $this->t('To check that your account has been added properly, enter the verification code from your phone into the box below, and click Verify.'));
         
@@ -169,12 +169,12 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             $html .= '<input type="submit" name="op" value="' . $this->t('Enable') . '" /></form>';
         }
         
-        return array(array(
+        return [ [
             'id' => 'otp',
             'title' => $this->t('Login Verification'),
             'content' => $html,
             'weight' => 0
-        ));
+        ] ];
     }
 
     /**
@@ -197,7 +197,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             // Note this is called from user_login(), so $_POST is always filled
             $this->f3->set('otp_instructions_label', $this->t('To verify your identity, enter the verification code.'));
             $this->f3->set('otp_recovery_label', $this->t('If you have lost your verification code, you can <a href="!url">recover your account</a>.',
-                array('!url' => 'http://simpleid.org/docs/2/common_problems/#otp')
+                [ '!url' => 'http://simpleid.org/docs/2/common_problems/#otp' ]
             ));
             $this->f3->set('otp_remember_label', $this->t('Do not ask for verification codes again on this browser.'));
 
@@ -205,12 +205,12 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             
             $this->f3->set('submit_button', $this->t('Verify'));
             
-            return array(
-                array(
+            return [
+                [
                     'content' => $tpl->render('auth_otp.html', false),
                     'weight' => 0
-                )
-            );
+                ]
+            ];
         }
     }
 
@@ -248,7 +248,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             $test_user['otp'] = $params;
             $store->saveUser($test_user); // Save the drift
 
-            return array('auth_level' => $form_state['mode']);
+            return  [ 'auth_level' => $form_state['mode'] ];
         }
     }
 
@@ -262,8 +262,8 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
         if (($level >= AuthManager::AUTH_LEVEL_VERIFIED) && isset($form_state['otp_remember']) && ($form_state['otp_remember'] == 1)) {
             $uaid = $auth->assignUAID();
 
-            if (!isset($user->auth[$uaid])) $user->auth[$uaid] = array();
-            if (!isset($user->auth[$uaid]['otp'])) $user->auth[$uaid]['otp'] = array();
+            if (!isset($user->auth[$uaid])) $user->auth[$uaid] = [];
+            if (!isset($user->auth[$uaid]['otp'])) $user->auth[$uaid]['otp'] = [];
             
             $user->auth[$uaid]['otp']['remember'] = true;
 
@@ -372,7 +372,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
      * @see SimpleID\API\AuthHooks::secretUserDataPathsHook()
      */
     public function secretUserDataPathsHook() {
-        return array('otp.secret', 'otp.drift');
+        return [ 'otp.secret', 'otp.drift' ];
     }
 }
 ?>

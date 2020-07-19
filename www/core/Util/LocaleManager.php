@@ -67,13 +67,13 @@ class LocaleManager extends Prefab {
             case 'dt':
             case 'dnt':
                 if (!$raw) $variables = array_pop($args);
-                $translated = call_user_func_array(array($this->i18n, $raw_method), $args);
+                $translated = call_user_func_array([ $this->i18n, $raw_method ], $args);
 
                 if ($raw) return $translated;
                 return $this->expand($translated, $variables);
                 break;
             default:
-                return call_user_func_array(array($this->i18n, $raw_method), $args);
+                return call_user_func_array([ $this->i18n, $raw_method ], $args);
         }
     }
 

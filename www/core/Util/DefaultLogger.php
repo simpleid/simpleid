@@ -42,7 +42,7 @@ class DefaultLogger extends Log implements LoggerInterface {
 
     protected $log_level;
 
-    protected static $log_levels = array(
+    protected static $log_levels = [
         LogLevel::EMERGENCY => 0,
         LogLevel::ALERT => 1,
         LogLevel::CRITICAL => 2,
@@ -51,7 +51,7 @@ class DefaultLogger extends Log implements LoggerInterface {
         LogLevel::NOTICE => 5,
         LogLevel::INFO => 6,
         LogLevel::DEBUG => 7,
-    );
+    ];
 
     /**
      * Creates a logger based on the Fat-Framework.  The log file
@@ -84,7 +84,7 @@ class DefaultLogger extends Log implements LoggerInterface {
      * @param string $message the message to log
      * @param array $context the context
      */
-    function log($level, $message, array $context = array()) {
+    function log($level, $message, array $context = []) {
         $fw = \Base::instance();
         $config = $fw->get('config');
 
@@ -106,7 +106,7 @@ class DefaultLogger extends Log implements LoggerInterface {
      * @return string the converted string.
      */
     static function formatArray($array, $keys = false) {
-        $output = array();
+        $output = [];
         
         if ($keys == false) $keys = array_keys($array);
         

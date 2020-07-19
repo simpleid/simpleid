@@ -39,7 +39,7 @@ class Client extends ArrayWrapper implements Storable {
 
     protected $dynamic;
 
-    public function __construct($data = array()) {
+    public function __construct($data = []) {
         parent::__construct($data);
     }
 

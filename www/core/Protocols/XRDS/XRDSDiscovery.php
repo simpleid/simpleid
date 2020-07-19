@@ -80,10 +80,10 @@ class XRDSDiscovery extends Prefab {
         $delegate = $this->getLinkRel('openid2.local_id', $html);
 
         if ($uri) {
-            $service = array(
-                'type' => array('http://specs.openid.net/auth/2.0/signon'),
-                'uri' => array($uri)
-                );
+            $service = [
+                'type' => [ 'http://specs.openid.net/auth/2.0/signon' ],
+                'uri' => [ $uri ]
+            ];
             if ($delegate) $service['localid'] = $delegate;
             $services->add($service, false);
         }
@@ -92,10 +92,10 @@ class XRDSDiscovery extends Prefab {
         $delegate = $this->getLinkRel('openid.delegate', $html);
             
         if ($uri) {
-            $service = array(
-                'type' => array('http://openid.net/signon/1.0'),
-                'uri' => array($uri)
-                );
+            $service = [
+                'type' => [ 'http://openid.net/signon/1.0' ],
+                'uri' => [ $uri ]
+            ];
             if ($delegate) $service['localid'] = $delegate;
             $services->add($service, false);
         }
@@ -296,7 +296,7 @@ class XRDSDiscovery extends Prefab {
      */
     protected function request($url, $headers = '') {
         $web = \Web::instance();
-        $result = $web->request($url, array('headers' => $headers));
+        $result = $web->request($url, [ 'headers' => $headers ]);
         return new HTTPResponse($result);
     }
 }

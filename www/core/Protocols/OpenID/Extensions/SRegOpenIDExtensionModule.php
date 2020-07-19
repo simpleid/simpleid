@@ -58,8 +58,8 @@ class SRegOpenIDExtensionModule extends Module {
         $user = $this->auth->getUser();
         
         $sreg_request = $request->getParamsForExtension(self::OPENID_NS_SREG);
-        $required = (isset($sreg_request['required'])) ? explode(',', $sreg_request['required']) : array();
-        $optional = (isset($sreg_request['optional'])) ? explode(',', $sreg_request['optional']) : array();
+        $required = (isset($sreg_request['required'])) ? explode(',', $sreg_request['required']) : [];
+        $optional = (isset($sreg_request['optional'])) ? explode(',', $sreg_request['optional']) : [];
         $fields = array_merge($required, $optional);
 
         $alias = $response->getAliasForExtension(self::OPENID_NS_SREG, 'sreg');
@@ -86,36 +86,36 @@ class SRegOpenIDExtensionModule extends Module {
         $user = $this->auth->getUser();
         
         $sreg_request = $request->getParamsForExtension(self::OPENID_NS_SREG);
-        $required = (isset($sreg_request['required'])) ? explode(',', $sreg_request['required']) : array();
-        $optional = (isset($sreg_request['optional'])) ? explode(',', $sreg_request['optional']) : array();
+        $required = (isset($sreg_request['required'])) ? explode(',', $sreg_request['required']) : [];
+        $optional = (isset($sreg_request['optional'])) ? explode(',', $sreg_request['optional']) : [];
         $fields = array_merge($required, $optional);
 
         // Check we have any response to consent to
         if (!count($response->getParamsForExtension(self::OPENID_NS_SREG))) return;
         
         $tpl = new \Template();
-        $hive = array(
+        $hive = [
             'module' => 'sreg',
             'userinfo_label' => $this->t('SimpleID will also be sending the following information to the site.'),
             'name_label' => $this->t('Name'),
             'value_label' => $this->t('Value'),
-            'fields' => array()
-        );
+            'fields' => []
+        ];
             
         if (isset($sreg_request['policy_url'])) {
-            $hive['policy_label'] = $this->t('You can view the site\'s policy in relation to the use of this information at this URL: <a href="@url">@url</a>.', array('@url' => $request['policy_url']));
+            $hive['policy_label'] = $this->t('You can view the site\'s policy in relation to the use of this information at this URL: <a href="@url">@url</a>.', [ '@url' => $request['policy_url'] ]);
         }
             
         foreach ($fields as $field) {
             $value = $this->getValue($user, $field);
         
             if ($value != NULL) {
-                $form_field = array(
+                $form_field = [
                     'id' => $field,
                     'html_id' => $field,
                     'name' => $field,
                     'value' => $value,
-                );
+                ];
 
                 if (in_array($field, $required)) {
                     $form_field['required'] = true;
@@ -128,12 +128,12 @@ class SRegOpenIDExtensionModule extends Module {
             }
         }
             
-        return array(
-            array(
+        return [
+            [
                 'content' => $tpl->render('openid_userinfo_consent.html', false, $hive),
                 'weight' => 0
-            )
-        );
+            ]
+        ];
         
     }
 
@@ -177,18 +177,18 @@ class SRegOpenIDExtensionModule extends Module {
         if (!isset($user['sreg'])) return;
 
         $tpl = new \Template();
-        $hive = array(
+        $hive = [
             'userinfo_label' => $this->t('SimpleID may send the following additional information to sites which supports the Simple Registration Extension.'),
             'name_label' => $this->t('Name'),
             'value_label' => $this->t('Value'),
             'info' => $user['sreg']
-        );
+        ];
         
-        return array(array(
+        return [ [
             'id' => 'sreg',
             'title' => t('Simple Registration Extension'),
             'content' => $tpl->render('openid_userinfo_profile.html', false, $hive),
-        ));
+        ] ];
     }
 
 
@@ -203,8 +203,8 @@ class SRegOpenIDExtensionModule extends Module {
      * @return string the value or NULL if not found
      */
     protected function getValue($user, $field) {
-        $sreg = (isset($user['sreg'])) ? $user['sreg'] : array();
-        $userinfo = (isset($user['userinfo'])) ? $user['userinfo'] : array();
+        $sreg = (isset($user['sreg'])) ? $user['sreg'] : [];
+        $userinfo = (isset($user['userinfo'])) ? $user['userinfo'] : [];
         
         if (isset($sreg[$field])) {
             return $sreg[$field];

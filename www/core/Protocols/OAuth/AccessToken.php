@@ -67,7 +67,7 @@ class AccessToken extends Token {
      * @param array $additional any additional data to be stored on the server for this token
      * @return AccessToken|null 
      */
-    static public function create($authorization, $scope = array(), $expires_in = Token::TTL_PERPETUAL, $source = NULL, $additional = array()) {
+    static public function create($authorization, $scope = [], $expires_in = Token::TTL_PERPETUAL, $source = NULL, $additional = []) {
         $token = new AccessToken();
         $token->init($authorization, $scope, $expires_in, $source, $additional);
         $token->encode();

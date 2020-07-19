@@ -136,7 +136,7 @@ class OAuthProtectedResource extends Module {
      * @param string $html the format of the error message
      * @param string $status the HTTP status to send
      */
-    protected function unauthorizedError($error, $error_description = NULL, $additional = array(), $format = 'html', $status = 401) {
+    protected function unauthorizedError($error, $error_description = NULL, $additional = [], $format = 'html', $status = 401) {
         $this->f3->status($status);
 
         if ($error) {
@@ -153,7 +153,7 @@ class OAuthProtectedResource extends Module {
 
         switch ($format) {
             case 'json':
-                $result = array_merge($additional, array('error' => $error));
+                $result = array_merge($additional, [ 'error' => $error ]);
                 if ($error_description) $result['error_description'] = $error_description;
                 header('Content-Type: application/json');
                 print json_encode($result);

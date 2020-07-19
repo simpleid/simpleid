@@ -131,7 +131,7 @@ class XRDSParser {
     }
 
     private function parseService() {
-        $service = array();
+        $service = [];
 
         if ($this->reader->getAttribute('priority')) {
             $service['#priority'] = $this->reader->getAttribute('priority');
@@ -147,7 +147,7 @@ class XRDSParser {
                 (strtolower($this->reader->namespaceURI) == strtolower(self::XRD2_NS)) &&
                 ($this->reader->localName == 'Service')) {
 
-                foreach (array('type', 'localid', 'uri') as $key) {
+                foreach ([ 'type', 'localid', 'uri' ] as $key) {
                     if (!isset($service[$key])) continue;
                     $service[$key] = $this->flatten_uris($service[$key]);
                 }
@@ -163,10 +163,10 @@ class XRDSParser {
                     case 'URI':
                         $key = strtolower($this->reader->localName);
                         if (!isset($service[$key])) {
-                            $service[$key] = array();
+                            $service[$key] = [];
                         }
 
-                        $item = array('#uri' => trim($this->reader->readString()));
+                        $item = [ '#uri' => trim($this->reader->readString()) ];
                         if ($this->reader->getAttribute('priority'))
                             $item['#priority'] = $this->reader->getAttribute('priority');
 
@@ -204,7 +204,7 @@ class XRDSParser {
      * @return array the services array with URIs sorted by priority
      */
     protected function flatten_uris($array, $sort = TRUE) {
-        $result = array();
+        $result = [];
         
         if ($sort) uasort($array, '\SimpleID\Protocols\XRDS\XRDSServices::sortByPriority');
         

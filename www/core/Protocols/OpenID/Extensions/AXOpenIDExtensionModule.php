@@ -52,7 +52,7 @@ class AXOpenIDExtensionModule extends Module {
      * @see hook_xrds_types()
      */
     function xrdsTypesHook() {
-        return array(self::OPENID_NS_AX);
+        return [ self::OPENID_NS_AX ];
     }
 
     /**
@@ -77,8 +77,8 @@ class AXOpenIDExtensionModule extends Module {
         if ($mode == 'fetch_request') {
             $response[$alias . '.mode'] = 'fetch_response';
             
-            $required = (isset($ax_request['required'])) ? explode(',', $ax_request['required']) : array();
-            $optional = (isset($ax_request['if_available'])) ? explode(',', $ax_request['if_available']) : array();
+            $required = (isset($ax_request['required'])) ? explode(',', $ax_request['required']) : [];
+            $optional = (isset($ax_request['if_available'])) ? explode(',', $ax_request['if_available']) : [];
             $fields = array_merge($required, $optional);
             
             foreach ($fields as $field) {
@@ -126,16 +126,16 @@ class AXOpenIDExtensionModule extends Module {
         
         if ($mode == 'fetch_request') {
             $tpl = new \Template();
-            $hive = array(
+            $hive = [
                 'module' => 'ax',
                 'userinfo_label' => $this->t('SimpleID will also be sending the following information to the site.'),
                 'name_label' => $this->t('Type URL'),
                 'value_label' => $this->t('Value'),
-                'fields' => array()
-            );
+                'fields' => []
+            ];
 
-            $required = (isset($ax_request['required'])) ? explode(',', $ax_request['required']) : array();
-            $optional = (isset($ax_request['if_available'])) ? explode(',', $ax_request['if_available']) : array();
+            $required = (isset($ax_request['required'])) ? explode(',', $ax_request['required']) : [];
+            $optional = (isset($ax_request['if_available'])) ? explode(',', $ax_request['if_available']) : [];
             $fields = array_merge($required, $optional);
             $i = 1;
             
@@ -146,12 +146,12 @@ class AXOpenIDExtensionModule extends Module {
                 if ($value == NULL) continue;
                 if (is_array($value)) $value = implode(',', $value);
 
-                $form_field = array(
+                $form_field = [
                     'id' => $type,
                     'html_id' => $i,
                     'name' => $type,
                     'value' => $value,
-                );
+                ];
 
                 if (in_array($field, $required)) {
                     $form_field['required'] = true;
@@ -164,12 +164,12 @@ class AXOpenIDExtensionModule extends Module {
                 $i++;
             }
 
-            return array(
-                array(
+            return [
+                [
                     'content' => $tpl->render('openid_userinfo_consent.html', false, $hive),
                     'weight' => 0
-                )
-            );
+                ]
+            ];
         } elseif ($mode == 'store_request') {
             // Sadly, we don't support storage at this stage
             $this->f3->set('message', $this->t('This web site requested to store information about you on SimpleID. Sadly, SimpleID does not support this feature.'));
@@ -231,18 +231,18 @@ class AXOpenIDExtensionModule extends Module {
         if (!isset($user['ax'])) return;
 
         $tpl = new \Template();
-        $hive = array(
+        $hive = [
             'userinfo_label' => $this->t('SimpleID may send the following additional information to sites which supports the Attribute Exchange Extension.'),
             'name_label' => $this->t('Type URL'),
             'value_label' => $this->t('Value'),
             'info' => $user['ax']
-        );
+        ];
         
-        return array(array(
+        return [ [
             'id' => 'ax',
             'title' => t('Attribute Exchange Extension'),
             'content' => $tpl->render('openid_userinfo_profile.html', false, $hive),
-        ));
+        ] ];
     }
 
     /**
@@ -257,9 +257,9 @@ class AXOpenIDExtensionModule extends Module {
      * @return string the value or NULL if not found
      */
     protected function getValue($user, $type) {
-        $ax = (isset($user['ax'])) ? $user['ax'] : array();
-        $sreg = (isset($user['sreg'])) ? $user['sreg'] : array();
-        $userinfo = (isset($user['userinfo'])) ? $user['userinfo'] : array();
+        $ax = (isset($user['ax'])) ? $user['ax'] : [];
+        $sreg = (isset($user['sreg'])) ? $user['sreg'] : [];
+        $userinfo = (isset($user['userinfo'])) ? $user['userinfo'] : [];
         
         if (isset($ax[$type])) {
             return $ax[$type];

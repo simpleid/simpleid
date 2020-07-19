@@ -103,12 +103,12 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
 
             $this->f3->set('rememberme_label', $this->t('Remember me on this device for two weeks.'));
 
-            return array(
-                array(
+            return [
+                [
                     'content' => $tpl->render('auth_rememberme.html', false),
                     'weight' => 10
-                )
-            );
+                ]
+            ];
         }
     }
 
@@ -180,13 +180,13 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
         
         if ($expires == NULL) $expires = time() + SIMPLEID_LONG_TOKEN_EXPIRES_IN;
 
-        $data = array(
+        $data = [
             'typ' => 'rememberme',
             'id' => $id,
             'uid' => $user['uid'],
             'exp' => $expires,
             'uaid' => $this->auth->assignUAID(),
-        );
+        ];
         
         $token = new SecurityToken();
         $cookie = $token->generate($data);

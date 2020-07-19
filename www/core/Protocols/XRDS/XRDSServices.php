@@ -31,7 +31,7 @@ namespace SimpleID\Protocols\XRDS;
 class XRDSServices {
 
     /** Array of discovered services */
-    private $services = array();
+    private $services = [];
 
     /**
      * Adds a service.
@@ -61,7 +61,7 @@ class XRDSServices {
      * match
      */
     public function getByType($type) {
-        $matches = array();
+        $matches = [];
         
         foreach ($this->services as $service) {
             foreach ($service['type'] as $service_type) {

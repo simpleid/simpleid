@@ -61,10 +61,10 @@ $f3->set('URI', preg_replace('!/index\\.php!', '', $f3->get('URI')));
 $mgr = SimpleID\ModuleManager::instance();
 $store = SimpleID\Store\StoreManager::instance();
 
-$upgrade_modules = array(
+$upgrade_modules = [
     'SimpleID\Upgrade\UpgradeModule',
     'SimpleID\Store\DefaultStoreModule',
-);
+];
 foreach ($upgrade_modules as $module) $mgr->loadModule($module);
 
 $config = $f3->get('config');

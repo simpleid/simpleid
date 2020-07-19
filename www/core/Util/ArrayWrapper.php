@@ -42,7 +42,7 @@ use \ArrayAccess;
  * array.  For example, the following will not work.
  *
  * <code>
- * $array_wrapper = new ArrayWrapper(array('dim1' => array('foo' => 1, 'bar' => 2)));
+ * $array_wrapper = new ArrayWrapper(['dim1' => ['foo' => 1, 'bar' => 2]]);
  * print $array_wrapper['dim1']['foo'];  # Prints 1
  * $array_wrapper['dim']['foo'] = 3;     # Will not work
  * print $array_wrapper['dim1']['foo'];  # Still prints 1
@@ -61,7 +61,7 @@ use \ArrayAccess;
  * and {@link pathRef()}.  Thus in the example above:
  *
  * <code>
- * $array_wrapper = new ArrayWrapper(array('dim1' => array('foo' => 1, 'bar' => 2)));
+ * $array_wrapper = new ArrayWrapper(['dim1' => ['foo' => 1, 'bar' => 2]]);
  * print $array_wrapper->pathGet('dim1.foo');  # Prints 1
  * $array_wrapper->pathSet('dim.foo', 3);      # Works!
  * print $array_wrapper->pathGet('dim1.foo');  # Now prints 3
@@ -70,14 +70,14 @@ use \ArrayAccess;
  */
 class ArrayWrapper implements ArrayAccess {
     /** @var array the underlying array */
-    protected $container = array();
+    protected $container = [];
 
     /**
      * Creates a new ArrayWrapper over an underlying array
      *
      * @param array $container the underlying array
      */
-    public function __construct($container = array()) {
+    public function __construct($container = []) {
         $this->container = $container;
     }
 
@@ -254,7 +254,7 @@ class ArrayWrapper implements ArrayAccess {
                     break;
                 }
             } else {
-                if (!is_array($var)) $var=array();
+                if (!is_array($var)) $var=[];
                 if ($add || array_key_exists($part,$var)) {
                     $var = &$var[$part];
                 } else {

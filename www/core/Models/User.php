@@ -41,11 +41,11 @@ class User extends ArrayWrapper implements Serializable, Storable {
     protected $uid;
 
     /** @var array the activity log */
-    protected $activities = array();
+    protected $activities = [];
 
-    public $clients = array();
+    public $clients = [];
 
-    public function __construct($data = array('openid' => array())) {
+    public function __construct($data = [ 'openid' => [] ]) {
         parent::__construct($data);
     }
 
@@ -184,7 +184,7 @@ class User extends ArrayWrapper implements Serializable, Storable {
         $mgr = ModuleManager::instance();
         $copy = new ArrayWrapper($this->container);
         $secret_paths = $mgr->invokeAll('secretUserDataPaths');
-        if ($secret_paths == null) $secret_paths = array();
+        if ($secret_paths == null) $secret_paths = [];
         $secret_paths[] = 'uid';
         foreach ($secret_paths as $path) {
             if ($hidden_value) {
@@ -199,7 +199,7 @@ class User extends ArrayWrapper implements Serializable, Storable {
     public function serialize() {
         $f3 = Base::instance();
 
-        $result = array();
+        $result = [];
         foreach (get_object_vars($this) as $var => $value) {
             if ($var == 'container') {
                 $result['container'] = $this->toSecureArray();
@@ -240,7 +240,7 @@ class User extends ArrayWrapper implements Serializable, Storable {
      * information removed.
      */
     public function toString() {
-        $result = array();
+        $result = [];
         foreach (get_object_vars($this) as $var => $value) {
             if ($var == 'container') {
                 $result['container'] = $this->toSecureArray('[hidden]');
