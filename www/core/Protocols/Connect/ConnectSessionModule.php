@@ -146,7 +146,7 @@ class ConnectSessionModule extends Module {
     protected function logoutForm($form_state = []) {
         $tpl = new \Template();
 
-        $this->f3->set('logout_consent_label', $this->t('Do you wish to log out of SimpleID as well?');
+        $this->f3->set('logout_consent_label', $this->t('Do you wish to log out of SimpleID as well?'));
         
         $token = new SecurityToken();
         $this->f3->set('tk', $token->generate('connect_logout', SecurityToken::OPTION_BIND_SESSION));
