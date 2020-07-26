@@ -69,7 +69,7 @@ class OpenIDModule extends Module implements ProtocolResult {
             return true;
         } else {
             // Point to SimpleID's XRDS document
-            header('X-XRDS-Location: ' . $this->getCanonicalURL('@openid_xrds'));
+            header('X-XRDS-Location: ' . $this->getCanonicalURL('@openid_provider_xrds'));
             return;
         }
     }
