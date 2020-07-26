@@ -394,7 +394,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
                             if (!isset($settings['claims'])) continue;
                             if (in_array($claim, $settings['claims'])) $consent_scope = $scope;
                         }
-                        if ($consent_scope == null) continue; // No consent given for this claim
+                        if ($consent_scope == null) break; // No consent given for this claim
 
                         if (isset($user['userinfo'][$claim])) {
                             $claims[$claim] = $user['userinfo'][$claim];
