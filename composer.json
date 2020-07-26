@@ -18,8 +18,8 @@
         "kelvinmo/fernet-php": "0.4.*",
         "bcosca/fatfree-core": "3.6.*",
         "mustangostang/spyc": "0.5.*",
-        "composer/semver": "0.1.*",
-        "psr/log": "1.*"
+        "composer/semver": "^3.0",
+        "psr/log": "^1.0"
     },
     "suggest": {
         "ext-gmp": "Better performance"
