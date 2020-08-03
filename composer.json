@@ -14,7 +14,13 @@
         "ext-gmp": "Better performance"
     },
     "require-dev": {
-        "phing/phing": "2.*"
+        "phing/phing": "^2.0",
+        "gettext/gettext": "^5.0",
+        "gettext/php-scanner": "^1.0"
+    },
+    "scripts": {
+        "build": "phing",
+        "xgettext": "phing xgettext"
     },
     "license": "GPL-2.0+",
     "authors": [
@@ -22,8 +28,5 @@
             "name": "Kelvin Mo",
             "email": "kmo@users.sourceforge.net"
         }
-    ],
-    "config": {
-        "vendor-dir": "www/vendor"
-    }
+    ]
 }

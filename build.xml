@@ -28,37 +28,16 @@
     
     <property name="dist.tar.dir" value="tar" />
     <property name="dist.pear.dir" value="pear" />
-    
-    <target name="gettext">
-        <echo file="gettext-filelist.txt">
+
+    <includepath classpath="build" />
+    <taskdef name="xgettext" classname="XGetTextTask" />
+
+    <target name="xgettext">
+        <xgettext destdir="www/locale">
             <fileset dir="www">
                 <include name="**/*.php" />
             </fileset>
-        </echo>
-        <reflexive file="gettext-filelist.txt">
-            <filterchain>
-                <striplinecomments>
-                    <comment value="Directory: " />
-                </striplinecomments>
-                <replaceregexp>
-                    <regexp pattern="\\" replace="/"/>
-	            </replaceregexp>
-            </filterchain>
-        </reflexive>
-        <exec command="&quot;${xgettext.path}&quot; -kt --from-code utf-8 -o www/locale/messages.pot -L PHP --no-wrap -f gettext-filelist.txt" passthru="true" />
-        <delete file="gettext-filelist.txt"/>
-    </target>
-    
-    <target name="msgfmt-exec">
-        <exec command="&quot;${msgfmt.path}&quot; -D www/locale/${lang} -o www/locale/${lang}/messages.mo messages.po" passthru="true" />
-    </target>
-
-    <target name="msgfmt">
-        <foreach param="lang" target="msgfmt-exec">
-            <fileset dir="www/locale">
-                <include name="**/LC_MESSAGES" />
-            </fileset>
-        </foreach>
+        </xgettext>
     </target>
     
     <target name="check-dist-dir">
