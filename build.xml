@@ -27,7 +27,7 @@
     <property file="simpleid.properties" />
     
     <property name="dist.tar.dir" value="tar" />
-    <property name="dist.pear.dir" value="pear" />
+    <property name="dist.frs.dir" value="frs" />
 
     <includepath classpath="build" />
     <taskdef name="xgettext" classname="XGetTextTask" />
@@ -45,30 +45,33 @@
     </target>
         
     <target name="dist-clean" depends="check-dist-dir">
-        <delete>
+        <delete includeemptydirs="true">
             <fileset dir="${dist.dir}"></fileset>
         </delete>
     </target>
     
     <!-- Copies the source to the distribution directory -->
     <target name="dist-copy" depends="check-dist-dir">
-        <copy todir="${dist.dir}/${dist.sub.dir}/simpleid">
+        <copy todir="${dist.dir}/${dist.sub.dir}/simpleid" >
             <fileset dir=".">
+                <exclude name="build/**" />
                 <exclude name="cache/*" />
                 <exclude name="cache/**/*.cache" />
+                <exclude name="identities/*.identity" />
                 <exclude name="store/*" />
-                <exclude name="openshift/**" />
+                <exclude name="tutorials/**" />
+                <exclude name="vendor/**" />
                 <exclude name="www/.htaccess" />
                 <exclude name="www/config.inc" />
                 <exclude name="www/config.php" />
-                <exclude name="identities/*.identity" />
                 <exclude name="www/test/**" />
                 <exclude name="www/test-suite/**" />
-                <exclude name="tutorials/**" />
+                <exclude name="www/vendor/**" />
                 <exclude name=".git/**" />
-                <exclude name="*.xml" />
-                <exclude name="*.xsl" />
+                <exclude name=".sourceforge/**" />
+                <exclude name="composer.lock" />
                 <exclude name="*.properties" />
+                <exclude name="*.xml" />
             </fileset>
             <filterchain>
                 <replacetokens begintoken="@@" endtoken="@@">
@@ -90,12 +93,13 @@
             <property name="config.store.dir" value="../store" />
         </phingcall>
         
-        <delete file="${dist.dir}/${dist.tar.dir}/simpleid/www/config.pear.php"/>
-    
-        <tar destfile="${dist.dir}/simpleid-${build.version}.tar.gz" compression="gzip">
+        <mkdir dir="${dist.dir}/${dist.frs.dir}/${build.version}" />
+        <tar destfile="${dist.dir}/${dist.frs.dir}/${build.version}/simpleid-${build.version}.tar.gz" compression="gzip">
             <tarfileset dir="${dist.dir}/${dist.tar.dir}" includes="**/*" defaultexcludes="no" />
         </tar>
-        <echo message="${build.version}" file="${dist.dir}/current-version.txt"/>
+        <copy file="${dist.dir}/${dist.tar.dir}/simpleid/README.txt" todir="${dist.dir}/${dist.frs.dir}/${build.version}" />
+
+        <echo message="${build.version}" file="${dist.dir}/current-version.txt"/>        
     </target>
     
     <target name="dist" depends="dist-tar">

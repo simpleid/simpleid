@@ -15,6 +15,7 @@
     },
     "require-dev": {
         "phing/phing": "^2.0",
+        "pear/archive_tar": "^1.4",
         "gettext/gettext": "^5.0",
         "gettext/php-scanner": "^1.0"
     },
