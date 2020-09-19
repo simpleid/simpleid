@@ -1,0 +1,9 @@
+# GitHub dependabot dependency management configuration file
+
+version: 2
+updates:
+  # Composer
+  - package-ecosystem: composer
+    directory: "/"
+    schedule:
+      interval: weekly
