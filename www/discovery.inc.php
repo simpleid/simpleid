@@ -146,11 +146,13 @@ function discovery_xrds_get($url, $check = TRUE, $retries = 5) {
         return $response['data'];
     } elseif (isset($response['headers']['x-xrds-location'])) {
         return discovery_xrds_get($response['headers']['x-xrds-location'], false, $retries - 1);
-    } else {
+    } elseif (isset($response['data'])) {
         $location = _discovery_meta_httpequiv('X-XRDS-Location', $response['data']);
         if ($location) {
             return discovery_xrds_get($location, false, $retries - 1);
         }
+        return NULL;
+    } else {
         return NULL;
     }
 }
