@@ -144,7 +144,8 @@ class SecurityToken {
 
         if (($options & self::OPTION_NONCE) == self::OPTION_NONCE) {
             $cache = \Cache::instance();
-            $cache->set($this->data['i'] . '.token', $token, SIMPLEID_HUMAN_TOKEN_EXPIRES_IN);
+            $cache_name = rawurlencode($this->data['i']) . '.token';
+            $cache->set($cache_name, $token, SIMPLEID_HUMAN_TOKEN_EXPIRES_IN);
         }
 
         return $token;

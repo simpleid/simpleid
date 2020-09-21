@@ -124,7 +124,7 @@ fix_http_request($f3);
 
 // For SimpleID 1.x compatibility
 if (isset($_GET['q'])) {
-    $f3->set('PATH', $_GET['q']);
+    $f3->set('PATH', '/' . $_GET['q']);
     unset($_GET['q']);
 }
 
