@@ -107,7 +107,7 @@ if (preg_match('/^folder\h*=\h*(.+)/', $config['cache']) && substr($config['cach
 }
 $f3->set('CACHE', $config['cache']);
 $cache = \Cache::instance();
-$cache->reset(null, SIMPLEID_LONG_TOKEN_EXPIRES_IN);
+//$cache->reset(null, SIMPLEID_LONG_TOKEN_EXPIRES_IN);
 
 // 5. Logging
 if (!isset($config['logger']) || ($config['logger'] == '') || ($config['log_file'] == '')) {
