@@ -262,7 +262,7 @@ class AuthManager extends Prefab {
         session_destroy();
         session_write_close();
         $this->f3->set('COOKIE.' . session_name(), '');
-        session_regenerate_id(true);
+        session_start();
 
         $this->assignUALoginState(true);
 
