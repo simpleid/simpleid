@@ -107,7 +107,7 @@ if (preg_match('/^folder\h*=\h*(.+)/', $config['cache']) && substr($config['cach
 }
 $f3->set('CACHE', $config['cache']);
 $cache = \Cache::instance();
-$cache->reset(null, SIMPLEID_LONG_TOKEN_EXPIRES_IN);
+//$cache->reset(null, SIMPLEID_LONG_TOKEN_EXPIRES_IN);
 
 // 5. Logging
 if (!isset($config['logger']) || ($config['logger'] == '') || ($config['log_file'] == '')) {
@@ -124,7 +124,7 @@ fix_http_request($f3);
 
 // For SimpleID 1.x compatibility
 if (isset($_GET['q'])) {
-    $f3->set('PATH', $_GET['q']);
+    $f3->set('PATH', '/' . $_GET['q']);
     unset($_GET['q']);
 }
 
