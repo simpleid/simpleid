@@ -1,3 +1,11 @@
+SimpleID 1.0.3
+--------------
+
+- Security enhancements:
+    * #23 Configuration can now be in a separate conf directory
+- Bug fixes:
+    * #35 Fix undefined index error in discovery.inc.php
+
 SimpleID 1.0.2
 --------------
 
