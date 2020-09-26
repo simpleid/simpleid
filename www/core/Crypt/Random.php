@@ -116,15 +116,5 @@ class Random {
         $base = pack('NN', $timeofday['sec'], $timeofday['usec']) . self::bytes(32);
         return strtr(trim(base64_encode(sha1($base, true)), '='), '+/', '-_');
     }
-
-    /**
-     * Generates a nonce for use in OpenID responses
-     *
-     * @return string an OpenID nonce
-     * @link http://openid.net/specs/openid-authentication-2_0.html#positive_assertions
-     */
-    function openIDNonce() {
-        return gmstrftime('%Y-%m-%dT%H:%M:%SZ') . bin2hex(self::bytes(4));
-    }
 }
 ?>

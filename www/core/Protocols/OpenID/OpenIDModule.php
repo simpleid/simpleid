@@ -475,12 +475,13 @@ class OpenIDModule extends Module implements ProtocolResult {
      */
     protected function createOKResponse($request) {
         $rand = new Random();
+        $nonce = gmstrftime('%Y-%m-%dT%H:%M:%SZ') . bin2hex($rand->bytes(4));
 
         $response = new Response($request);
         $response->setArray([
             'mode' => 'id_res',
             'op_endpoint' => $this->getCanonicalURL(),
-            'response_nonce' => $rand->openIDNonce()
+            'response_nonce' => $nonce
         ]);
         
         if (isset($request['openid.assoc_handle'])) $response['assoc_handle'] = $request['openid.assoc_handle'];
