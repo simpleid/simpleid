@@ -329,7 +329,7 @@ class BigNum {
      */
     function _pow($base, $exp) {
         if (BIGNUM_GMP) {
-            if ((is_resource($exp) && (get_resource_type($exp) == 'gmp'))
+            if ((is_resource($exp) && (get_resource_type($exp) == 'GMP integer'))
                 || (is_object($exp) && (get_class($exp) == 'GMP')))
                  $exp = gmp_intval($exp);
             return gmp_pow($base, $exp);
