@@ -44,8 +44,7 @@
  *
  * @global bool $upgrade_access_check
  */
-//$upgrade_access_check = TRUE;
-$upgrade_access_check = false;
+$upgrade_access_check = TRUE;
 
 /* ----- Do not modify anything following this line ------------------------- */
 
