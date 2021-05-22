@@ -105,7 +105,7 @@ class OpenIDModule extends Module implements ProtocolResult {
             default:
                 if (isset($request['openid.return_to'])) {
                     // Indirect communication - send error via indirect communication.
-                    $this->f3->fatalError($this->t('Invalid OpenID message.'));
+                    $this->f3->fatalError($this->f3->get('intl.core.openid.invalid_message'));
                 } else {
                     // Direct communication
                     $this->directError('Invalid OpenID message.', [], $request);
@@ -221,12 +221,12 @@ class OpenIDModule extends Module implements ProtocolResult {
         if ($version == Message::OPENID_VERSION_1_1) {
             if (!isset($request['openid.return_to'])) {
                 $this->logger->log(LogLevel::ERROR, 'Protocol Error: openid.return_to not set.');
-                $this->fatalError($this->t('Protocol Error: openid.return_to not set.'));
+                $this->fatalError($this->f3->get('intl.core.openid.missing_return_to'));
                 return;
             }
             if (!isset($request['openid.identity'])) {
                 $this->logger->log(LogLevel::ERROR, 'Protocol Error: openid.identity not set.');
-                $this->fatalError($this->t('Protocol Error: openid.identity not set.'));
+                $this->fatalError($this->f3->get('intl.core.openid.missing_identity'));
                 return;
             }
         }
@@ -234,13 +234,13 @@ class OpenIDModule extends Module implements ProtocolResult {
         if ($version == Message::OPENID_VERSION_2) {
             if (isset($request['openid.identity']) && !isset($request['openid.claimed_id'])) {
                 $this->logger->log(LogLevel::ERROR, 'Protocol Error: openid.identity set, but not openid.claimed_id.');
-                $this->fatalError($this->t('Protocol Error: openid.identity set, but not openid.claimed_id.'));
+                $this->fatalError($this->f3->get('intl.core.openid.missing_claimed_id'));
                 return;
             }
             
             if (!isset($request['openid.realm']) && !isset($request['openid.return_to'])) {
                 $this->logger->log(LogLevel::ERROR, 'Protocol Error: openid.return_to not set when openid.realm is not set.');
-                $this->fatalError($this->t('Protocol Error: openid.return_to not set when openid.realm is not set.'));
+                $this->fatalError($this->f3->get('intl.core.openid.realm_but_no_return_to'));
                 return;
             }
         }
@@ -735,10 +735,11 @@ class OpenIDModule extends Module implements ProtocolResult {
 
         $realm = $request->getRealm();
 
+        $this->f3->set('realm', $realm);
+
         if ($cancel) {
-            $this->f3->set('unable_label', $this->t('Unable to log into <strong class="realm">@realm</strong>.', [ '@realm' => $realm ]));
-            $this->f3->set('identity_not_matching_label', $this->t('Your current identity does not match the requested identity %identity.', [ '%identity' => $request['openid.identity'] ]));
-            $this->f3->set('switch_user_label', $this->t('<a href="!url">Switch to a different user</a> and try again.', [ '!url' => $this->getCanonicalURL('auth/logout/continue/' .  rawurlencode($token->generate($request->toArray())), '', true) ]));
+            $this->f3->set('requested_identity', $request['openid.identity']);
+            $this->f3->set('switch_url', $this->getCanonicalURL('auth/logout/continue/' .  rawurlencode($token->generate($request->toArray())), '', true));
         } else {
             $base_path = $this->f3->get('base_path');
             
@@ -750,28 +751,21 @@ class OpenIDModule extends Module implements ProtocolResult {
             
             if ($reason == self::CHECKID_RETURN_TO_SUSPECT) {
                 $this->f3->set('return_to_suspect', true);
-                $this->f3->set('suspect_label', $this->t('Warning: This web site has not confirmed its identity and might be fraudulent.  Do not share any personal information with this web site unless you are sure it is legitimate. See the <a href="!url" class="popup">SimpleID documentation for details</a> (OpenID version 2.0 return_to discovery failure)',
-                    [ '!url' => 'http://simpleid.org/documentation/troubleshooting/returnto-discovery-failure' ]));
-                $this->f3->set('js_locale', [ 'openid_suspect' => addslashes($this->t('This web site has not confirmed its identity and might be fraudulent.')) . '\n\n' . addslashes($this->t('Are you sure you wish to automatically send your information to this site for any future requests?')) ]);
+                $this->f3->set('suspect_url', 'http://simpleid.org/documentation/troubleshooting/returnto-discovery-failure');
+                $this->f3->set('js_locale', [ 'openid_suspect' => addslashes($this->f3->get('intl.core.openid.suspect_js_1')) . '\n\n' . addslashes($this->f3->get('intl.core.openid.suspect_js_2')) ]);
                 $this->f3->set('realm_class', 'return-to-suspect');
             }
-            
-            $this->f3->set('realm_label', $this->t('You are being logged into <strong class="realm">@realm</strong>.', [ '@realm' => $realm ]));
-            $this->f3->set('openid_consent_label', $this->t('Automatically send my information to this site for any future requests.'));
-            $this->f3->set('ok_button', $this->t('OK'));
-            
         }
         
         $this->f3->set('tk', $token->generate('openid_consent', SecurityToken::OPTION_BIND_SESSION));
         $this->f3->set('fs', $token->generate($form_state));
 
         $this->f3->set('cancel', $cancel);
-        $this->f3->set('cancel_button', $this->t('Cancel'));
 
         $this->f3->set('logout_destination', '/continue/' . rawurlencode($token->generate($request->toArray())));
         $this->f3->set('user_header', true);
         $this->f3->set('framekiller', true);
-        $this->f3->set('title', $this->t('OpenID Login'));
+        $this->f3->set('title', $this->f3->get('intl.core.openid.openid_title'));
         $this->f3->set('page_class', 'dialog-page');
         $this->f3->set('layout', 'openid_consent.html');
         
@@ -804,7 +798,7 @@ class OpenIDModule extends Module implements ProtocolResult {
 
         if (!$token->verify($this->f3->get('POST.tk'), 'openid_consent')) {
             $this->logger->log(LogLevel::WARNING, 'Security token ' . $this->f3->get('POST.tk') . ' invalid.');
-            $this->f3->set('message', $this->t('SimpleID detected a potential security attack.  Please try again.'));
+            $this->f3->set('message', $this->f3->get('intl.common.invalid_tk'));
             $this->consentForm($request, $response, $reason);
             return;
         }
@@ -812,9 +806,9 @@ class OpenIDModule extends Module implements ProtocolResult {
         $return_to = $response['return_to'];
         if ($return_to == null) $return_to = $request['openid.return_to'];
     
-        if ($this->f3->get('POST.op') == $this->t('Cancel')) {
+        if ($this->f3->get('POST.op') == $this->f3->get('intl.common.cancel')) {
             $response = $this->createErrorResponse($request, false);
-            if (!$return_to) $this->f3->set('message', $this->t('Log in cancelled.'));
+            if (!$return_to) $this->f3->set('message', $this->f3->get('intl.common.login_cancelled'));
         } else {
             $this->mgr->invokeRefAll('openIDConsentFormSubmit', $form_state);
 
@@ -822,7 +816,7 @@ class OpenIDModule extends Module implements ProtocolResult {
             $this->logActivity($request, $consents);
             
             $this->signResponse($response, isset($response['assoc_handle']) ? $response['assoc_handle'] : NULL);
-            if (!$return_to) $this->f3->set('message', $this->t('You were logged in successfully.'));
+            if (!$return_to) $this->f3->set('message', $this->f3->get('intl.common.login_success'));
         }
 
         if ($return_to) {
@@ -995,7 +989,7 @@ class OpenIDModule extends Module implements ProtocolResult {
         } else {
             $this->f3->status(404);
             
-            $this->fatalError($this->t('User %uid not found.', [ '%uid' => $uid ]));
+            $this->fatalError($this->f3->get('intl.common.user_not_found', $uid));
         }
     }
 
@@ -1009,7 +1003,7 @@ class OpenIDModule extends Module implements ProtocolResult {
         if (self::$scope_settings == NULL) {
             self::$scope_settings = [
                 'openid' => [
-                    'description' => $this->t('know who you are'),
+                    'description' => $this->f3->get('intl.common.scope.id'),
                 ]
             ];
         }
@@ -1026,27 +1020,21 @@ class OpenIDModule extends Module implements ProtocolResult {
         $user = $auth->getUser();
         $tpl = new \Template();
         
-        $this->f3->set('js_locale', [ 'code' => addslashes($this->t('<em>You need to set at least one of OpenID 1.x or OpenID 2 to generate the code.</em>')) ]);
+        $this->f3->set('js_locale', [ 'code' => addslashes($this->f3->get('intl.core.openid.profile_js')) ]);
 
         $xrds_url = $this->getCanonicalURL('user/'. $user['uid'] . '/xrds', '', true);
         $hive = [
             'config' => $this->f3->get('config'),
+            'intl' => $this->f3->get('intl'),
             'user' => $user,
-            'link_tags_label' => $this->t('<link> tags'),
-            'openid1_label' => $this->t('OpenID 1.x'),
-            'openid2_label' => $this->t('OpenID 2.x'),
-            'localid_label' => $this->t('Claim a different identifier'),
-            'yadis_label' => $this->t('YADIS'),
-            'yadis_doc_label' => $this->t('Write your own or <a href="!url">download</a> your YADIS document', [ '!url' => $xrds_url ]),
-            'yadis_add_label' => $this->t('Add HTTP headers or <meta> tag, e.g.:'),
             'xrds_url' => $xrds_url
         ];
         
         return [ [
             'id' => 'discovery',
-            'title' => $this->t('OpenID 2'),
+            'title' => $this->f3->get('intl.core.openid.discovery_title'),
             'content' => $tpl->render('openid_profile.html', false, $hive),
-            'links' => [ [ 'href' => 'http://simpleid.org/documentation/getting-started/setting-identity/claim-your-identifier', 'name' => $this->t('More information') ] ],
+            'links' => [ [ 'href' => 'http://simpleid.org/documentation/getting-started/setting-identity/claim-your-identifier', 'name' => $this->f3->get('intl.common.more_info') ] ],
             'weight' => 1
         ] ];
     }

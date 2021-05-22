@@ -97,7 +97,7 @@ class OAuthModule extends Module implements ProtocolResult {
             if (isset($request['redirect_uri'])) {
                 $response->renderRedirect();
             } else {
-                $this->fatalError($this->t('Protocol Error: %error_code', [ '%error_code' => $response['error'] ]));
+                $this->fatalError($this->f3->get('intl.common.protocol_error', $response['error']));
             }
             return;
         }
@@ -109,7 +109,7 @@ class OAuthModule extends Module implements ProtocolResult {
             if (isset($request['redirect_uri'])) {
                 $response->renderRedirect();
             } else {
-                $this->fatalError($this->t('Protocol Error: %error_code', [ '%error_code' => $response['error'] ]));
+                $this->fatalError($this->f3->get('intl.common.protocol_error', $response['error']));
             }
             return;
         }
@@ -131,7 +131,7 @@ class OAuthModule extends Module implements ProtocolResult {
         // 1. response_type (pass 1 - check that it exists)
         if (!isset($request['response_type'])) {
             $this->logger->log(LogLevel::ERROR, 'Protocol Error: response_type not set.');
-            $this->fatalError($this->t('Protocol Error: response_type not set.'));
+            $this->fatalError($this->f3->get('intl.core.oauth.missing_repsonse_type'));
             return;
         }
         
@@ -145,7 +145,7 @@ class OAuthModule extends Module implements ProtocolResult {
             if (isset($request['redirect_uri'])) {
                 $response->setError('invalid_request', 'client_id not set')->renderRedirect();
             } else {
-                $this->fatalError($this->t('Protocol Error: client_id not set'));
+                $this->fatalError($this->f3->get('intl.core.oauth.missing_client_id'));
             }
             return;
         }
@@ -156,7 +156,7 @@ class OAuthModule extends Module implements ProtocolResult {
             if (isset($request['redirect_uri'])) {
                 $response->setError('invalid_request', 'client not found')->renderRedirect();
             } else {
-                $this->fatalError($this->t('Protocol Error: Client not found'));
+                $this->fatalError($this->f3->get('intl.core.oauth.client_not_found'));
             }
             return;
         }
@@ -180,7 +180,7 @@ class OAuthModule extends Module implements ProtocolResult {
             
             if (!$redirect_uri_found) {
                 $this->logger->log(LogLevel::ERROR, 'Incorrect redirect URI: ' . $request['redirect_uri']);
-                $this->fatalError($this->t('Protocol Error: Incorrect redirect URI'));
+                $this->fatalError($this->f3->get('intl.core.oauth.invalid_redirect_uri'));
                 return;
             }
         } elseif (isset($client['oauth']['redirect_uris'])) {
@@ -190,12 +190,12 @@ class OAuthModule extends Module implements ProtocolResult {
                 $response->setRedirectURI($client['oauth']['redirect_uris'][0]);
             } else {
                 $this->logger->log(LogLevel::ERROR, 'Protocol Error: redirect_uri not specified in request when multiple redirect_uris are registered');
-                $this->fatalError($this->t('Protocol Error: redirect_uri not specified in request when multiple redirect_uris are registered'));
+                $this->fatalError($this->f3->get('intl.core.oauth.ambiguous_redirect_uri'));
                 return;
             }
         } else {
             $this->logger->log(LogLevel::ERROR, 'Protocol Error: redirect_uri not specified in request or client registration');
-            $this->fatalError($this->t('Protocol Error: redirect_uri not specified in request or client registration'));
+            $this->fatalError($this->f3->get('intl.core.oauth.missing_redirect_uri'));
             return;
         }
         
@@ -608,6 +608,7 @@ class OAuthModule extends Module implements ProtocolResult {
         $application_type = (isset($client['oauth']['application_type'])) ? $client['oauth']['application_type'] : '';
         
         $this->f3->set('application_name', $application_name);
+        $this->f3->set('application_type', $application_type);
         
         if (isset($client['logo_url'])) {
             $this->f3->set('logo_url', $client['logo_url']);
@@ -627,19 +628,18 @@ class OAuthModule extends Module implements ProtocolResult {
         $this->f3->set('scope_list', $scope_list);
 
         if ($client->isDynamic()) {
-            $this->f3->set('dynamic_label', $this->t('Warning: %application_name did not pre-register with SimpleID.  Its identity has not been confirmed.', [ '%application_name' => $application_name ]));
             $this->f3->set('client_dynamic', 'client-dynamic');
         }
 
         $client_info = [];
         if (isset($client['oauth']['website'])) {
-            $client_info[] = $this->t('You can visit this application\'s web site at <a href="%url">%url</a>.', [ '%url' => $client['oauth']['website'] ]);
+            $client_info[] = $this->f3->get('intl.common.consent.website', $client['oauth']['website']);
         }
         if (isset($client['oauth']['policy_url'])) {
-            $client_info[] = $this->t('You can view this application\'s policy on the use of your data at <a href="%url">%url</a>.', [ '%url' => $client['oauth']['policy_url'] ]);
+            $client_info[] = $this->f3->get('intl.common.consent.policy_url', $client['oauth']['policy_url']);
         }
         if (isset($client['oauth']['tos_url'])) {
-            $client_info[] = $this->t('You can view this application\'s terms of service at <a href="%url">%url</a>.', [ '%url' => $client['oauth']['tos_url'] ]);
+            $client_info[] = $this->f3->get('intl.common.consent.tos_url', $client['oauth']['tos_url']);
         }
         if (isset($client['oauth']['contacts'])) {
             $contacts = [];
@@ -652,16 +652,9 @@ class OAuthModule extends Module implements ProtocolResult {
                 $contacts[] = '<a href="mailto:' . $this->rfc3986_urlencode($client['oauth']['contacts']) . '">' . $this->f3->clean($client['oauth']['contacts']) . '</a>';
             }
             
-            $client_info[] = $this->t('You can email the developer of this application at: !contacts.', [ '!contacts' => implode(', ', $contacts) ]);
+            $client_info[] = $this->f3->get('intl.common.consent.contacts', implode(', ', $contacts));
         }
         $this->f3->set('client_info', $client_info);
-        $this->f3->set('client_info_label', $this->t('More information'));
-        
-        $this->f3->set('request_label', $this->t('<strong class="@application_type">%application_name</strong> is requesting access to:', [ '@application_type' => $application_type, '%application_name' => $application_name ]));
-        $this->f3->set('dashboard_label', $this->t('You can revoke access at any time under <strong>Dashboard</strong>.'));
-        $this->f3->set('oauth_consent_label', $this->t('Don\'t ask me again for %application_name.', [ '%application_name' => $application_name ]));
-        $this->f3->set('allow_button', $this->t('Allow'));
-        $this->f3->set('deny_button', $this->t('Deny'));
         
         $token = new SecurityToken();
         $this->f3->set('tk', $token->generate('oauth_consent', SecurityToken::OPTION_BIND_SESSION));
@@ -670,7 +663,7 @@ class OAuthModule extends Module implements ProtocolResult {
         $this->f3->set('logout_destination', '/continue/' . rawurlencode($token->generate($request->toArray())));
         $this->f3->set('user_header', true);
         $this->f3->set('framekiller', true);
-        $this->f3->set('title', $this->t('OAuth Login'));
+        $this->f3->set('title', $this->f3->get('intl.core.oauth.oauth_title'));
         $this->f3->set('page_class', 'dialog-page');
         $this->f3->set('layout', 'oauth_consent.html');
 
@@ -706,12 +699,12 @@ class OAuthModule extends Module implements ProtocolResult {
 
         if (!$token->verify($this->f3->get('POST.tk'), 'oauth_consent')) {
             $this->logger->log(LogLevel::WARNING, 'Security token ' . $this->f3->get('POST.tk') . ' invalid.');
-            $this->f3->set('message', $this->t('SimpleID detected a potential security attack.  Please try again.'));
+            $this->f3->set('message', $this->f3->get('intl.common.invalid_tk'));
             $this->consentForm($request, $response);
             return;
         }
         
-        if ($this->f3->get('POST.op') == $this->t('Deny')) {
+        if ($this->f3->get('POST.op') == $this->f3->get('intl.common.deny')) {
             $response->setError('access_denied')->renderRedirect();
             return;
         } else {
@@ -756,7 +749,7 @@ class OAuthModule extends Module implements ProtocolResult {
             self::$scope_settings = [
                 'oauth' => [
                     self::DEFAULT_SCOPE => [
-                        'description' => $this->t('know who you are'),
+                        'description' => $this->f3->get('intl.common.scope.id'),
                         //'required' => true
                     ]
                 ]

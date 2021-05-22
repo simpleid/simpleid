@@ -1,14 +1,14 @@
-<p>{{ @otp_instructions_label }}</p>
+<p>{{ @intl.core.auth_otp.otp_instructions_label }}</p>
 
-<p>{{ @otp_recovery_label | raw }}</p>
+<p>{{ @intl.core.auth_otp.otp_recovery_label, @otp_recovery_url | format, raw }}</p>
 
 <div class="form-item">
-    <label for="edit-otp">{{ @otp_label }}</label>
+    <label for="edit-otp">{{ @intl.core.auth_otp.otp_label }}</label>
     <input type="number" maxlength="6" name="otp[otp]" id="edit-otp" size="10" autocomplete="off" autocorrect="off" class="form-text otp required" data-focus-weight="0">
 </div>
 <div class="form-item">
     <label class="option">
         <input type="checkbox" name="otp[remember]" value="1" <check if="{{ @@REQUEST.otp.remember }}">checked="checked"</check>>
-        {{ @otp_remember_label }}
+        {{ @intl.core.auth_otp.otp_remember_label }}
     </label>
 </div>

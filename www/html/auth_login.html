@@ -12,9 +12,10 @@
         {{ @form.content | raw }}
     </repeat>
 
+    {* @submit_button text may vary depending on auth module *}
     <input type="submit" name="op" id="edit-submit" value="{{ @@submit_button }}" class="form-default" {{ @@security_disabled }}>
     <check if="{{ @@cancellable }}">
-        <input type="submit" name="op" id="edit-cancel" value="{{ @cancel_button }}">
+        <input type="submit" name="op" id="edit-cancel" value="{{ @intl.common.cancel }}">
     </check>
 </form>
 

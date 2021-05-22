@@ -32,6 +32,19 @@
     <property name="dist.dir" value="${build.dir}/dist" />
     <property name="dist.tar.dir" value="tar" />
 
+    <includepath classpath="build" />
+    <taskdef name="xgettext" classname="XGetTextTask" />
+
+    <target name="xgettext">
+        <xgettext destdir="www/locale">
+            <fileset dir="www">
+                <include name="**/*.php" />
+                <exclude name="locale/**/*.php" />
+                <exclude name="vendor/**/*.php" />
+            </fileset>
+        </xgettext>
+    </target>
+
     <!-- Tool -->
     <target name="tool">
         <phing dir="tool" target="phar" />

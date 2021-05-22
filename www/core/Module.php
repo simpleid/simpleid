@@ -23,7 +23,6 @@
 namespace SimpleID;
 
 use SimpleID\Auth\AuthManager;
-use SimpleID\Util\LocaleManager;
 
 /**
  * A SimpleID module.
@@ -85,10 +84,6 @@ abstract class Module extends \Prefab {
         } else {
             $this->domain = LocaleManager::DEFAULT_DOMAIN;
         }
-
-        $this->f3->set('logout_label', $this->t('Log out'));
-        $this->f3->set('footer_doc', $this->t('Documentation'));
-        $this->f3->set('footer_support', $this->t('Support'));
     }
 
     /**
@@ -118,6 +113,7 @@ abstract class Module extends \Prefab {
      */
     protected function isHttps() {
         return ($this->f3->get('SCHEME') == 'https')
+            || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && (strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) == 'https'))
             || (isset($_SERVER['HTTP_FRONT_END_HTTPS']) && ($_SERVER['HTTP_FRONT_END_HTTPS'] == 'on'));
     }
 
@@ -158,7 +154,7 @@ abstract class Module extends \Prefab {
 
             header('Upgrade: TLS/1.2, HTTP/1.1');
             header('Connection: Upgrade');
-            $this->fatalError($this->t('An encrypted connection (HTTPS) is required for this page.'));
+            $this->fatalError($this->f3->get('intl.common.require_https'));
             exit;
             return;
         }
@@ -228,31 +224,11 @@ abstract class Module extends \Prefab {
      * @param string $error the message to set
      */
     protected function fatalError($error) {
-        $this->f3->set('title', $this->t('Error'));
+        $this->f3->set('title', $this->f3->get('intl.common.error'));
         $this->f3->set('message', $error);
         $tpl = new \Template();
         print $tpl->render('page.html');
         exit;
-    }
-
-    /**
-     * Translates a string.
-     *
-     * @param string $string the string to translate
-     * @param array $variables an array of replacements variables to be made after
-     * a translation. Prefix the variable with a @ to make the replacement HTML safe,
-     * a % to make the replacement HTML safe and surround with &lt;strong&gt; tags,
-     * and ! to replace as is
-     * @return string the translated string
-     */
-    protected function t($string, $variables = []) {
-        $i18n = LocaleManager::instance();
-
-        $translated = $i18n->dt_raw($this->domain, $string);
-        if (($translated == $string) && ($this->domain != LocaleManager::DEFAULT_DOMAIN))
-            $translated = $i18n->t_raw($string);
-    
-        return $i18n->expand($translated, $variables);
     }
 
     /**

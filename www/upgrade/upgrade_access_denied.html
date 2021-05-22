@@ -1,12 +1,12 @@
-<p>{{ @login_required | raw }}</p>
+<p>{{ @intl.upgrade.login_required | raw }}</p>
 
-<p>{{ @edit_upgrade_php | raw }}</p>
+<p>{{ @intl.upgrade.edit_upgrade_php | raw }}</p>
 
 <ol>
-    <li>{{ @edit_upgrade_php1 | raw }}</li>
-    <li>{{ @edit_upgrade_php2 | raw }}</li>
-    <li>{{ @edit_upgrade_php3 | raw }}</li>
-    <li>{{ @edit_upgrade_php4 | raw }}</li>
+    <li>{{ @intl.upgrade.edit_upgrade_php1 | raw }}</li>
+    <li>{{ @intl.upgrade.edit_upgrade_php2 | raw }}</li>
+    <li>{{ @intl.upgrade.edit_upgrade_php3 | raw }}</li>
+    <li>{{ @intl.upgrade.edit_upgrade_php4 | raw }}</li>
 </ol>
 
-<p>{{ @simpleid_docs | raw }}</p>
+<p>{{ @intl.upgrade.simpleid_docs, @upgrade_url | raw }}</p>

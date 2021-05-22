@@ -46,16 +46,16 @@ class UserModule extends Module {
         $store = StoreManager::instance();
         $mgr = ModuleManager::instance();
         
-        $this->f3->set('title', $this->t('User Page'));
+        $this->f3->set('title', $this->f3->get('intl.core.user.user_title'));
         if (!isset($params['uid'])) {
             $this->f3->status(400);
-            $this->f3->set('message', $this->t('No user specified.'));
+            $this->f3->set('message', $this->f3->get('intl.common.missing_uid'));
         } else {
             $user = $store->loadUser($params['uid']);
             
             if ($user == NULL) {
                 $this->f3->status(404);
-                $this->f3->set('message', $this->t('User %uid not found.', [ '%uid' => $params['uid'] ]));
+                $this->f3->set('message', $this->f3->get('intl.common.user_not_found', $params['uid']));
             } else {
                 header('Vary: Accept');
                 
@@ -70,7 +70,7 @@ class UserModule extends Module {
                     $xrds_location = $this->getCanonicalURL('@openid_user_xrds');
                     header('X-XRDS-Location: ' . $xrds_location);
                     
-                    $this->f3->set('message', $this->t('This is the user %uid\'s SimpleID page.  It contains hidden information for the use by OpenID consumers.', [ '%uid' => $params['uid'] ]));
+                    $this->f3->set('message', $this->f3->get('intl.core.user.user_page', $params['uid']));
                     
                     $this->f3->set('title', $user['uid']);
                     $this->f3->set('xrds', $xrds_location);
@@ -95,9 +95,9 @@ class UserModule extends Module {
         $auth = AuthManager:: instance();
         $user = $auth->getUser();
         
-        $html = '<p>' . $this->t('SimpleID may, with your consent, send the following information to sites.') . '</p>';    
+        $html = '<p>' . $this->f3->get('intl.core.user.profile_label') . '</p>';    
         
-        $html .= "<table><tr><th>" . $this->t('Member') . "</th><th>" . $this->t('Value') . "</th></tr>";
+        $html .= "<table><tr><th>" . $this->f3->get('intl.common.name') . "</th><th>" . $this->f3->get('intl.common.value') . "</th></tr>";
         
         if (isset($user['userinfo'])) {
             foreach ($user['userinfo'] as $member => $value) {
@@ -115,7 +115,7 @@ class UserModule extends Module {
         
         return [ [
             'id' => 'userinfo',
-            'title' => $this->t('User information'),
+            'title' => $this->f3->get('intl.core.user.userinfo_title'),
             'content' => $html,
             'weight' => -1
         ] ];

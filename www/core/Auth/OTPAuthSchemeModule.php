@@ -59,9 +59,9 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             return;
         }
 
-        if ($this->f3->get('POST.op') == $this->t('Disable')) {
+        if ($this->f3->get('POST.op') == $this->f3->get('intl.common.disable')) {
             if (($this->f3->exists('POST.tk') === false) || (!$token->verify($this->f3->get('POST.tk'), 'otp'))) {
-                $this->f3->set('message', $this->t('SimpleID detected a potential security attack.  Please try again.'));
+                $this->f3->set('message', $this->f3->get('intl.common.invalid_tk'));
                 $this->f3->mock('GET /my/dashboard');
                 return;
             }
@@ -70,26 +70,26 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
                 unset($user['otp']);
                 $store->saveUser($user);
             }
-            $this->f3->set('message', $this->t('Login verification has been disabled.'));
+            $this->f3->set('message', $this->f3->get('intl.core.auth_otp.disable_success'));
             $this->f3->mock('GET /my/dashboard');
             return;
-        } elseif ($this->f3->get('POST.op') == $this->t('Verify')) {
+        } elseif ($this->f3->get('POST.op') == $this->f3->get('intl.common.verify')) {
             $params = $token->getPayload($this->f3->get('POST.otp_params'));
             $this->f3->set('otp_params', $this->f3->get('POST.otp_params'));
 
             if (($this->f3->exists('POST.tk') === false) || (!$token->verify($this->f3->get('POST.tk'), 'otp'))) {
-                $this->f3->set('message', $this->t('SimpleID detected a potential security attack.  Please try again.'));
+                $this->f3->set('message', $this->f3->get('intl.common.invalid_tk'));
                 page_dashboard();
                 return;
             } elseif (($this->f3->exists('POST.otp') === false) || ($this->f3->get('POST.otp') == '')) {
-                $this->f3->set('message', $this->t('You need to enter the verification code to complete enabling login verification.'));
+                $this->f3->set('message', $this->f3->get('intl.core.auth_otp.missing_otp'));
             } elseif ($this->verifyOTP($params, $this->f3->get('POST.otp'), 10) === false) {
-                $this->f3->set('message', $this->t('The verification code is not correct.'));
+                $this->f3->set('message', $this->f3->get('intl.core.auth_otp.invalid_otp'));
             } else {
                 $user['otp'] = $params;
                 $store->saveUser($user);
 
-                $this->f3->set('message', $this->t('Login verification has been enabled.'));
+                $this->f3->set('message', $this->f3->get('intl.core.auth_otp.enable_success'));
                 $this->f3->mock('GET /my/dashboard');
                 return;
             }
@@ -118,24 +118,13 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
         $url = 'otpauth://totp/SimpleID?secret=' . $code . '&digits=' . $params['digits'] . '&period=' . $params['period'];
         $this->f3->set('qr', addslashes($url));
 
-        $this->f3->set('about_otp', $this->t('Login verification adds an extra layer of protection to your account. When enabled, you will need to enter an additional security code whenever you log into SimpleID.'));
-        $this->f3->set('otp_warning', $this->t('<strong>WARNING:</strong> If you enable login verification and lose your authenticator app, you will need to <a href="!url">edit your identity file manually</a> before you can log in again.',
-            [ '!url' => 'http://simpleid.org/docs/2/common_problems/#otp' ]
-        ));
-
-        $this->f3->set('setup_otp', $this->t('To set up login verification, following these steps.'));
-        $this->f3->set('download_app', $this->t('Download an authenticator app that supports TOTP for your smartphone, such as Google Authenticator.'));
-        $this->f3->set('add_account', $this->t('Add your SimpleID account to authenticator app using this key.  If you are viewing this page on your smartphone you can use <a href="!url">this link</a> or scan the QR code to add your account.',
-            [ '!url' => $url ]
-        ));
-        $this->f3->set('verify_code', $this->t('To check that your account has been added properly, enter the verification code from your phone into the box below, and click Verify.'));
+        $this->f3->set('otp_recovery_url', 'http://simpleid.org/docs/2/common_problems/#otp');
         
         $this->f3->set('tk', $token->generate('otp', SecurityToken::OPTION_BIND_SESSION));
-        $this->f3->set('otp_label', $this->t('Verification code:'));
-        $this->f3->set('submit_button', $this->t('Verify'));
+
 
         $this->f3->set('page_class', 'dialog-page');
-        $this->f3->set('title', $this->t('Login Verification'));
+        $this->f3->set('title', $this->f3->get('intl.core.auth_otp.otp_title'));
 
         $this->f3->set('framekiller', true);
         
@@ -157,21 +146,21 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
         $token = new SecurityToken();
         $tk = $token->generate('otp', SecurityToken::OPTION_BIND_SESSION);
 
-        $html = '<p>' . $this->t('Login verification adds an extra layer of protection to your account. When enabled, you will need to enter an additional security code whenever you log into SimpleID.') . '</p>';
+        $html = '<p>' . $this->f3->get('intl.core.auth_otp.about_otp') . '</p>';
 
         if (isset($user['otp'])) {
-            $html .= '<p>' . $this->t('Login verification is <strong>enabled</strong>.') . '</p>';
+            $html .= '<p>' . $this->f3->get('intl.core.auth_otp.otp_enabled_block') . '</p>';
             $html .= '<form action="' . $base_path . 'auth/otp" method="post" enctype="application/x-www-form-urlencoded"><input type="hidden" name="tk" value="'. $tk . '"/>';
-            $html .= '<input type="submit" name="op" value="' . $this->t('Disable') . '" /></form>';
+            $html .= '<input type="submit" name="op" value="' . $this->f3->get('intl.common.disable') . '" /></form>';
         } else {
-            $html .= '<p>' . $this->t('Login verification is <strong>disabled</strong>. To enable login verification, click the button below.') . '</p>';
+            $html .= '<p>' . $this->f3->get('intl.core.auth_otp.otp_disabled_block') . '</p>';
             $html .= '<form action="' . $base_path . 'auth/otp" method="post" enctype="application/x-www-form-urlencoded"><input type="hidden" name="tk" value="'. $tk . '"/>';
-            $html .= '<input type="submit" name="op" value="' . $this->t('Enable') . '" /></form>';
+            $html .= '<input type="submit" name="op" value="' . $this->f3->get('intl.common.enable') . '" /></form>';
         }
         
         return [ [
             'id' => 'otp',
-            'title' => $this->t('Login Verification'),
+            'title' => $this->f3->get('intl.core.auth_otp.otp_title'),
             'content' => $html,
             'weight' => 0
         ] ];
@@ -195,15 +184,9 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             $tpl = new \Template();
 
             // Note this is called from user_login(), so $_POST is always filled
-            $this->f3->set('otp_instructions_label', $this->t('To verify your identity, enter the verification code.'));
-            $this->f3->set('otp_recovery_label', $this->t('If you have lost your verification code, you can <a href="!url">recover your account</a>.',
-                [ '!url' => 'http://simpleid.org/docs/2/common_problems/#otp' ]
-            ));
-            $this->f3->set('otp_remember_label', $this->t('Do not ask for verification codes again on this browser.'));
+            $this->f3->set('otp_recovery_url', 'http://simpleid.org/docs/2/common_problems/#otp');
 
-            $this->f3->set('otp_label', $this->t('Verification code:'));
-            
-            $this->f3->set('submit_button', $this->t('Verify'));
+            $this->f3->set('submit_button', $this->f3->get('intl.common.verify'));
             
             return [
                 [
@@ -220,7 +203,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
     public function loginFormValidateHook(&$form_state) {
         if ($form_state['mode'] == AuthManager::MODE_VERIFY) {
             if ($this->f3->exists('POST.otp.otp') === false) {
-                $this->f3->set('message', $this->t('You need to enter the verification code in order to log in.'));
+                $this->f3->set('message', $this->f3->get('intl.core.auth_otp.missing_otp'));
                 return false;
             }
             return true;
@@ -239,7 +222,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             $params = $test_user['otp'];
             
             if ($this->verifyOTP($params, $this->f3->get('POST.otp.otp'), 10) === false) {
-                $this->f3->set('message', $this->t('The verification code is not correct.'));
+                $this->f3->set('message', $this->f3->get('intl.core.auth_otp.invalid_otp'));
                 return false;
             }
 

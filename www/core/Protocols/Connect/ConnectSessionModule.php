@@ -66,18 +66,18 @@ class ConnectSessionModule extends Module {
 
             if (!$token->verify($this->f3->get('POST.tk'), 'connect_logout')) {
                 $this->logger->log(LogLevel::WARNING, 'Security token ' . $this->f3->get('POST.tk') . ' invalid.');
-                $this->f3->set('message', $this->t('SimpleID detected a potential security attack.  Please try again.'));
+                $this->f3->set('message', $this->f3->get('intl.common.invalid_tk'));
                 $this->logoutForm($form_state);
                 return;
             }
 
-            if ($this->f3->get('POST.op') == $this->t('Cancel')) {
+            if ($this->f3->get('POST.op') == $this->f3->get('intl.common.cancel')) {
                 if ($form_state['connect_logout']['post_logout_redirect_uri']) {
                     $response = new Response();
                     if (isset($form_state['connect_logout']['state'])) $response['state'] = $form_state['connect_logout']['state'];
                     $response->renderRedirect($form_state['connect_logout']['post_logout_redirect_uri']);
                 } else {
-                    $this->f3->set('message', $this->t('Log out cancelled.'));
+                    $this->f3->set('message', $this->f3->get('intl.common.logout_cancelled'));
 
                     $index_module = $this->mgr->getModule('SimpleID\Base\IndexModule');
                     $index_module->index();                    
@@ -128,14 +128,14 @@ class ConnectSessionModule extends Module {
                 } else {
                     // The user that the id_token_hint points to is not the same user as the one
                     // currently logged in.
-                    $this->fatalError($this->t('The requested user has already logged out of SimpleID.'));
+                    $this->fatalError($this->f3->get('intl.common.already_logged_out'));
                 }
             } elseif ($auth->isLoggedIn()) {
                 // Prompt for log out
                 $this->logoutForm($form_state);
             } else {
                 // User has already been logged out
-                $this->f3->set('message', $this->t('You have been logged out.'));
+                $this->f3->set('message', $this->f3->get('intl.core.auth.logout_success'));
                 $auth_module = $this->mgr->getModule('SimpleID\Auth\AuthModule');
                 $auth_module->loginForm();
                 return;
@@ -146,18 +146,15 @@ class ConnectSessionModule extends Module {
     protected function logoutForm($form_state = []) {
         $tpl = new \Template();
 
-        $this->f3->set('logout_consent_label', $this->t('Do you wish to log out of SimpleID as well?'));
-        
         $token = new SecurityToken();
         $this->f3->set('tk', $token->generate('connect_logout', SecurityToken::OPTION_BIND_SESSION));
         $this->f3->set('fs', $token->generate($form_state));
 
         // logout_label is already defined in Module
-        $this->f3->set('cancel_button', $this->t('Cancel'));
 
         $this->f3->set('user_header', true);
         $this->f3->set('framekiller', true);
-        $this->f3->set('title', $this->t('Log out'));
+        $this->f3->set('title', $this->f3->get('intl.common.logout'));
         $this->f3->set('page_class', 'dialog-page');
         $this->f3->set('layout', 'connect_logout.html');
         
@@ -174,7 +171,7 @@ class ConnectSessionModule extends Module {
         $payload = $token->getPayload($params['token']);
 
         if ($payload === null) {
-            $this->f3->fatalError($this->t('Invalid request.'));
+            $this->f3->fatalError($this->f3->get('intl.common.invalid_request'));
             return;
         }
 

@@ -25,7 +25,6 @@ namespace SimpleID;
 use \Prefab;
 use \Base;
 use Psr\Log\LogLevel;
-use SimpleID\Util\LocaleManager;
 
 /**
  * Manages SimpleID modules.
@@ -61,10 +60,8 @@ class ModuleManager extends Prefab {
         $this->modules[$name] = $module;
         
         if (isset($info['asset_domain'])) {
-            $this->f3->set('UI', $this->f3->get('UI') . PATH_SEPARATOR . $info['asset_dir']);
-
-            $locale = LocaleManager::instance();
-            $locale->addDomain($info['asset_domain'], $info['asset_dir']);
+            $this->f3->set('UI', $this->f3->get('UI') . ';' . $info['asset_dir']);
+            $this->f3->set('LOCALES', $this->f3->get('LOCALES') . ';' . $info['asset_dir']);
         }
     }
 

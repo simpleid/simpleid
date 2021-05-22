@@ -226,7 +226,7 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
 
         if (($client == NULL) || !is_a($client, 'SimpleID\Protocols\Connect\ConnectDynamicClient')) {
             $this->f3->status(404);
-            $this->fatalError($this->t('Client not found.'));
+            $this->fatalError($this->f3->get('intl.common.not_found'));
             return;
         }
 
