@@ -32,19 +32,6 @@
     <property name="dist.dir" value="${build.dir}/dist" />
     <property name="dist.tar.dir" value="tar" />
 
-    <includepath classpath="build" />
-    <taskdef name="xgettext" classname="XGetTextTask" />
-
-    <target name="xgettext">
-        <xgettext destdir="www/locale">
-            <fileset dir="www">
-                <include name="**/*.php" />
-                <exclude name="locale/**/*.php" />
-                <exclude name="vendor/**/*.php" />
-            </fileset>
-        </xgettext>
-    </target>
-
     <!-- Tool -->
     <target name="tool">
         <phing dir="tool" target="phar" />
@@ -108,7 +95,6 @@
         <delete dir="${dist.dir}/${dist.sub.dir}/simpleid/build" includeemptydirs="true" />
     </target>
 
-
     <!-- tests -->
     <target name="tests">
         <phpunit pharlocation="${phpunit.cmd}" />
@@ -122,41 +108,6 @@
             </fileset>
         </delete>
         <exec command="${apigen.cmd} generate -q" passthru="true" />
-    </target>
-
-    <!-- Internationalisation -->    
-    <target name="gettext" depends="_check-build-dir">
-        <property name="xgettext.filelist" value="${build.dir}/xgettext-filelist.txt" />
-        <echo file="${xgettext.filelist}">
-            <fileset dir="www">
-                <include name="**/*.php" />
-                <exclude name="vendor/**/*" />
-            </fileset>
-        </echo>
-        <reflexive file="${xgettext.filelist}">
-            <filterchain>
-                <striplinecomments>
-                    <comment value="Directory: " />
-                </striplinecomments>
-                <replaceregexp>
-                    <regexp pattern="\\" replace="/"/>
-	            </replaceregexp>
-            </filterchain>
-        </reflexive>
-        <exec command="${xgettext.cmd} -kt --from-code utf-8 -o www/locale/messages.pot -L PHP --no-wrap -f ${xgettext.filelist}" passthru="true" />
-        <delete file="${xgettext.filelist}"/>
-    </target>
-
-    <target name="msgfmt">
-        <foreach param="lang" target="_msgfmt-exec">
-            <fileset dir="www/locale">
-                <include name="**/LC_MESSAGES" />
-            </fileset>
-        </foreach>
-    </target>
-
-    <target name="_msgfmt-exec">
-        <exec command="${msgfmt.cmd} -D www/locale/${lang} -o www/locale/${lang}/messages.mo messages.po" passthru="true" />
     </target>
 
     <!-- Utility tasks -->
