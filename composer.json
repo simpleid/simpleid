@@ -14,7 +14,6 @@
         "ext-hash": "*",
         "kelvinmo/simplexrd": "^3.0",
         "kelvinmo/simplejwt": "^0.5",
-        "kelvinmo/simplei18n": "^0.2",
         "kelvinmo/fernet-php": "^1.0 | ^0.5",
         "bcosca/fatfree-core": "^3.7",
         "mustangostang/spyc": "^0.6",
@@ -27,9 +26,8 @@
         "simpleid/simpleid-tool": "Utilities for SimpleID"
     },
     "require-dev": {
-        "phpunit/phpunit": "4.*",
-        "phing/phing": "2.*",
-        "apigen/apigen": "4.*"
+        "phpunit/phpunit": "^4.8.35 || ^6.0",
+        "phing/phing": "2.*"
     },
     "license": "GPL-2.0+",
     "authors": [

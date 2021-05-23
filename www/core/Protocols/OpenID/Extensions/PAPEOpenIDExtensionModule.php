@@ -88,7 +88,7 @@ class PAPEOpenIDExtensionModule extends Module implements ProtocolResult {
             // max_auth_age, we then require the user to log in again
             if (($auth_level < AuthLevel::AUTH_LEVEL_CREDENTIALS) 
                 || ((time() - $auth->getAuthTime()) > $pape_request['max_auth_age'])) {
-                $this->f3->set('message', $this->t('This web site\'s policy requires you to log in again to confirm your identity.'));
+                $this->f3->set('message', $this->f3->get('intl.common.reenter_credentials'));
                 return self::CHECKID_REENTER_CREDENTIALS;
             }
         }

@@ -1,15 +1,15 @@
-<p>{{ @intro }}</p>
+<p>{{ @intl.upgrade.intro }}</p>
 
-<p>{{ @simpleid_docs | raw }}</p>
+<p>{{ @intl.upgrade.simpleid_docs, @upgrade_url | format,raw }}</p>
 
 <ol>
-    <li>{{ @step1 | raw }}</li>
-    <li>{{ @step2 | raw }}</li>
+    <li>{{ @intl.upgrade.step1 | raw }}</li>
+    <li>{{ @intl.upgrade.step2 | raw }}</li>
 </ol>
 
-<p>{{ @click_continue | raw }}</p>
+<p>{{ @intl.upgrade.info_click_continue | raw }}</p>
 
 <form method="post" action="{{ @base_path }}upgrade/index.php/select">
     <input type="hidden" name="tk" value="{{ @tk }}" />
-    <input type="submit" value="{{ @continue_button }}" />
+    <input type="submit" value="{{ @intl.common.continue }}" />
 </form>

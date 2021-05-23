@@ -68,17 +68,12 @@ class UpgradeModule extends Module {
     function info() {
         $tpl = new \Template();
         
-        $this->f3->set('intro',$this->t('Use this script to update your installation whenever you upgrade to a new version of SimpleID.'));
-        $this->f3->set('simpleid_docs', $this->t('For more detailed information, see the <a href="!url">SimpleID documentation</a>.', [ '!url' => 'http://simpleid.org/documentation/getting-started/upgrading' ]));
-        $this->f3->set('step1', $this->t('<strong>Back up your installation</strong>. This process will change various files within your SimpleID installation and in case of emergency you may need to revert to a backup.'));
-        $this->f3->set('step2', $this->t('Install your new files in the appropriate location, as described in the <a href="!url">SimpleID documentation</a>.', [ '!url' => 'http://simpleid.org/documentation/getting-started/installing-simpleid' ]));
-        $this->f3->set('click_continue', $this->t('When you have performed the steps above, click <strong>Continue</strong>.'));
-        $this->f3->set('continue_button', $this->t('Continue'));
+        $this->f3->set('upgrade_url', 'http://simpleid.org/documentation/getting-started/upgrading');
 
         $token = new SecurityToken();
         $this->f3->set('tk', $token->generate('upgrade_info', SecurityToken::OPTION_BIND_SESSION));
                
-        $this->f3->set('title', $this->t('Upgrade'));
+        $this->f3->set('title', $this->f3->get('intl.upgrade.upgrade_title'));
         $this->f3->set('page_class', 'dialog-page');
         $this->f3->set('layout', 'upgrade_info.html');
         
@@ -95,7 +90,7 @@ class UpgradeModule extends Module {
 
         $token = new SecurityToken();
         if (($this->f3->exists('POST.tk') === false) || !$token->verify($this->f3->get('POST.tk'), 'upgrade_info')) {
-            $this->f3->set('message', $this->t('SimpleID detected a potential security attack.  Please try again.'));
+            $this->f3->set('message', $this->f3->get('intl.common.invalid_tk'));
             $this->info();
             return;
         }
@@ -107,9 +102,7 @@ class UpgradeModule extends Module {
 
         $list = $this->getUpgradeList();
         
-        if (count($list) == 0) {
-            $this->f3->set('script_complete', $this->t('Your SimpleID installation is up-to-date.  This script is complete.'));
-        } else {
+        if (count($list) != 0)
             $rand = new Random();
 
             $upgid = $rand->id();
@@ -117,21 +110,12 @@ class UpgradeModule extends Module {
             $this->f3->set('upgid', $upgid);
 
             $this->f3->set('tk', $token->generate('upgrade_selection', SecurityToken::OPTION_BIND_SESSION));
-            
-            $this->f3->set('click_continue', $this->t('Click <strong>Continue</strong> to proceed with the upgrade.'));
-            $this->f3->set('continue_button', $this->t('Continue'));
         }
         
         $this->f3->set('original_version', $this->getVersion());
         $this->f3->set('this_version', SIMPLEID_VERSION);
         
-        $this->f3->set('version_detected', $this->t('The version of SimpleID you are updating from has been automatically detected.'));
-        $this->f3->set('original_version_label', $this->t('Original version'));
-        $this->f3->set('this_version_label', $this->t('Upgrade version'));
-
-        $this->f3->set('edit_upgrade_php', $this->t('Remember to edit upgrade.php to check <code>$upgrade_access_check</code> back to <code>FALSE</code>.'));
-        
-        $this->f3->set('title', $this->t('Upgrade'));
+        $this->f3->set('title', $this->f3->get('intl.upgrade.upgrade_title'));
         $this->f3->set('page_class', 'dialog-page');
         $this->f3->set('layout', 'upgrade_selection.html');
         
@@ -144,7 +128,7 @@ class UpgradeModule extends Module {
     function apply() {
         $token = new SecurityToken();
         if (($this->f3->exists('POST.tk') === false) || !$token->verify($this->f3->get('POST.tk'), 'upgrade_selection')) {
-            $this->f3->set('message', $this->t('SimpleID detected a potential security attack.  Please try again.'));
+            $this->f3->set('message', $this->f3->get('intl.common.invalid_tk'));
             $this->info();
             return;
         }
@@ -152,8 +136,7 @@ class UpgradeModule extends Module {
         $step = $token->generate([ 'upgid' => $this->f3->get('POST.upgid'), 'step' => 0 ], SecurityToken::OPTION_BIND_SESSION);
         $this->f3->set('step', $step);
 
-        $this->f3->set('applying_upgrade', $this->t('Applying upgrade...'));
-        $this->f3->set('title', $this->t('Upgrade'));
+        $this->f3->set('title', $this->f3->get('intl.upgrade.upgrade_title'));
         $this->f3->set('page_class', 'dialog-page');
         $this->f3->set('layout', 'upgrade_apply.html');
         
@@ -174,7 +157,7 @@ class UpgradeModule extends Module {
             print json_encode([
                 'status' => 'error',
                 'error' => 'unauthorized',
-                'error_description' => $this->t('Unauthorized')
+                'error_description' => $this->f3->get('intl.common.unauthorized')
             ]);
             return;
         }
@@ -185,7 +168,7 @@ class UpgradeModule extends Module {
             print json_encode([
                 'status' => 'error',
                 'error' => 'unauthorized',
-                'error_description' => $this->t('Unauthorized')
+                'error_description' => $this->f3->get('intl.common.unauthorized')
             ]);
             return;
         }
@@ -200,7 +183,7 @@ class UpgradeModule extends Module {
             print json_encode([
                 'status' => 'error',
                 'error' => 'upgrade_error',
-                'error_description' => $this->t('Upgrade not found')
+                'error_description' => $this->f3->get('intl.upgrade.upgrade_not_found')
             ]);
             return;
         }
@@ -234,14 +217,14 @@ class UpgradeModule extends Module {
         $token = new SecurityToken();
         if (!$this->f3->exists('GET.tk')) {
             $this->f3->status(401);
-            $this->fatalError($this->t('SimpleID detected a potential security attack.  Please try again.'));
+            $this->fatalError($this->f3->get('intl.common.invalid_tk'));
             return;
         }
 
         $payload = $token->getPayload($this->f3->get('POST.step'));
         if ($payload == null) {
             $this->f3->status(401);
-            $this->fatalError($this->t('SimpleID detected a potential security attack.  Please try again.'));
+            $this->fatalError($this->f3->get('intl.common.invalid_tk'));
             return;
         }
 
@@ -252,17 +235,12 @@ class UpgradeModule extends Module {
 
         if ($upgrade === false) {
             $this->f3->status(500);
-            $this->fatalError($this->t('Upgrade not found'));
+            $this->fatalError($this->f3->get('intl.upgrade.upgrade_not_found'));
         }
 
-        if (!$upgrade_access_check) {
-            $this->f3->set('edit_upgrade_php', $this->t('Remember to edit upgrade.php to check <code>$upgrade_access_check</code> back to <code>TRUE</code>.'));
-        }
         $this->f3->set('results', $upgrade['results']);
-        
-        $this->f3->set('upgrade_complete', $this->t('Your SimpleID installation has been upgraded.  Please check the results below for any errors.'));
-        
-        $this->f3->set('title', $this->t('Upgrade'));
+                
+        $this->f3->set('title', $this->f3->get('intl.upgrade.upgrade_title'));
         $this->f3->set('page_class', 'dialog-page');
         $this->f3->set('layout', 'upgrade_results.html');
         
@@ -276,15 +254,9 @@ class UpgradeModule extends Module {
     protected function accessDenied() {
         $tpl = new \Template();
 
-        $this->f3->set('login_required', $this->t('Access denied. You are not authorised to access this page. Please <a href="auth/login">log in</a> as an administrator (a user whose identity file includes the line <code>administrator=1</code>).'));
-        $this->f3->set('edit_upgrade_php', $this->t('If you cannot log in, you will have to edit <code>upgrade.php</code> to bypass this access check. To do this:'));
-        $this->f3->set('edit_upgrade_php1', $this->t('With a text editor find the upgrade.php file.'));
-        $this->f3->set('edit_upgrade_php2', $this->t('There is a line inside your upgrade.php file that says <code>$upgrade_access_check = TRUE;</code>. Change it to <code>$upgrade_access_check = FALSE;</code>.'));
-        $this->f3->set('edit_upgrade_php3', $this->t('As soon as the upgrade.php script is done, you must change the file back to its original form with <code>$upgrade_access_check = TRUE;</code>.'));
-        $this->f3->set('edit_upgrade_php4', $this->t('To avoid having this problem in future, remember to log in to SimpleID as an administrator before you run this script.'));
-        $this->f3->set('simpleid_docs', $this->t('For more detailed information, see the <a href="!url">SimpleID documentation</a>.', [ '!url' => 'http://simpleid.org/documentation/getting-started/upgrading/running-upgradephp' ]));
+        $this->f3->set('upgrade_url', 'http://simpleid.org/documentation/getting-started/upgrading/running-upgradephp'));
         
-        $this->f3->set('title', $this->t('Access Denied'));
+        $this->f3->set('title', $this->f3->get('intl.common.access_denied'));
         $this->f3->set('layout', 'upgrade_access_denied.html');
         print $tpl->render('page.html');
         exit;

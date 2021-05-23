@@ -8,7 +8,7 @@
     </div>
     </check>
     
-    <p>{{ @request_label | raw }}</p>
+    <p>{{ @intl.common.consent.request_label, @application_name, @application_type | format, raw }}</p>
     
     <ul>
         <repeat group="{{ @scope_list }}" key="{{ @scope }}" value="{{ @description }}">
@@ -19,15 +19,15 @@
     
     <check if="{{ @@client_dynamic }}">
     <div class="message unsecure">
-        <p>{{ @dynamic_label | raw }}</p>
+        <p>{{ @intl.core.oauth.dynamic_label, @application_name | format, raw }}</p>
     </div>
     </check>
     
-    <p>{{ @dashboard_label | raw }}</p>
+    <p>{{ @intl.common.consent.dashboard_label | raw }}</p>
 
     <check if="{{ @@client_info }}">
     <div class="client-info">
-        <h2 class="client-info-heading collapsed">{{ @@client_info_label }}</h2>
+        <h2 class="client-info-heading collapsed">{{ @intl.common.more_info }}</h2>
         <div class="client-info-details">
             <ul>
                 <repeat group="{{ @client_info }}" value="{{ @item }}"><li>{{ @item | raw }}</li></repeat>
@@ -39,10 +39,10 @@
     <div class="form-item">
         <label class="option">
             <input class="{{ @@client_dynamic }}" type="checkbox" name="prefs[oauth][prompt_none]" value="true">
-            {{ @@oauth_consent_label | raw }}
+            {{ @intl.common.consent.consent_label, @application_name | format, raw }}
         </label>
     </div>
     
-    <input name="op" id="edit-allow" value="{{ @allow_button }}" class="form-default" type="submit">
-    <input name="op" id="edit-deny" value="{{ @deny_button }}" type="submit">
+    <input name="op" id="edit-allow" value="{{ @intl.common.allow }}" class="form-default" type="submit">
+    <input name="op" id="edit-deny" value="{{ @intl.common.deny }}" type="submit">
 </form>

@@ -2,9 +2,9 @@
     <input type="hidden" name="fs" value="{{ @@fs }}">
     <input type="hidden" name="tk" value="{{ @@tk }}">    
     
-    <p>{{ @logout_consent_label | raw }}</p>
+    <p>{{ @intl.core.connect.logout_consent_label | raw }}</p>
     
-    <input type="submit" name="op" id="edit-submit" value="{{ @logout_label }}" class="form-default" />
-    <input type="submit" name="op" id="edit-cancel" value="{{ @cancel_button }}" />
+    <input type="submit" name="op" id="edit-submit" value="{{ @intl.common.logout }}" class="form-default" />
+    <input type="submit" name="op" id="edit-cancel" value="{{ @intl.common.cancel }}" />
 </form>
 

@@ -74,12 +74,12 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
 
         if (!is_readable($config['public_jwks_file'])) {
             $this->f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'Public JSON web key file not found.');
-            $this->f3->error(500, $this->t('Public JSON web key file not found.  See the <a href="!url">manual</a> for instructions on how to set up OpenID Connect on SimpleID.', [ '!url' => 'http://simpleid.org/docs/2/installing/#keys' ]));
+            $this->f3->error(500, $this->f3->get('intl.core.connect.missing_public_jwk', 'http://simpleid.org/docs/2/installing/#keys'));
         }
 
         if (!is_readable($config['private_jwks_file'])) {
             $this->f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'Private JSON web key file not found.');
-            $this->f3->error(500, $this->t('Private JSON web key file not found.  See the <a href="!url">manual</a> for instructions on how to set up OpenID Connect on SimpleID.', [ '!url' => 'http://simpleid.org/docs/2/installing/#keys' ]));
+            $this->f3->error(500, $this->f3->get('intl.core.connect.missing_private_jwk', 'http://simpleid.org/docs/2/installing/#keys'));
         }
     }
 
@@ -170,7 +170,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
         $request->setImmediate($request->paramContains('prompt', 'none'));
 
         if ($request->paramContains('prompt', 'login')) {
-            $this->f3->set('message', $this->t('This app\'s policy requires you to log in again to confirm your identity.'));
+            $this->f3->set('message', $this->f3->get('intl.common.reenter_credentials'));
             $request->paramRemove('prompt', 'login');
             return self::CHECKID_REENTER_CREDENTIALS;
         }
@@ -215,7 +215,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
             // max_age, we then require the user to log in again
             if (($auth_level < AuthManager::AUTH_LEVEL_CREDENTIALS) 
                 || ((time() - $auth->getAuthTime()) > $max_age)) {
-                $this->f3->set('message', $this->t('This app\'s policy requires you to log in again to confirm your identity.'));
+                $this->f3->set('message', $this->f3->get('intl.common.reenter_credentials'));
                 return self::CHECKID_REENTER_CREDENTIALS;
             }
         }
@@ -481,23 +481,23 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
             self::$scope_settings = [
                 'oauth' => [
                     'openid' => [
-                        'description' => $this->t('know who you are'),
+                        'description' => $this->f3->get('intl.common.scope.id'),
                         'weight' => -1
                     ],
                     'profile' => [
-                        'description' => $this->t('view your profile information (excluding e-mail and address information)'),
+                        'description' => $this->f3->get('intl.common.scope.profile'),
                         'claims' => ['name', 'family_name', 'given_name', 'middle_name', 'nickname', 'preferred_username', 'profile', 'picture', 'website', 'gender', 'birthdate', 'zoneinfo', 'locale' ]
                     ],
                     'email' => [
-                        'description' => $this->t('view your e-mail address'),
+                        'description' => $this->f3->get('intl.common.scope.email'),
                         'claims' => [ 'email' ]
                     ],
                     'address' => [
-                        'description' => $this->t('view your address information'),
+                        'description' => $this->f3->get('intl.common.scope.address'),
                         'claims' => [ 'address' ]
                     ],
                     'phone' => [
-                        'description' => $this->t('view your phone number'),
+                        'description' => $this->f3->get('intl.common.scope.phone'),
                         'claims' => [ 'phone_number' ]
                     ]
                 ]
@@ -576,7 +576,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
 
         if (!isset($config['public_jwks_file'])) {
             $this->f3->status(404);
-            $this->fatalError($this->t('No web key file found.'));
+            $this->fatalError($this->f3->get('intl.core.connect.missing_jwks'));
         }
         
         $set = new KeySet();
@@ -584,7 +584,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
 
         if (!$set->isPublic()) {
             $this->f3->status(401);
-            $this->fatalError($this->t('Web key file not public.'));
+            $this->fatalError($this->f3->get('intl.core.connect.jwks_not_public'));
         }
 
         header('Content-Type: application/jwk-set+json');

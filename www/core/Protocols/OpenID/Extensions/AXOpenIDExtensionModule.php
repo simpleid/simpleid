@@ -128,9 +128,9 @@ class AXOpenIDExtensionModule extends Module {
             $tpl = new \Template();
             $hive = [
                 'module' => 'ax',
-                'userinfo_label' => $this->t('SimpleID will also be sending the following information to the site.'),
-                'name_label' => $this->t('Type URL'),
-                'value_label' => $this->t('Value'),
+                'userinfo_label' => $this->f3->get('intl.common.consent.send_label'),
+                'name_label' => $this->f3->get('intl.core.openid.ax.type_url_label'),
+                'value_label' => $this->f3->get('intl.common.value'),
                 'fields' => []
             ];
 
@@ -172,7 +172,7 @@ class AXOpenIDExtensionModule extends Module {
             ];
         } elseif ($mode == 'store_request') {
             // Sadly, we don't support storage at this stage
-            $this->f3->set('message', $this->t('This web site requested to store information about you on SimpleID. Sadly, SimpleID does not support this feature.'));
+            $this->f3->set('message', $this->f3->get('intl.core.openid.ax.unsupported_feature'));
         }
     }
 
@@ -232,15 +232,15 @@ class AXOpenIDExtensionModule extends Module {
 
         $tpl = new \Template();
         $hive = [
-            'userinfo_label' => $this->t('SimpleID may send the following additional information to sites which supports the Attribute Exchange Extension.'),
-            'name_label' => $this->t('Type URL'),
-            'value_label' => $this->t('Value'),
+            'userinfo_label' => $this->f3->get('intl.core.openid.ax.profile_block'),
+            'name_label' => $this->f3->get('intl.core.openid.ax.type_url_label'),
+            'value_label' => $this->f3->get('intl.common.value'),
             'info' => $user['ax']
         ];
         
         return [ [
             'id' => 'ax',
-            'title' => t('Attribute Exchange Extension'),
+            'title' => $this->f3->get('intl.core.openid.ax.ax_title'),
             'content' => $tpl->render('openid_userinfo_profile.html', false, $hive),
         ] ];
     }

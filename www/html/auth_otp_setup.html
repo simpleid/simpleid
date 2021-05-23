@@ -1,16 +1,16 @@
-<p>{{ @about_otp }}</p>
+<p>{{ @intl.core.auth_otp.about_otp }}</p>
 
-<p>{{ @otp_warning | raw }}</p>
+<p>{{ @intl.core.auth_otp.otp_warning, @otp_recovery_url | format, raw }}</p>
 
-<p>{{ @setup_otp }}</p>
+<p>{{ @intl.core.auth_otp.setup_otp }}</p>
 
 <ol>
-    <li>{{ @download_app }}</li>
-    <li>{{ @add_account | raw }}
+    <li>{{ @intl.core.auth_otp.download_app }}</li>
+    <li>{{ @intl.core.auth_otp.add_account, @qr | format, raw }}
         <div class="otp-key"><span class="otp-letters">{{ @secret1 }}</span><span class="otp-letters">{{ @secret5 }}</span><span class="otp-letters">{{ @secret9 }}</span><span class="otp-letters">{{ @secret13 }}</span></div>
         <div id="otp-key-qr"></div>
     </li>
-    <li>{{ @verify_code }}</li>
+    <li>{{ @intl.core.auth_otp.verify_code }}</li>
 </ol>
 
 <script src="{{ @base_path }}html/jquery.qrcode.js" type="text/javascript"></script><script type="text/javascript">$('#otp-key-qr').qrcode("{{ @qr | raw }}");</script>
@@ -20,8 +20,8 @@
     <input type="hidden" name="otp_params" value="{{ @otp_params }}"/>
     
     <div class="form-item">
-        <label for="edit-otp">{{ @otp_label }}</label>
+        <label for="edit-otp">{{ @intl.core.auth_otp.otp_label }}</label>
         <input type="number" maxlength="6" name="otp" id="edit-otp" size="10" value="" autocapitalize="off" autocorrect="off" class="form-text otp required" />
     </div>
-    <input type="submit" name="op" id="edit-submit" value="{{ @submit_button }}" class="form-default" />
+    <input type="submit" name="op" id="edit-submit" value="{{ @intl.common.verify }}" class="form-default" />
 </form>

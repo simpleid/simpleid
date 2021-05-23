@@ -53,7 +53,7 @@ class MyModule extends Module {
                 header('Content-Type: application/json');
                 print json_encode([
                     'error' => 'unauthorized',
-                    'error_description' => $this->t('Unauthorized')
+                    'error_description' => $this->f3->get('intl.common.unauthorized')
                 ]);
                 exit;
             } else {
@@ -73,14 +73,14 @@ class MyModule extends Module {
      * Displays the dashboard page.
      */
     public function dashboard() {
-        $this->blocksPage($this->t('Dashboard'), 'dashboardBlocks');
+        $this->blocksPage($this->f3->get('intl.core.my.dashboard_title'), 'dashboardBlocks');
     }
 
     /**
      * Displays the profile page.
      */
     public function profile() {
-        $this->blocksPage($this->t('My Profile'), 'profileBlocks');
+        $this->blocksPage($this->f3->get('intl.core.my.profile_title'), 'profileBlocks');
     }
 
     /**
@@ -94,8 +94,7 @@ class MyModule extends Module {
 
         $tpl = new \Template();
         $this->f3->set('tk', $token->generate('apps', SecurityToken::OPTION_BIND_SESSION));
-        $this->f3->set('title', $this->t('My Apps'));
-        $this->f3->set('delete_label', $this->t('Delete'));
+        $this->f3->set('title', $this->f3->get('intl.core.my.apps_title'));
         $this->f3->set('layout', 'my_apps.html');
         print $tpl->render('page.html');
     }
@@ -110,7 +109,7 @@ class MyModule extends Module {
             $this->f3->status(401);
             print json_encode([
                 'error' => 'unauthorized',
-                'error_description' => $this->t('Unauthorized')
+                'error_description' => $this->f3->get('intl.common.unauthorized')
             ]);
             return;
         }
@@ -140,7 +139,7 @@ class MyModule extends Module {
             $this->f3->status(401);
             print json_encode([
                 'error' => 'unauthorized',
-                'error_description' => $this->t('Unauthorized')
+                'error_description' => $this->f3->get('intl.common.unauthorized')
             ]);
             return;
         }
@@ -152,7 +151,7 @@ class MyModule extends Module {
             $this->f3->status(404);
             print json_encode([
                 'error' => 'not_found',
-                'error_description' => $this->t('Not found')
+                'error_description' => $this->f3->get('intl.common.not_found')
             ]);
             return;
         }
@@ -162,9 +161,9 @@ class MyModule extends Module {
             'first_time' => $this->f3->format('{0,date} {0,time}', $prefs['first_time']),
             'last_time' => $this->f3->format('{0,date} {0,time}', $prefs['last_time']),
             't' => [
-                'first_time_label' => $this->t('First accessed:'),
-                'last_time_label' => $this->t('Last accessed:'),
-                'consents_label' => $this->t('You allowed this app to:'),
+                'first_time_label' => $this->f3->get('intl.core.my.first_time_label'),
+                'last_time_label' => $this->f3->get('intl.core.my.last_time_label'),
+                'consents_label' => $this->f3->get('intl.core.my.consents_label'),
             ],
         ];
 
@@ -214,7 +213,7 @@ class MyModule extends Module {
             $this->f3->status(401);
             print json_encode([
                 'error' => 'unauthorized',
-                'error_description' => $this->t('Unauthorized'),
+                'error_description' => $this->f3->get('intl.common.unauthorized'),
             ]);
             return;
         }
@@ -226,7 +225,7 @@ class MyModule extends Module {
             $this->f3->status(404);
             print json_encode([
                 'error' => 'not_found',
-                'error_description' => $this->t('Not found')
+                'error_description' => $this->f3->get('intl.common.not_found')
             ]);
             return;
         }
@@ -241,15 +240,15 @@ class MyModule extends Module {
 
         print json_encode([
             'result' => 'success',
-            'result_description' => $this->t('App has been deleted.')
+            'result_description' => $this->f3->get('intl.core.my.app_delete_success')
         ]);
     }
 
     public function navHook() {
         return [
-            [ 'name' => $this->t('Dashboard'), 'path' =>'my/dashboard', 'weight' => -10 ],
-            [ 'name' => $this->t('My Profile'), 'path' =>'my/profile', 'weight' => -9 ],
-            [ 'name' => $this->t('My Apps'), 'path' =>'my/apps', 'weight' => -8 ],
+            [ 'name' => $this->f3->get('intl.core.my.dashboard_title'), 'path' =>'my/dashboard', 'weight' => -10 ],
+            [ 'name' => $this->f3->get('intl.core.my.profile_title'), 'path' =>'my/profile', 'weight' => -9 ],
+            [ 'name' => $this->f3->get('intl.core.my.apps_title'), 'path' =>'my/apps', 'weight' => -8 ],
         ];
     }
 
@@ -267,21 +266,14 @@ class MyModule extends Module {
 
         $blocks[] = [
             'id' => 'welcome',
-            'title' => $this->t('Welcome'),
-            'content' => $this->t('You are logged in as %identity (%uid).', [ '%uid' => $user['uid'], '%identity' => $user->getDisplayName() ]),
+            'title' => $this->f3->get('intl.core.my.welcome_title'),
+            'content' => $this->f3->get('intl.core.my.logged_in_as', $user->getDisplayName(), $user['uid']),
             'weight' => -10
         ];
 
-        $this->f3->mset([
-            'access_type' => $this->t('Access type'),
-            'location' => $this->t('Location'),
-            'time' => $this->t('Date/time'),
-            'browser_label' => $this->t('Browser'),
-            'app_label' => $this->t('Authorized application'),
-        ]);
         $blocks[] = [
             'id' => 'activity',
-            'title' => $this->t('Recent activity'),
+            'title' => $this->f3->get('intl.core.my.activity_title'),
             'content' => $tpl->render('my_activity.html', false),
             'weight' => 0
         ];
@@ -289,14 +281,14 @@ class MyModule extends Module {
         if ($this->f3->get('config.debug')) {
             $blocks[] = [
                 'id' => 'auth',
-                'title' => $this->t('Authentication'),
+                'title' => $this->f3->get('intl.core.my.debug_auth_title'),
                 'content' => '<pre class="code">' . $this->f3->encode($auth->toString()) . '</pre>',
                 'weight' => 10
             ];
 
             $blocks[] = [
                 'id' => 'user',
-                'title' => $this->t('User'),
+                'title' => $this->f3->get('intl.core.my.debug_user_title'),
                 'content' => '<pre class="code">' . $this->f3->encode($user->toString()) . '</pre>',
                 'weight' => 10
             ];

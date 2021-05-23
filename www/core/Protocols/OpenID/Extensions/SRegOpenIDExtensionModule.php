@@ -96,14 +96,14 @@ class SRegOpenIDExtensionModule extends Module {
         $tpl = new \Template();
         $hive = [
             'module' => 'sreg',
-            'userinfo_label' => $this->t('SimpleID will also be sending the following information to the site.'),
-            'name_label' => $this->t('Name'),
-            'value_label' => $this->t('Value'),
+            'userinfo_label' => $this->f3->get('intl.common.consent.send_label'),
+            'name_label' => $this->f3->get('intl.common.name'),
+            'value_label' => $this->f3->get('intl.common.value'),
             'fields' => []
         ];
             
         if (isset($sreg_request['policy_url'])) {
-            $hive['policy_label'] = $this->t('You can view the site\'s policy in relation to the use of this information at this URL: <a href="@url">@url</a>.', [ '@url' => $request['policy_url'] ]);
+            $hive['policy_url'] = $sreg_request['policy_url'];
         }
             
         foreach ($fields as $field) {
@@ -178,15 +178,15 @@ class SRegOpenIDExtensionModule extends Module {
 
         $tpl = new \Template();
         $hive = [
-            'userinfo_label' => $this->t('SimpleID may send the following additional information to sites which supports the Simple Registration Extension.'),
-            'name_label' => $this->t('Name'),
-            'value_label' => $this->t('Value'),
+            'userinfo_label' => $this->f3->get('intl.core.openid.sreg.profile_block'),
+            'name_label' => $this->f3->get('intl.common.name'),
+            'value_label' => $this->f3->get('intl.common.value'),
             'info' => $user['sreg']
         ];
         
         return [ [
             'id' => 'sreg',
-            'title' => t('Simple Registration Extension'),
+            'title' => $this->f3->get('intl.core.openid.sreg.sreg_title'),
             'content' => $tpl->render('openid_userinfo_profile.html', false, $hive),
         ] ];
     }

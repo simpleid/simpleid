@@ -1,8 +1,8 @@
-<p>{{ @@upgrade_complete }}</p>
+<p>{{ @@intl.upgrade.upgrade_complete }}</p>
             
-<check if="{{ @@edit_upgrade_php }}">
+<check if="{{ !@upgrade_access_check }}">
     <div class="message unsecure">
-        <p>{{ @edit_upgrade_php }}</p>
+        <p>{{ @intl.upgrade.edit_upgrade_php | raw }}</p>
     </div>
 </check>
 

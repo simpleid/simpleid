@@ -50,8 +50,6 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
         if ($form_state['mode'] == AuthManager::MODE_CREDENTIALS || $form_state['mode'] == AuthManager::MODE_REENTER_CREDENTIALS) {
             $tpl = new \Template();
 
-            $this->f3->set('name_label', $this->t('User name:'));
-            $this->f3->set('pass_label', $this->t('Password:'));
             $this->f3->set('login_form_module', 'password');
 
             return [
@@ -77,7 +75,7 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
             if (($uid == '') || ($this->f3->exists('POST.password.password') === false)) {
                 if ($this->f3->exists('PARAMS.continue')) {
                     // User came from a log in form.
-                    $this->f3->set('message', $this->t('You need to supply the user name and the password in order to log in.'));
+                    $this->f3->set('message', $this->f3->get('intl.core.auth_password.missing_password'));
                 }
                 return false;
             }
@@ -97,7 +95,7 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
             $uid = ($form_state['mode'] == AuthManager::MODE_CREDENTIALS) ? $this->f3->get('POST.uid') : $form_state['uid'];
             
             if ($this->verifyCredentials($uid, $this->f3->get('POST')) === false) {
-                $this->f3->set('message', $this->t('The user name or password is not correct.'));
+                $this->f3->set('message', $this->f3->get('intl.core.auth_password.invalid_password'));
                 return false;
             }
 

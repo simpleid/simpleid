@@ -112,6 +112,13 @@ class Random {
      * @return string a relatively unique identifier
      */
     function id() {
+        // Current: 160 [sha1:160] => [base64: <=28]
+        // nanoid: 126 [rand:126] => [base64: 21]
+        // cuid: 137 [timestamp:42] [counter:21] [fingerprint:21] [random: 42] => [base36: 24]
+        // cuid (slug): 44 [timestamp:11] [counter:11] [fingerprint:11] [random:11] => [base36:<=10]
+        // ksuid: 160 [timestamp:32] [rand:128] => [base62:27]
+        // ulid: 128 [timestamp:48] [rand:80]
+        // uuid: [rand:122]
         $timeofday = gettimeofday();
         $base = pack('NN', $timeofday['sec'], $timeofday['usec']) . self::bytes(32);
         return strtr(trim(base64_encode(sha1($base, true)), '='), '+/', '-_');

@@ -1,6 +1,6 @@
 <p>{{ @userinfo_label }} </p>
 
-<check if="{{ @@policy_label }}"><p>{{ @policy_label | raw }}</p></check>
+<check if="{{ @@policy_url }}"><p>{{ @intl.common.consent.policy_url, @policy_url | format, raw }}</p></check>
 
 <table>
     <tr>

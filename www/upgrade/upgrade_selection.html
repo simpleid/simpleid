@@ -1,25 +1,25 @@
-<p>{{ @version_detected }}</p>
+<p>{{ @intl.upgrade.version_detected }}</p>
 
-<p>{{ @original_version_label }}: <strong class="upgrade-version original-version">{{ @original_version }}</strong></p>
+<p>{{ @intl.upgrade.original_version_label }}: <strong class="upgrade-version original-version">{{ @original_version }}</strong></p>
 
-<p>{{ @this_version_label }}: <strong class="upgrade-version this-version">{{ @this_version }}</strong></p>
+<p>{{ @intl.upgrade.this_version_label }}: <strong class="upgrade-version this-version">{{ @this_version }}</strong></p>
 
 <check if="{{ @@upgid }}">
     <true>
-        <p>{{ @click_continue | raw }}</p>
+        <p>{{ @intl.upgrade.selection_click_continue | raw }}</p>
 
         <form method="post" action="{{ @base_path }}upgrade/index.php/select">
             <input type="hidden" name="tk" value="{{ @tk }}" />
             <input type="hidden" name="upgid" value="{{ @upgid }}" />
-            <input type="submit" value="{{ @continue_button }}" />
+            <input type="submit" value="{{ @intl.common.continue }}" />
         </form>
     </true>
     <false>
-        <p>{{ @script_complete }}</p>
+        <p>{{ @intl.upgrade.script_complete }}</p>
 
         <check if="{{ !@upgrade_access_check }}">
             <div class="message unsecure">
-                <p>{{ @edit_upgrade_php | raw }}</p>
+                <p>{{ @intl.upgrade.edit_upgrade_php | raw }}</p>
             </div>
         </check>
     </false>

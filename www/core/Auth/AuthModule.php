@@ -96,7 +96,7 @@ class AuthModule extends Module {
         if ($form_state === false) $form_state = [ 'mode' => AuthManager::MODE_CREDENTIALS ];
         $mode = $form_state['mode'];
         if (!in_array($mode, [ AuthManager::MODE_CREDENTIALS, AuthManager::MODE_REENTER_CREDENTIALS, AuthManager::MODE_VERIFY ])) {
-            $this->f3->set('message', $this->t('SimpleID detected a potential security attack on your log in.  Please log in again.'));
+            $this->f3->set('message', $this->f3->get('intl.core.auth.state_error'));
             $this->loginForm($params, $form_state);
             return;
         }
@@ -104,7 +104,7 @@ class AuthModule extends Module {
         if ($this->f3->exists('POST.tk') === false) {
             if (isset($params['destination'])) {
                 // User came from a log in form.
-                $this->f3->set('message', $this->t('You seem to be attempting to log in from another web page.  You must use this page to log in.'));
+                $this->f3->set('message', $this->f3->get('intl.core.auth.missing_tk'));
             }
             $this->loginForm($params, $form_state);
             return;
@@ -112,16 +112,16 @@ class AuthModule extends Module {
 
         if (!$token->verify($this->f3->get('POST.tk'), 'login')) {
             $this->logger->log(LogLevel::WARNING, 'Login attempt: Security token ' . $this->f3->get('POST.tk') . ' invalid.');
-            $this->f3->set('message', $this->t('SimpleID detected a potential security attack on your log in.  Please log in again.'));
+            $this->f3->set('message', $this->f3->get('intl.core.auth.state_error'));
             $this->loginForm($params, $form_state);
             return;
         }
 
-        if ($this->f3->exists('POST.op') && $this->f3->get('POST.op') == $this->t('Cancel')) {
+        if ($this->f3->exists('POST.op') && $this->f3->get('POST.op') == $this->f3->get('intl.common.cancel')) {
             $results = $this->mgr->invokeAll('loginFormCancelled', $form_state);
             
             if (!array_reduce($results, function($overall, $result) { return ($result) ? true : $overall; }, false)) {
-                $this->fatalError($this->t('Login cancelled without a proper request.'));
+                $this->fatalError($this->f3->get('intl.core.auth.cancelled'));
             }
             return;
         }
@@ -193,7 +193,7 @@ class AuthModule extends Module {
             if ($params['destination']) {
                 $this->f3->reroute('/' . $params['destination']);
             } else {
-                $this->f3->set('message', $this->t('You have been logged out.'));
+                $this->f3->set('message', $this->f3->get('intl.core.auth.logout_success'));
                 $this->loginForm($params);
             }
         }
@@ -221,18 +221,17 @@ class AuthModule extends Module {
                 $security_class = ($config['allow_autocomplete']) ? 'allow-autocomplete ' : '';
                 $this->f3->set('security_class', $security_class);
 
-                $this->f3->set('submit_button', $this->t('Log in'));
-                $this->f3->set('title', $this->t('Log In'));
+                $this->f3->set('submit_button', $this->f3->get('intl.common.login'));
+                $this->f3->set('title', $this->f3->get('intl.common.login'));
                 break;
             case AuthManager::MODE_VERIFY:
                 if (count($forms) == 0) return; // Nothing to verify
-                $this->f3->set('submit_button', $this->t('Verify'));
-                $this->f3->set('title', $this->t('Verify'));
+                $this->f3->set('submit_button', $this->f3->get('intl.common.verify'));
+                $this->f3->set('title', $this->f3->get('intl.common.verify'));
         }
 
         if (isset($form_state['cancel'])) {
             $this->f3->set('cancellable', true);
-            $this->f3->set('cancel_button', $this->t('Cancel'));
         }
 
         // 3. Build the forms
