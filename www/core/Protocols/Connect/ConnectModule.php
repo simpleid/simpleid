@@ -183,7 +183,8 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
         // Check 2: If id_token_hint is provided, check that it refers to the current logged-in user
         if (isset($request['id_token_hint'])) {
             try {
-                list($headers, $claims, $signing_input, $signature) = JWT::deserialise($request['id_token_hint']);
+                $jwt = JWT::deserialise($request['id_token_hint']);
+                $claims = $jwt['claims'];
                 $user_match = ($claims['sub'] == self::getSubject($auth->getUser(), $client));
             } catch (InvalidTokenException $e) {
                 $user_match = false;

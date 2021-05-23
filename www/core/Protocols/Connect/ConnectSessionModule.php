@@ -104,7 +104,8 @@ class ConnectSessionModule extends Module {
             if ($this->f3->exists('REQUEST.id_token_hint')) {
                 try {
                     $id_token_hint = $this->f3->get('REQUEST.id_token_hint');
-                    list($headers, $claims, $signing_input, $signature) = JWT::deserialise($id_token_hint);
+                    $jwt = JWT::deserialise($id_token_hint);
+                    $claims = $jwt['claims'];
 
                     $client_id = $claims['aud'];
                     $sub = $claims['sub'];
