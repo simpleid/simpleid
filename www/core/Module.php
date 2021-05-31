@@ -79,11 +79,6 @@ abstract class Module extends \Prefab {
 
         $mgr = ModuleManager::instance();
         $info = $mgr->getModuleInfo(get_class($this));
-        if (isset($info['asset_domain'])) {
-            $this->domain = $info['asset_domain'];
-        } else {
-            $this->domain = LocaleManager::DEFAULT_DOMAIN;
-        }
     }
 
     /**
