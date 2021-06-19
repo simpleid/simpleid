@@ -43,12 +43,12 @@ class DefaultStoreModule extends StoreModule {
 
     protected function checkConfig() {
         if (!is_dir($this->config['identities_dir'])) {
-            $this->f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'Identities directory not found.');
+            $this->logger->log(\Psr\Log\LogLevel::CRITICAL, 'Identities directory not found.');
             $this->f3->error(500, $this->f3->get('intl.store.identity_not_found', 'http://simpleid.org/docs/2/installing/'));
         }
 
         if (!is_dir($this->config['store_dir']) || !is_writeable($this->config['store_dir'])) {
-            $this->f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'Store directory not found or not writeable.');
+            $this->logger->log(\Psr\Log\LogLevel::CRITICAL, 'Store directory not found or not writeable.');
             $this->f3->error(500, $this->f3->get('intl.store.store_not_found', 'http://simpleid.org/docs/2/installing/'));
         }
     }
@@ -188,7 +188,7 @@ class DefaultStoreModule extends StoreModule {
         try {
             $data = Spyc::YAMLLoad($identity_file);
         } catch (Exception $e) {
-            $this->f3->get('logger')->log(\Psr\Log\LogLevel::ERROR, 'Cannot read user file ' . $identity_file . ': ' . $e->getMessage());
+            $this->logger->log(\Psr\Log\LogLevel::ERROR, 'Cannot read user file ' . $identity_file . ': ' . $e->getMessage());
             trigger_error('Cannot read user file ' . $identity_file . ': ' . $e->getMessage(), E_USER_ERROR);
         }
             
@@ -241,7 +241,7 @@ class DefaultStoreModule extends StoreModule {
             try {
                 $data = Spyc::YAMLLoad($client_file);
             } catch (Exception $e) {
-                $this->f3->get('logger')->log(\Psr\Log\LogLevel::ERROR, 'Cannot read client file ' . $client_file . ' :' . $e->getMessage());
+                $this->logger->log(\Psr\Log\LogLevel::ERROR, 'Cannot read client file ' . $client_file . ' :' . $e->getMessage());
                 trigger_error('Cannot read client file ' . $client_file . ' :' . $e->getMessage(), E_USER_ERROR);
             }
 
