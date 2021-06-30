@@ -96,13 +96,13 @@ class ModuleManager extends Prefab {
     }
 
     /**
-     * Initialises the routes made available by the loaded modules.
+     * Initialises the loaded modules.
      */
-    public function initRoutes() {
+    public function initModules() {
         foreach ($this->modules as $name => $module) {
-            if (method_exists($name, 'routes')) {
-                $this->logger->log(LogLevel::DEBUG, 'SimpleID\ModuleManager->initRoutes: ' . $name);
-                call_user_func([ $name, 'routes' ], $this->f3);
+            if (method_exists($name, 'init')) {
+                $this->logger->log(LogLevel::DEBUG, 'SimpleID\ModuleManager->initModules: ' . $name);
+                call_user_func([ $name, 'init' ], $this->f3);
             }
         }
     }

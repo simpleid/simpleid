@@ -35,7 +35,7 @@ use SimpleID\Util\SecurityToken;
  */
 class OTPAuthSchemeModule extends AuthSchemeModule {
 
-    static function routes($f3) {
+    static function init($f3) {
         $f3->route('GET|POST /auth/otp', 'SimpleID\Auth\OTPAuthSchemeModule->setup');
     }
 

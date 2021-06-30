@@ -53,7 +53,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
      */
     protected $oauth_include_request_body = true;
 
-    static function routes($f3) {
+    static function init($f3) {
         $f3->route('GET /.well-known/openid-configuration', 'SimpleID\Protocols\Connect\ConnectModule->openid_configuration');
         $f3->route('GET|POST @connect_userinfo: /connect/userinfo', 'SimpleID\Protocols\Connect\ConnectModule->userinfo');
         $f3->route('GET @connect_jwks: /connect/jwks', 'SimpleID\Protocols\Connect\ConnectModule->jwks');

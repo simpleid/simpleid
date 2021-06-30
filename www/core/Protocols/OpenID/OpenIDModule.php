@@ -44,7 +44,7 @@ class OpenIDModule extends Module implements ProtocolResult {
     protected $cache;
     protected $mgr;
 
-    static function routes($f3) {
+    static function init($f3) {
         $f3->route('GET @openid_provider_xrds: /openid/xrds', 'SimpleID\Protocols\OpenID\OpenIDModule->providerXRDS');
         $f3->route('GET @openid_user_xrds: /user/@uid/xrds', 'SimpleID\Protocols\OpenID\OpenIDModule->userXRDS');
         $f3->route('POST @openid_consent: /openid/consent', 'SimpleID\Protocols\OpenID\OpenIDModule->consent');

@@ -45,7 +45,7 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
 
     static protected $metadata_map = NULL;
 
-    static function routes($f3) {
+    static function init($f3) {
         $f3->route('POST @connect_client_register: /connect/client', 'SimpleID\Protocols\Connect\ConnectClientRegistrationModule->register');
         $f3->map('/connect/client/@client_id', 'SimpleID\Protocols\Connect\ConnectClientRegistrationModule');
     }

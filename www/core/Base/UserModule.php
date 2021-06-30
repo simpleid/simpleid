@@ -31,7 +31,7 @@ use SimpleID\Util\SecurityToken;
 
 
 class UserModule extends Module {
-    static function routes($f3) {
+    static function init($f3) {
         $f3->route('GET /user/@uid', 'SimpleID\Base\UserModule->user');
     }
 

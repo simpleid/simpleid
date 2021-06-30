@@ -34,7 +34,7 @@ use SimpleID\Module;
 use SimpleJWT\InvalidTokenException;
 
 class ConnectSessionModule extends Module {
-    static function routes($f3) {
+    static function init($f3) {
         $f3->route('GET @connect_check_session: /connect/session', 'SimpleID\Protocols\Connect\ConnectSessionModule->check_session');
         $f3->route('GET|POST @connect_logout: /connect/logout', 'SimpleID\Protocols\Connect\ConnectSessionModule->logout');
         $f3->route('GET @connect_logout_complete: /connect/logout_complete/@token', 'SimpleID\Protocols\Connect\ConnectSessionModule->logoutComplete');

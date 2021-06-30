@@ -34,7 +34,7 @@ use SimpleID\Util\SecurityToken;
  * @since 0.7
  */
 class MyModule extends Module {
-    static function routes($f3) {
+    static function init($f3) {
         $f3->route('GET /my/dashboard', 'SimpleID\Base\MyModule->dashboard');
         $f3->route('GET /my/apps [sync]', 'SimpleID\Base\MyModule->apps_sync');
         $f3->route('GET /my/profile', 'SimpleID\Base\MyModule->profile');

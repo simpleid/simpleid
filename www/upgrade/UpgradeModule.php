@@ -39,7 +39,7 @@ use SimpleID\Util\SecurityToken;
  * are required for different versions of SimpleID.
  */
 class UpgradeModule extends Module {
-    static function routes($f3) {
+    static function init($f3) {
         $f3->route('GET|POST /', 'SimpleID\Upgrade\UpgradeModule->info');
         $f3->route('POST /select', 'SimpleID\Upgrade\UpgradeModule->select');
         $f3->route('POST /apply [sync]', 'SimpleID\Upgrade\UpgradeModule->apply');

@@ -50,7 +50,7 @@ class OAuthModule extends Module implements ProtocolResult {
 
     protected $mgr;
 
-    static function routes($f3) {
+    static function init($f3) {
         $f3->route('GET @oauth_auth: /oauth/auth', 'SimpleID\Protocols\OAuth\OAuthModule->auth');
         $f3->route('POST @oauth_token: /oauth/token', 'SimpleID\Protocols\OAuth\OAuthModule->token');
         $f3->route('POST @oauth_consent: /oauth/consent', 'SimpleID\Protocols\OAuth\OAuthModule->consent');

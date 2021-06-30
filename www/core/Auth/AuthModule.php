@@ -42,7 +42,7 @@ class AuthModule extends Module {
     private $auth;
     private $mgr;
 
-    static function routes($f3) {
+    static function init($f3) {
         $f3->route('GET|POST /auth/login', 'SimpleID\Auth\AuthModule->login');
         $f3->route('GET|POST @auth_login: /auth/login/*', 'SimpleID\Auth\AuthModule->login');
         $f3->route('GET /auth/logout', 'SimpleID\Auth\AuthModule->logout');
