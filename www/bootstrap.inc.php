@@ -20,7 +20,7 @@
  * 
  */
 include_once 'version.inc.php';
-$class_loader = include_once('autoload.inc.php');
+$class_loader = include_once('vendor/autoload.php');
 
 // 1. Constants
 const SIMPLEID_INSTANT_TOKEN_EXPIRES_IN = 60;

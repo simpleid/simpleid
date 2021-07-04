@@ -36,6 +36,12 @@
             "email": "kmo@users.sourceforge.net"
         }
     ],
+    "autoload": {
+        "psr-4": {
+           "SimpleID\\Upgrade\\": "www/upgrade",
+           "SimpleID\\": "www/core"
+        }
+    },
     "config": {
         "vendor-dir": "www/vendor"
     },
