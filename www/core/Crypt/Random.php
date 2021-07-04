@@ -47,41 +47,7 @@ class Random {
      * @return string a string containing random bytes
      */
     static function bytes($num_bytes) {
-        if (function_exists('random_bytes')) return random_bytes($num_bytes);
-
-        $is_windows = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN');
-        
-        if ($is_windows) {
-            // Windows
-            if (function_exists('mcrypt_create_iv') && version_compare(PHP_VERSION, '5.3.0', '>=')) 
-                return mcrypt_create_iv($num_bytes);
-
-            if (function_exists('openssl_random_pseudo_bytes') && version_compare(PHP_VERSION, '5.3.4', '>='))
-                return openssl_random_pseudo_bytes($num_bytes);
-        }
-
-        if (!$is_windows && function_exists('openssl_random_pseudo_bytes'))
-            return openssl_random_pseudo_bytes($num_bytes);
-
-        $bytes = '';
-        if ($f === null) {
-            if (SIMPLEID_RAND_SOURCE === null) {
-                $f = FALSE;
-            } else {
-                $f = @fopen(SIMPLEID_RAND_SOURCE, "r");
-            }
-        }
-        if ($f === FALSE) {
-            $bytes = '';
-            for ($i = 0; $i < $num_bytes; $i += 4) {
-                $bytes .= pack('L', mt_rand());
-            }
-            $bytes = substr($bytes, 0, $num_bytes);
-        } else {
-            $bytes = fread($f, $num_bytes);
-            fclose($f);
-        }
-        return $bytes;
+        return random_bytes($num_bytes);
     }
 
     /**
