@@ -2,7 +2,9 @@
 
 namespace SimpleID\Util;
 
-class HTTPResponseTest extends \PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class HTTPResponseTest extends TestCase {
     protected function getOKResponse() {
         return array(
             'body' => '<html><body><h1>It works!</h1></body></html>',

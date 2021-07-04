@@ -2,7 +2,9 @@
 
 namespace SimpleID\Protocols\OpenID;
 
-class DiffieHellmanTest extends \PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class DiffieHellmanTest extends TestCase {
     protected function doTestFunctional($mac_key, $algo) {
         $consumer = new DiffieHellman(NULL, NULL, $algo);
         $server = new DiffieHellman(NULL, NULL, $algo);

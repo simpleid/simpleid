@@ -2,6 +2,7 @@
 
 namespace SimpleID\Protocols\XRDS;
 
+use PHPUnit\Framework\TestCase;
 use SimpleID\Util\HTTPResponse;
 
 class XRDSDiscoveryStub extends XRDSDiscovery {
@@ -49,7 +50,7 @@ class XRDSDiscoveryStub extends XRDSDiscovery {
     }
 }
 
-class XRDSTest extends \PHPUnit_Framework_TestCase {
+class XRDSTest extends TestCase {
     static function getXRDSDocument() {
         return
 '<?xml version="1.0" encoding="UTF-8"?>

@@ -2,7 +2,9 @@
 
 namespace SimpleID\Crypt;
 
-class BigNumTest extends \PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class BigNumTest extends TestCase {
     protected function getInstance($str, $base = 10) {
         return new BigNum($str, $base);
     }
