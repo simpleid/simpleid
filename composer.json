@@ -3,7 +3,7 @@
     "description": "A simple, personal OpenID provider written in PHP",
     "type": "project",
     "require": {
-        "php": "^5.4 | ^7.0",
+        "php": "^7.2 || ^8.0",
         "ext-bcmath": "*",
         "ext-pcre": "*",
         "ext-session": "*",
