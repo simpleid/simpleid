@@ -20,7 +20,7 @@
  * 
  */
 include_once 'version.inc.php';
-$class_loader = include_once('autoload.inc.php');
+$class_loader = include_once('vendor/autoload.php');
 
 // 1. Constants
 const SIMPLEID_INSTANT_TOKEN_EXPIRES_IN = 60;
@@ -80,7 +80,7 @@ if (!isset($config['canonical_base_path'])) {
         . ($port && $port != 80 && $port != 443 ? (':' . $port) : '') . $f3->get('BASE');
 }
 
-if (function_exists('date_default_timezone_set')) date_default_timezone_set(@date_default_timezone_get());
+date_default_timezone_set(@date_default_timezone_get());
 
 $f3->mset([
     'CASELESS' => false,

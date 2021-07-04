@@ -3,7 +3,7 @@
     "description": "A simple, personal OpenID provider written in PHP",
     "type": "project",
     "require": {
-        "php": "^5.4 | ^7.0",
+        "php": "^7.2 || ^8.0",
         "ext-bcmath": "*",
         "ext-pcre": "*",
         "ext-session": "*",
@@ -26,7 +26,7 @@
         "simpleid/simpleid-tool": "Utilities for SimpleID"
     },
     "require-dev": {
-        "phpunit/phpunit": "^4.8.35 || ^6.0",
+        "phpunit/phpunit": "^7.0 || ^9.3",
         "phing/phing": "2.*"
     },
     "license": "GPL-2.0+",
@@ -36,8 +36,17 @@
             "email": "kmo@users.sourceforge.net"
         }
     ],
+    "autoload": {
+        "psr-4": {
+           "SimpleID\\Upgrade\\": "www/upgrade",
+           "SimpleID\\": "www/core"
+        }
+    },
     "config": {
         "vendor-dir": "www/vendor"
+    },
+    "scripts": {
+        "test": [ "@composer install", "phpunit" ]
     },
     "extra": {
         "branch-alias": {
