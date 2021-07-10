@@ -2,3 +2,4 @@ composer.lock
 vendor/
 www/vendor/
 dist/
+version.txt

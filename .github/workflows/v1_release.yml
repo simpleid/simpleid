@@ -1,0 +1,55 @@
+name: Release to Sourceforge
+
+on:
+  push:
+    branches:
+      - simpleid1
+    tags:
+      - release-1.*
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          extensions: gmp, zlib
+          tools: composer
+
+      - name: Cache dependencies
+        uses: actions/cache@v1
+        with:
+          path: "~/.composer/cache"
+          key: "composer-${{ hashFiles('**/composer.json') }}"
+          restore-keys: "composer-"
+
+      - name: Install dependencies
+        run: composer install
+
+      - name: Build release package
+        run: composer build
+
+      - name: Get version number
+        id: version
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: version.txt
+
+      - name: Upload to Sourceforge
+        uses: burnett01/rsync-deployments@4.1
+        with:
+          switches: -rvz
+          path: dist/
+          remote_path: /home/frs/project/simpleid/simpleid/
+          remote_host: frs.sourceforge.net
+          remote_user: kmo
+          remote_key: ${{ secrets.GIT_MIRROR_PRIVATE_KEY }}
+
+      - name: Notify Sourceforge
+        run: |
+          curl -H "Accept: application/json" -X PUT -d "default=windows&default=mac&default=linux&default=bsd&default=solaris&default=others" -d "api_key=${{ secrets.SOURCEFORGE_API_KEY }}" https://sourceforge.net/projects/simpleid/files/simpleid/${{ steps.version.outputs.content }}/simpleid-${{ steps.version.outputs.content }}.tar.gz

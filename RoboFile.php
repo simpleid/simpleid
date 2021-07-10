@@ -104,8 +104,10 @@ class RoboFile extends \Robo\Tasks {
                 ->to([$version, '../identities', '../cache', '../store']);
         }
 
-        // 5. Create the release file
-        $main_collection->taskPack($working . '/' . $dist_file)->addDir('simpleid/', "$temp/simpleid");
+        // 5. Create the release files
+        $main_collection->taskFileSystemStack()->mkdir("$working/$version")->copy('.sourceforge/frs/README.md', "$working/$version/README.md");
+        $main_collection->taskPack("$working/$version/$dist_file")->addDir('simpleid/', "$temp/simpleid");
+        $main_collection->taskWriteToFile('version.txt')->line($version);
 
         // 6. Run everything
         return $main_collection->run();
