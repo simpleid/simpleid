@@ -14,14 +14,14 @@
         "ext-gmp": "Better performance"
     },
     "require-dev": {
-        "phing/phing": "^2.0",
         "pear/archive_tar": "^1.4",
         "gettext/gettext": "^5.0",
-        "gettext/php-scanner": "^1.0"
+        "gettext/php-scanner": "^1.0",
+        "consolidation/robo": "1.0"
     },
     "scripts": {
-        "build": "phing",
-        "xgettext": "phing xgettext"
+        "build": [ "@composer install", "robo build" ],
+        "xgettext": [ "@composer install", "robo xgettext" ]
     },
     "license": "GPL-2.0+",
     "authors": [
