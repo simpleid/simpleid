@@ -20,7 +20,7 @@
         "composer/semver": "^3.0",
         "psr/log": "^1.0",
         "wikimedia/composer-merge-plugin": "^2.0",
-        "kelvinmo/f3-event-dispatcher": "dev-master"
+        "kelvinmo/f3-event-dispatcher": "^0.1"
     },
     "suggest": {
         "ext-gmp": "Better performance",
