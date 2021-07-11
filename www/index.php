@@ -33,7 +33,8 @@ foreach ($config['modules'] as $module) $mgr->loadModule($module);
 $store->checkStores();
 $mgr->initModules();
 
-$mgr->invokeAll('init');
+$event = new SimpleID\Util\Events\BaseDataCollectionEvent('post_init');
+\Events::instance()->dispatch($event);
 
 $f3->run();
 ?>

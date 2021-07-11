@@ -31,6 +31,7 @@ use SimpleID\Auth\AuthManager;
 use SimpleID\Crypt\Random;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
+use SimpleID\Util\Events\BaseDataCollectionEvent;
 
 /**
  * SimpleID upgrade module.
@@ -308,13 +309,15 @@ class UpgradeModule extends Module {
     protected function getUpgradeList($version = NULL) {
         $mgr = ModuleManager::instance();
 
-        $upgrade_data = [];
-
+        $listeners = \Listeners::instance();
         foreach ($mgr->getModules() as $name => $module) {
-            $data = $mgr->invoke($name, 'upgradeList');
-            if ($data != NULL) $upgrade_data = array_merge_recursive($upgrade_data, $data);
+            $listeners->map($module);
         }
-        
+
+        $event = new BaseDataCollectionEvent('upgrade_list', true);
+        \Events::instance()->dispatch($event);
+        $upgrade_data = $event->getResults();
+
         if ($version == NULL) $version = $this->getVersion();
         $list = [];
         
@@ -333,8 +336,8 @@ class UpgradeModule extends Module {
         return $list;
     }
 
-    public function upgradeListHook() {
-        return Spyc::YAMLLoad(__DIR__ . '/upgrade.yml');
+    public function onUpgradeList(BaseDataCollectionEvent $event) {
+        $event->addResults(Spyc::YAMLLoad(__DIR__ . '/upgrade.yml'));
     }
 }
 

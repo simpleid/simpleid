@@ -30,6 +30,7 @@ use SimpleID\ModuleManager;
 use SimpleID\Protocols\ProtocolResult;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
+use SimpleID\Util\Events\BaseDataCollectionEvent;
 use SimpleID\Util\Forms\FormState;
 
 /**
@@ -64,11 +65,11 @@ class OAuthModule extends Module implements ProtocolResult {
     }
 
     /**
-     * Initialises this module.
+     * Run post-initialisation procedures.  This event is only called in the main
+     * SimpleID invocation, and not during the upgrade process.
      *
-     * @see SimpleID\API\ModuleHooks::initHook()
      */
-    public function initHook() {
+    public function onPostInit(BaseDataCollectionEvent $event) {
         $scope_settings = $this->mgr->invokeAll('scopes');
         self::$oauth_scope_settings = $scope_settings['oauth'];
     }
