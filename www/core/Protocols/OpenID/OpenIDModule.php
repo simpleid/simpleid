@@ -25,6 +25,7 @@ namespace SimpleID\Protocols\OpenID;
 use Psr\Log\LogLevel;
 use SimpleID\Auth\AuthManager;
 use SimpleID\Crypt\Random;
+use SimpleID\Base\IndexEvent;
 use SimpleID\Module;
 use SimpleID\ModuleManager;
 use SimpleID\Protocols\ProtocolResult;
@@ -56,17 +57,18 @@ class OpenIDModule extends Module implements ProtocolResult {
         $this->mgr = ModuleManager::instance();
     }
 
-    public function indexHook($_request) {
-        $web = \Web::instance();
+    public function onIndexEvent(IndexEvent $event) {
+        $_request = $event->getRequest();
 
+        $web = \Web::instance();
         $content_type = $web->acceptable([ 'text/html', 'application/xml', 'application/xhtml+xml', 'application/xrds+xml' ]);
 
         if (isset($_request['openid.mode'])) {
             $this->start(new Request($_request));
-            return true;
+            $event->stopPropagation();
         } elseif ($content_type == 'application/xrds+xml') {
             $this->providerXRDS();
-            return true;
+            $event->stopPropagation();
         } else {
             // Point to SimpleID's XRDS document
             header('X-XRDS-Location: ' . $this->getCanonicalURL('@openid_provider_xrds'));

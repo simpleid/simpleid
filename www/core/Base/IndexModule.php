@@ -53,9 +53,10 @@ class IndexModule extends Module {
 
         $this->logger->log(LogLevel::DEBUG, 'SimpleID\Base\IndexModule->index');
         header('Vary: Accept');
-        $result = $mgr->invokeAll('index', $_REQUEST);
 
-        if ($result) return;
+        $event = new IndexEvent($_REQUEST);
+        $dispatcher = \Events::instance();
+        if ($dispatcher->dispatch($event)->isPropagationStopped()) return;
 
         $auth = AuthManager::instance();
     
