@@ -22,8 +22,6 @@
 
 namespace SimpleID\Util\Events;
 
-use \GenericEventInterface
-
 /**
  * A generic event used to collect data.
  * 
@@ -39,19 +37,23 @@ use \GenericEventInterface
  * The emitter can retrieve the collected data by calling the
  * {@link getResults()} method.
  */
-class BaseDataCollectionEvent implements GenericEventInterface {
+class BaseDataCollectionEvent implements \GenericEventInterface {
     /** @var string */
     protected $eventName;
 
     /** @var array */
     protected $results = [];
 
+    /** @var bool */
+    protected $recursive;
+
     /**
      * Creates a data collection event
      * 
      * @param string $eventName the name of the event, or the name
+     * @param bool $recursive whether the merge will be recursive
      */
-    public function __construct($eventName = null) {
+    public function __construct($eventName = null, $recursive = false) {
         if ($eventName == null) {
             // We use static::class instead of self::class or __CLASS__
             // to pick up the name of the subclass instead of
@@ -78,10 +80,18 @@ class BaseDataCollectionEvent implements GenericEventInterface {
      * @param mixed $result the data to add
      */
     public function addResult($result) {
-        if ($result == null) return;
+        if (($result == null) || (is_array($result) && (count($result) == 0))) return;
+
+        // If recursive, result must be an array
+        if ($this->recursive && !is_array($result))
+            throw new \InvalidArgumentException('result must be an array if recursive merge');
                 
         if (is_array($result)) {
-            if (count($result) > 0) $this->results = array_merge($this->results, $result);
+            if ($this->recursive) {
+                $this->results = array_merge_recursive($this->results, $result);
+            } else {
+                $this->results = array_merge($this->results, $result);
+            }
         } else {
             $this->results[] = $result;
         }
