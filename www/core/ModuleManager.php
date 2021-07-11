@@ -99,11 +99,14 @@ class ModuleManager extends Prefab {
      * Initialises the loaded modules.
      */
     public function initModules() {
+        $listeners = \Listeners::instance();
+
         foreach ($this->modules as $name => $module) {
             if (method_exists($name, 'init')) {
                 $this->logger->log(LogLevel::DEBUG, 'SimpleID\ModuleManager->initModules: ' . $name);
                 call_user_func([ $name, 'init' ], $this->f3);
             }
+            $listeners->map($module);
         }
     }
 
