@@ -29,15 +29,30 @@ namespace SimpleID\Util\Events;
  * therefore the event name is specified by the `$eventName` parameter
  * passed in the constructor.
  * 
- * Listeners add data by calling the {@link addResult()} method.  If
- * the data to be added is an array, it is merged with the existing data.
- * If the data to be added is a scalar, it is appended to the existing
- * data.
+ * Listeners add data by calling the {@link addResult()} method.  How
+ * this is added to the existing data depends on the merge strategy:
+ * 
+ * - If the merge strategy is `MERGE_APPEND`, then the result
+ *   is appended to the existing data
+ * - If the merge strategy is `MERGE_PLAIN`, then the result
+ *   is merged to the existing data using `array_merge`
+ * - If the merge strategy is `MERGE_RECURSIVE`, then the result
+ *   is merged to the existing data using `array_merge_recursive`
+ * - If the merge strategy is `MERGE_DEFAULT`, then the result is
+ *   appended if it is a scalar, or merged if it is an array
  * 
  * The emitter can retrieve the collected data by calling the
  * {@link getResults()} method.
  */
 class BaseDataCollectionEvent implements \GenericEventInterface {
+    public const MERGE_DEFAULT = 0;
+    public const MERGE_APPEND = 1;
+    public const MERGE_PLAIN = 2;
+    public const MERGE_RECURSIVE = 3;
+
+    // alias
+    public const MERGE_MERGE = self::MERGE_PLAIN;
+
     /** @var string */
     protected $eventName;
 
@@ -45,15 +60,15 @@ class BaseDataCollectionEvent implements \GenericEventInterface {
     protected $results = [];
 
     /** @var bool */
-    protected $recursive;
+    protected $mergeStrategy;
 
     /**
      * Creates a data collection event
      * 
      * @param string $eventName the name of the event, or the name
-     * @param bool $recursive whether the merge will be recursive
+     * @param bool $mergeStrategy whether the merge will be mergeStrategy
      */
-    public function __construct($eventName = null, $recursive = false) {
+    public function __construct($eventName = null, $mergeStrategy = self::MERGE_DEFAULT) {
         if ($eventName == null) {
             // We use static::class instead of self::class or __CLASS__
             // to pick up the name of the subclass instead of
@@ -62,6 +77,8 @@ class BaseDataCollectionEvent implements \GenericEventInterface {
         } else {
             $this->eventName = $eventName;
         }
+
+        $this->mergeStrategy = $mergeStrategy;
     }
 
     /**
@@ -83,17 +100,25 @@ class BaseDataCollectionEvent implements \GenericEventInterface {
         if (($result == null) || (is_array($result) && (count($result) == 0))) return;
 
         // If recursive, result must be an array
-        if ($this->recursive && !is_array($result))
+        if (($this->mergeStrategy == self::MERGE_RECURSIVE) && !is_array($result))
             throw new \InvalidArgumentException('result must be an array if recursive merge');
-                
-        if (is_array($result)) {
-            if ($this->recursive) {
-                $this->results = array_merge_recursive($this->results, $result);
-            } else {
-                $this->results = array_merge($this->results, $result);
-            }
+
+        if ($this->mergeStrategy == self::MERGE_DEFAULT) {
+            $merge_strategy = (is_array($result)) ? self::MERGE_PLAIN : self::MERGE_APPEND;
         } else {
-            $this->results[] = $result;
+            $merge_strategy = $this->mergeStrategy;
+        }
+
+        switch ($this->mergeStrategy) {
+            case self::MERGE_APPEND:
+                $this->results[] = $result;
+                break;
+            case self::MERGE_PLAIN:
+                $this->results = array_merge($this->results, $result);
+                break;
+            case self::MERGE_RECURSIVE:
+                $this->results = array_merge_recursive($this->results, $result);
+                break;
         }
     }
 

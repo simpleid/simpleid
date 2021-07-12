@@ -30,6 +30,9 @@ class OrderedDataCollectionEvent extends BaseDataCollectionEvent {
     /**
      * Adds data to the event.
      * 
+     * Unlike the {@link BaseDataCollectionEvent}, results are always
+     * appended to the results array and never merged
+     * 
      * @param array $result the data to add
      * @param int $weight the weight
      */
