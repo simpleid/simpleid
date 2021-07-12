@@ -45,6 +45,8 @@ namespace SimpleID\Util\Events;
  * {@link getResults()} method.
  */
 class BaseDataCollectionEvent implements \GenericEventInterface {
+    use GenericEventTrait;
+
     public const MERGE_DEFAULT = 0;
     public const MERGE_APPEND = 1;
     public const MERGE_PLAIN = 2;
@@ -52,9 +54,6 @@ class BaseDataCollectionEvent implements \GenericEventInterface {
 
     // alias
     public const MERGE_MERGE = self::MERGE_PLAIN;
-
-    /** @var string */
-    protected $eventName;
 
     /** @var array */
     protected $results = [];
@@ -69,24 +68,10 @@ class BaseDataCollectionEvent implements \GenericEventInterface {
      * @param bool $mergeStrategy whether the merge will be mergeStrategy
      */
     public function __construct($eventName = null, $mergeStrategy = self::MERGE_DEFAULT) {
-        if ($eventName == null) {
-            // We use static::class instead of self::class or __CLASS__
-            // to pick up the name of the subclass instead of
-            // BaseDataCollectionEvent (if applicable)
-            $this->eventName = static::class;
-        } else {
-            $this->eventName = $eventName;
-        }
-
+        $this->setEventName($eventName);
         $this->mergeStrategy = $mergeStrategy;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getEventName() {
-        return $this->eventName;
-    }
 
     /**
      * Adds data to the event.

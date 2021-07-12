@@ -20,30 +20,22 @@
  * 
  */
 
-namespace SimpleID\Base;
+namespace SimpleID\Util\Events;
 
-use Psr\EventDispatcher\StoppableEventInterface;
-use SimpleID\Util\Events\StoppableEventTrait;
 
 /**
- * An event requesting processing of the root route (i.e. `/`).
- * 
- * The request to be processed can be obtained from the
- * {@link getRequest()} method.  If the listener is able to process
- * the request, it should call the {@link stopPropagation()}
- * method to stop further processing.
+ * A utility trait for implementing {@link \StoppableEventInterface}.
  */
-class IndexEvent implements StoppableEventInterface {
-    use StoppableEventTrait;
+trait StoppableEventTrait {
+    protected $stopped = false;
 
-    protected $request;
-
-    public function __construct($request) {
-        $this->request = $request;
+    public function isPropagationStopped(): bool {
+        return $this->stopped;
     }
 
-    public function getRequest() {
-        return $this->request;
+    public function stopPropagation() {
+        $this->stopped = true;
+        return $this;
     }
 }
 
