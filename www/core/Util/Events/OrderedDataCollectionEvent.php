@@ -26,7 +26,21 @@ namespace SimpleID\Util\Events;
  * A generic event used to collect data in an ordered way.
  *
  */
-class OrderedDataCollectionEvent extends BaseDataCollectionEvent {
+class OrderedDataCollectionEvent implements \GenericEventInterface {
+    use GenericEventTrait;
+
+    /** @var array */
+    protected $results = [];
+
+    /**
+     * Creates a data collection event
+     * 
+     * @param string $eventName the name of the event, or the name
+     */
+    public function __construct($eventName = null) {
+        $this->setEventName($eventName);
+    }
+
     /**
      * Adds data to the event.
      * 

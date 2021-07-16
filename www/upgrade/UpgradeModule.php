@@ -314,7 +314,7 @@ class UpgradeModule extends Module {
             $listeners->map($module);
         }
 
-        $event = new BaseDataCollectionEvent('upgrade_list', true);
+        $event = new BaseDataCollectionEvent('upgrade_list', BaseDataCollectionEvent::MERGE_RECURSIVE);
         \Events::instance()->dispatch($event);
         $upgrade_data = $event->getResults();
 
