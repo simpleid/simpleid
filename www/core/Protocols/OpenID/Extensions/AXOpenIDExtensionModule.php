@@ -25,7 +25,7 @@ namespace SimpleID\Protocols\OpenID\Extensions;
 
 use SimpleID\Module;
 use SimpleID\Auth\AuthManager;
-use SimpleID\Util\Event\OrderedDataCollectionEvent;
+use SimpleID\Util\Event\UIBuildEvent;
 
 /**
  * Implements the Attribute Exchange extension.
@@ -221,7 +221,7 @@ class AXOpenIDExtensionModule extends Module {
         $prefs['consents']['sreg'] = $form;
     }
 
-    public function onProfileBlocks(OrderedDataCollectionEvent $event) {
+    public function onProfileBlocks(UIBuildEvent $event) {
         $user = $this->auth->getUser();
 
         if (!isset($user['ax'])) return;
@@ -234,10 +234,8 @@ class AXOpenIDExtensionModule extends Module {
             'info' => $user['ax']
         ];
         
-        $event->addResult([
-            'id' => 'ax',
-            'title' => $this->f3->get('intl.core.openid.ax.ax_title'),
-            'content' => $tpl->render('openid_userinfo_profile.html', false, $hive),
+        $event->addBlock('ax', $tpl->render('openid_userinfo_profile.html', false, $hive), 0, [
+            'title' => $this->f3->get('intl.core.openid.ax.ax_title')
         ]);
     }
 

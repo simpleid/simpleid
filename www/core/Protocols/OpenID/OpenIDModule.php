@@ -31,7 +31,7 @@ use SimpleID\ModuleManager;
 use SimpleID\Protocols\ProtocolResult;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
-use SimpleID\Util\Events\OrderedDataCollectionEvent;
+use SimpleID\Util\Events\UIBuildEvent;
 
 /**
  * The module for authentication under OpenID version 1.1 and 2.0
@@ -1016,10 +1016,10 @@ class OpenIDModule extends Module implements ProtocolResult {
     /**
      * Returns a block containing discovery information.
      *
-     * @param OrderedDataCollectionEvent $event the event to collect
+     * @param UIBuildEvent $event the event to collect
      * the discovery block
      */
-    public function onProfileBlocks(OrderedDataCollectionEvent $event) {
+    public function onProfileBlocks(UIBuildEvent $event) {
         $auth = AuthManager::instance();
         $user = $auth->getUser();
         $tpl = new \Template();
@@ -1034,12 +1034,10 @@ class OpenIDModule extends Module implements ProtocolResult {
             'xrds_url' => $xrds_url
         ];
         
-        $event->addResult([
-            'id' => 'discovery',
+        $event->addBlock('discovery', $tpl->render('openid_profile.html', false, $hive), 1, [
             'title' => $this->f3->get('intl.core.openid.discovery_title'),
-            'content' => $tpl->render('openid_profile.html', false, $hive),
             'links' => [ [ 'href' => 'http://simpleid.org/documentation/getting-started/setting-identity/claim-your-identifier', 'name' => $this->f3->get('intl.common.more_info') ] ],
-        ], 1);
+        ]);
     }
 }
 

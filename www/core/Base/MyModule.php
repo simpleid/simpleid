@@ -29,6 +29,7 @@ use SimpleID\Models\ConsentEvent;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
 use SimpleID\Util\Events\OrderedDataCollectionEvent;
+use SimpleID\Util\Events\UIBuildEvent;
 
 /**
  * Functions for displaying various pages in SimpleID.
@@ -255,37 +256,29 @@ class MyModule extends Module {
     /**
      * Returns the welcome block.
      *
-     * @return OrderedDataCollectionEvent the event to pick up the welcome block
+     * @return UIBuildEvent the event to pick up the welcome block
      */
-    public function onDashboardBlocks(OrderedDataCollectionEvent $event) {
+    public function onDashboardBlocks(UIBuildEvent $event) {
         $auth = AuthManager::instance();
         $user = $auth->getUser();
         $tpl = new \Template();
 
-        $event->addResult([
-            'id' => 'welcome',
-            'title' => $this->f3->get('intl.core.my.welcome_title'),
-            'content' => $this->f3->get('intl.core.my.logged_in_as', $user->getDisplayName(), $user['uid'])
-        ], -10);
+        $event->addBlock('welcome', $this->f3->get('intl.core.my.logged_in_as', $user->getDisplayName(), $user['uid']), -10, [
+            'title' => $this->f3->get('intl.core.my.welcome_title')
+        ]);
 
-        $event->addResult([
-            'id' => 'activity',
-            'title' => $this->f3->get('intl.core.my.activity_title'),
-            'content' => $tpl->render('my_activity.html', false)
-        ], 0);
+        $event->addBlock('activity', $tpl->render('my_activity.html', false), 0, [
+            'title' => $this->f3->get('intl.core.my.activity_title')
+        ]);
 
         if ($this->f3->get('config.debug')) {
-            $event->addResult([
-                'id' => 'auth',
-                'title' => $this->f3->get('intl.core.my.debug_auth_title'),
-                'content' => '<pre class="code">' . $this->f3->encode($auth->toString()) . '</pre>'
-            ], 10);
+            $event->addBlock('auth', '<pre class="code">' . $this->f3->encode($auth->toString()) . '</pre>', 10, [
+                'title' => $this->f3->get('intl.core.my.debug_auth_title')
+            ]);
 
-            $event->addResult([
-                'id' => 'user',
-                'title' => $this->f3->get('intl.core.my.debug_user_title'),
-                'content' => '<pre class="code">' . $this->f3->encode($user->toString()) . '</pre>'
-            ], 10);
+            $event->addBlock('user', '<pre class="code">' . $this->f3->encode($user->toString()) . '</pre>', 10, [
+                'title' => $this->f3->get('intl.core.my.debug_user_title')
+            ]);
         }
     }
 
@@ -306,11 +299,12 @@ class MyModule extends Module {
         // Require HTTPS, redirect if necessary
         $this->checkHttps('redirect', true);
 
-        $event = new OrderedDataCollectionEvent($event_name);
+        $event = new UIBuildEvent($event_name);
         $event = \Events::instance()->dispatch($event);
 
         $tpl = new \Template();
-        $this->f3->set('blocks', $event->getResults());
+        // TODO $event->getAttachments();
+        $this->f3->set('blocks', $event->getBlocks());
         $this->f3->set('title', $title);
         $this->f3->set('layout', 'my_blocks.html');
         print $tpl->render('page.html');        

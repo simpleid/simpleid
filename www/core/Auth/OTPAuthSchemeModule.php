@@ -28,7 +28,7 @@ use SimpleID\Crypt\BigNum;
 use SimpleID\Crypt\Random;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
-use SimpleID\Util\Events\OrderedDataCollectionEvent;
+use SimpleID\Util\Events\UIBuildEvent;
 
 /**
  * An authentication scheme module that provides two-factor authentication
@@ -136,10 +136,10 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
     /**
      * Returns the dashboard OTP block.
      *
-     * @param OrderedDataCollectionEvent $event the event to collect
+     * @param UIBuildEvent $event the event to collect
      * the dashboard OTP block
      */
-    public function onDashboardBlocks(OrderedDataCollectionEvent $event) {
+    public function onDashboardBlocks(UIBuildEvent $event) {
         $auth = AuthManager::instance();
         $user = $auth->getUser();
 
@@ -160,11 +160,9 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             $html .= '<input type="submit" name="op" value="' . $this->f3->get('intl.common.enable') . '" /></form>';
         }
         
-        $event->addResult([
-            'id' => 'otp',
-            'title' => $this->f3->get('intl.core.auth_otp.otp_title'),
-            'content' => $html
-        ], 0);
+        $event->addBlock('otp', $html, 0, [
+            'title' => $this->f3->get('intl.core.auth_otp.otp_title')
+        ]);
     }
 
     /**
