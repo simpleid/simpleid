@@ -27,6 +27,7 @@ use Psr\Log\LogLevel;
 use SimpleID\Auth\AuthManager;
 use SimpleID\Module;
 use SimpleID\ModuleManager;
+use SimpleID\Models\ConsentEvent;
 use SimpleID\Protocols\ProtocolResult;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
@@ -765,7 +766,8 @@ class OAuthModule extends Module implements ProtocolResult {
     }
 
     /** @see SimpleID\API\MyHooks::revokeAppHook() */
-    public function revokeAppHook($cid) {
+    public function onConsentRevoke(ConsentEvent $event) {
+        $cid = $event->getConsentID();
         $auth = AuthManager::instance();
         $store = StoreManager::instance();
         

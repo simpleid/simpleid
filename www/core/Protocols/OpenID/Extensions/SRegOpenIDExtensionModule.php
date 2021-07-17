@@ -25,6 +25,7 @@ namespace SimpleID\Protocols\OpenID\Extensions;
 use SimpleID\Module;
 use SimpleID\Auth\AuthManager;
 use SimpleID\Protocols\OpenID\Message;
+use SimpleID\Util\Events\OrderedDataCollectionEvent;
 
 /**
  * Implements the Simple Registration extension.
@@ -167,10 +168,8 @@ class SRegOpenIDExtensionModule extends Module {
         $prefs['consents']['sreg'] = $form;
     }
 
-    /**
-     * @see hook_page_profile()
-     */
-    public function profileBlocksHook() {
+
+    public function onProfileBlocks(OrderedDataCollectionEvent $event) {
         $user = $this->auth->getUser();
 
         if (!isset($user['sreg'])) return;
@@ -183,11 +182,11 @@ class SRegOpenIDExtensionModule extends Module {
             'info' => $user['sreg']
         ];
         
-        return [ [
+        $event->addResult([
             'id' => 'sreg',
             'title' => $this->f3->get('intl.core.openid.sreg.sreg_title'),
             'content' => $tpl->render('openid_userinfo_profile.html', false, $hive),
-        ] ];
+        ]);
     }
 
 

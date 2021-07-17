@@ -28,6 +28,7 @@ use SimpleID\ModuleManager;
 use SimpleID\Auth\AuthManager;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
+use SimpleID\Util\Events\OrderedDataCollectionEvent;
 
 
 class UserModule extends Module {
@@ -89,9 +90,10 @@ class UserModule extends Module {
     /**
      * Returns a block containing OpenID Connect user information.
      *
-     * @return array the OpenID Connect user information block
+     * @param OrderedDataCollectionEvent the event to collect the
+     * OpenID Connect user information block
      */
-    function profileBlocksHook() {
+    function onProfileBlocks(OrderedDataCollectionEvent $event) {
         $auth = AuthManager:: instance();
         $user = $auth->getUser();
         
@@ -113,12 +115,11 @@ class UserModule extends Module {
         
         $html .= "</table>";
         
-        return [ [
+        $event->addResult([
             'id' => 'userinfo',
             'title' => $this->f3->get('intl.core.user.userinfo_title'),
             'content' => $html,
-            'weight' => -1
-        ] ];
+        ], -1);
     }
 }
 

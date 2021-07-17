@@ -25,8 +25,10 @@ namespace SimpleID\Base;
 use SimpleID\Auth\AuthManager;
 use SimpleID\Module;
 use SimpleID\ModuleManager;
+use SimpleID\Models\ConsentEvent;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
+use SimpleID\Util\Events\OrderedDataCollectionEvent;
 
 /**
  * Functions for displaying various pages in SimpleID.
@@ -73,14 +75,14 @@ class MyModule extends Module {
      * Displays the dashboard page.
      */
     public function dashboard() {
-        $this->blocksPage($this->f3->get('intl.core.my.dashboard_title'), 'dashboardBlocks');
+        $this->blocksPage($this->f3->get('intl.core.my.dashboard_title'), 'dashboard_blocks');
     }
 
     /**
      * Displays the profile page.
      */
     public function profile() {
-        $this->blocksPage($this->f3->get('intl.core.my.profile_title'), 'profileBlocks');
+        $this->blocksPage($this->f3->get('intl.core.my.profile_title'), 'profile_blocks');
     }
 
     /**
@@ -230,8 +232,8 @@ class MyModule extends Module {
             return;
         }
 
-        $mgr = ModuleManager::instance();
-        $mgr->invokeAll('revokeApp', $params['cid']);
+        $event = new ConsentEvent('consent_revoke', $params['cid'], $prefs[$params['cid']]);
+        \Events::instance()->dispatch($event);
 
         unset($prefs[$params['cid']]);
         
@@ -244,65 +246,53 @@ class MyModule extends Module {
         ]);
     }
 
-    public function navHook() {
-        return [
-            [ 'name' => $this->f3->get('intl.core.my.dashboard_title'), 'path' =>'my/dashboard', 'weight' => -10 ],
-            [ 'name' => $this->f3->get('intl.core.my.profile_title'), 'path' =>'my/profile', 'weight' => -9 ],
-            [ 'name' => $this->f3->get('intl.core.my.apps_title'), 'path' =>'my/apps', 'weight' => -8 ],
-        ];
+    public function onNav(OrderedDataCollectionEvent $event) {
+        $event->addResult([ 'name' => $this->f3->get('intl.core.my.dashboard_title'), 'path' =>'my/dashboard' ], -10);
+        $event->addResult([ 'name' => $this->f3->get('intl.core.my.profile_title'), 'path' =>'my/profile' ], -9);
+        $event->addResult([ 'name' => $this->f3->get('intl.core.my.apps_title'), 'path' =>'my/apps' ], -8);
     }
 
     /**
      * Returns the welcome block.
      *
-     * @return array the welcome block
+     * @return OrderedDataCollectionEvent the event to pick up the welcome block
      */
-    public function dashboardBlocksHook() {
+    public function onDashboardBlocks(OrderedDataCollectionEvent $event) {
         $auth = AuthManager::instance();
         $user = $auth->getUser();
         $tpl = new \Template();
 
-        $blocks = [];
-
-        $blocks[] = [
+        $event->addResult([
             'id' => 'welcome',
             'title' => $this->f3->get('intl.core.my.welcome_title'),
-            'content' => $this->f3->get('intl.core.my.logged_in_as', [ $user->getDisplayName(), $user['uid'] ]),
-            'weight' => -10
-        ];
+            'content' => $this->f3->get('intl.core.my.logged_in_as', $user->getDisplayName(), $user['uid'])
+        ], -10);
 
-        $blocks[] = [
+        $event->addResult([
             'id' => 'activity',
             'title' => $this->f3->get('intl.core.my.activity_title'),
-            'content' => $tpl->render('my_activity.html', false),
-            'weight' => 0
-        ];
+            'content' => $tpl->render('my_activity.html', false)
+        ], 0);
 
         if ($this->f3->get('config.debug')) {
-            $blocks[] = [
+            $event->addResult([
                 'id' => 'auth',
                 'title' => $this->f3->get('intl.core.my.debug_auth_title'),
-                'content' => '<pre class="code">' . $this->f3->encode($auth->toString()) . '</pre>',
-                'weight' => 10
-            ];
+                'content' => '<pre class="code">' . $this->f3->encode($auth->toString()) . '</pre>'
+            ], 10);
 
-            $blocks[] = [
+            $event->addResult([
                 'id' => 'user',
                 'title' => $this->f3->get('intl.core.my.debug_user_title'),
-                'content' => '<pre class="code">' . $this->f3->encode($user->toString()) . '</pre>',
-                'weight' => 10
-            ];
+                'content' => '<pre class="code">' . $this->f3->encode($user->toString()) . '</pre>'
+            ], 10);
         }
-        
-        return $blocks;
     }
 
     public function insertNav() {
-        $mgr = ModuleManager::instance();
-
-        $items = $mgr->invokeAll('nav');
-        uasort($items, function($a, $b) { if ($a['weight'] == $b['weight']) { return 0; } return ($a['weight'] < $b['weight']) ? -1 : 1; });
-        $this->f3->set('nav', $items);
+        $event = new OrderedDataCollectionEvent('nav');
+        $event = \Events::instance()->dispatch($event);
+        $this->f3->set('nav', $event->getResults());
     }
 
     /**
@@ -310,19 +300,17 @@ class MyModule extends Module {
      * from a hook.
      *
      * @param string $title the page title
-     * @param string $hook the hook to call
+     * @param string $event_name the hook to call
      */
-    protected function blocksPage($title, $hook) {
+    protected function blocksPage($title, $event_name) {
         // Require HTTPS, redirect if necessary
         $this->checkHttps('redirect', true);
 
-        $mgr = ModuleManager::instance();
-
-        $blocks = $mgr->invokeAll($hook);
-        uasort($blocks, function($a, $b) { if ($a['weight'] == $b['weight']) { return 0; } return ($a['weight'] < $b['weight']) ? -1 : 1; });
+        $event = new OrderedDataCollectionEvent($event_name);
+        $event = \Events::instance()->dispatch($event);
 
         $tpl = new \Template();
-        $this->f3->set('blocks', $blocks);
+        $this->f3->set('blocks', $event->getResults());
         $this->f3->set('title', $title);
         $this->f3->set('layout', 'my_blocks.html');
         print $tpl->render('page.html');        
