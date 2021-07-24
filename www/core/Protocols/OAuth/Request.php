@@ -22,8 +22,8 @@
 namespace SimpleID\Protocols\OAuth;
 
 use \Base;
+use SimpleID\Protocols\HTTPResponse;
 use SimpleID\Util\ArrayWrapper;
-use SimpleID\Util\HTTPResponse;
 
 /**
  * A utility class representing a HTTP request.  This class contains
