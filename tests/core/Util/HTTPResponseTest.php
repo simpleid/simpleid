@@ -1,6 +1,6 @@
 <?php
 
-namespace SimpleID\Util;
+namespace SimpleID\Protocols;
 
 use PHPUnit\Framework\TestCase;
 
