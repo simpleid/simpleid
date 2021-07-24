@@ -3,7 +3,7 @@
 namespace SimpleID\Protocols\XRDS;
 
 use PHPUnit\Framework\TestCase;
-use SimpleID\Util\HTTPResponse;
+use SimpleID\Protocols\HTTPResponse;
 
 class XRDSDiscoveryStub extends XRDSDiscovery {
     protected function request($url, $headers = '') {

@@ -25,7 +25,7 @@ namespace SimpleID\Protocols\Connect;
 use Psr\Log\LogLevel;
 use SimpleID\Crypt\Random;
 use SimpleID\Module;
-use SimpleID\Util\HTTPResponse;
+use SimpleID\Protocols\HTTPResponse;
 use SimpleID\Protocols\OAuth\Authorization;
 use SimpleID\Protocols\OAuth\OAuthProtectedResource;
 use SimpleID\Protocols\OAuth\Response;

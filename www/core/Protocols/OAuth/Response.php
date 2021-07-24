@@ -22,8 +22,8 @@
 namespace SimpleID\Protocols\OAuth;
 
 use \Base;
+use SimpleID\Protocols\FormResponse;
 use SimpleID\Util\ArrayWrapper;
-use SimpleID\Util\FormResponse;
 
 /**
  * A class representing an OAuth authorization or token (or similar)
