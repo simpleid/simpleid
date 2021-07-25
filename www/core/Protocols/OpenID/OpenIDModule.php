@@ -308,12 +308,12 @@ class OpenIDModule extends Module implements ProtocolResult {
                 } else {
                     $token = new SecurityToken();
                     $state = [ 'rq' => $request->toArray() ];
-                    $form_state = [
+                    $form_state = new FormState([
                         'cancel' => 'openid',
-                        'rq' => $request->toArray(),
                         'mode' => AuthManager::MODE_CREDENTIALS,
                         'auth_skip_activity' => true
-                    ];
+                    ]);
+                    $form_state->setRequest($request);
                     if ($result == self::CHECKID_REENTER_CREDENTIALS) {
                         $auth = AuthManager::instance();
                         $user = $auth->getUser();
@@ -726,11 +726,11 @@ class OpenIDModule extends Module implements ProtocolResult {
         $tpl = new \Template();
         $token = new SecurityToken();
 
-        $form_state = [
-            'rq' => $request,
-            'rs' => $response,
+        $form_state = new FormState([
             'code' => $reason
-        ];
+        ]);
+        $form_state->setRequest($request);
+        $form_state->setResponse($response);
         $cancel = ($response['mode'] == 'cancel');
 
         $realm = $request->getRealm();
@@ -758,7 +758,7 @@ class OpenIDModule extends Module implements ProtocolResult {
         }
         
         $this->f3->set('tk', $token->generate('openid_consent', SecurityToken::OPTION_BIND_SESSION));
-        $this->f3->set('fs', $token->generate($form_state));
+        $this->f3->set('fs', $token->generate($form_state->toArray()));
 
         $this->f3->set('cancel', $cancel);
 
@@ -791,9 +791,9 @@ class OpenIDModule extends Module implements ProtocolResult {
         }
         $user = $auth->getUser();
 
-        $form_state = $token->getPayload($this->f3->get('POST.fs'));
-        $request = $form_state['rq'];
-        $response = $form_state['rs'];
+        $form_state = new FormState($token->getPayload($this->f3->get('POST.fs')));
+        $request = new Request($form_state->getRequestArray());
+        $response = new Response($form_state->getResponseArray());
         $reason = $form_state['code'];
 
         if (!$token->verify($this->f3->get('POST.tk'), 'openid_consent')) {
@@ -829,12 +829,12 @@ class OpenIDModule extends Module implements ProtocolResult {
     /**
      * Processes a cancellation from the login form.
      *
-     * @param array $form_state the form state
+     * @param SimpleID\Util\Forms\FormState $form_state the form state
      * @return bool|null
      */
     public function loginFormCancelled($form_state) {
         if ($form_state['cancel'] == 'openid') {
-            $request = new Request($form_state['rq']);
+            $request = new Request($form_state->getRequestArray());
             if (isset($request['openid.return_to'])) {
                 $return_to = $request['openid.return_to'];
                 $response = $this->createErrorResponse($request, FALSE);

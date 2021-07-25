@@ -94,10 +94,10 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
     /**
      * Displays the login form, with a remember-me checkbox.
      *
-     * @param array &$form_state
+     * @param SimpleID\Util\Form\FormState $form_state
      * @return array
      */
-    public function loginFormHook(&$form_state) {
+    public function loginFormHook($form_state) {
         if ($form_state['mode'] == AuthManager::MODE_CREDENTIALS) {
             $tpl = new \Template();
 
@@ -114,10 +114,10 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
      * Processes the login form by storing the user's remember-me setting
      * in the form state.
      *
-     * @param array &$form_state
+     * @param SimpleID\Util\Form\FormState $form_state
      * @return bool|array
      */
-    public function loginFormSubmitHook(&$form_state) {
+    public function loginFormSubmitHook($form_state) {
         if ($form_state['mode'] == AuthManager::MODE_CREDENTIALS) {
             if ($this->f3->exists('POST.rememberme') === true) {
                 $form_state['rememberme'] = $this->f3->get('POST.rememberme');
@@ -132,7 +132,7 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
      * @param User $user
      * @param int $level
      * @param array $modules
-     * @param array $form_state
+     * @param SimpleID\Util\Form\FormState $form_state
      */
     public function loginHook($user, $level, $modules, $form_state) {
         if (($level == AuthManager::MODE_CREDENTIALS) && isset($form_state['rememberme']) && ($form_state['rememberme'] == 1)) {

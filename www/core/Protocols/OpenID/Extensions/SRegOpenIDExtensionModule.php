@@ -25,6 +25,8 @@ namespace SimpleID\Protocols\OpenID\Extensions;
 use SimpleID\Module;
 use SimpleID\Auth\AuthManager;
 use SimpleID\Protocols\OpenID\Message;
+use SimpleID\Protocols\OpenID\Request;
+use SimpleID\Protocols\OpenID\Response;
 
 /**
  * Implements the Simple Registration extension.
@@ -76,8 +78,8 @@ class SRegOpenIDExtensionModule extends Module {
      * @see hook_consent_form()
      */
     function openIDConsentFormHook($form_state) {
-        $request = $form_state['rq'];
-        $response = $form_state['rs'];
+        $request = new Request($form_state->getRequestArray());
+        $response = new Response($form_state->getResponseArray());
         $prefs = $form_state['prefs'];
         
         // We only respond if the extension is requested
@@ -140,10 +142,9 @@ class SRegOpenIDExtensionModule extends Module {
     /**
      * @see hook_consent()
      */
-    function openIDConsentFormSubmitHook(&$form_state) {
-        $request = &$form_state['rq'];
-        $response = &$form_state['rs'];
-        $prefs = &$form_state['prefs'];
+    function openIDConsentFormSubmitHook($form_state) {
+        $response = new Response($form_state->getResponseArray());
+        $prefs =& $form_state->pathRef('prefs');
 
         // We only respond if the extension is requested
         if (!$response->hasExtension(self::OPENID_NS_SREG)) return;
@@ -166,6 +167,7 @@ class SRegOpenIDExtensionModule extends Module {
         }
         
         $prefs['consents']['sreg'] = $form;
+        $form_state->setResponse($response);
     }
 
     /**

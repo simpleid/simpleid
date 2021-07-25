@@ -31,6 +31,7 @@ use SimpleID\ModuleManager;
 use SimpleID\Store\StoreManager;
 use SimpleID\Crypt\Random;
 use SimpleID\Util\OpaqueIdentifier;
+use SimpleID\Util\Forms\FormState;
 
 /**
  * The authentication manager.
@@ -206,9 +207,11 @@ class AuthManager extends Prefab {
      * session
      * @param array $modules array of authentication modules used to
      * authenticate the user in this session
-     * @param array $form_state
+     * @param SimpleID\Util\Forms\FormState $form_state
      */
-    public function login($user, $level, $modules = [], $form_state = []) {
+    public function login($user, $level, $modules = [], $form_state = null) {
+        if ($form_state == null) $form_state = new FormState();
+
         $store = StoreManager::instance();
         if (is_string($user)) $user = $store->loadUser($user);
 

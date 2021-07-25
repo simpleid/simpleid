@@ -32,10 +32,10 @@ abstract class AuthHooks {
      *
      * Other modules may insert additional elements into the `$form_state` array
      *
-     * @param array $form_state the form state
+     * @param SimpleID\Util\Forms\FormState $form_state the form state
      * @return array an array of form elements
      */
-    abstract function loginFormHook(&$form_state);
+    abstract function loginFormHook($form_state);
 
     /**
      * Validates a login form.
@@ -46,10 +46,10 @@ abstract class AuthHooks {
      * `$form_state` contains the same elements as per the
      * {@link loginFormHook()}.
      *
-     * @param array $form_state the form state
+     * @param SimpleID\Util\Forms\FormState $form_state the form state
      * @return bool true if the form passes validation
      */
-    abstract function loginFormValidateHook(&$form_state);
+    abstract function loginFormValidateHook($form_state);
 
     /**
      * Processes a login form (previously `hook_user_verify_credentials`).
@@ -72,10 +72,10 @@ abstract class AuthHooks {
      *       - uid the user ID
      *       - auth_level the authentication level supported by this module
      *
-     * @param array $form_state the form state
+     * @param SimpleID\Util\Forms\FormState $form_state the form state
      * @return array|bool|null the result of the processing
      */
-    abstract function loginFormSubmitHook(&$form_state);
+    abstract function loginFormSubmitHook($form_state);
 
     /**
      * Processes a login form where the user has cancelled login.
@@ -88,7 +88,7 @@ abstract class AuthHooks {
      * - null if the hook is skipping processing to another module
      * - true if the hook has processed the hook
      *
-     * @param array $form_state the form state
+     * @param SimpleID\Util\Forms\FormState $form_state the form state
      * @return bool|null the result of the processing
      */
     abstract function loginFormCancelled($form_state);
@@ -123,7 +123,7 @@ abstract class AuthHooks {
      * authentication process
      * @param array $modules an array of fully qualified class names of the modules
      * involved in the authentication process
-     * @param array $form_state the state of the login form
+     * @param SimpleID\Util\Forms\FormState $form_state the state of the login form
      * @since 2.0
      */
     abstract function loginHook($user, $level, $modules, $form_state);
