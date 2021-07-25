@@ -40,24 +40,45 @@ class FormState extends ArrayWrapper {
         parent::__construct($data);
     }
 
-
     public function setRequest(ArrayWrapper $request) {
         $this->offsetSet(self::REQUEST_KEY, $request);
     }
 
-    public function getRequestArray() {
+    public function getRequest() {
         return $this->offsetGet(self::REQUEST_KEY);
     }
-
 
     public function setResponse(ArrayWrapper $response) {
         $this->offsetSet(self::RESPONSE_KEY, $response);
     }
 
-    public function getResponseArray() {
+    public function getResponse() {
         return $this->offsetGet(self::RESPONSE_KEY);
     }
 
+    public function encode() {
+        $data = $this->container;
+
+        if (isset($data[self::REQUEST_KEY]) && $data[self::REQUEST_KEY] instanceof ArrayWrapper) {
+            $data[self::REQUEST_KEY] = $data[self::REQUEST_KEY]->toArray();
+        }
+        if (isset($data[self::RESPONSE_KEY]) && $data[self::RESPONSE_KEY] instanceof ArrayWrapper) {
+            $data[self::RESPONSE_KEY] = $data[self::RESPONSE_KEY]->toArray();
+        }
+        return $data;
+    }
+
+    public static function decode($data, $request_class = null, $response_class = null) {
+        if (!is_array($data)) return new FormState();
+
+        if (isset($data[self::REQUEST_KEY]) && $request_class != null) {
+            $data[self::REQUEST_KEY] = new $request_class($data[self::REQUEST_KEY]);
+        }
+        if (isset($data[self::RESPONSE_KEY]) && $response_class != null) {
+            $data[self::RESPONSE_KEY] = new $response_class($data[self::RESPONSE_KEY]);
+        }
+        return new FormState($data);
+    }
 }
 
 ?>

@@ -92,7 +92,7 @@ class AuthModule extends Module {
             return;
         }
 
-        $form_state = new FormState($token->getPayload($this->f3->get('POST.fs')));
+        $form_state = FormState::decode($token->getPayload($this->f3->get('POST.fs')));
         if (count($form_state) == 0) $form_state['mode'] = AuthManager::MODE_CREDENTIALS;
         $mode = $form_state['mode'];
         if (!in_array($mode, [ AuthManager::MODE_CREDENTIALS, AuthManager::MODE_REENTER_CREDENTIALS, AuthManager::MODE_VERIFY ])) {
@@ -252,7 +252,7 @@ class AuthModule extends Module {
         $token = new SecurityToken();
         $this->f3->set('tk', $token->generate('login', SecurityToken::OPTION_NONCE));
         
-        $this->f3->set('fs', $token->generate($form_state->toArray()));
+        $this->f3->set('fs', $token->generate($form_state->encode()));
         if (isset($params['destination'])) $this->f3->set('destination', $params['destination']);
         $this->f3->set('framekiller', true);
         $this->f3->set('page_class', 'dialog-page');

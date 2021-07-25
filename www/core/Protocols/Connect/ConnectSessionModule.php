@@ -63,7 +63,7 @@ class ConnectSessionModule extends Module {
 
         if ($this->f3->exists('POST.fs') !== false) {            
             $token = new SecurityToken();
-            $form_state = new FormState($token->getPayload($this->f3->get('POST.fs')));
+            $form_state = FormState::decode($token->getPayload($this->f3->get('POST.fs')));
 
             if (!$token->verify($this->f3->get('POST.tk'), 'connect_logout')) {
                 $this->logger->log(LogLevel::WARNING, 'Security token ' . $this->f3->get('POST.tk') . ' invalid.');
@@ -151,7 +151,7 @@ class ConnectSessionModule extends Module {
 
         $token = new SecurityToken();
         $this->f3->set('tk', $token->generate('connect_logout', SecurityToken::OPTION_BIND_SESSION));
-        $this->f3->set('fs', $token->generate($form_state->toArray()));
+        $this->f3->set('fs', $token->generate($form_state->encode()));
 
         // logout_label is already defined in Module
 

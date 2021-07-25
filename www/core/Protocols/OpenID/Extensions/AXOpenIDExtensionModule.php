@@ -25,8 +25,6 @@ namespace SimpleID\Protocols\OpenID\Extensions;
 
 use SimpleID\Module;
 use SimpleID\Auth\AuthManager;
-use SimpleID\Protocols\OpenID\Request;
-use SimpleID\Protocols\OpenID\Response;
 
 /**
  * Implements the Attribute Exchange extension.
@@ -113,7 +111,7 @@ class AXOpenIDExtensionModule extends Module {
      * @see hook_consent_form()
      */
     public function openIDConsentFormHook($form_state) {
-        $request = new Request($form_state->getRequestArray());
+        $request = $form_state->getRequest();
         $prefs = $form_state['prefs'];
         
         // We only respond if the extension is requested
@@ -181,7 +179,7 @@ class AXOpenIDExtensionModule extends Module {
      * @see hook_consent()
      */
     function openIDConsentFormSubmitHook($form_state) {
-        $response = new Response($form_state->getResponseArray());
+        $response = $form_state->getResponse();
         $prefs =& $form_state->pathRef('prefs');
 
         // We only respond if the extension is requested
@@ -220,7 +218,6 @@ class AXOpenIDExtensionModule extends Module {
         }
         
         $prefs['consents']['sreg'] = $form;
-        $form_state->setResponse($response);
     }
 
     /**
