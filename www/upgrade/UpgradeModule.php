@@ -102,7 +102,7 @@ class UpgradeModule extends Module {
 
         $list = $this->getUpgradeList();
         
-        if (count($list) != 0)
+        if (count($list) != 0) {
             $rand = new Random();
 
             $upgid = $rand->id();
@@ -254,7 +254,7 @@ class UpgradeModule extends Module {
     protected function accessDenied() {
         $tpl = new \Template();
 
-        $this->f3->set('upgrade_url', 'https://simpleid.org/docs/2/upgrading/#upgrade'));
+        $this->f3->set('upgrade_url', 'https://simpleid.org/docs/2/upgrading/#upgrade');
         
         $this->f3->set('title', $this->f3->get('intl.common.access_denied'));
         $this->f3->set('layout', 'upgrade_access_denied.html');
