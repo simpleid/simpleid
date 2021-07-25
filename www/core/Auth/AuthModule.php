@@ -78,7 +78,6 @@ class AuthModule extends Module {
         $this->f3->set('PARAMS.destination', $params['destination']);
 
         $token = new SecurityToken();
-        $token->gc();
 
         // Require HTTPS or return an error
         $this->checkHttps('error', true);
