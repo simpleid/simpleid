@@ -169,7 +169,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
     /**
      * @see SimpleID\API\AuthHooks::loginFormHook()
      */
-    public function loginFormHook(&$form_state) {
+    public function loginFormHook($form_state) {
         if ($form_state['mode'] == AuthManager::MODE_VERIFY) {
             $auth = AuthManager::instance();
             $store = StoreManager::instance();
@@ -200,7 +200,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
     /**
      * @see SimpleID\API\AuthHooks::loginFormValidateHook()
      */
-    public function loginFormValidateHook(&$form_state) {
+    public function loginFormValidateHook($form_state) {
         if ($form_state['mode'] == AuthManager::MODE_VERIFY) {
             if ($this->f3->exists('POST.otp.otp') === false) {
                 $this->f3->set('message', $this->f3->get('intl.core.auth_otp.missing_otp'));
@@ -213,7 +213,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
     /**
      * @see SimpleID\API\AuthHooks::loginFormSubmitHook()
      */
-    public function loginFormSubmitHook(&$form_state) {
+    public function loginFormSubmitHook($form_state) {
         if ($form_state['mode'] == AuthManager::MODE_VERIFY) {
             $store = StoreManager::instance();
 

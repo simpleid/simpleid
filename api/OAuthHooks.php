@@ -122,7 +122,7 @@ abstract class OAuthHooks {
      * - `rq` the Request object
      * - `rs` the Response object
      * 
-     * @param array $form_state the form state
+     * @param SimpleID\Util\Forms\FormState $form_state the form state
      * @return array an array of form elements
      */
     abstract function oAuthConsentFormHook($form_state);
@@ -130,7 +130,7 @@ abstract class OAuthHooks {
     /**
      * Processes the OAuth authorisation request form.
      *
-     * @param array $form_state the form state
+     * @param SimpleID\Util\Forms\FormState $form_state the form state
      *
      */
     abstract function oAuthConsentFormSubmitHook($form_state);

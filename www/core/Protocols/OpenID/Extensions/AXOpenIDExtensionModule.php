@@ -111,8 +111,7 @@ class AXOpenIDExtensionModule extends Module {
      * @see hook_consent_form()
      */
     public function openIDConsentFormHook($form_state) {
-        $request = $form_state['rq'];
-        $response = $form_state['rs'];
+        $request = $form_state->getRequest();
         $prefs = $form_state['prefs'];
         
         // We only respond if the extension is requested
@@ -179,10 +178,9 @@ class AXOpenIDExtensionModule extends Module {
     /**
      * @see hook_consent()
      */
-    function openIDConsentFormSubmitHook(&$form_state) {
-        $request = &$form_state['rq'];
-        $response = &$form_state['rs'];
-        $prefs = &$form_state['prefs'];
+    function openIDConsentFormSubmitHook($form_state) {
+        $response = $form_state->getResponse();
+        $prefs =& $form_state->pathRef('prefs');
 
         // We only respond if the extension is requested
         if (!$response->hasExtension(self::OPENID_NS_AX)) return;

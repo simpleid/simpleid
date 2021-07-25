@@ -127,10 +127,10 @@ abstract class OpenIDHooks {
      * `$form_state` contains the same element as per the
      * {@link SimpleID\Protocols\OpenID\OpenIDModule::openIDCheckIdentity()} hook, except that this is now passed by reference
      *
-     * @param array &$form_state the form state
+     * @param SimpleID\Util\Forms\FormState $form_state the form state
      *
      */
-    abstract function openIDConsentFormSubmitHook(&$form_state);
+    abstract function openIDConsentFormSubmitHook($form_state);
 }
 
 ?>

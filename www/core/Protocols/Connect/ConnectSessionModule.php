@@ -29,6 +29,7 @@ use SimpleID\Protocols\Connect\ConnectModule;
 use SimpleID\Protocols\OAuth\Response;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
+use SimpleID\Util\Form\FormState;
 use SimpleID\Module;
 use SimpleJWT\InvalidTokenException;
 
@@ -62,7 +63,7 @@ class ConnectSessionModule extends Module {
 
         if ($this->f3->exists('POST.fs') !== false) {            
             $token = new SecurityToken();
-            $form_state = $token->getPayload($this->f3->get('POST.fs'));
+            $form_state = FormState::decode($token->getPayload($this->f3->get('POST.fs')));
 
             if (!$token->verify($this->f3->get('POST.tk'), 'connect_logout')) {
                 $this->logger->log(LogLevel::WARNING, 'Security token ' . $this->f3->get('POST.tk') . ' invalid.');
@@ -95,8 +96,8 @@ class ConnectSessionModule extends Module {
                 }
             }
         } else {
-            $form_state = [ 'connect_logout' => [] ];
-            if ($this->f3->exists('REQUEST.state')) $form_state['connect_logout']['state'] = $this->f3->get('REQUEST.state');
+            $form_state = new FormState([ 'connect_logout' => [] ]);
+            if ($this->f3->exists('REQUEST.state')) $form_state->pathSet('connect_logout.state', $this->f3->get('REQUEST.state'));
 
             // Check for id_token_hint.  If it is a valid ID token AND it is the
             // current logged in user, then we can proceed with log out.  Otherwise
@@ -118,7 +119,7 @@ class ConnectSessionModule extends Module {
                         $post_logout_redirect_uri = $this->f3->get('REQUEST.post_logout_redirect_uri');
 
                         if (in_array($post_logout_redirect_uri, $client['connect']['post_logout_redirect_uris']))
-                            $form_state['connect_logout']['post_logout_redirect_uri'] = $post_logout_redirect_uri;
+                            $form_state->pathSet('connect_logout.post_logout_redirect_uri', $post_logout_redirect_uri);
                     }
                 } catch (InvalidTokenException $e) {
                     $user_match = false;
@@ -144,12 +145,13 @@ class ConnectSessionModule extends Module {
         }
     }
 
-    protected function logoutForm($form_state = []) {
+    protected function logoutForm($form_state = null) {
+        if ($form_state == null) $form_state = new FormState();
         $tpl = new \Template();
 
         $token = new SecurityToken();
         $this->f3->set('tk', $token->generate('connect_logout', SecurityToken::OPTION_BIND_SESSION));
-        $this->f3->set('fs', $token->generate($form_state));
+        $this->f3->set('fs', $token->generate($form_state->encode()));
 
         // logout_label is already defined in Module
 

@@ -26,6 +26,7 @@ use Psr\Log\LogLevel;
 use SimpleID\Module;
 use SimpleID\ModuleManager;
 use SimpleID\Util\SecurityToken;
+use SimpleID\Util\Forms\FormState;
 
 /**
  * The module used to authenticate users.
@@ -78,13 +79,12 @@ class AuthModule extends Module {
         $this->f3->set('PARAMS.destination', $params['destination']);
 
         $token = new SecurityToken();
-        $token->gc();
 
         // Require HTTPS or return an error
         $this->checkHttps('error', true);
 
         if (($this->f3->exists('POST.fs') === false)) {
-            $form_state = [ 'mode' => AuthManager::MODE_CREDENTIALS ];
+            $form_state = new FormState([ 'mode' => AuthManager::MODE_CREDENTIALS ]);
             if (in_array($this->f3->get('GET.mode'), [ AuthManager::MODE_VERIFY, AuthManager::MODE_REENTER_CREDENTIALS ])) {
                 $form_state['mode'] = $this->f3->get('GET.mode');
             }
@@ -92,8 +92,8 @@ class AuthModule extends Module {
             return;
         }
 
-        $form_state = $token->getPayload($this->f3->get('POST.fs'));
-        if ($form_state === false) $form_state = [ 'mode' => AuthManager::MODE_CREDENTIALS ];
+        $form_state = FormState::decode($token->getPayload($this->f3->get('POST.fs')));
+        if (count($form_state) == 0) $form_state['mode'] = AuthManager::MODE_CREDENTIALS;
         $mode = $form_state['mode'];
         if (!in_array($mode, [ AuthManager::MODE_CREDENTIALS, AuthManager::MODE_REENTER_CREDENTIALS, AuthManager::MODE_VERIFY ])) {
             $this->f3->set('message', $this->f3->get('intl.core.auth.state_error'));
@@ -148,7 +148,9 @@ class AuthModule extends Module {
                     $form_state['auth_level'] = (isset($form_state['auth_level'])) ? max($form_state['auth_level'], $results['auth_level']) : $results['auth_level'];
                 }
                 if (!isset($form_state['modules'])) $form_state['modules'] = [];
-                $form_state['modules'][] = $module;
+
+                $modules =& $form_state->pathRef('modules');
+                $modules[] = $module;
             }
         }
 
@@ -205,9 +207,10 @@ class AuthModule extends Module {
      * @param array $params the F3 parameters
      * @param array $form_state the form state
      */
-    public function loginForm($params = [ 'destination' => null ], $form_state = [ 'mode' => AuthManager::MODE_CREDENTIALS ]) {
+    public function loginForm($params = [ 'destination' => null ], $form_state = null) {
         $tpl = new \Template();
         $config = $this->f3->get('config');
+        if ($form_state == null) $form_state = new FormState([ 'mode' => AuthManager::MODE_CREDENTIALS ]);
 
         // 1. Check for HTTPS
         $this->checkHttps('redirect', true);
@@ -249,7 +252,7 @@ class AuthModule extends Module {
         $token = new SecurityToken();
         $this->f3->set('tk', $token->generate('login', SecurityToken::OPTION_NONCE));
         
-        $this->f3->set('fs', $token->generate($form_state));
+        $this->f3->set('fs', $token->generate($form_state->encode()));
         if (isset($params['destination'])) $this->f3->set('destination', $params['destination']);
         $this->f3->set('framekiller', true);
         $this->f3->set('page_class', 'dialog-page');

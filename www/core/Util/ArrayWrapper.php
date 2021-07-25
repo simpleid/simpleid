@@ -23,6 +23,7 @@
 namespace SimpleID\Util;
 
 use \ArrayAccess;
+use \Countable;
 
 /**
  * A class that wraps around an array while providing array-like and
@@ -68,7 +69,7 @@ use \ArrayAccess;
  * </code>
  *
  */
-class ArrayWrapper implements ArrayAccess {
+class ArrayWrapper implements ArrayAccess, Countable {
     /** @var array the underlying array */
     protected $container = [];
 
@@ -78,7 +79,7 @@ class ArrayWrapper implements ArrayAccess {
      * @param array $container the underlying array
      */
     public function __construct($container = []) {
-        $this->container = $container;
+        if (is_array($container)) $this->container = $container;
     }
 
     /**
@@ -135,6 +136,13 @@ class ArrayWrapper implements ArrayAccess {
      */
     public function offsetGet($offset) {
         return isset($this->container[$offset]) ? $this->container[$offset] : null;
+    }
+
+    /**
+     * Implementation of Countable
+     */
+    public function count() {
+        return count($this->container);
     }
 
     /**

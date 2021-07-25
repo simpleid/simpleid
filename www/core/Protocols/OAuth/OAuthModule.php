@@ -30,6 +30,7 @@ use SimpleID\ModuleManager;
 use SimpleID\Protocols\ProtocolResult;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
+use SimpleID\Util\Forms\FormState;
 
 /**
  * The module for authentication using OAuth.
@@ -263,11 +264,11 @@ class OAuthModule extends Module implements ProtocolResult {
                 } else {
                     $token = new SecurityToken();
                     $state = [ 'rt' => '/oauth/auth', 'rq' => $request->toArray() ];
-                    $form_state = [
-                        'rq' => $request->toArray(),
+                    $form_state = new FormState([
                         'mode' => AuthManager::MODE_CREDENTIALS,
                         'auth_skip_activity' => true
-                    ];
+                    ]);
+                    $form_state->setRequest($request);
                     if ($result == self::CHECKID_REENTER_CREDENTIALS) {
                         $auth = AuthManager::instance();
                         $user = $auth->getUser();
@@ -599,10 +600,9 @@ class OAuthModule extends Module implements ProtocolResult {
 
         $client = $store->loadClient($request['client_id'], 'SimpleID\Protocols\OAuth\OAuthClient');
 
-        $form_state = [
-            'rq' => $request,
-            'rs' => $response,
-        ];
+        $form_state = new FormState();
+        $form_state->setRequest($request);
+        $form_state->setResponse($response);
         
         $application_name = $client->getDisplayName();
         $application_type = (isset($client['oauth']['application_type'])) ? $client['oauth']['application_type'] : '';
@@ -658,7 +658,7 @@ class OAuthModule extends Module implements ProtocolResult {
         
         $token = new SecurityToken();
         $this->f3->set('tk', $token->generate('oauth_consent', SecurityToken::OPTION_BIND_SESSION));
-        $this->f3->set('fs', $token->generate($form_state));
+        $this->f3->set('fs', $token->generate($form_state->encode()));
 
         $this->f3->set('logout_destination', '/continue/' . rawurlencode($token->generate($request->toArray())));
         $this->f3->set('user_header', true);
@@ -693,9 +693,9 @@ class OAuthModule extends Module implements ProtocolResult {
         }
         $user = $auth->getUser();
         
-        $form_state = $token->getPayload($this->f3->get('POST.fs'));
-        $request = $form_state['rq'];
-        $response = $form_state['rs'];
+        $form_state = FormState::decode($token->getPayload($this->f3->get('POST.fs')), Request::class, Response::class);
+        $request = $form_state->getRequest();
+        $response = $form_state->getResponse();
 
         if (!$token->verify($this->f3->get('POST.tk'), 'oauth_consent')) {
             $this->logger->log(LogLevel::WARNING, 'Security token ' . $this->f3->get('POST.tk') . ' invalid.');

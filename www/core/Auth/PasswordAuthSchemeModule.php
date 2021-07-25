@@ -42,10 +42,10 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
      * Displays the login form, with input fields for the user name
      * and password
      *
-     * @param array &$form_state
+     * @param SimpleID\Util\Form\FormState $form_state
      * @return array
      */
-    public function loginFormHook(&$form_state) {
+    public function loginFormHook($form_state) {
         if ($form_state['mode'] == AuthManager::MODE_CREDENTIALS || $form_state['mode'] == AuthManager::MODE_REENTER_CREDENTIALS) {
             $tpl = new \Template();
 
@@ -63,10 +63,10 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
     /**
      * Validates the login form.
      *
-     * @param array &$form_state
+     * @param SimpleID\Util\Form\FormState $form_state
      * @return bool
      */
-    public function loginFormValidateHook(&$form_state) {
+    public function loginFormValidateHook($form_state) {
         if ($form_state['mode'] == AuthManager::MODE_CREDENTIALS || $form_state['mode'] == AuthManager::MODE_REENTER_CREDENTIALS) {
             $uid = ($form_state['mode'] == AuthManager::MODE_CREDENTIALS) ? $this->f3->get('POST.uid') : $form_state['uid'];
             if (($uid === false) || ($uid === null)) $uid = '';
@@ -86,10 +86,10 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
      * Processes the login form by verifying password credentials supplied
      * by the user.
      *
-     * @param array &$form_state
+     * @param SimpleID\Util\Form\FormState $form_state
      * @return bool|array
      */
-    public function loginFormSubmitHook(&$form_state) {
+    public function loginFormSubmitHook($form_state) {
         if ($form_state['mode'] == AuthManager::MODE_CREDENTIALS || $form_state['mode'] == AuthManager::MODE_REENTER_CREDENTIALS) {
             $uid = ($form_state['mode'] == AuthManager::MODE_CREDENTIALS) ? $this->f3->get('POST.uid') : $form_state['uid'];
             

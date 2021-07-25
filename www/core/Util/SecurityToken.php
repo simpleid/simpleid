@@ -84,7 +84,7 @@ class SecurityToken {
         $message = $this->fernet->decode($token, $ttl);
         if ($message === null) return null;
 
-        $this->data = unserialize(gzuncompress($message));
+        $this->data = json_decode(gzuncompress($message), true);
 
         if (($this->data['o'] & self::OPTION_BIND_SESSION) == self::OPTION_BIND_SESSION) {
             if (!isset($this->data['s'])) return null;
@@ -140,7 +140,7 @@ class SecurityToken {
             $this->data['s'] = session_id();
         }
 
-        $token = $this->fernet->encode(gzcompress(serialize($this->data)));
+        $token = $this->fernet->encode(gzcompress(json_encode($this->data)));
 
         if (($options & self::OPTION_NONCE) == self::OPTION_NONCE) {
             $cache = \Cache::instance();
@@ -149,19 +149,6 @@ class SecurityToken {
         }
 
         return $token;
-    }
-
-    /**
-     * Deletes any expired tokens.
-     */
-    public function gc() {
-        /* FatFree 3.6.1 removed the $lifetime parameter in $cache->reset() as
-         * part of its support for memcached.  Garbage collection occurs
-         * automatically in $cache->exists() and $cache->get(), so this is
-         * strictly not necessary
-         */
-        //$cache = \Cache::instance();
-        //$cache->reset('.token', SIMPLEID_HUMAN_TOKEN_EXPIRES_IN);
     }
 
     /**
