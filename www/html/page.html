@@ -68,7 +68,12 @@
             <h1>{{ @title }}</h1>
 
             <check if="{{ @@message }}">
-                <div class="message"><p>{{ @message | raw }}</p></div>
+                <div class="message">
+                    <check if="{{ is_array(@message) }}">
+                        <true><ul><repeat group="{{ @message }}" value="{{ @item }}"><li>{{ @item | raw }}</li></repeat></ul></true>
+                        <false><p>{{ @message | raw }}</p></false>
+                    </check>
+                </div>
             </check>
 
             <check if="{{ @@layout }}"><include href="{{ @layout }}"></check>
