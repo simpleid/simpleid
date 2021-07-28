@@ -24,6 +24,14 @@ namespace SimpleID\Util\Events;
 
 /**
  * A generic event used to build user interfaces.
+ * 
+ * User interfaces built by adding "blocks" using the {@link addBlock()}
+ * method.  A block is essentially a piece of HTML code that can be
+ * inserted in a particular order.
+ * 
+ * In addition to blocks, listeners can also add attachments.  Attachments
+ * can be things such as CSS style sheets, Javascript references or
+ * Javascript code.  Each attachment is associated with a type.
  *
  */
 class UIBuildEvent implements \GenericEventInterface {

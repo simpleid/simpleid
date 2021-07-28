@@ -27,8 +27,9 @@ use SimpleID\Util\Events\GenericEventTrait;
 use SimpleID\Util\Events\StoppableEventTrait;
 
 /**
- * A generic event used to process a submitted form.  Processing in this
- * context includes validating whether the data submitted in a form is valid.
+ * A generic event used to process a submitted form.  This includes
+ * validating whether the data submitted in a form is valid as well as
+ * processing submitted data.
  * 
  * If a validation error is encountered, call {@link setInvalid()}.  Validation
  * messages can be added using {@link addMessage()}.
