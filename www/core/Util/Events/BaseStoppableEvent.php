@@ -22,26 +22,22 @@
 
 namespace SimpleID\Util\Events;
 
+use Psr\EventDispatcher\StoppableEventInterface;
 
 /**
- * A utility trait for implementing {@link Psr\EventDispatcher\StoppableEventInterface}.
+ * A generic event that can be stopped.
  */
-trait StoppableEventTrait {
-    protected $stopped = false;
+class BaseStoppableEvent implements \GenericEventInterface, StoppableEventInterface {
+    use GenericEventTrait;
+    use StoppableEventTrait;
 
     /**
-     * @see Psr\EventDispatcher\StoppableEventInterface::isPropagationStopped()
+     * Creates a stoppable event.
+     * 
+     * @param string $eventName the name of the event
      */
-    public function isPropagationStopped(): bool {
-        return $this->stopped;
-    }
-
-    /**
-     * Stops further propagation of the event
-     */
-    public function stopPropagation() {
-        $this->stopped = true;
-        return $this;
+    public function __construct($eventName = null) {
+        $this->setEventName($eventName);
     }
 }
 
