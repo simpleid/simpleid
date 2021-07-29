@@ -117,6 +117,17 @@ class BaseDataCollectionEvent implements \GenericEventInterface {
     public function getResults() {
         return $this->results;
     }
+
+
+    /**
+     * Returns whether any data have been collected by the
+     * event.
+     * 
+     * @return bool true if data have been collected
+     */
+    public function hasResults() {
+        return (count($this->results) > 0);
+    }
 }
 
 ?>
