@@ -28,7 +28,10 @@ use SimpleID\Crypt\BigNum;
 use SimpleID\Crypt\Random;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
+use SimpleID\Util\Events\BaseDataCollectionEvent;
 use SimpleID\Util\Events\UIBuildEvent;
+use SimpleID\Util\Forms\FormBuildEvent;
+use SimpleID\Util\Forms\FormSubmitEvent;
 
 /**
  * An authentication scheme module that provides two-factor authentication
@@ -166,9 +169,11 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
     }
 
     /**
-     * @see SimpleID\API\AuthHooks::loginFormHook()
+     * @param SimpleID\Util\Form\FormBuildEvent $event
      */
-    public function loginFormHook($form_state) {
+    public function onLoginFormBuild(FormBuildEvent $event) {
+        $form_state = $event->getFormState();
+
         if ($form_state['mode'] == AuthManager::MODE_VERIFY) {
             $auth = AuthManager::instance();
             $store = StoreManager::instance();
@@ -186,33 +191,31 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             $this->f3->set('otp_recovery_url', 'http://simpleid.org/docs/2/common_problems/#otp');
 
             $this->f3->set('submit_button', $this->f3->get('intl.common.verify'));
-            
-            return [
-                [
-                    'content' => $tpl->render('auth_otp.html', false),
-                    'weight' => 0
-                ]
-            ];
+
+            $event->addBlock('auth_otp', $tpl->render('auth_otp.html', false), 0);
         }
     }
 
     /**
-     * @see SimpleID\API\AuthHooks::loginFormValidateHook()
+     * @param SimpleID\Util\Form\FormSubmitEvent $event
      */
-    public function loginFormValidateHook($form_state) {
+    public function onLoginFormValidate(FormSubmitEvent $event) {
+        $form_state = $event->getFormState();
+
         if ($form_state['mode'] == AuthManager::MODE_VERIFY) {
             if ($this->f3->exists('POST.otp.otp') === false) {
                 $this->f3->set('message', $this->f3->get('intl.core.auth_otp.missing_otp'));
-                return false;
+                $event->setInvalid();
             }
-            return true;
         }
     }
 
     /**
-     * @see SimpleID\API\AuthHooks::loginFormSubmitHook()
+     * @param SimpleID\Auth\LoginFormSubmitEvent $event
      */
-    public function loginFormSubmitHook($form_state) {
+    public function onLoginFormSubmit(LoginFormSubmitEvent $event) {
+        $form_state = $event->getFormState();
+
         if ($form_state['mode'] == AuthManager::MODE_VERIFY) {
             $store = StoreManager::instance();
 
@@ -230,14 +233,19 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             $test_user['otp'] = $params;
             $store->saveUser($test_user); // Save the drift
 
-            return  [ 'auth_level' => $form_state['mode'] ];
+            $event->addAuthModuleName(self::class);
+            $event->setAuthLevel($form_state['mode']);
         }
     }
 
     /**
-     * @see SimpleID\API\AuthHooks::loginHook()
+     * @see SimpleID\Auth\LoginEvent
      */
-    public function loginHook($user, $level, $modules, $form_state) {
+    public function onLoginEvent(LoginEvent $event) {
+        $user = $event->getUser();
+        $level = $event->getAuthLevel();
+        $form_state = $event->getFormState();
+        
         $auth = AuthManager::instance();
         $store = StoreManager::instance();
 
@@ -350,11 +358,9 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
         return $code % pow(10, $digits);
     }
 
-    /**
-     * @see SimpleID\API\AuthHooks::secretUserDataPathsHook()
-     */
-    public function secretUserDataPathsHook() {
-        return [ 'otp.secret', 'otp.drift' ];
+    
+    public function onUserSecretDataPaths(BaseDataCollectionEvent $event) {
+        $event->addResult([ 'otp.secret', 'otp.drift' ]);
     }
 }
 ?>

@@ -23,7 +23,7 @@
 namespace SimpleID\Auth;
 
 use SimpleID\Models\User;
-use SimpleID\Util\Events\FormSubmitEvent;
+use SimpleID\Util\Forms\FormSubmitEvent;
 
 /**
  * An event used to process the login form.
@@ -48,7 +48,7 @@ class LoginFormSubmitEvent extends FormSubmitEvent implements AuthResultInterfac
      * {@inheritdoc}
      */
     public function isAuthSuccessful() {
-        return ($user != null);
+        return ($this->user != null);
     }
 
     /**
@@ -66,7 +66,7 @@ class LoginFormSubmitEvent extends FormSubmitEvent implements AuthResultInterfac
      * 
      * @return SimpleID\Models\User the user
      */
-    public function getUser(): User {
+    public function getUser(): ?User {
         return $this->user;
     }
 

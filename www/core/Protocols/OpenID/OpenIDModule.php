@@ -32,6 +32,7 @@ use SimpleID\Protocols\ProtocolResult;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
 use SimpleID\Util\Events\UIBuildEvent;
+use SimpleID\Util\Forms\FormSubmitEvent;
 
 /**
  * The module for authentication under OpenID version 1.1 and 2.0
@@ -832,17 +833,20 @@ class OpenIDModule extends Module implements ProtocolResult {
     /**
      * Processes a cancellation from the login form.
      *
-     * @param SimpleID\Util\Forms\FormState $form_state the form state
-     * @return bool|null
+     * @param SimpleID\Util\Forms\FormSubmitEvent $event the form cancellation
+     * event
      */
-    public function loginFormCancelled($form_state) {
+    public function onLoginFormCancel(FormSubmitEvent $event) {
+        $form_state = $event->getFormState();
+
         if ($form_state['cancel'] == 'openid') {
             $request = $form_state->getRequest();
             if (isset($request['openid.return_to'])) {
                 $return_to = $request['openid.return_to'];
                 $response = $this->createErrorResponse($request, FALSE);
                 $response->render($return_to);
-                return true;
+                $event->stopPropagation();
+                return;
             }
         }
     }

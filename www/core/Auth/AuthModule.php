@@ -26,7 +26,10 @@ use Psr\Log\LogLevel;
 use SimpleID\Module;
 use SimpleID\ModuleManager;
 use SimpleID\Util\SecurityToken;
+use SimpleID\Util\Events\BaseStoppableEvent;
 use SimpleID\Util\Forms\FormState;
+use SimpleID\Util\Forms\FormBuildEvent;
+use SimpleID\Util\Forms\FormSubmitEvent;
 
 /**
  * The module used to authenticate users.
@@ -75,6 +78,8 @@ class AuthModule extends Module {
      * @param array $params
      */
     public function login($f3, $params) {
+        $dispatcher = \Events::instance();
+
         $params['destination'] = (isset($params[1])) ? $params[1] : '';
         $this->f3->set('PARAMS.destination', $params['destination']);
 
@@ -118,9 +123,12 @@ class AuthModule extends Module {
         }
 
         if ($this->f3->exists('POST.op') && $this->f3->get('POST.op') == $this->f3->get('intl.common.cancel')) {
-            $results = $this->mgr->invokeAll('loginFormCancelled', $form_state);
-            
-            if (!array_reduce($results, function($overall, $result) { return ($result) ? true : $overall; }, false)) {
+            $cancel_event = new FormSubmitEvent($form_state, 'login_form_cancel');
+
+            $dispatcher->dispatch($cancel_event);
+
+            // Listeners should call stopPropagation if it has processed successfully
+            if (!$cancel_event->isPropagationStopped()) {
                 $this->fatalError($this->f3->get('intl.core.auth.cancelled'));
             }
             return;
@@ -129,29 +137,31 @@ class AuthModule extends Module {
         // If the user is already logged in, return
         if (($mode == AuthManager::MODE_CREDENTIALS) && $this->auth->isLoggedIn()) $this->f3->reroute('/');
 
-        $results = $this->mgr->invokeRefAll('loginFormValidate', $form_state);
-        if (!array_reduce($results, function($overall, $result) { return (($result !== null) && ($result === false)) ? false : $overall; }, true)) {
+        $validate_event = new FormSubmitEvent($form_state, 'login_form_validate');
+        $dispatcher->dispatch($validate_event);
+        if (!$validate_event->isValid()) {
+            $this->f3->set('message', $validate_event->getMessages());
             $this->loginForm($params, $form_state);
             return;
         }
 
-        $modules = $this->mgr->getModules();
-        foreach ($modules as $module) {
-            $results = $this->mgr->invokeRef($module, 'loginFormSubmit', $form_state);
-            if ($results === false) {
-                $this->loginForm($params, $form_state);
-                return;
-            }
-            if (is_array($results)) {
-                if (isset($results['uid'])) $form_state['uid'] = $results['uid'];
-                if (isset($results['auth_level'])) {
-                    $form_state['auth_level'] = (isset($form_state['auth_level'])) ? max($form_state['auth_level'], $results['auth_level']) : $results['auth_level'];
-                }
-                if (!isset($form_state['modules'])) $form_state['modules'] = [];
+        $submit_event = new LoginFormSubmitEvent($form_state, 'login_form_submit');
+        $dispatcher->dispatch($submit_event);
+        if (!$submit_event->isValid()) {
+            $this->f3->set('message', $submit_event->getMessages());
+            $this->loginForm($params, $form_state);
+            return;
+        }
 
-                $modules =& $form_state->pathRef('modules');
-                $modules[] = $module;
-            }
+        if ($submit_event->isAuthSuccessful()) {
+            $test_user = $submit_event->getUser();
+
+            $form_state['uid'] = $test_user['uid'];
+            $form_state['auth_level'] = $submit_event->getAuthLevel();
+            $form_state['modules'] = $submit_event->getAuthModuleNames();
+        } else {
+            $this->loginForm($params, $form_state);
+            return;
         }
 
         if (!isset($form_state['uid'])) {
@@ -162,14 +172,16 @@ class AuthModule extends Module {
 
         if ($mode == AuthManager::MODE_CREDENTIALS) {
             $form_state['mode'] = AuthManager::MODE_VERIFY;
-            $forms = $this->mgr->invokeRefAll('loginForm', $form_state);
-            if (count($forms) > 0) {
+            $event = new FormBuildEvent('login_form_build', $form_state);
+
+            $dispatcher->dispatch($event);
+            if (count($event->getBlocks()) > 0) {
                 $this->loginForm($params, $form_state);
                 return;
             }
         }
         
-        $this->auth->login($form_state['uid'], $form_state['auth_level'], $form_state['modules'], $form_state);
+        $this->auth->login($submit_event, $form_state);
         
         $this->f3->reroute('/' . $params['destination']);
     }
@@ -189,9 +201,10 @@ class AuthModule extends Module {
     
         $this->auth->logout();
 
-        $results = $this->mgr->invokeAll('logoutComplete');
+        $event = new BaseStoppableEvent('post_logout');
+        \Events()::instance()->dispatch($event);
 
-        if (!$results) {
+        if (!$event->isPropagationStopped()) {
             if ($params['destination']) {
                 $this->f3->reroute('/' . $params['destination']);
             } else {
@@ -242,8 +255,9 @@ class AuthModule extends Module {
             $forms = $form_state['verify_forms'];
             unset($form_state['verify_forms']);
         } else {
-            $forms = $this->mgr->invokeRefAll('loginForm', $form_state);
-            uasort($forms, function($a, $b) { if ($a['weight'] == $b['weight']) { return 0; } return ($a['weight'] < $b['weight']) ? -1 : 1; });
+            $event = new FormBuildEvent('login_form_build', $form_state);
+            \Events::instance()->dispatch($event);
+            $forms = $event->getBlocks();
         }
         $this->f3->set('forms', $forms);
 

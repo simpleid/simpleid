@@ -26,6 +26,9 @@ use \Bcrypt;
 use Psr\Log\LogLevel;
 use SimpleID\Auth\AuthManager;
 use SimpleID\Store\StoreManager;
+use SimpleID\Util\Events\BaseDataCollectionEvent;
+use SimpleID\Util\Forms\FormBuildEvent;
+use SimpleID\Util\Forms\FormSubmitEvent;
 
 /**
  * Password-based authentication scheme.
@@ -42,31 +45,28 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
      * Displays the login form, with input fields for the user name
      * and password
      *
-     * @param SimpleID\Util\Form\FormState $form_state
-     * @return array
+     * @param SimpleID\Util\Form\FormBuildEvent $event
      */
-    public function loginFormHook($form_state) {
+    public function onLoginFormBuild(FormBuildEvent $event) {
+        $form_state = $event->getFormState();
+
         if ($form_state['mode'] == AuthManager::MODE_CREDENTIALS || $form_state['mode'] == AuthManager::MODE_REENTER_CREDENTIALS) {
             $tpl = new \Template();
 
             $this->f3->set('login_form_module', 'password');
 
-            return [
-                [
-                    'content' => $tpl->render('auth_password.html', false),
-                    'weight' => 0
-                ]
-            ];
+            $event->addBlock('auth_password', $tpl->render('auth_password.html', false), 0);
         }
     }
 
     /**
      * Validates the login form.
      *
-     * @param SimpleID\Util\Form\FormState $form_state
-     * @return bool
+     * @param SimpleID\Util\Form\FormSubmitEvent $event
      */
-    public function loginFormValidateHook($form_state) {
+    public function onLoginFormValidate(FormSubmitEvent $event) {
+        $form_state = $event->getFormState();
+
         if ($form_state['mode'] == AuthManager::MODE_CREDENTIALS || $form_state['mode'] == AuthManager::MODE_REENTER_CREDENTIALS) {
             $uid = ($form_state['mode'] == AuthManager::MODE_CREDENTIALS) ? $this->f3->get('POST.uid') : $form_state['uid'];
             if (($uid === false) || ($uid === null)) $uid = '';
@@ -74,11 +74,10 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
             if (($uid == '') || ($this->f3->exists('POST.password.password') === false)) {
                 if ($this->f3->exists('PARAMS.continue')) {
                     // User came from a log in form.
-                    $this->f3->set('message', $this->f3->get('intl.core.auth_password.missing_password'));
+                    $event->addMessage($this->f3->get('intl.core.auth_password.missing_password'));
                 }
-                return false;
+                $event->setInvalid();
             }
-            return true;
         }
     }
 
@@ -86,22 +85,26 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
      * Processes the login form by verifying password credentials supplied
      * by the user.
      *
-     * @param SimpleID\Util\Form\FormState $form_state
-     * @return bool|array
+     * @param SimpleID\Auth\LoginFormSubmitEvent $event
      */
-    public function loginFormSubmitHook($form_state) {
+    public function onLoginFormSubmit(LoginFormSubmitEvent $event) {
+        $store = StoreManager::instance();
+        $form_state = $event->getFormState();
+
         if ($form_state['mode'] == AuthManager::MODE_CREDENTIALS || $form_state['mode'] == AuthManager::MODE_REENTER_CREDENTIALS) {
             $uid = ($form_state['mode'] == AuthManager::MODE_CREDENTIALS) ? $this->f3->get('POST.uid') : $form_state['uid'];
             
             if ($this->verifyCredentials($uid, $this->f3->get('POST')) === false) {
                 $this->f3->set('message', $this->f3->get('intl.core.auth_password.invalid_password'));
-                return false;
+                $event->setInvalid();
+                return;
             }
 
-            return [
-                'uid' => $uid,
-                'auth_level' => $form_state['mode']
-            ];
+            $test_user = $store->loadUser($uid);
+
+            $event->addAuthModuleName(self::class);
+            $event->setUser($test_user);
+            $event->setAuthLevel($form_state['mode']);
         }
     }
 
@@ -143,11 +146,8 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
         }
     }
 
-    /**
-     * @see SimpleID\API\AuthHooks::secretUserDataPathsHook()
-     */
-    public function secretUserDataPathsHook() {
-        return [ 'password.password' ];
+    public function onUserSecretDataPaths(BaseDataCollectionEvent $event) {
+        $event->addResult('password.password');
     }
 }
 ?>

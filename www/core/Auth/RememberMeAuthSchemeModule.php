@@ -23,9 +23,11 @@
 namespace SimpleID\Auth;
 
 use Psr\Log\LogLevel;
+use SimpleID\Auth\AutoAuthEvent;
 use SimpleID\Crypt\Random;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
+use SimpleID\Util\Forms\FormBuildEvent;
 
 /**
  * An authentication scheme that provides automatic authentication
@@ -43,10 +45,9 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
     /**
      * Attempts to automatically login using the auto login cookie
      * 
-     * @see SimpleID\API\AuthHooks::autoAuthHook()
-     * @return SimpleID\Models\User the user object, or NULL
+     * @see SimpleID\Auth\AutoAuthEvent
      */
-    public function autoAuthHook() {
+    public function onAutoAuthEvent(AutoAuthEvent $event) {
         if (!$this->f3->exists('COOKIE.' . $this->cookie_name)) return null;
        
         $cookie = $this->f3->get('COOKIE.' . $this->cookie_name);
@@ -56,7 +57,7 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
 
         if ($data === null) {
             $this->logger->log(LogLevel::NOTICE, 'Automatic login: Invalid token - clearing');
-            $this->logoutHook();
+            $this->removeCookie();
             return null;
         }
     
@@ -66,13 +67,13 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
     
         if ($data['exp'] < time()) {  // Cookie expired
             $this->logger->log(LogLevel::NOTICE, 'Automatic login: Expired - clearing');
-            $this->logoutHook();
+            $this->removeCookie();
             return NULL;
         }
 
         if ($data['uaid'] != $this->auth->assignUAID()) {
             $this->logger->log(LogLevel::WARNING, 'Automatic login: User agent ID does not match - clearing');
-            $this->logoutHook();
+            $this->removeCookie();
             return NULL;
         }
 
@@ -83,30 +84,23 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
         
         if ($test_user != NULL) {
             $this->logger->log(LogLevel::INFO, 'Automatic login token accepted for ' . $data['uid']);
-            
-            return $test_user;
+            $event->setUser($test_user, static::class);
         } else {
             $this->logger->log(LogLevel::WARNING, 'Automatic login token accepted for ' . $data['uid'] . ', but no such user exists');
-            return NULL;
         }
     }
 
     /**
      * Displays the login form, with a remember-me checkbox.
      *
-     * @param SimpleID\Util\Form\FormState $form_state
-     * @return array
+     * @param SimpleID\Util\Form\FormBuildEvent $event
      */
-    public function loginFormHook($form_state) {
+    public function onLoginFormBuild(FormBuildEvent $event) {
+        $form_state = $event->getFormState();
+
         if ($form_state['mode'] == AuthManager::MODE_CREDENTIALS) {
             $tpl = new \Template();
-
-            return [
-                [
-                    'content' => $tpl->render('auth_rememberme.html', false),
-                    'weight' => 10
-                ]
-            ];
+            $event->addBlock('auth_rememberme', $tpl->render('auth_rememberme.html', false), 10);
         }
     }
 
@@ -114,10 +108,11 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
      * Processes the login form by storing the user's remember-me setting
      * in the form state.
      *
-     * @param SimpleID\Util\Form\FormState $form_state
-     * @return bool|array
+     * @param SimpleID\Auth\LoginFormSubmitEvent $event
      */
-    public function loginFormSubmitHook($form_state) {
+    public function onLoginFormSubmit(LoginFormSubmitEvent $event) {
+        $form_state = $event->getFormState();
+
         if ($form_state['mode'] == AuthManager::MODE_CREDENTIALS) {
             if ($this->f3->exists('POST.rememberme') === true) {
                 $form_state['rememberme'] = $this->f3->get('POST.rememberme');
@@ -129,23 +124,27 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
      * Completes the login process by issuing a auto login cookie (if
      * so selected by the user).
      *
-     * @param User $user
-     * @param int $level
-     * @param array $modules
-     * @param SimpleID\Util\Form\FormState $form_state
+     * @see SimpleID\Auth\LoginEvent
      */
-    public function loginHook($user, $level, $modules, $form_state) {
+    public function onLoginEvent(LoginEvent $event) {
+        $level = $event->getAuthLevel();
+        $form_state = $event->getFormState();
+
         if (($level == AuthManager::MODE_CREDENTIALS) && isset($form_state['rememberme']) && ($form_state['rememberme'] == 1)) {
             $this->createCookie();
         }
     }
 
+
+    public function onLogoutEvent(LogoutEvent $event) {
+        $this->removeCookie();
+    }
+
     /**
      * Removes the auto login cookie from the user agent.
      *
-     * @see SimpleID\API\AuthHooks::logoutHook()
      */
-    public function logoutHook($user) {
+    public function removeCookie() {
         if ($this->f3->exists('COOKIE.' . $this->cookie_name)) {
             $cookie = $this->f3->clear('COOKIE.' . $this->cookie_name);
         }
