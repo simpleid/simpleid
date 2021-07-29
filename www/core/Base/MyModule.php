@@ -267,7 +267,7 @@ class MyModule extends Module {
         $blocks[] = [
             'id' => 'welcome',
             'title' => $this->f3->get('intl.core.my.welcome_title'),
-            'content' => $this->f3->get('intl.core.my.logged_in_as', $user->getDisplayName(), $user['uid']),
+            'content' => $this->f3->get('intl.core.my.logged_in_as', [ $user->getDisplayName(), $user['uid'] ]),
             'weight' => -10
         ];
 

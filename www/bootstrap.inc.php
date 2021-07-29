@@ -142,27 +142,27 @@ if ((@ini_get('register_globals') === 1) || (@ini_get('register_globals') === '1
 
 if (!\SimpleID\Crypt\BigNum::loaded()) {
     $f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'gmp/bcmath PHP extension not loaded.');
-    $f3->error(500, $f3->get('intl.bootstrap.extension', 'gmp/bcmath', 'http://simpleid.org/docs/2/system-requirements/'));
+    $f3->error(500, $f3->get('intl.bootstrap.extension', [ 'gmp/bcmath', 'http://simpleid.org/docs/2/system-requirements/' ]));
 }
 if (!function_exists('preg_match')) {
     $f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'pcre PHP extension not loaded.');
-    $f3->error(500, $f3->get('intl.bootstrap.extension', 'pcre', 'http://simpleid.org/docs/2/system-requirements/'));
+    $f3->error(500, $f3->get('intl.bootstrap.extension', [ 'pcre', 'http://simpleid.org/docs/2/system-requirements/' ]));
 }
 if (!function_exists('session_start')) {
     $f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'session PHP extension not loaded.');
-    $f3->error(500, $f3->get('intl.bootstrap.extension', 'session', 'http://simpleid.org/docs/2/system-requirements/'));
+    $f3->error(500, $f3->get('intl.bootstrap.extension', [ 'session', 'http://simpleid.org/docs/2/system-requirements/' ]));
 }
 if (!function_exists('xml_parser_create_ns')) {
     $f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'xml PHP extension not loaded.');
-    $f3->error(500, $f3->get('intl.bootstrap.extension', 'xml', 'http://simpleid.org/docs/2/system-requirements/'));
+    $f3->error(500, $f3->get('intl.bootstrap.extension', [ 'xml', 'http://simpleid.org/docs/2/system-requirements/' ]));
 }
 if (!function_exists('hash')) {
     $f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'hash PHP extension not loaded.');
-    $f3->error(500, $f3->get('intl.bootstrap.extension', 'hash', 'http://simpleid.org/docs/2/system-requirements/'));
+    $f3->error(500, $f3->get('intl.bootstrap.extension', [ 'hash', 'http://simpleid.org/docs/2/system-requirements/' ]));
 }
 if (!function_exists('openssl_sign')) {
     $f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'openssl PHP extension not loaded.');
-    $f3->error(500, $f3->get('intl.bootstrap.extension', 'openssl', 'http://simpleid.org/docs/2/system-requirements/'));
+    $f3->error(500, $f3->get('intl.bootstrap.extension', [ 'openssl', 'http://simpleid.org/docs/2/system-requirements/' ]));
 }
 if (is_numeric(@ini_get('suhosin.get.max_value_length')) && (@ini_get('suhosin.get.max_value_length') < 1024)) {
     $f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'suhosin.get.max_value_length < 1024');
