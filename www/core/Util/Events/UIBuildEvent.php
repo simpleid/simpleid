@@ -93,8 +93,8 @@ class UIBuildEvent implements \GenericEventInterface {
      * @return array
      */
     public function getBlocks() {
-        uasort($this->results, function($a, $b) { if ($a['#weight'] == $b['#weight']) { return 0; } return ($a['#weight'] < $b['#weight']) ? -1 : 1; });
-        return array_map(function($a) { return $a['#data']; }, $this->results);
+        uasort($this->blocks, function($a, $b) { if ($a['#weight'] == $b['#weight']) { return 0; } return ($a['#weight'] < $b['#weight']) ? -1 : 1; });
+        return array_map(function($a) { return $a['#data']; }, $this->blocks);
     }
 
     /**
@@ -122,7 +122,7 @@ class UIBuildEvent implements \GenericEventInterface {
      * @return array
      */
     public function getAttachmentsByType($attachment_type) {
-        if (!isset($this->attachments[$attachment_type])) return []
+        if (!isset($this->attachments[$attachment_type])) return [];
         return array_unique($this->attachments[$attachment_type]);
     }
 }
