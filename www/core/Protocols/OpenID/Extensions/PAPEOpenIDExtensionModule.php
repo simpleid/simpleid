@@ -25,11 +25,14 @@ namespace SimpleID\Protocols\OpenID\Extensions;
 use SimpleID\Auth\AuthManager;
 use SimpleID\Module;
 use SimpleID\Protocols\ProtocolResult;
+use SimpleID\Protocols\OpenID\OpenIDCheckEvent;
 use SimpleID\Protocols\OpenID\OpenIDModule;
 use SimpleID\Protocols\OpenID\Message;
 use SimpleID\Protocols\OpenID\Request;
+use SimpleID\Protocols\OpenID\OpenIDResponseBuildEvent;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\OpaqueIdentifier;
+use SimpleID\Util\Events\BaseDataCollectionEvent;
 
 /**
  * Implements the Provider Authentication Policy Extension
@@ -48,20 +51,21 @@ class PAPEOpenIDExtensionModule extends Module implements ProtocolResult {
     /**
      * Returns the support for PAPE in SimpleID XRDS document
      *
-     * @return array
-     * @see hook_xrds_types()
+     * @param SimpleID\Util\Event\BaseDataCollectionEvent $event
      */
-    public function xrdsTypesHook() {
-        return [
+    public function onXrdsTypes(BaseDataCollectionEvent $event) {
+        $event->addResult([
             self::OPENID_NS_PAPE,
             self::PAPE_LEVEL_NIST800_63
-        ];
+        ]);
     }
 
     /**
-     * @see hook_checkid_identity()
+     * @see SimpleID\Protocols\OpenID\OpenIDCheckEvent
      */
-    public function openIDCheckIdentityHook($request, $identity, $immediate) {
+    public function onOpenIDCheckEvent(OpenIDCheckEvent $event) {
+        $request = $event->getRequest();
+
         // We only respond if the extension is requested
         if (!$request->hasExtension(self::OPENID_NS_PAPE)) return null;
         
@@ -95,15 +99,18 @@ class PAPEOpenIDExtensionModule extends Module implements ProtocolResult {
     }
 
     /**
-     * @see hook_response()
+     * @see SimpleID\Protocols\OpenID\OpenIDResponseBuildEvent
      */
-    public function openIDResponseHook($assertion, $request, $response) {
+    public function onOpenIDResponseBuildEvent(OpenIDResponseBuildEvent $event) {
         $auth = AuthManager::instance();
         
         // We only deal with positive assertions
-        if (!$assertion) return [];
+        if (!$event->isPositiveAssertion()) return [];
         
         // We only respond if we are using OpenID 2 or later
+        $request = $event->getRequest();
+        $response = $event->getResponse();
+        
         if ($request->getVersion() < Message::OPENID_VERSION_2) return [];
         
         // Get what is requested
