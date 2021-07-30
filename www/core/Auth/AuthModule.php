@@ -172,7 +172,7 @@ class AuthModule extends Module {
 
         if ($mode == AuthManager::MODE_CREDENTIALS) {
             $form_state['mode'] = AuthManager::MODE_VERIFY;
-            $event = new FormBuildEvent('login_form_build', $form_state);
+            $event = new FormBuildEvent($form_state, 'login_form_build');
 
             $dispatcher->dispatch($event);
             if (count($event->getBlocks()) > 0) {
@@ -255,7 +255,7 @@ class AuthModule extends Module {
             $forms = $form_state['verify_forms'];
             unset($form_state['verify_forms']);
         } else {
-            $event = new FormBuildEvent('login_form_build', $form_state);
+            $event = new FormBuildEvent($form_state, 'login_form_build');
             \Events::instance()->dispatch($event);
             $forms = $event->getBlocks();
         }
