@@ -75,6 +75,7 @@ class DefaultLogger extends Log implements LoggerInterface {
      */
     function write($text, $format = 'r') {
         $this->log(LogLevel::INFO, $text);
+        return;
     }
 
     /**

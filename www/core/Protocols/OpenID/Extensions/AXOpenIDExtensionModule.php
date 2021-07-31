@@ -25,6 +25,11 @@ namespace SimpleID\Protocols\OpenID\Extensions;
 
 use SimpleID\Module;
 use SimpleID\Auth\AuthManager;
+use SimpleID\Protocols\OpenID\OpenIDResponseBuildEvent;
+use SimpleID\Util\Events\BaseDataCollectionEvent;
+use SimpleID\Util\Events\UIBuildEvent;
+use SimpleID\Util\Forms\FormBuildEvent;
+use SimpleID\Util\Forms\FormSubmitEvent;
 
 /**
  * Implements the Attribute Exchange extension.
@@ -48,21 +53,23 @@ class AXOpenIDExtensionModule extends Module {
     /**
      * Returns the support for AX in SimpleID XRDS document
      *
-     * @return array
-     * @see hook_xrds_types()
+     * @param SimpleID\Util\Event\BaseDataCollectionEvent $event
      */
-    function xrdsTypesHook() {
-        return [ self::OPENID_NS_AX ];
+    function onXrdsTypes(BaseDataCollectionEvent $event) {
+        $event->addResult(self::OPENID_NS_AX);
     }
 
     /**
-     * @see hook_response()
+     * @see SimpleID\Protocols\OpenID\OpenIDResponseBuildEvent
      */
-    public function openIDResponseHook($assertion, $request, $response) {
+    public function onOpenIDResponseBuildEvent(OpenIDResponseBuildEvent $event) {
         // We only deal with positive assertions
-        if (!$assertion) return;
+        if (!$event->isPositiveAssertion()) return;
         
         // We only respond if the extension is requested
+        $request = $event->getRequest();
+        $response = $event->getResponse();
+        
         if (!$request->hasExtension(self::OPENID_NS_AX)) return;
         
         $user = $this->auth->getUser();
@@ -108,9 +115,10 @@ class AXOpenIDExtensionModule extends Module {
     }
 
     /**
-     * @see hook_consent_form()
+     * @see SimpleID\Util\Forms\FormBuildEvent
      */
-    public function openIDConsentFormHook($form_state) {
+    function onOpenidConsentFormBuild(FormBuildEvent $event) {
+        $form_state = $event->getFormState();
         $request = $form_state->getRequest();
         $prefs = $form_state['prefs'];
         
@@ -163,12 +171,7 @@ class AXOpenIDExtensionModule extends Module {
                 $i++;
             }
 
-            return [
-                [
-                    'content' => $tpl->render('openid_userinfo_consent.html', false, $hive),
-                    'weight' => 0
-                ]
-            ];
+            $event->addBlock('openid_consent_ax', $tpl->render('openid_userinfo_consent.html', false, $hive), 0);
         } elseif ($mode == 'store_request') {
             // Sadly, we don't support storage at this stage
             $this->f3->set('message', $this->f3->get('intl.core.openid.ax.unsupported_feature'));
@@ -176,9 +179,10 @@ class AXOpenIDExtensionModule extends Module {
     }
 
     /**
-     * @see hook_consent()
+     * @see SimpleID\Util\Forms\FormSubmitEvent
      */
-    function openIDConsentFormSubmitHook($form_state) {
+    function onOpenidConsentFormSubmit(FormSubmitEvent $event) {
+        $form_state = $event->getFormState();
         $response = $form_state->getResponse();
         $prefs =& $form_state->pathRef('prefs');
 
@@ -220,10 +224,7 @@ class AXOpenIDExtensionModule extends Module {
         $prefs['consents']['sreg'] = $form;
     }
 
-    /**
-     * @see hook_page_profile()
-     */
-    public function profileBlocksHook() {
+    public function onProfileBlocks(UIBuildEvent $event) {
         $user = $this->auth->getUser();
 
         if (!isset($user['ax'])) return;
@@ -236,11 +237,9 @@ class AXOpenIDExtensionModule extends Module {
             'info' => $user['ax']
         ];
         
-        return [ [
-            'id' => 'ax',
-            'title' => $this->f3->get('intl.core.openid.ax.ax_title'),
-            'content' => $tpl->render('openid_userinfo_profile.html', false, $hive),
-        ] ];
+        $event->addBlock('ax', $tpl->render('openid_userinfo_profile.html', false, $hive), 0, [
+            'title' => $this->f3->get('intl.core.openid.ax.ax_title')
+        ]);
     }
 
     /**
@@ -284,6 +283,7 @@ class AXOpenIDExtensionModule extends Module {
                     break;
             }
         }
+        return null;
     }
 }
 

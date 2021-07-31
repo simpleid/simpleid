@@ -24,15 +24,21 @@ namespace SimpleID\Protocols\Connect;
 
 use Fernet\Fernet;
 use Psr\Log\LogLevel;
-use SimpleID\Auth\AuthManager;
 use SimpleID\ModuleManager;
+use SimpleID\Auth\AuthManager;
+use SimpleID\Base\ScopeInfoCollectionEvent;
 use SimpleID\Protocols\HTTPResponse;
 use SimpleID\Protocols\ProtocolResult;
 use SimpleID\Protocols\OAuth\OAuthModule;
+use SimpleID\Protocols\OAuth\OAuthEvent;
 use SimpleID\Protocols\OAuth\OAuthProtectedResource;
 use SimpleID\Protocols\OAuth\OAuthDynamicClient;
+use SimpleID\Protocols\OAuth\OAuthAuthRequestEvent;
+use SimpleID\Protocols\OAuth\OAuthAuthGrantEvent;
+use SimpleID\Protocols\OAuth\OAuthTokenGrantEvent;
 use SimpleID\Protocols\OAuth\Response;
 use SimpleID\Store\StoreManager;
+use SimpleID\Util\Events\BaseDataCollectionEvent;
 use SimpleJWT\Util\Helper;
 use SimpleJWT\JWT;
 use SimpleJWT\InvalidTokenException;
@@ -45,15 +51,12 @@ use \Web;
  * Module for authenticating with OpenID Connect.
  */
 class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
-
-    static private $scope_settings = NULL;
-
     /**
      * @see SimpleID\Protocols\OAuth\OAuthProtectedResource::$oauth_include_request_body
      */
     protected $oauth_include_request_body = true;
 
-    static function routes($f3) {
+    static function init($f3) {
         $f3->route('GET /.well-known/openid-configuration', 'SimpleID\Protocols\Connect\ConnectModule->openid_configuration');
         $f3->route('GET|POST @connect_userinfo: /connect/userinfo', 'SimpleID\Protocols\Connect\ConnectModule->userinfo');
         $f3->route('GET @connect_jwks: /connect/jwks', 'SimpleID\Protocols\Connect\ConnectModule->jwks');
@@ -87,11 +90,12 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
      * Resolves an OpenID Connect authorisation request by decoding any
      * `request` and `request_uri` parameters.
      *
-     * @see SimpleID\API\OAuthHooks::oAuthResolveAuthRequestHook()
      */
-    public function oAuthResolveAuthRequestHook($request, $response) {
+    public function onOauthAuthResolve(OAuthEvent $event) {
         $store = StoreManager::instance();
         $web = Web::instance();
+        $request = $event->getRequest();
+        $response = $event->getResponse();
 
         // 1. Check if request_uri parameter is present.  If so, fetch the JWT
         // from this URL and place it in the request parameter
@@ -158,9 +162,10 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
      * protocol, including processing the `prompt`, `max_age` and
      * `acr` paramters.
      *
-     * @see SimpleID\API\OAuthHooks::oAuthProcessAuthRequestHook()
+     * @see SimpleID\Protocols\OAuth\OAuthProcessAuthRequestEvent
      */
-    function oAuthProcessAuthRequestHook($request, $response) {
+    function onOAuthAuthRequestEvent(OAuthAuthRequestEvent $event) {
+        $request = $event->getRequest();
         $store = StoreManager::instance();
         $auth = AuthManager::instance();
 
@@ -172,12 +177,14 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
         if ($request->paramContains('prompt', 'login')) {
             $this->f3->set('message', $this->f3->get('intl.common.reenter_credentials'));
             $request->paramRemove('prompt', 'login');
-            return self::CHECKID_REENTER_CREDENTIALS;
+            $event->setResult(self::CHECKID_REENTER_CREDENTIALS);
+            return;
         }
 
         if ($request->paramContains('prompt', 'consent')) {
             $request->paramRemove('prompt', 'consent');
-            return self::CHECKID_APPROVAL_REQUIRED;
+            $event->setResult(self::CHECKID_APPROVAL_REQUIRED);
+            return;
         }
 
         // Check 2: If id_token_hint is provided, check that it refers to the current logged-in user
@@ -191,7 +198,8 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
             }
             if (!$user_match) {
                 $auth->logout();
-                return self::CHECKID_LOGIN_REQUIRED;
+                $event->setResult(self::CHECKID_LOGIN_REQUIRED);
+                return;
             }
         }
         
@@ -217,7 +225,8 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
             if (($auth_level < AuthManager::AUTH_LEVEL_CREDENTIALS) 
                 || ((time() - $auth->getAuthTime()) > $max_age)) {
                 $this->f3->set('message', $this->f3->get('intl.common.reenter_credentials'));
-                return self::CHECKID_REENTER_CREDENTIALS;
+                $event->setResult(self::CHECKID_REENTER_CREDENTIALS);
+                return;
             }
         }
 
@@ -230,10 +239,9 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
         }
 
         if ($acr > -1) {
-            return self::CHECKID_INSUFFICIENT_TRUST;
+            $event->setResult(self::CHECKID_INSUFFICIENT_TRUST);
+            return;
         }
-
-        return null;
     }
 
 
@@ -253,15 +261,19 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
      *   response; and/or
      * - save the claims to be returned as part of the token response.
      * 
-     * @see SimpleID\API\OAuthHooks::oAuthGrantAuthHook()
+     * @see SimpleID\Protocols\OAuth\OAuthAuthGrantEvent
      */
-    function oAuthGrantAuthHook($authorization, $request, $response, $scopes) {
+    function onOAuthAuthGrantEvent(OAuthAuthGrantEvent $event) {
         // code: ?code / id_token
         // id_token: #id_token
         // id_token token: #access_token #id_token
         // code id_token: #code #id_token[c_hash] / id_token
         // code token: #code #access_token / id_token
         // code id_token token: #code #access_token #id_token[c_hash, at_hash] / id_token
+        $request = $event->getRequest();
+        $response = $event->getResponse();
+        $authorization = $event->getAuthorization();
+        $scopes = $event->getRequestedScope();
 
         if ($request->paramContains('scope', 'openid')) {
             $user = AuthManager::instance()->getUser();
@@ -311,10 +323,13 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
      * response may contain an ID token containing the claims that the
      * OpenID Connect client requested earlier.
      * 
-     * @see SimpleID\API\OAuthHooks::oAuthTokenHook()
+     * @see SimpleID\Protocols\OAuth\OAuthTokenGrantEvent
      */
-    function oAuthTokenHook($grant_type, $auth, $request, $response, $scopes) {
-        if (($grant_type == 'authorization_code') && isset($auth->additional['id_token_claims'])) {
+    function onOAuthTokenGrantEvent(OAuthTokenGrantEvent $event) {
+        $auth = $event->getAuthorization();
+        $response = $event->getResponse();
+
+        if (($event->getGrantType() == 'authorization_code') && isset($auth->additional['id_token_claims'])) {
             $client = $this->oauth->getClient();
             $claims = $auth->additional['id_token_claims'];
             $access_token = $response['access_token'];
@@ -328,9 +343,8 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
         }
     }
 
-    /** @see SimpleID\API\OAuthHooks::oAuthResponseTypesHook() */
-    public function oAuthResponseTypesHook() {
-        return [ 'id_token' ];
+    public function onOauthResponseTypes(BaseDataCollectionEvent $event) {
+        $event->addResult('id_token');
     }
 
     /**
@@ -374,10 +388,13 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
     private function buildClaims($user, $client, $context, $scopes, $claims_requested = NULL) {
         $auth = AuthManager::instance();
         $mgr = ModuleManager::instance();
-        $scope_settings = $mgr->invokeAll('scopes');
+        $dispatcher = \Events::instance();
+
+        $scope_info_event = new ScopeInfoCollectionEvent();
+        $dispatcher->dispatch($scope_info_event);
+        $scope_info = $scope_info_event->getScopeInfoForType('oauth');
 
         $claims = [];
-
         $claims['sub'] = self::getSubject($user, $client);
 
         if ($claims_requested != null) {
@@ -391,7 +408,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
                         break;
                     default:
                         $consent_scope = null;
-                        foreach (array_keys($scope_settings['oauth']) as $scope => $settings) {
+                        foreach (array_keys($scope_info) as $scope => $settings) {
                             if (!isset($settings['claims'])) continue;
                             if (in_array($claim, $settings['claims'])) $consent_scope = $scope;
                         }
@@ -408,8 +425,8 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
         } else {
             foreach ([ 'profile', 'email', 'address', 'phone' ] as $scope) {
                 if (in_array($scope, $scopes)) {
-                    if (isset($scope_settings['oauth'][$scope]['claims'])) {
-                        foreach ($scope_settings['oauth'][$scope]['claims'] as $claim) {
+                    if (isset($scope_info[$scope]['claims'])) {
+                        foreach ($scope_info[$scope]['claims'] as $claim) {
                             if (isset($user['userinfo'][$claim])) $claims[$claim] = $user['userinfo'][$claim];
                             if ($claim == 'email') $claims['email_verified'] = false;
                             if ($claim == 'phone_number') $claims['phone_number_verified'] = false;
@@ -427,9 +444,11 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
             $claims['acr'] = $auth->getACR();
         }
 
-        $hook_claims = $mgr->invokeAll('connectBuildClaims', $user, $client, $context, $scopes, $claims_requested);
+        $build_claims_event = new ConnectBuildClaimsEvent($user, $client, $context, $scopes, $claims_requested);
+        $build_claims_event->addResult($claims);
+        $dispatcher->dispatch($build_claims_event);
 
-        return array_merge($claims, $hook_claims);
+        return $build_claims_event->getResults();
     }
 
     /**
@@ -475,36 +494,31 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
     /**
      * Returns the OpenID Connect scopes supported by this server.
      *
-     * @see SimpleID\API\OAuthHooks::scopesHook()
+     * @see SimpleID\Base\ScopeInfoCollectionEvent
      */
-    public function scopesHook() {
-        if (self::$scope_settings == NULL) {
-            self::$scope_settings = [
-                'oauth' => [
-                    'openid' => [
-                        'description' => $this->f3->get('intl.common.scope.id'),
-                        'weight' => -1
-                    ],
-                    'profile' => [
-                        'description' => $this->f3->get('intl.common.scope.profile'),
-                        'claims' => ['name', 'family_name', 'given_name', 'middle_name', 'nickname', 'preferred_username', 'profile', 'picture', 'website', 'gender', 'birthdate', 'zoneinfo', 'locale' ]
-                    ],
-                    'email' => [
-                        'description' => $this->f3->get('intl.common.scope.email'),
-                        'claims' => [ 'email' ]
-                    ],
-                    'address' => [
-                        'description' => $this->f3->get('intl.common.scope.address'),
-                        'claims' => [ 'address' ]
-                    ],
-                    'phone' => [
-                        'description' => $this->f3->get('intl.common.scope.phone'),
-                        'claims' => [ 'phone_number' ]
-                    ]
-                ]
-            ];
-        }
-        return self::$scope_settings;
+    public function scopesHook(ScopeInfoCollectionEvent $event) {
+        $event->addScopeInfo('oauth', [
+            'openid' => [
+                'description' => $this->f3->get('intl.common.scope.id'),
+                'weight' => -1
+            ],
+            'profile' => [
+                'description' => $this->f3->get('intl.common.scope.profile'),
+                'claims' => ['name', 'family_name', 'given_name', 'middle_name', 'nickname', 'preferred_username', 'profile', 'picture', 'website', 'gender', 'birthdate', 'zoneinfo', 'locale' ]
+            ],
+            'email' => [
+                'description' => $this->f3->get('intl.common.scope.email'),
+                'claims' => [ 'email' ]
+            ],
+            'address' => [
+                'description' => $this->f3->get('intl.common.scope.address'),
+                'claims' => [ 'address' ]
+            ],
+            'phone' => [
+                'description' => $this->f3->get('intl.common.scope.phone'),
+                'claims' => [ 'phone_number' ]
+            ]
+        ]);
     }
 
 
@@ -514,11 +528,14 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
      */
     public function openid_configuration() {
         $mgr = ModuleManager::instance();
+        $dispatcher = \Events::instance();
 
         header('Content-Type: application/json');
         header('Content-Disposition: inline; filename=openid-configuration');
 
-        $scopes = $mgr->invokeAll('scopes');
+        $scope_info_event = new ScopeInfoCollectionEvent();
+        $dispatcher->dispatch($scope_info_event);
+        $scopes = $scope_info_event->getScopesForType('oauth');
 
         $jwt_signing_algs = AlgorithmFactory::getSupportedAlgs(Algorithm::SIGNATURE_ALGORITHM);
         $jwt_encryption_algs = AlgorithmFactory::getSupportedAlgs(Algorithm::KEY_ALGORITHM);
@@ -539,7 +556,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
             'token_endpoint' => $this->getCanonicalURL('@oauth_token', '', 'https'),
             'userinfo_endpoint' => $this->getCanonicalURL('@connect_userinfo', '', 'https'),
             'jwks_uri' => $this->getCanonicalURL('@connect_jwks', '', 'https'),
-            'scopes_supported' => array_keys($scopes['oauth']),
+            'scopes_supported' => $scopes,
             'response_types_supported' => [ 'code', 'token', 'id_token', 'id_token token', 'code token', 'code id_token', 'code id_token token' ],
             'response_modes_supported' => Response::getResponseModesSupported(),
             'grant_types_supported' => [ 'authorization_code', 'refresh_token' ],
@@ -563,9 +580,11 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
             'require_request_uri_registration' => false,
             'service_documentation' => 'http://simpleid.org/docs/'
         ];
-        
-        $config = array_merge($config, $mgr->invokeAll('connectConfiguration'));
-        print json_encode($config);
+
+        $config_event = new BaseDataCollectionEvent('connect_configuration');
+        $config_event->addResult($config);
+        $dispatcher->dispatch($config_event);
+        print json_encode($config_event->getResults());
     }
 
 

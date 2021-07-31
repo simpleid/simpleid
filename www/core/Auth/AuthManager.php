@@ -31,6 +31,7 @@ use SimpleID\ModuleManager;
 use SimpleID\Store\StoreManager;
 use SimpleID\Crypt\Random;
 use SimpleID\Util\OpaqueIdentifier;
+use SimpleID\Util\Events\BaseDataCollectionEvent;
 use SimpleID\Util\Forms\FormState;
 
 /**
@@ -131,14 +132,12 @@ class AuthManager extends Prefab {
             $user = $store->loadUser($this->auth_info['uid']);
             $this->f3->set('user', $user);
         } elseif ($auto_auth) {
-            $modules = $this->mgr->getModules();
+            $event = new AutoAuthEvent();
+            \Events::instance()->dispatch($event);
 
-            foreach ($modules as $module) {
-                $test_user = $this->mgr->invoke($module, 'autoAuth');
-                if ($test_user != NULL) {
-                    $this->login($test_user, self::AUTH_LEVEL_AUTO, [ $module ]);
-                    return;
-                }
+            if ($event->isAuthSuccessful()) {
+                $this->login($event);
+                return;
             }
         }
     }
@@ -185,15 +184,21 @@ class AuthManager extends Prefab {
      * Returns the authentication context class references in relation
      * to the current authentication session.
      *
+     * @todo Move to part of the login event
      * @return string the ACR
      */
     public function getACR() {
         $default_acr = $this->f3->get('config.acr');
 
         if (isset($this->auth_info['modules'])) {
+            $event = new BaseDataCollectionEvent('acr');
+
             foreach ($this->auth_info['modules'] as $module) {
-                $module_acr = $this->mgr->invoke($module, 'acr');
+                if (method_exists($module, 'onAcr')) {
+                    $module->onAcr($event);
+                }
             }
+            $module_acr = implode(' ', $event->getResults());
         }
 
         return ($module_acr) ? $module_acr : $default_acr;
@@ -209,11 +214,13 @@ class AuthManager extends Prefab {
      * authenticate the user in this session
      * @param SimpleID\Util\Forms\FormState $form_state
      */
-    public function login($user, $level, $modules = [], $form_state = null) {
+    public function login(AuthResultInterface $result, $form_state = null) {
         if ($form_state == null) $form_state = new FormState();
 
         $store = StoreManager::instance();
-        if (is_string($user)) $user = $store->loadUser($user);
+        $user = $result->getUser();
+        $level = $result->getAuthLevel();
+        $modules = $result->getAuthModuleNames();
 
         $this->f3->set('user', $user);
 
@@ -247,7 +254,8 @@ class AuthManager extends Prefab {
             $this->logger->log(LogLevel::INFO, 'Login successful: ' . $user['uid']);
         }
 
-        $this->mgr->invokeAll('login', $user, $level, $modules, $form_state);
+        $event = new LoginEvent($result, $form_state);
+        \Events::instance()->dispatch($event);
     }
 
     /**
@@ -255,8 +263,9 @@ class AuthManager extends Prefab {
      */
     public function logout() {
         $user = $this->getUser();
-    
-        $this->mgr->invokeAll('logout', $user);
+
+        $event = new LogoutEvent($user);
+        \Events::instance()->dispatch($event);
 
         $this->cache->clear(rawurlencode($user['uid']) . '.login');
         $this->f3->clear('user');

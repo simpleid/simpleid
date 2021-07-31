@@ -81,11 +81,13 @@ class OAuthManager extends Prefab {
             
             $this->client_auth_method = $client_auth_method;
         } else {
-            $results = $this->mgr->invokeAll('oAuthInitClient', $request);
-            $results = array_merge(array_diff($results, [ NULL ]));
-            if (count($results) == 1) {
-                $client = $results[0]['#client'];
-                $this->client_auth_method = $results[0]['#client_auth_method'];
+            $event = new OAuthInitClientEvent($request);
+            \Events::instance()->dispatch($event);
+
+            if ($event->hasClient()) {
+                $client = $event->getClient();
+                $client_id = $client->getStoreID();
+                $this->client_auth_method = $event->getAuthMethod();
             }
         }
         $this->f3->set('oauth_client', $client);
@@ -124,7 +126,7 @@ class OAuthManager extends Prefab {
                 $auth_method_map = [
                     'client_secret_basic' => 'Basic'
                 ];
-                $http_auth_method = $auth_method_map[$auth_method];
+                $http_auth_method = $auth_method_map[$this->client_auth_method];
                 $this->f3->status(401);
                 header('WWW-Authenticate: ' . $http_auth_method . ' realm="'. $this->f3->get('REALM') . '"');
             }
@@ -170,9 +172,11 @@ class OAuthManager extends Prefab {
         }
 
         // Try other token types
-        $results = $this->mgr->invokeAll('oAuthInitAccessToken');
-        $results = array_merge(array_diff($results, [ NULL ]));
-        if (count($results) == 1) $this->access_token = $results[0];
+        $event = new OAuthInitTokenEvent();
+        \Events::instance()->dispatch($event);
+        if ($event->hasToken()) {
+            $this->access_token = $event->getToken();
+        }
     }
 
     /**

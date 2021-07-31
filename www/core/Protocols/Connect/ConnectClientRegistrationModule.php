@@ -31,6 +31,7 @@ use SimpleID\Protocols\OAuth\OAuthProtectedResource;
 use SimpleID\Protocols\OAuth\Response;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\RateLimiter;
+use SimpleID\Util\Events\BaseDataCollectionEvent;
 
 /**
  * Module implementing the OpenID Connect Dynamic Client Registration
@@ -45,7 +46,7 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
 
     static protected $metadata_map = NULL;
 
-    static function routes($f3) {
+    static function init($f3) {
         $f3->route('POST @connect_client_register: /connect/client', 'SimpleID\Protocols\Connect\ConnectClientRegistrationModule->register');
         $f3->map('/connect/client/@client_id', 'SimpleID\Protocols\Connect\ConnectClientRegistrationModule');
     }
@@ -175,7 +176,7 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
         foreach ($request as $name => $value) {
             $parts = explode('#', $name, 2);
             $client_path = (isset(self::$metadata_map[$parts[0]])) ? self::$metadata_map[$parts[0]] : 'connect.' . $parts[0];
-            if (isset($parts[1])) $client_path .= '#' . $locale;
+            if (isset($parts[1])) $client_path .= '#' . $parts[1];
             $client->pathSet($client_path, $value);
         }
 
@@ -215,7 +216,7 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
         $this->checkHttps('error');
         $client_id = $this->f3->get('PARAMS.client_id');
 
-        if (!$this->isAuthorized(self::CLIENT_REGISTRATION_ACCESS_SCOPE)
+        if (!$this->isTokenAuthorized(self::CLIENT_REGISTRATION_ACCESS_SCOPE)
             || ($this->getAccessToken()->getAuthorization()->getClient()->getStoreID() != $client_id)) {
             $this->unauthorizedError('invalid_token');
             return;
@@ -236,10 +237,10 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
     }
 
     /**
-     * @see SimpleID\API\ConnectHooks::connectConfigurationHook()
+     * 
      */
-    public function connectConfigurationHook() {
-        return [ 'registration_endpoint' => $this->getCanonicalURL('@connect_client_register') ];
+    public function onConnectConfiguration(BaseDataCollectionEvent $event) {
+        $event->addResult([ 'registration_endpoint' => $this->getCanonicalURL('@connect_client_register') ]);
     }
 
     /**

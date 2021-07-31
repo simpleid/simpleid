@@ -23,6 +23,7 @@ namespace SimpleID\Protocols;
 
 use \Template;
 use \Base;
+use SimpleID\Util\ArrayWrapper;
 
 /**
  * A class representing a response to be rendered using an HTML

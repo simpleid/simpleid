@@ -28,6 +28,7 @@ use SimpleID\ModuleManager;
 use SimpleID\Store\Storable;
 use SimpleID\Util\ArrayWrapper;
 use SimpleID\Util\OpaqueIdentifier;
+use SimpleID\Util\Events\BaseDataCollectionEvent;
 use SimpleID\Base\UserModule;
 
 /**
@@ -181,9 +182,9 @@ class User extends ArrayWrapper implements Serializable, Storable {
 
 
     private function toSecureArray($hidden_value = null) {
-        $mgr = ModuleManager::instance();
+        $event = new BaseDataCollectionEvent('user_secret_data_paths');
         $copy = new ArrayWrapper($this->container);
-        $secret_paths = $mgr->invokeAll('secretUserDataPaths');
+        $secret_paths = \Events::instance()->dispatch($event)->getResults();
         if ($secret_paths == null) $secret_paths = [];
         $secret_paths[] = 'uid';
         foreach ($secret_paths as $path) {

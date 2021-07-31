@@ -31,9 +31,10 @@ foreach ($config['required_modules'] as $module) $mgr->loadModule($module);
 foreach ($config['modules'] as $module) $mgr->loadModule($module);
 
 $store->checkStores();
-$mgr->initRoutes();
+$mgr->initModules();
 
-$mgr->invokeAll('init');
+$event = new SimpleID\Util\Events\BaseStoppableEvent('post_init');
+\Events::instance()->dispatch($event);
 
 $f3->run();
 ?>

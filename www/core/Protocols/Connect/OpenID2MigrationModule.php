@@ -23,9 +23,10 @@
 namespace SimpleID\Protocols\Connect;
 
 use Psr\Log\LogLevel;
-use SimpleID\Auth\AuthManager;
 use SimpleID\Module;
 use SimpleID\ModuleManager;
+use SimpleID\Auth\AuthManager;
+use SimpleID\Base\ScopeInfoCollectionEvent;
 use SimpleID\Store\StoreManager;
 
 /**
@@ -35,8 +36,6 @@ use SimpleID\Store\StoreManager;
  * @link http://openid.net/specs/openid-connect-migration-1_0.html
  */
 class OpenID2MigrationModule extends Module {
-
-    static private $scope_settings = NULL;
 
     public function __construct() {
         parent::__construct();
@@ -63,36 +62,35 @@ class OpenID2MigrationModule extends Module {
         } else {
             $this->f3->status(404);
             
-            $this->fatalError($this->f3->get('intl.common.user_not_found', $uid));
+            $this->fatalError($this->f3->get('intl.common.user_not_found', $user['uid']));
         }
     }
 
     /**
-     * @see SimpleID\API\ConnectHooks::connectBuildClaimsHook()
+     * @see SimpleID\Protocols\Connect\ConnectBuildClaimsEvent
      */
-    public function connectBuildClaimsHook($user, $client, $context, $scopes, $claims_requested = NULL) {
+    public function onConnectBuildClaimsEvent(ConnectBuildClaimsEvent $event) {
+        $context = $event->getContext();
+        $scope = $event->getScope();
+        $user = $event->getUser();
+
         if (($context == 'id_token') && in_array('openid2', $scope)) {            
             if (isset($user['openid']['identity'])) {
-                return [ 'openid2_id' => $user['openid']['identity'] ];
+                $event->addResult([ 'openid2_id' => $user['openid']['identity'] ]);
             }
         }
     }
 
     /**
-     * @see SimpleID\API\OAuthHooks::scopesHook()
+     * @see SimpleID\Base\ScopeInfoCollectionEvent
      */
-    public function scopesHook() {
-        if (self::$scope_settings == NULL) {
-            self::$scope_settings = [
-                'oauth' => [
-                    'openid2' => [
-                        'description' => '',
-                        'weight' => -1
-                    ]
-                ]
-            ];
-        }
-        return self::$scope_settings;
+    public function onScopeInfoCollectionEvent(ScopeInfoCollectionEvent $event) {
+        $event->addScopeInfo('oauth', [
+            'openid2' => [
+                'description' => '',
+                'weight' => -1
+            ]
+        ]);
     }
 }
 ?>

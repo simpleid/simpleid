@@ -136,6 +136,7 @@ class StoreManager extends Prefab {
         $store = $this->getStore($type . ':read');
         $id = $store->find($type, $criteria, $value);
         if ($id != null) return $this->load($type, $id);
+        return null;
     }
 
     /**

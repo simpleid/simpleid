@@ -53,15 +53,18 @@ abstract class Module extends \Prefab {
     private $domain;
 
     /**
-     * Initialises URL routes to this module using the FatFree framework.
-     *
-     * This static method is called during initialisation to build a list of
-     * URLs that all the modules provide.  Subclasses should call `$f3->route()`
-     * or `$f3->map()` to provide URL routes to the module.
+     * Initialises the module.
+     * 
+     * This static method is called during initialisation.  Subclasses can
+     * use this to, among other things:
+     * 
+     * - register URL routes with the Fat-Free Framework using `$f3->route()`
+     *   or `$f3->map()`
+     * - register events
      *
      * @param \Base $f3 the FatFree framework
      */
-    public static function routes($f3) {
+    public static function init($f3) {
 
     }
 

@@ -58,7 +58,7 @@ class KeySetBuilder {
      * @return KeySetBuilder
      */
     function addClientSecret() {
-        $this->set->add(new SymmetricKey($client['oauth']['client_secret'], 'bin'));
+        $this->set->add(new SymmetricKey($this->client['oauth']['client_secret'], 'bin'));
         return $this;
     }
 
@@ -69,13 +69,13 @@ class KeySetBuilder {
      * @return KeySetBuilder
      */
     function addClientPublicKeys() {
-        if (!isset($client['oauth']['jwks']) && isset($client['oauth']['jwks_uri']) && is_subclass_of($client, 'SimpleID\Protocols\OAuth\OAuthDynamicClient')) {
-            $client->fetchJWKs();
+        if (!isset($this->client['oauth']['jwks']) && isset($this->client['oauth']['jwks_uri']) && is_subclass_of($this->client, 'SimpleID\Protocols\OAuth\OAuthDynamicClient')) {
+            $this->client->fetchJWKs();
         }
 
-        if (isset($client['oauth']['jwks'])) {
+        if (isset($this->client['oauth']['jwks'])) {
             $client_jwks = new KeySet();
-            $client_jwks->load(json_encode($client['oauth']['jwks']));
+            $client_jwks->load(json_encode($this->client['oauth']['jwks']));
             $this->set->addAll($client_jwks);
         }
 

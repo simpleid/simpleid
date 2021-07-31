@@ -32,7 +32,7 @@ use SimpleID\Util\SecurityToken;
  * This module contains generic routes for SimpleID.
  */
 class IndexModule extends Module {
-    static function routes($f3) {
+    static function init($f3) {
         $f3->route('GET|POST /', 'SimpleID\Base\IndexModule->index');
         $f3->route('GET|POST /continue/@token', 'SimpleID\Base\IndexModule->continueRequest');
     }
@@ -53,9 +53,10 @@ class IndexModule extends Module {
 
         $this->logger->log(LogLevel::DEBUG, 'SimpleID\Base\IndexModule->index');
         header('Vary: Accept');
-        $result = $mgr->invokeAll('index', $_REQUEST);
 
-        if ($result) return;
+        $event = new IndexEvent($_REQUEST);
+        $dispatcher = \Events::instance();
+        if ($dispatcher->dispatch($event)->isPropagationStopped()) return;
 
         $auth = AuthManager::instance();
     

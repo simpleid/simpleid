@@ -25,6 +25,10 @@ namespace SimpleID\Protocols\OpenID\Extensions;
 use SimpleID\Module;
 use SimpleID\Auth\AuthManager;
 use SimpleID\Protocols\OpenID\Message;
+use SimpleID\Protocols\OpenID\OpenIDResponseBuildEvent;
+use SimpleID\Util\Events\UIBuildEvent;
+use SimpleID\Util\Forms\FormBuildEvent;
+use SimpleID\Util\Forms\FormSubmitEvent;
 
 /**
  * Implements the Simple Registration extension.
@@ -46,13 +50,16 @@ class SRegOpenIDExtensionModule extends Module {
     }
 
     /**
-     * @see SimpleID\API\OpenIDHooks::openIDResponseHook()
+     * @see SimpleID\Protocols\OpenID\OpenIDResponseBuildEvent
      */
-    public function openIDResponseHook($assertion, $request, $response) {
+    public function onOpenIDResponseBuildEvent(OpenIDResponseBuildEvent $event) {
         // We only deal with positive assertions
-        if (!$assertion) return;
+        if (!$event->isPositiveAssertion()) return;
         
         // We only respond if the extension is requested
+        $request = $event->getRequest();
+        $response = $event->getResponse();
+        
         if (!$request->hasExtension(self::OPENID_NS_SREG)) return;
 
         $user = $this->auth->getUser();
@@ -73,9 +80,10 @@ class SRegOpenIDExtensionModule extends Module {
     }
 
     /**
-     * @see hook_consent_form()
+     * @see SimpleID\Util\Forms\FormBuildEvent
      */
-    function openIDConsentFormHook($form_state) {
+    function onOpenidConsentFormBuild(FormBuildEvent $event) {
+        $form_state = $event->getFormState();
         $request = $form_state->getRequest();
         $response = $form_state->getResponse();
         $prefs = $form_state['prefs'];
@@ -128,19 +136,14 @@ class SRegOpenIDExtensionModule extends Module {
             }
         }
             
-        return [
-            [
-                'content' => $tpl->render('openid_userinfo_consent.html', false, $hive),
-                'weight' => 0
-            ]
-        ];
-        
+        $event->addBlock('openid_consent_sreg', $tpl->render('openid_userinfo_consent.html', false, $hive), 0);
     }
 
     /**
-     * @see hook_consent()
+     * @see SimpleID\Util\Forms\FormSubmitEvent
      */
-    function openIDConsentFormSubmitHook($form_state) {
+    function onOpenidConsentFormSubmit(FormSubmitEvent $event) {
+        $form_state = $event->getFormState();
         $response = $form_state->getResponse();
         $prefs =& $form_state->pathRef('prefs');
 
@@ -167,10 +170,8 @@ class SRegOpenIDExtensionModule extends Module {
         $prefs['consents']['sreg'] = $form;
     }
 
-    /**
-     * @see hook_page_profile()
-     */
-    public function profileBlocksHook() {
+
+    public function onProfileBlocks(UIBuildEvent $event) {
         $user = $this->auth->getUser();
 
         if (!isset($user['sreg'])) return;
@@ -183,11 +184,9 @@ class SRegOpenIDExtensionModule extends Module {
             'info' => $user['sreg']
         ];
         
-        return [ [
-            'id' => 'sreg',
-            'title' => $this->f3->get('intl.core.openid.sreg.sreg_title'),
-            'content' => $tpl->render('openid_userinfo_profile.html', false, $hive),
-        ] ];
+        $event->addBlock('sreg', $tpl->render('openid_userinfo_profile.html', false, $hive), 0, [
+            'title' => $this->f3->get('intl.core.openid.sreg.sreg_title')
+        ]);
     }
 
 

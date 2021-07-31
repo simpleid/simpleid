@@ -28,10 +28,11 @@ use SimpleID\ModuleManager;
 use SimpleID\Auth\AuthManager;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
+use SimpleID\Util\Events\UIBuildEvent;
 
 
 class UserModule extends Module {
-    static function routes($f3) {
+    static function init($f3) {
         $f3->route('GET /user/@uid', 'SimpleID\Base\UserModule->user');
     }
 
@@ -89,9 +90,10 @@ class UserModule extends Module {
     /**
      * Returns a block containing OpenID Connect user information.
      *
-     * @return array the OpenID Connect user information block
+     * @param UIBuildEvent the event to collect the
+     * OpenID Connect user information block
      */
-    function profileBlocksHook() {
+    function onProfileBlocks(UIBuildEvent $event) {
         $auth = AuthManager:: instance();
         $user = $auth->getUser();
         
@@ -113,12 +115,9 @@ class UserModule extends Module {
         
         $html .= "</table>";
         
-        return [ [
-            'id' => 'userinfo',
-            'title' => $this->f3->get('intl.core.user.userinfo_title'),
-            'content' => $html,
-            'weight' => -1
-        ] ];
+        $event->addBlock('userinfo', $html, -1, [
+            'title' => $this->f3->get('intl.core.user.userinfo_title')
+        ]);
     }
 }
 

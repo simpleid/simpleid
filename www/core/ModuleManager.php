@@ -96,104 +96,18 @@ class ModuleManager extends Prefab {
     }
 
     /**
-     * Initialises the routes made available by the loaded modules.
+     * Initialises the loaded modules.
      */
-    public function initRoutes() {
-        foreach ($this->modules as $name => $module) {
-            if (method_exists($name, 'routes')) {
-                $this->logger->log(LogLevel::DEBUG, 'SimpleID\ModuleManager->initRoutes: ' . $name);
-                call_user_func([ $name, 'routes' ], $this->f3);
-            }
-        }
-    }
-
-    /**
-     * Invokes a hook in a specified module.
-     *
-     * @param string $name the module to call
-     * @param string $hook the name of the hook to call
-     * @param mixed $args the arguments to the hook
-     * @return mixed the return value from the hook
-     */
-    public function invoke() {
-        $args = func_get_args();
-        $name = array_shift($args);
-        $function = array_shift($args) . 'Hook';
-
-        if (method_exists($this->modules[$name], $function)) {
-            $this->logger->log(LogLevel::DEBUG, 'SimpleID\ModuleManager->invoke: ' . $name . '->' . $function);
-            return call_user_func_array([ $this->modules[$name], $function ], $args);
-        }
-    }
-
-    /**
-     * Invokes a hook in all the loaded modules.
-     *
-     * @param string $hook the name of the hook to call
-     * @param mixed $args the arguments to the hook
-     * @return array the return values from the hook
-     */
-    public function invokeAll() {
-        $args = func_get_args();
-        $function = array_shift($args) . 'Hook';
-        $return = [];
+    public function initModules() {
+        $listeners = \Listeners::instance();
 
         foreach ($this->modules as $name => $module) {
-            if (method_exists($module, $function)) {
-                $this->logger->log(LogLevel::DEBUG, 'SimpleID\ModuleManager->invokeAll: ' . $name . '->' . $function);
-                $result = call_user_func_array([ $module, $function ], $args);
-                if (isset($result) && is_array($result)) {
-                    $return = array_merge($return, $result);
-                } elseif (isset($result)) {
-                    $return[] = $result;
-                }
+            if (method_exists($name, 'init')) {
+                $this->logger->log(LogLevel::DEBUG, 'SimpleID\ModuleManager->initModules: ' . $name);
+                call_user_func([ $name, 'init' ], $this->f3);
             }
+            $listeners->map($module);
         }
-        
-        return $return;
-    }
-
-    /**
-     * Invokes a hook in a specified module by reference.
-     *
-     * @param string $name the module to call
-     * @param string $hook the name of the hook to call
-     * @param mixed &$data the data that is passed by reference
-     * @return mixed the return value from the hook
-     */
-    public function invokeRef($name, $hook, &$data) {
-        $function = $hook . 'Hook';
-
-        if (method_exists($this->modules[$name], $function)) {
-            $this->logger->log(LogLevel::DEBUG, 'SimpleID\ModuleManager->invokeRef: ' . $name . '->' . $function);
-            return $this->modules[$name]->$function($data);
-        }
-    }
-
-    /**
-     * Invokes a hook in all the loaded modules by reference.
-     *
-     * @param string $hook the name of the hook to call
-     * @param mixed &$data the data that is passed by reference
-     * @return array the return values from the hook
-     */
-    public function invokeRefAll($hook, &$data) {
-        $function = $hook . 'Hook';
-        $return = [];
-
-        foreach ($this->modules as $name => $module) {
-            if (method_exists($module, $function)) {
-                $this->logger->log(LogLevel::DEBUG, 'SimpleID\ModuleManager->invokeRefAll: ' . $name . '->' . $function);
-                $result = $module->$function($data);
-                if (isset($result) && is_array($result)) {
-                    $return = array_merge($return, $result);
-                } elseif (isset($result)) {
-                    $return[] = $result;
-                }
-            }
-        }
-        
-        return $return;
     }
 
     /**

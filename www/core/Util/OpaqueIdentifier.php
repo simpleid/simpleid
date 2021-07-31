@@ -52,7 +52,7 @@ class OpaqueIdentifier {
      * @param array $context additional data that have been encoded
      */
     public function verify($token, $expected_id, $context = []) {
-        return ($this->generate($id, $context) == $token);
+        return ($this->generate($expected_id, $context) == $token);
     }
 
     /**

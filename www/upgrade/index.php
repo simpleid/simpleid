@@ -70,7 +70,7 @@ $config = $f3->get('config');
 foreach ($config['modules'] as $module) $mgr->loadModule($module);
 
 $store->checkStores();
-SimpleID\Upgrade\UpgradeModule::routes($f3); // We call this directly instead of initRoutes();
+SimpleID\Upgrade\UpgradeModule::init($f3); // We call this directly instead of initModules();
 
 $f3->run();
 ?>

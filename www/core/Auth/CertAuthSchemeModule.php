@@ -23,7 +23,9 @@
 namespace SimpleID\Auth;
 
 use Psr\Log\LogLevel;
+use SimpleID\Auth\AutoAuthEvent;
 use SimpleID\Store\StoreManager;
+use SimpleID\Util\Events\BaseDataCollectionEvent;
 
 /**
  * An authentication scheme that provides automatic authentication
@@ -33,22 +35,21 @@ class CertAuthSchemeModule extends AuthSchemeModule {
     /**
      * Attempts to automatically login using the client certificate
      * 
-     * @return SimpleID\Models\User the user object, or NULL
+     * @param SimpleID\Auth\AutoAuthEvent $event the event
      */
-    public function autoAuthHook() {
+    public function onAutoAuthEvent(AutoAuthEvent $event) {
         if (!$this->hasClientCert()) return NULL;
 
         $cert = trim($_SERVER['SSL_CLIENT_M_SERIAL']) . ';' . trim($_SERVER['SSL_CLIENT_I_DN']);
         $this->logger->log(LogLevel::DEBUG, 'Client SSL certificate: ' . $cert);
 
         $store = StoreManager::instance();
-        $user = $store->findUser('cert.certs', $cert);
-        if ($user != NULL) {
-            $this->logger->log(LogLevel::DEBUG, 'Client SSL certificate accepted for ' . $user['uid']);
-            return $user;            
+        $test_user = $store->findUser('cert.certs', $cert);
+        if ($test_user != NULL) {
+            $this->logger->log(LogLevel::DEBUG, 'Client SSL certificate accepted for ' . $test_user['uid']);
+            $event->setUser($test_user, static::class);
         } else {
             $this->logger->log(LogLevel::DEBUG, 'Client SSL certificate presented, but no user with that certificate exists.');
-            return NULL;
         }
     }
 
@@ -86,11 +87,9 @@ class CertAuthSchemeModule extends AuthSchemeModule {
         return true;
     }
 
-    /**
-     * @see SimpleID\API\AuthHooks::secretUserDataPathsHook()
-     */
-    public function secretUserDataPathsHook() {
-        return [ 'cert.certs' ];
+    
+    public function onUserSecretDataPaths(BaseDataCollectionEvent $event) {
+        $event->addResult('cert.certs');
     }
 }
 ?>

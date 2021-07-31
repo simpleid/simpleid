@@ -183,7 +183,7 @@ class JOSEResponse extends ArrayWrapper {
         if ($typ == 'json') return json_encode($this->container);
         
         if ($set == null) {
-            $builder = new KeySetBuilder($client);
+            $builder = new KeySetBuilder($this->client);
             $set = $builder->addClientSecret()->addClientPublicKeys()->addServerPrivateKeys()->toKeySet();
         }
 

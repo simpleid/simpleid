@@ -254,7 +254,7 @@ class ArrayWrapper implements ArrayAccess, Countable {
                 $in_object = TRUE;
             } elseif ($in_object) {
                 $in_object = FALSE;
-                if (!is_object($var)) $var = new stdclass;
+                if (!is_object($var)) $var = new \stdClass;
                 if ($add || property_exists($var, $part)) {
                     $var = &$var->$part;
                 } else {

@@ -27,14 +27,18 @@ use SimpleID\Auth\AuthManager;
 use SimpleID\Crypt\Random;
 use SimpleID\Protocols\Connect\ConnectModule;
 use SimpleID\Protocols\OAuth\Response;
+use SimpleID\Protocols\OAuth\OAuthAuthGrantEvent;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
-use SimpleID\Util\Form\FormState;
+use SimpleID\Util\Events\BaseDataCollectionEvent;
+use SimpleID\Util\Forms\FormState;
 use SimpleID\Module;
+use SimpleID\ModuleManager;
+use SimpleJWT\JWT;
 use SimpleJWT\InvalidTokenException;
 
 class ConnectSessionModule extends Module {
-    static function routes($f3) {
+    static function init($f3) {
         $f3->route('GET @connect_check_session: /connect/session', 'SimpleID\Protocols\Connect\ConnectSessionModule->check_session');
         $f3->route('GET|POST @connect_logout: /connect/logout', 'SimpleID\Protocols\Connect\ConnectSessionModule->logout');
         $f3->route('GET @connect_logout_complete: /connect/logout_complete/@token', 'SimpleID\Protocols\Connect\ConnectSessionModule->logoutComplete');
@@ -80,7 +84,7 @@ class ConnectSessionModule extends Module {
                 } else {
                     $this->f3->set('message', $this->f3->get('intl.common.logout_cancelled'));
 
-                    $index_module = $this->mgr->getModule('SimpleID\Base\IndexModule');
+                    $index_module = ModuleManager::instance()->getModule('SimpleID\Base\IndexModule');
                     $index_module->index();                    
                 }
                 return;
@@ -138,7 +142,7 @@ class ConnectSessionModule extends Module {
             } else {
                 // User has already been logged out
                 $this->f3->set('message', $this->f3->get('intl.core.auth.logout_success'));
-                $auth_module = $this->mgr->getModule('SimpleID\Auth\AuthModule');
+                $auth_module = ModuleManager::instance()->getModule('SimpleID\Auth\AuthModule');
                 $auth_module->loginForm();
                 return;
             }
@@ -187,20 +191,23 @@ class ConnectSessionModule extends Module {
      * Builds the OpenID Connect Session Management response on a successful
      * authentication.
      * 
-     * @see SimpleID\API\OAuthHooks::oAuthGrantAuthHook()
+     * @see SimpleID\Protocols\OAuth\OAuthAuthGrantEvent
      */
-    public function oAuthGrantAuthHook($authorization, $request, $response, $scopes) {
+    function onOAuthAuthGrantEvent(OAuthAuthGrantEvent $event) {
+        $request = $event->getRequest();
+        $response = $event->getResponse();
+
         $response['session_state'] = $this->buildSessionState($request['client_id'], $request['redirect_uri']);
     }
 
     /**
-     * @see SimpleID\API\ConnectHooks::connectConfigurationHook()
+     * 
      */
-    public function connectConfigurationHook() {
-        return [
+    public function onConnectConfiguration(BaseDataCollectionEvent $event) {
+        $event->addResult([
             'check_session_iframe' => $this->getCanonicalURL('@connect_check_session', '', 'https'),
             'end_session_endpoint' => $this->getCanonicalURL('@connect_logout', 'https')
-        ];
+        ]);
     }
 
     /**
