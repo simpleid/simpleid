@@ -68,12 +68,15 @@ class OpenID2MigrationModule extends Module {
     }
 
     /**
-     * @see SimpleID\API\ConnectHooks::connectBuildClaimsHook()
+     * @see SimpleID\Protocols\Connect\ConnectBuildClaimsEvent
      */
-    public function connectBuildClaimsHook($user, $client, $context, $scopes, $claims_requested = NULL) {
+    public function onConnectBuildClaimsEvent(ConnectBuildClaimsEvent $event) {
+        $context = $event->getContext();
+        $scope = $event->getScope();
+
         if (($context == 'id_token') && in_array('openid2', $scope)) {            
             if (isset($user['openid']['identity'])) {
-                return [ 'openid2_id' => $user['openid']['identity'] ];
+                $event->addResult([ 'openid2_id' => $user['openid']['identity'] ]);
             }
         }
     }

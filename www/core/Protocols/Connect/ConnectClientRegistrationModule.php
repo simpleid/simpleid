@@ -31,6 +31,7 @@ use SimpleID\Protocols\OAuth\OAuthProtectedResource;
 use SimpleID\Protocols\OAuth\Response;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\RateLimiter;
+use SimpleID\Util\Events\BaseDataCollectionEvent;
 
 /**
  * Module implementing the OpenID Connect Dynamic Client Registration
@@ -236,10 +237,10 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
     }
 
     /**
-     * @see SimpleID\API\ConnectHooks::connectConfigurationHook()
+     * 
      */
-    public function connectConfigurationHook() {
-        return [ 'registration_endpoint' => $this->getCanonicalURL('@connect_client_register') ];
+    public function onConnectConfiguration(BaseDataCollectionEvent $event) {
+        $event->addResult([ 'registration_endpoint' => $this->getCanonicalURL('@connect_client_register') ]);
     }
 
     /**

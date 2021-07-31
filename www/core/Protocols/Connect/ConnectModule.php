@@ -33,6 +33,7 @@ use SimpleID\Protocols\OAuth\OAuthProtectedResource;
 use SimpleID\Protocols\OAuth\OAuthDynamicClient;
 use SimpleID\Protocols\OAuth\Response;
 use SimpleID\Store\StoreManager;
+use SimpleID\Util\Events\BaseDataCollectionEvent;
 use SimpleJWT\Util\Helper;
 use SimpleJWT\JWT;
 use SimpleJWT\InvalidTokenException;
@@ -427,9 +428,11 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
             $claims['acr'] = $auth->getACR();
         }
 
-        $hook_claims = $mgr->invokeAll('connectBuildClaims', $user, $client, $context, $scopes, $claims_requested);
+        $event = new ConnectBuildClaimsEvent($user, $client, $context, $scopes, $claims_requested);
+        $event->addResult($claims);
+        \Events::instance()->dispatch($event);
 
-        return array_merge($claims, $hook_claims);
+        return $event->getResults();
     }
 
     /**
@@ -563,9 +566,11 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
             'require_request_uri_registration' => false,
             'service_documentation' => 'http://simpleid.org/docs/'
         ];
-        
-        $config = array_merge($config, $mgr->invokeAll('connectConfiguration'));
-        print json_encode($config);
+
+        $event = new BaseDataCollectionEvent('connect_configuration');
+        $event->addResult($config);
+        \Events::instance()->dispatch($event);
+        print json_encode($event->getResults());
     }
 
 

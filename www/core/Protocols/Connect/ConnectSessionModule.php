@@ -29,7 +29,8 @@ use SimpleID\Protocols\Connect\ConnectModule;
 use SimpleID\Protocols\OAuth\Response;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
-use SimpleID\Util\Form\FormState;
+use SimpleID\Util\Events\BaseDataCollectionEvent;
+use SimpleID\Util\Forms\FormState;
 use SimpleID\Module;
 use SimpleJWT\InvalidTokenException;
 
@@ -194,13 +195,13 @@ class ConnectSessionModule extends Module {
     }
 
     /**
-     * @see SimpleID\API\ConnectHooks::connectConfigurationHook()
+     * 
      */
-    public function connectConfigurationHook() {
-        return [
+    public function onConnectConfiguration(BaseDataCollectionEvent $event) {
+        $event->addResult([
             'check_session_iframe' => $this->getCanonicalURL('@connect_check_session', '', 'https'),
             'end_session_endpoint' => $this->getCanonicalURL('@connect_logout', 'https')
-        ];
+        ]);
     }
 
     /**
