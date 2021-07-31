@@ -35,7 +35,7 @@ class CertAuthSchemeModule extends AuthSchemeModule {
     /**
      * Attempts to automatically login using the client certificate
      * 
-     * @return SimpleID\Models\User the user object, or NULL
+     * @param SimpleID\Auth\AutoAuthEvent $event the event
      */
     public function onAutoAuthEvent(AutoAuthEvent $event) {
         if (!$this->hasClientCert()) return NULL;
@@ -44,9 +44,9 @@ class CertAuthSchemeModule extends AuthSchemeModule {
         $this->logger->log(LogLevel::DEBUG, 'Client SSL certificate: ' . $cert);
 
         $store = StoreManager::instance();
-        $user = $store->findUser('cert.certs', $cert);
-        if ($user != NULL) {
-            $this->logger->log(LogLevel::DEBUG, 'Client SSL certificate accepted for ' . $user['uid']);
+        $test_user = $store->findUser('cert.certs', $cert);
+        if ($test_user != NULL) {
+            $this->logger->log(LogLevel::DEBUG, 'Client SSL certificate accepted for ' . $test_user['uid']);
             $event->setUser($test_user, static::class);
         } else {
             $this->logger->log(LogLevel::DEBUG, 'Client SSL certificate presented, but no user with that certificate exists.');

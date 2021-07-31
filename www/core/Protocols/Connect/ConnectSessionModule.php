@@ -33,6 +33,8 @@ use SimpleID\Util\SecurityToken;
 use SimpleID\Util\Events\BaseDataCollectionEvent;
 use SimpleID\Util\Forms\FormState;
 use SimpleID\Module;
+use SimpleID\ModuleManager;
+use SimpleJWT\JWT;
 use SimpleJWT\InvalidTokenException;
 
 class ConnectSessionModule extends Module {
@@ -82,7 +84,7 @@ class ConnectSessionModule extends Module {
                 } else {
                     $this->f3->set('message', $this->f3->get('intl.common.logout_cancelled'));
 
-                    $index_module = $this->mgr->getModule('SimpleID\Base\IndexModule');
+                    $index_module = ModuleManager::instance()->getModule('SimpleID\Base\IndexModule');
                     $index_module->index();                    
                 }
                 return;
@@ -140,7 +142,7 @@ class ConnectSessionModule extends Module {
             } else {
                 // User has already been logged out
                 $this->f3->set('message', $this->f3->get('intl.core.auth.logout_success'));
-                $auth_module = $this->mgr->getModule('SimpleID\Auth\AuthModule');
+                $auth_module = ModuleManager::instance()->getModule('SimpleID\Auth\AuthModule');
                 $auth_module->loginForm();
                 return;
             }

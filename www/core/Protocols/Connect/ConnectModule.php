@@ -392,7 +392,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
 
         $scope_info_event = new ScopeInfoCollectionEvent();
         $dispatcher->dispatch($scope_info_event);
-        $scope_info = $event->getScopeInfoForType('oauth');
+        $scope_info = $scope_info_event->getScopeInfoForType('oauth');
 
         $claims = [];
         $claims['sub'] = self::getSubject($user, $client);
@@ -496,7 +496,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
      *
      * @see SimpleID\Base\ScopeInfoCollectionEvent
      */
-    public function scopesHook() {
+    public function scopesHook(ScopeInfoCollectionEvent $event) {
         $event->addScopeInfo('oauth', [
             'openid' => [
                 'description' => $this->f3->get('intl.common.scope.id'),
@@ -535,7 +535,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
 
         $scope_info_event = new ScopeInfoCollectionEvent();
         $dispatcher->dispatch($scope_info_event);
-        $scopes = $event->getScopesForType('oauth');
+        $scopes = $scope_info_event->getScopesForType('oauth');
 
         $jwt_signing_algs = AlgorithmFactory::getSupportedAlgs(Algorithm::SIGNATURE_ALGORITHM);
         $jwt_encryption_algs = AlgorithmFactory::getSupportedAlgs(Algorithm::KEY_ALGORITHM);

@@ -148,7 +148,7 @@ class OAuthModule extends Module implements ProtocolResult {
         
         $response_types = preg_split('/\s+/', $request['response_type']);
         
-        if (in_array('token', $response_types)) $response->setResponseType(Response::FRAGMENT_RESPONSE_TYPE);
+        if (in_array('token', $response_types)) $response->setResponseMode(Response::FRAGMENT_RESPONSE_MODE);
 
         // 2. client_id (pass 1 - check that it exists)
         if (!isset($request['client_id'])) {
@@ -241,7 +241,7 @@ class OAuthModule extends Module implements ProtocolResult {
 
         $core_result = $this->checkIdentity($request);
 
-        $event = new OAuthProcessAuthRequestEvent($request, $response);
+        $event = new OAuthAuthRequestEvent($request, $response);
         $event->setResult($core_result);
         \Events::instance()->dispatch($event);
         $result = $event->getResult();
@@ -379,7 +379,7 @@ class OAuthModule extends Module implements ProtocolResult {
             'time' => time()
         ];
         if ($this->f3->exists('IP')) $activity['remote'] = $this->f3->get('IP');
-        $user->addActivity($cid, $activity);
+        $user->addActivity($client->getStoreID(), $activity);
 
         if ($request->paramContains('response_type', 'code')) {
             $additional = [];
@@ -459,7 +459,7 @@ class OAuthModule extends Module implements ProtocolResult {
             default:
                 // Extensions can be put here.
                 $this->logger->log(LogLevel::ERROR, 'Token request failed: unsupported grant type');
-                $response->setError('unsupported_grant_type', 'grant type ' . $grant_type . ' is not supported');
+                $response->setError('unsupported_grant_type', 'grant type ' . $request['grant_type'] . ' is not supported');
                 break;
         }
 

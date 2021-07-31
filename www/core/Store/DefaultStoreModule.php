@@ -62,6 +62,7 @@ class DefaultStoreModule extends StoreModule {
             case 'user':
                 return $this->findUser($criteria, $value);
         }
+        return null;
     }
 
     public function exists($type, $id) {
@@ -187,7 +188,7 @@ class DefaultStoreModule extends StoreModule {
 
         try {
             $data = Spyc::YAMLLoad($identity_file);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->logger->log(\Psr\Log\LogLevel::ERROR, 'Cannot read user file ' . $identity_file . ': ' . $e->getMessage());
             trigger_error('Cannot read user file ' . $identity_file . ': ' . $e->getMessage(), E_USER_ERROR);
         }
@@ -240,7 +241,7 @@ class DefaultStoreModule extends StoreModule {
         if (file_exists($client_file)) {
             try {
                 $data = Spyc::YAMLLoad($client_file);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $this->logger->log(\Psr\Log\LogLevel::ERROR, 'Cannot read client file ' . $client_file . ' :' . $e->getMessage());
                 trigger_error('Cannot read client file ' . $client_file . ' :' . $e->getMessage(), E_USER_ERROR);
             }
@@ -338,7 +339,7 @@ class DefaultStoreModule extends StoreModule {
         }
 
         $file = $this->getKeyValueFile($type, $name);
-        $this->f3->mutex($file, function() { unlink($file); });
+        $this->f3->mutex($file, function() use ($file) { unlink($file); });
     }
 
     /**

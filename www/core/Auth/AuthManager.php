@@ -255,7 +255,7 @@ class AuthManager extends Prefab {
         }
 
         $event = new LoginEvent($result, $form_state);
-        \Event::instance()->dispatch($event);
+        \Events::instance()->dispatch($event);
     }
 
     /**

@@ -176,7 +176,7 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
         foreach ($request as $name => $value) {
             $parts = explode('#', $name, 2);
             $client_path = (isset(self::$metadata_map[$parts[0]])) ? self::$metadata_map[$parts[0]] : 'connect.' . $parts[0];
-            if (isset($parts[1])) $client_path .= '#' . $locale;
+            if (isset($parts[1])) $client_path .= '#' . $parts[1];
             $client->pathSet($client_path, $value);
         }
 
@@ -216,7 +216,7 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
         $this->checkHttps('error');
         $client_id = $this->f3->get('PARAMS.client_id');
 
-        if (!$this->isAuthorized(self::CLIENT_REGISTRATION_ACCESS_SCOPE)
+        if (!$this->isTokenAuthorized(self::CLIENT_REGISTRATION_ACCESS_SCOPE)
             || ($this->getAccessToken()->getAuthorization()->getClient()->getStoreID() != $client_id)) {
             $this->unauthorizedError('invalid_token');
             return;

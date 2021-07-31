@@ -26,8 +26,8 @@ namespace SimpleID\Protocols\OpenID\Extensions;
 use SimpleID\Module;
 use SimpleID\Auth\AuthManager;
 use SimpleID\Protocols\OpenID\OpenIDResponseBuildEvent;
-use SimpleID\Util\Event\BaseDataCollectionEvent;
-use SimpleID\Util\Event\UIBuildEvent;
+use SimpleID\Util\Events\BaseDataCollectionEvent;
+use SimpleID\Util\Events\UIBuildEvent;
 use SimpleID\Util\Forms\FormBuildEvent;
 use SimpleID\Util\Forms\FormSubmitEvent;
 
@@ -283,6 +283,7 @@ class AXOpenIDExtensionModule extends Module {
                     break;
             }
         }
+        return null;
     }
 }
 

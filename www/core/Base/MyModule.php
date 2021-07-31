@@ -250,7 +250,7 @@ class MyModule extends Module {
     /**
      * Returns the welcome block.
      *
-     * @return UIBuildEvent the event to pick up the welcome block
+     * @param UIBuildEvent $event the event to pick up the welcome block
      */
     public function onDashboardBlocks(UIBuildEvent $event) {
         $auth = AuthManager::instance();

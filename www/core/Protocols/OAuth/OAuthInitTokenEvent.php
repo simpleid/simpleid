@@ -67,7 +67,7 @@ class OAuthInitTokenEvent implements StoppableEventInterface {
     /**
      * {@inheritdoc}
      */
-    public function isPropagationStopped() {
+    public function isPropagationStopped(): bool {
         return ($this->access_token != null);
     }
 }

@@ -41,7 +41,6 @@ class ConnectBuildClaimsEvent extends BaseDataCollectionEvent {
     public function __construct(User $user, Client $client, $context, $scope, $claims_requested = NULL) {
         parent::__construct();
 
-        $this->setEventName($eventName);
         $this->user = $user;
         $this->client = $client;
         $this->context = $context;

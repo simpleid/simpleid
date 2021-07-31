@@ -83,7 +83,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
 
             if (($this->f3->exists('POST.tk') === false) || (!$token->verify($this->f3->get('POST.tk'), 'otp'))) {
                 $this->f3->set('message', $this->f3->get('intl.common.invalid_tk'));
-                page_dashboard();
+                $this->f3->mock('GET /my/dashboard');
                 return;
             } elseif (($this->f3->exists('POST.otp') === false) || ($this->f3->get('POST.otp') == '')) {
                 $this->f3->set('message', $this->f3->get('intl.core.auth_otp.missing_otp'));
@@ -183,7 +183,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             if ($test_user['otp']['type'] == 'recovery') return;
 
             $uaid = $auth->assignUAID();
-            if (isset($user->auth[$uaid]) && isset($user->auth[$uaid]['otp']) && $user->auth[$uaid]['otp']['remember']) return;
+            if (isset($test_user->auth[$uaid]) && isset($test_user->auth[$uaid]['otp']) && $test_user->auth[$uaid]['otp']['remember']) return;
 
             $tpl = new \Template();
 

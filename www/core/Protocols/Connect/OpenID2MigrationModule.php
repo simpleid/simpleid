@@ -62,7 +62,7 @@ class OpenID2MigrationModule extends Module {
         } else {
             $this->f3->status(404);
             
-            $this->fatalError($this->f3->get('intl.common.user_not_found', $uid));
+            $this->fatalError($this->f3->get('intl.common.user_not_found', $user['uid']));
         }
     }
 
@@ -72,6 +72,7 @@ class OpenID2MigrationModule extends Module {
     public function onConnectBuildClaimsEvent(ConnectBuildClaimsEvent $event) {
         $context = $event->getContext();
         $scope = $event->getScope();
+        $user = $event->getUser();
 
         if (($context == 'id_token') && in_array('openid2', $scope)) {            
             if (isset($user['openid']['identity'])) {

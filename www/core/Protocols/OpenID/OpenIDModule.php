@@ -26,7 +26,7 @@ use Psr\Log\LogLevel;
 use SimpleID\Module;
 use SimpleID\ModuleManager;
 use SimpleID\Base\IndexEvent;
-use SimpleID\Base\ScopeInfoCollectionEventl
+use SimpleID\Base\ScopeInfoCollectionEvent;
 use SimpleID\Auth\AuthManager;
 use SimpleID\Crypt\Random;
 use SimpleID\Protocols\ProtocolResult;
@@ -36,6 +36,7 @@ use SimpleID\Util\Events\BaseDataCollectionEvent;
 use SimpleID\Util\Events\UIBuildEvent;
 use SimpleID\Util\Forms\FormBuildEvent;
 use SimpleID\Util\Forms\FormSubmitEvent;
+use SimpleID\Util\Forms\FormState;
 
 /**
  * The module for authentication under OpenID version 1.1 and 2.0
@@ -271,7 +272,7 @@ class OpenIDModule extends Module implements ProtocolResult {
 
             // Extension request
             $event = new OpenIDCheckEvent($request, $immediate);
-            \Events::instance->dispatch($event);
+            \Events::instance()->dispatch($event);
 
             $result = $event->getResult();
         }
@@ -582,6 +583,7 @@ class OpenIDModule extends Module implements ProtocolResult {
      */
     protected function createErrorResponse($request, $immediate = false) {
         $response = new Response($request);
+        $version = $request->getVersion();
 
         if ($immediate) {
             if ($version == Message::OPENID_VERSION_2) {
@@ -734,6 +736,8 @@ class OpenIDModule extends Module implements ProtocolResult {
     protected function consentForm($request, $response, $reason = self::CHECKID_APPROVAL_REQUIRED) {
         $tpl = new \Template();
         $token = new SecurityToken();
+        $auth = AuthManager::instance();
+        $user = $auth->getUser();
 
         $form_state = new FormState([
             'code' => $reason
@@ -752,7 +756,7 @@ class OpenIDModule extends Module implements ProtocolResult {
         } else {
             $base_path = $this->f3->get('base_path');
             
-            $form_state['prefs'] = (isset($user_clients[$realm])) ? $user_clients[$realm] : [];
+            $form_state['prefs'] = (isset($user->clients[$realm])) ? $user->clients[$realm] : [];
 
             $event = new FormBuildEvent($form_state, 'openid_consent_form_build');
             \Events::instance()->dispatch($event);
@@ -1005,14 +1009,13 @@ class OpenIDModule extends Module implements ProtocolResult {
         } else {
             $this->f3->status(404);
             
-            $this->fatalError($this->f3->get('intl.common.user_not_found', $uid));
+            $this->fatalError($this->f3->get('intl.common.user_not_found', $user['uid']));
         }
     }
 
     /**
      * Returns the OpenID Connect scopes supported by this server.
      *
-     * @return array an array containing the scopes supported by this server
      * @since 2.0
      */
     public function onScopeInfoCollectionEvent(ScopeInfoCollectionEvent $event) {

@@ -202,7 +202,7 @@ class AuthModule extends Module {
         $this->auth->logout();
 
         $event = new BaseStoppableEvent('post_logout');
-        \Events()::instance()->dispatch($event);
+        \Events::instance()->dispatch($event);
 
         if (!$event->isPropagationStopped()) {
             if ($params['destination']) {
@@ -228,7 +228,18 @@ class AuthModule extends Module {
         // 1. Check for HTTPS
         $this->checkHttps('redirect', true);
 
-        // 2. Build the buttons and security messaging
+        // 2. Build the forms
+        if (($form_state['mode'] == AuthManager::MODE_VERIFY) && isset($form_state['verify_forms'])) {
+            $forms = $form_state['verify_forms'];
+            unset($form_state['verify_forms']);
+        } else {
+            $event = new FormBuildEvent($form_state, 'login_form_build');
+            \Events::instance()->dispatch($event);
+            $forms = $event->getBlocks();
+        }
+        $this->f3->set('forms', $forms);
+
+        // 3. Build the buttons and security messaging
         switch ($form_state['mode']) {
             case AuthManager::MODE_REENTER_CREDENTIALS:
                 // Follow through
@@ -249,17 +260,6 @@ class AuthModule extends Module {
         if (isset($form_state['cancel'])) {
             $this->f3->set('cancellable', true);
         }
-
-        // 3. Build the forms
-        if (($form_state['mode'] == AuthManager::MODE_VERIFY) && isset($form_state['verify_forms'])) {
-            $forms = $form_state['verify_forms'];
-            unset($form_state['verify_forms']);
-        } else {
-            $event = new FormBuildEvent($form_state, 'login_form_build');
-            \Events::instance()->dispatch($event);
-            $forms = $event->getBlocks();
-        }
-        $this->f3->set('forms', $forms);
 
         // 4. We can't use SecurityToken::BIND_SESSION here because the PHP session is not
         // yet stable

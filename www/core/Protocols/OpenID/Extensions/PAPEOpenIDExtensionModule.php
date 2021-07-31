@@ -71,7 +71,7 @@ class PAPEOpenIDExtensionModule extends Module implements ProtocolResult {
         
         // See if we are choosing an identity and save for later
         // This may be used by pape_response() to produce a private identifier
-        if ($request['openid.identity'] == Request::OPENID_IDENTIFIER_SELECT) $this->identifier_select = true;
+        //if ($request['openid.identity'] == Request::OPENID_IDENTIFIER_SELECT) $this->identifier_select = true;
         
         $pape_request = $request->getParamsForExtension(self::OPENID_NS_PAPE);
         
@@ -90,7 +90,7 @@ class PAPEOpenIDExtensionModule extends Module implements ProtocolResult {
 
             // If the last time we logged on actively (i.e. using a password) is greater than
             // max_auth_age, we then require the user to log in again
-            if (($auth_level < AuthLevel::AUTH_LEVEL_CREDENTIALS) 
+            if (($auth_level < AuthManager::AUTH_LEVEL_CREDENTIALS) 
                 || ((time() - $auth->getAuthTime()) > $pape_request['max_auth_age'])) {
                 $this->f3->set('message', $this->f3->get('intl.common.reenter_credentials'));
                 return self::CHECKID_REENTER_CREDENTIALS;

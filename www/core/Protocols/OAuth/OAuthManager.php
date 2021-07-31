@@ -126,7 +126,7 @@ class OAuthManager extends Prefab {
                 $auth_method_map = [
                     'client_secret_basic' => 'Basic'
                 ];
-                $http_auth_method = $auth_method_map[$auth_method];
+                $http_auth_method = $auth_method_map[$this->client_auth_method];
                 $this->f3->status(401);
                 header('WWW-Authenticate: ' . $http_auth_method . ' realm="'. $this->f3->get('REALM') . '"');
             }
