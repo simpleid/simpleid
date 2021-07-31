@@ -23,9 +23,10 @@
 namespace SimpleID\Protocols\Connect;
 
 use Psr\Log\LogLevel;
-use SimpleID\Auth\AuthManager;
 use SimpleID\Module;
 use SimpleID\ModuleManager;
+use SimpleID\Auth\AuthManager;
+use SimpleID\Base\ScopeInfoCollectionEvent;
 use SimpleID\Store\StoreManager;
 
 /**
@@ -35,8 +36,6 @@ use SimpleID\Store\StoreManager;
  * @link http://openid.net/specs/openid-connect-migration-1_0.html
  */
 class OpenID2MigrationModule extends Module {
-
-    static private $scope_settings = NULL;
 
     public function __construct() {
         parent::__construct();
@@ -82,20 +81,15 @@ class OpenID2MigrationModule extends Module {
     }
 
     /**
-     * @see SimpleID\API\OAuthHooks::scopesHook()
+     * @see SimpleID\Base\ScopeInfoCollectionEvent
      */
-    public function scopesHook() {
-        if (self::$scope_settings == NULL) {
-            self::$scope_settings = [
-                'oauth' => [
-                    'openid2' => [
-                        'description' => '',
-                        'weight' => -1
-                    ]
-                ]
-            ];
-        }
-        return self::$scope_settings;
+    public function onScopeInfoCollectionEvent(ScopeInfoCollectionEvent $event) {
+        $event->addScopeInfo('oauth', [
+            'openid2' => [
+                'description' => '',
+                'weight' => -1
+            ]
+        ]);
     }
 }
 ?>

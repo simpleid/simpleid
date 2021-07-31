@@ -23,11 +23,12 @@
 namespace SimpleID\Protocols\OpenID;
 
 use Psr\Log\LogLevel;
-use SimpleID\Auth\AuthManager;
-use SimpleID\Crypt\Random;
-use SimpleID\Base\IndexEvent;
 use SimpleID\Module;
 use SimpleID\ModuleManager;
+use SimpleID\Base\IndexEvent;
+use SimpleID\Base\ScopeInfoCollectionEventl
+use SimpleID\Auth\AuthManager;
+use SimpleID\Crypt\Random;
 use SimpleID\Protocols\ProtocolResult;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
@@ -44,7 +45,7 @@ class OpenIDModule extends Module implements ProtocolResult {
     /** Constant for the XRDS service type for return_to verification */
     const OPENID_RETURN_TO = 'http://specs.openid.net/auth/2.0/return_to';
 
-    static private $scope_settings = NULL;
+    const DEFAULT_SCOPE = 'tag:simpleid.sf.net,2021:openid:default';
 
     protected $cache;
     protected $mgr;
@@ -1014,15 +1015,12 @@ class OpenIDModule extends Module implements ProtocolResult {
      * @return array an array containing the scopes supported by this server
      * @since 2.0
      */
-    public function scopesHook() {
-        if (self::$scope_settings == NULL) {
-            self::$scope_settings = [
-                'openid' => [
-                    'description' => $this->f3->get('intl.common.scope.id'),
-                ]
-            ];
-        }
-        return self::$scope_settings;
+    public function onScopeInfoCollectionEvent(ScopeInfoCollectionEvent $event) {
+        $event->addScopeInfo('openid', [
+            self::DEFAULT_SCOPE => [
+                'description' => $this->f3->get('intl.common.scope.id'),
+            ]
+        ]);
     }
 
     /**

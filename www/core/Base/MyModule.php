@@ -170,15 +170,9 @@ class MyModule extends Module {
             ],
         ];
 
-        $mgr = ModuleManager::instance();
-        $modules = $mgr->getModules();
-        $scope_info = [];
-        foreach ($this->modules as $module) {
-            $result = $mgr->invoke($module, 'scopes');
-            if (isset($result) && is_array($result)) {
-                $scope_info = array_replace_recursive($scope_info, $result);
-            }
-        }
+        $event = new ScopeInfoCollectionEvent();
+        \Events::instance()->dispatch($event);
+        $scope_info = $event->getAllScopeInfo();
 
         $consent_info = [];
         foreach ($prefs['consents'] as $protocol => $consents) {

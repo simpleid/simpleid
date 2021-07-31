@@ -27,12 +27,16 @@ use Psr\Log\LogLevel;
 use SimpleID\Auth\AuthManager;
 use SimpleID\Module;
 use SimpleID\ModuleManager;
+use SimpleID\Base\ScopeInfoCollectionEvent;
 use SimpleID\Models\ConsentEvent;
 use SimpleID\Protocols\ProtocolResult;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
 use SimpleID\Util\Events\BaseStoppableEvent;
+use SimpleID\Util\Events\BaseDataCollectionEvent;
 use SimpleID\Util\Forms\FormState;
+use SimpleID\Util\Forms\FormBuildEvent;
+use SimpleID\Util\Forms\FormSubmitEvent;
 
 /**
  * The module for authentication using OAuth.
@@ -45,8 +49,6 @@ class OAuthModule extends Module implements ProtocolResult {
     const DEFAULT_SCOPE = 'tag:simpleid.sf.net,2014:oauth:default';
 
     static private $oauth_scope_settings = NULL;
-
-    static private $scope_settings = NULL;
 
     protected $oauth;
 
@@ -71,8 +73,10 @@ class OAuthModule extends Module implements ProtocolResult {
      *
      */
     public function onPostInit(BaseStoppableEvent $event) {
-        $scope_settings = $this->mgr->invokeAll('scopes');
-        self::$oauth_scope_settings = $scope_settings['oauth'];
+        $event = new ScopeInfoCollectionEvent();
+        \Events::instance()->dispatch($event);
+        
+        self::$oauth_scope_settings = $event->getScopeInfoForType('oauth');
     }
 
     /**
@@ -89,13 +93,16 @@ class OAuthModule extends Module implements ProtocolResult {
     public function auth() {
         $this->checkHttps('redirect');
 
+        $dispatcher = \Events::instance();
+
         $request = new Request($this->f3->get('GET'), []);
         
         $this->logger->log(LogLevel::INFO, 'OAuth authorisation request: ', $request->toArray());
         
         $response = new Response($request);
-        
-        $this->mgr->invokeAll('oAuthResolveAuthRequest', $request, $response);
+
+        $resolve_event = new OAuthEvent($request, $response, 'oauth_auth_resolve');
+        $dispatcher->dispatch($resolve_event);
         if ($response->isError()) {
             if (isset($request['redirect_uri'])) {
                 $response->renderRedirect();
@@ -107,7 +114,8 @@ class OAuthModule extends Module implements ProtocolResult {
         
         $this->checkAuthRequest($request, $response);
 
-        $this->mgr->invokeAll('oAuthCheckAuthRequest', $request, $response);
+        $resolve_event = new OAuthEvent($request, $response, 'oauth_auth_check');
+        $dispatcher->dispatch($resolve_event);
         if ($response->isError()) {
             if (isset($request['redirect_uri'])) {
                 $response->renderRedirect();
@@ -203,7 +211,10 @@ class OAuthModule extends Module implements ProtocolResult {
         }
         
         // 4. response_type (pass 2 - check that all are supported)
-        $supported_response_types = $this->mgr->invokeAll('oAuthResponseTypes');
+        $event = new BaseDataCollectionEvent('oauth_response_types');
+        \Events::instance()->dispatch($event);
+
+        $supported_response_types = $event->getResults();
         foreach ($response_types as $response_type) {
             if (!in_array($response_type, $supported_response_types)) {
                 $this->logger->log(LogLevel::ERROR, 'Protocol Error: unsupported response_type: ' . $response_type);
@@ -230,14 +241,10 @@ class OAuthModule extends Module implements ProtocolResult {
 
         $core_result = $this->checkIdentity($request);
 
-        $results = $this->mgr->invokeAll('oAuthProcessAuthRequest', $request, $response);
-        
-        // Filter out nulls
-        $results = array_merge(array_diff($results, [ NULL ]));
-            
-        // Prepend the core_result and take the lowest value
-        array_unshift($results, $core_result);
-        $result = min($results);
+        $event = new OAuthProcessAuthRequestEvent($request, $response);
+        $event->setResult($core_result);
+        \Events::instance()->dispatch($event);
+        $result = $event->getResult();
         
         switch ($result) {
             case self::CHECKID_OK:
@@ -345,6 +352,7 @@ class OAuthModule extends Module implements ProtocolResult {
      * @param array $scopes the requested scope
      */
     protected function grantAuth($request, $response, $scopes = NULL) {
+        $dispatcher = \Events::instance();
         $store = StoreManager::instance();
 
         $user = AuthManager::instance()->getUser();
@@ -384,10 +392,13 @@ class OAuthModule extends Module implements ProtocolResult {
 
         if ($request->paramContains('response_type', 'token')) {
             $response->loadData($authorization->issueAccessToken($scopes, SIMPLEID_SHORT_TOKEN_EXPIRES_IN));
-            $this->mgr->invokeAll('oAuthToken', 'implicit', $authorization, $request, $response, $scopes);
+
+            $token_event = new OAuthTokenGrantEvent('implicit', $authorization, $request, $response, $scopes);
+            $dispatcher->dispatch($token_event);
         }
 
-        $this->mgr->invokeAll('oAuthGrantAuth', $authorization, $request, $response, $scopes);
+        $grant_auth_event = new OAuthAuthGrantEvent($authorization, $request, $response, $scopes);
+        $dispatcher->dispatch($grant_auth_event);
 
         $store->saveAuth($authorization);
         $store->saveUser($user);
@@ -536,7 +547,8 @@ class OAuthModule extends Module implements ProtocolResult {
         $response->loadData($authorization->issueTokens($scope, SIMPLEID_SHORT_TOKEN_EXPIRES_IN, $code));
 
         // Call modules
-        $this->mgr->invokeAll('oAuthToken', 'authorization_code', $authorization, $request, $response, $scope);
+        $event = new OAuthTokenGrantEvent('authorization_code', $authorization, $request, $response, $scope);
+        \Events::instance()->dispatch($event);
 
         return $authorization;
     }
@@ -583,7 +595,8 @@ class OAuthModule extends Module implements ProtocolResult {
         $response->loadData($authorization->issueTokens($scope, SIMPLEID_SHORT_TOKEN_EXPIRES_IN, $refresh_token));
 
         // Call modules
-        $this->mgr->invokeAll('oAuthToken', 'refresh_token', $authorization, $request, $response, $scope);
+        $event = new OAuthTokenGrantEvent('refresh_token', $authorization, $request, $response, $scope);
+        \Events::instance()->dispatch($event);
 
         return $authorization;
     }
@@ -669,9 +682,9 @@ class OAuthModule extends Module implements ProtocolResult {
         $this->f3->set('page_class', 'dialog-page');
         $this->f3->set('layout', 'oauth_consent.html');
 
-        $forms = $this->mgr->invokeAll('oAuthConsentForm', $form_state);
-        uasort($forms, function($a, $b) { if ($a['weight'] == $b['weight']) { return 0; } return ($a['weight'] < $b['weight']) ? -1 : 1; });
-        $this->f3->set('forms', $forms);
+        $event = new FormBuildEvent($form_state, 'oauth_consent_form_build');
+        \Events::instance()->dispatch($event);
+        $this->f3->set('forms', $event->getBlocks());
         
         header('X-Frame-Options: DENY');
         print $tpl->render('page.html');
@@ -710,7 +723,8 @@ class OAuthModule extends Module implements ProtocolResult {
             $response->setError('access_denied')->renderRedirect();
             return;
         } else {
-            $this->mgr->invokeRefAll('oAuthConsentFormSubmit', $form_state);
+            $event = new FormSubmitEvent($form_state, 'oauth_consent_form_submit');
+            \Events::instance()->dispatch($event);
 
             $client = $store->loadClient($request['client_id'], 'SimpleID\Protocols\OAuth\OAuthClient');
             $cid = $client->getStoreID();
@@ -745,24 +759,21 @@ class OAuthModule extends Module implements ProtocolResult {
         $this->processAuthRequest($request, $response);
     }
 
-    /** @see SimpleID\API\OAuthHooks::scopesHook() */
-    public function scopesHook() {
-        if (self::$scope_settings == NULL) {
-            self::$scope_settings = [
-                'oauth' => [
-                    self::DEFAULT_SCOPE => [
-                        'description' => $this->f3->get('intl.common.scope.id'),
-                        //'required' => true
-                    ]
-                ]
-            ];
-        }
-        return self::$scope_settings;
+    /**
+     * @see SimpleID\Base\ScopeInfoCollectionEvent
+     */
+    public function onScopeInfoCollectionEvent(ScopeInfoCollectionEvent $event) {
+        $event->addScopeInfo('oauth', [
+            self::DEFAULT_SCOPE => [
+                'description' => $this->f3->get('intl.common.scope.id'),
+                //'required' => true
+            ]
+        ]);
     }
 
-    /** @see SimpleID\API\OAuthHooks::oAuthResponseTypesHook() */
-    public function oAuthResponseTypesHook() {
-        return [ 'token', 'code' ];
+
+    public function onOauthResponseTypes(BaseDataCollectionEvent $event) {
+        $event->addResult([ 'token', 'code' ]);
     }
 
     /** @see SimpleID\API\MyHooks::revokeAppHook() */

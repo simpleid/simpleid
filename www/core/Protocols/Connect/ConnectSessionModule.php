@@ -27,6 +27,7 @@ use SimpleID\Auth\AuthManager;
 use SimpleID\Crypt\Random;
 use SimpleID\Protocols\Connect\ConnectModule;
 use SimpleID\Protocols\OAuth\Response;
+use SimpleID\Protocols\OAuth\OAuthAuthGrantEvent;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
 use SimpleID\Util\Events\BaseDataCollectionEvent;
@@ -188,9 +189,12 @@ class ConnectSessionModule extends Module {
      * Builds the OpenID Connect Session Management response on a successful
      * authentication.
      * 
-     * @see SimpleID\API\OAuthHooks::oAuthGrantAuthHook()
+     * @see SimpleID\Protocols\OAuth\OAuthAuthGrantEvent
      */
-    public function oAuthGrantAuthHook($authorization, $request, $response, $scopes) {
+    function onOAuthAuthGrantEvent(OAuthAuthGrantEvent $event) {
+        $request = $event->getRequest();
+        $response = $event->getResponse();
+
         $response['session_state'] = $this->buildSessionState($request['client_id'], $request['redirect_uri']);
     }
 

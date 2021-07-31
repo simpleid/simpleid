@@ -23,6 +23,7 @@
 namespace SimpleID\Protocols\OpenID;
 
 use SimpleID\Protocols\ProtocolResult;
+use SimpleID\Protocols\ProtocolResultTrait;
 
 /**
  * An event to process an OpenID authentication request.
@@ -50,12 +51,18 @@ use SimpleID\Protocols\ProtocolResult;
  * The result must be one of the constants defined in
  * {@link SimpleID\Protocols\ProtocolResult}.
  * 
+ * Note that for identifier requests, the standard processing
+ * (by {@link SimpleID\Protocols\OpenID\OpenIDModule::openIDCheckIdentity()})
+ * occurs *after* these listeners are called.  Therefore, attempts to retrieve
+ * the assertion result may return CHECKID_PROTOCOL_ERROR.
+ * 
  */
 class OpenIDCheckEvent implements ProtocolResult {
+    use ProtocolResultTrait;
+
     protected $request;
     protected $immediate;
     protected $identity = null;
-    protected $result = null;
 
     public function __construct(Request $request, bool $immediate, ?string $identity = null) {
         $this->request = $request;
@@ -102,59 +109,6 @@ class OpenIDCheckEvent implements ProtocolResult {
      */
     public function getRequestedIdentity() {
         return $this->identity;
-    }
-
-    /**
-     * Sets the assertion result.
-     * 
-     * This method is ignored if the provided assertion result
-     * is *not worse* (i.e. greater than) the existing assertion
-     * result stored in the event.
-     * 
-     * The result must be one of the constants defined in
-     * {@link SimpleID\Protocols\ProtocolResult}.
-     * 
-     * @param int $result the assertion result
-     */
-    public function setResult(int $result) {
-        if ($this->result == null) {
-            $this->result = $result;
-        } else {
-            $this->result = min($this->result, $result);
-        }
-    }
-
-    /**
-     * Returns the currently stored assertion result.
-     * 
-     * If there is no assertion result currently stored
-     * (i.e. {@link hasResult()} returns false), this
-     * returns {@link SimpleID\Protocols\ProtocolResult::CHECKID_PROTOCOL_ERROR}.
-     * 
-     * Note that for identifier requests, the standard processing
-     * (by {@link SimpleID\Protocols\OpenID\OpenIDModule::openIDCheckIdentity()})
-     * occurs *after* these listeners are called.  Therefore, for these
-     * requests, this function will return CHECKID_PROTOCOL_ERROR.
-     * 
-     * @return bool true if an assertion result has been set previously
-     */
-    public function getResult() {
-        return ($this->result != null) ? $this->result : self::CHECKID_PROTOCOL_ERROR;
-    }
-
-    /**
-     * Returns true if an assertion result has been set previously
-     * by another listener.
-     * 
-     * Note that for identifier requests, the standard processing
-     * (by {@link SimpleID\Protocols\OpenID\OpenIDModule::openIDCheckIdentity()})
-     * occurs *after* these listeners are called.  Therefore, for these
-     * requests, this function will return false.
-     * 
-     * @return bool true if an assertion result has been set previously
-     */
-    public function hasResult() {
-        return ($this->result == null);
     }
 }
 
