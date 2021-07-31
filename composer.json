@@ -28,7 +28,8 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^7.0 || ^9.3",
-        "consolidation/robo": "^3.0"
+        "consolidation/robo": "^3.0",
+        "phpstan/phpstan": "^0.12.94"
     },
     "license": "GPL-2.0+",
     "authors": [
@@ -48,6 +49,7 @@
     },
     "scripts": {
         "test": [ "@composer install", "phpunit" ],
+        "phpstan": [ "@composer install", "phpstan analyse" ],
         "update-copyright": [ "@composer install", "robo update_copyright" ]
     },
     "extra": {
