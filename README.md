@@ -62,7 +62,7 @@ Licensing information for this library can be found at
 
 SimpleID uses the [famfamfam Silk icon set](http://www.famfamfam.com/lab/icons/silk/),
 designed by Mark James.
-The icon set is licensed is licensed under a
+The icon set is licensed under a
 [Creative Commons Attribution 2.5 License](http://creativecommons.org/licenses/by/2.5/).
 
 SimpleID uses the [jQuery JavaScript library](http://jquery.com),
