@@ -1,6 +1,11 @@
 name: Mirror to Sourceforge
 
-on: [ push, delete, create ]
+on:
+  push:
+    branches-ignore:
+      - 'dependabot/**'
+  delete:
+  create:
 
 jobs:
   git-mirror:
