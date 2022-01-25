@@ -9,7 +9,6 @@
         "ext-session": "*",
         "ext-xml": "*",
         "ext-xmlreader": "*",
-        "ext-mcrypt": "*",
         "ext-openssl": "*",
         "ext-hash": "*",
         "kelvinmo/simplexrd": "^3.0",
