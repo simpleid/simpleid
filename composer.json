@@ -45,7 +45,11 @@
         }
     },
     "config": {
-        "vendor-dir": "www/vendor"
+        "vendor-dir": "www/vendor",
+        "allow-plugins": {
+            "wikimedia/composer-merge-plugin": true,
+            "simpleid/module-installer": true
+        }
     },
     "scripts": {
         "test": [ "@composer install", "phpunit" ],
