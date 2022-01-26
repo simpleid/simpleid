@@ -198,7 +198,7 @@ pre.code { white-space: pre; overflow: initial; }
 
 span.last-time { display: none; }
 
-.message, .login-security {
+.message {
     border: 1px solid #666666;
     border-radius: 4px;
     padding: 0 10px;

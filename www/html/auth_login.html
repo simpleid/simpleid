@@ -1,23 +1,19 @@
-<check if="{{ @@security_class }}" >
-<div class="login-security {{ @security_class }}">
-    <p>{{ @security_message | raw }}</p>
+<div class="login-security {{ @@security_class }}">
+    <form action="{{ @base_path }}auth/login/{{ @@destination }}" method="post" enctype="application/x-www-form-urlencoded" id="login-form">
+        <input type="hidden" name="fs" value="{{ @@fs }}">
+        <input type="hidden" name="tk" value="{{ @@tk }}">
+
+        <repeat group="{{ @forms }}" value="{{ @form }}">
+            {{ @form.content | raw }}
+        </repeat>
+
+        {* @submit_button text may vary depending on auth module *}
+        <input type="submit" name="op" id="edit-submit" value="{{ @@submit_button }}" class="form-default" {{ @@security_disabled }}>
+        <check if="{{ @@cancellable }}">
+            <input type="submit" name="op" id="edit-cancel" value="{{ @intl.common.cancel }}">
+        </check>
+    </form>
 </div>
-</check>
-
-<form action="{{ @base_path }}auth/login/{{ @@destination }}" method="post" enctype="application/x-www-form-urlencoded" id="login-form">
-    <input type="hidden" name="fs" value="{{ @@fs }}">
-    <input type="hidden" name="tk" value="{{ @@tk }}">
-
-    <repeat group="{{ @forms }}" value="{{ @form }}">
-        {{ @form.content | raw }}
-    </repeat>
-
-    {* @submit_button text may vary depending on auth module *}
-    <input type="submit" name="op" id="edit-submit" value="{{ @@submit_button }}" class="form-default" {{ @@security_disabled }}>
-    <check if="{{ @@cancellable }}">
-        <input type="submit" name="op" id="edit-cancel" value="{{ @intl.common.cancel }}">
-    </check>
-</form>
 
 <script type="text/javascript">
 (function ($) {
