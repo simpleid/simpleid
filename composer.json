@@ -12,7 +12,7 @@
         "ext-openssl": "*",
         "ext-hash": "*",
         "kelvinmo/simplexrd": "^3.0",
-        "kelvinmo/simplejwt": "^0.5",
+        "kelvinmo/simplejwt": "^0.6",
         "kelvinmo/fernet-php": "^1.0 | ^0.5",
         "bcosca/fatfree-core": "^3.7",
         "mustangostang/spyc": "^0.6",
