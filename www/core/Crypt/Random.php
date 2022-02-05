@@ -109,8 +109,8 @@ class Random {
      * @return string a short-lived code
      */
     function shortCode($num_digits = 6) {
-        $base = new BigNum(self::bytes(4), 256);
-        return substr($base->val(10), -6);
+        $base = new BigNum(self::bytes($num_digits), 256);
+        return substr($base->val(10), -$num_digits);
     }
 }
 ?>
