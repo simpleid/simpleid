@@ -257,7 +257,7 @@ class MyModule extends Module {
         $user = $auth->getUser();
         $tpl = new \Template();
 
-        $event->addBlock('welcome', $this->f3->get('intl.core.my.logged_in_as', $user->getDisplayName(), $user['uid']), -10, [
+        $event->addBlock('welcome', $this->f3->get('intl.core.my.logged_in_as', [ $user->getDisplayName(), $user['uid'] ]), -10, [
             'title' => $this->f3->get('intl.core.my.welcome_title')
         ]);
 
