@@ -68,18 +68,18 @@ class OAuthManager extends Prefab {
             $client_secret = $header['#password'];
         }
 
-        if (!$client_id && $this->f3->exists('POST.client_id') && $this->f3->exists('POST.client_secret')) {
+        if (!isset($client_id) && $this->f3->exists('POST.client_id') && $this->f3->exists('POST.client_secret')) {
             $client_auth_method = 'client_secret_post';
             $client_id = $this->f3->get('POST.client_id');
             $client_secret = $this->f3->get('POST.client_secret');
         }
 
-        if ($client_id) {
+        if (isset($client_id)) {
             $client = $store->loadClient($client_id, 'SimpleID\Protocols\OAuth\OAuthClient');
             
-            if ($client['oauth']['client_secret'] != $client_secret) return;
+            if ($client['oauth']['client_secret'] != $client_secret) return;  // @phpstan-ignore-line
             
-            $this->client_auth_method = $client_auth_method;
+            $this->client_auth_method = $client_auth_method; // @phpstan-ignore-line
         } else {
             $event = new OAuthInitClientEvent($request);
             \Events::instance()->dispatch($event);
@@ -90,9 +90,12 @@ class OAuthManager extends Prefab {
                 $this->client_auth_method = $event->getAuthMethod();
             }
         }
-        $this->f3->set('oauth_client', $client);
 
-        $this->logger->log(LogLevel::INFO, 'OAuth client: ' . $client_id . ' [' . $this->client_auth_method . ']');
+        if (isset($client)) {
+            $this->f3->set('oauth_client', $client);
+
+            $this->logger->log(LogLevel::INFO, 'OAuth client: ' . $client_id . ' [' . $this->client_auth_method . ']');  // @phpstan-ignore-line
+        }
     }
 
 

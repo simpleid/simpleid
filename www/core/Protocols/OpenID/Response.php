@@ -249,8 +249,9 @@ class Response extends Message {
     public function getAliasForExtension($ns, $create = FALSE) {        
         if (isset($this->extension_map[$ns])) return $this->extension_map[$ns];
         if ($create !== FALSE) {
+            $alias = 'e' . $this->extension_autonum;
+            
             if ($create === TRUE) {
-                $alias = 'e' . $this->extension_autonum;
                 $this->extension_autonum++;
             } elseif (is_string($create)) {
                 $used_aliases = array_values($this->extension_map);

@@ -201,7 +201,7 @@ class AuthManager extends Prefab {
             $module_acr = implode(' ', $event->getResults());
         }
 
-        return ($module_acr) ? $module_acr : $default_acr;
+        return (isset($module_acr)) ? $module_acr : $default_acr;
     }
 
     /**

@@ -75,7 +75,7 @@ class Request extends Message {
             $realm = $this->container['openid.realm'];
         }
         
-        if (!$realm) {
+        if (!isset($realm)) {
             $realm = $this->container['openid.return_to'];
         }
         
