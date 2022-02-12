@@ -31,7 +31,7 @@ use SimpleID\Util\Forms\FormSubmitEvent;
  */
 class LoginFormSubmitEvent extends FormSubmitEvent implements AuthResultInterface {
     protected $user = null;
-    protected $auth_level = 0;
+    protected $auth_level = AuthManager::AUTH_LEVEL_SESSION;
     protected $auth_module_names = [];
 
     /**
@@ -42,13 +42,18 @@ class LoginFormSubmitEvent extends FormSubmitEvent implements AuthResultInterfac
      */
     public function __construct($form_state, $eventName = null) {
         parent::__construct($form_state, $eventName);
+
+        if (isset($form_state['auth_level'])) $this->auth_level = $form_state['auth_level'];
     }
 
     /**
      * {@inheritdoc}
      */
     public function isAuthSuccessful() {
-        return ($this->user != null);
+        if ($this->user != null) return true;
+
+        if (isset($this->form_state['mode']) && ($this->auth_level >= $this->form_state['mode'])) return true;
+        return false;
     }
 
     /**
