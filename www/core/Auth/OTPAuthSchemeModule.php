@@ -79,6 +79,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             return;
         } elseif ($this->f3->get('POST.op') == $this->f3->get('intl.common.verify')) {
             $params = $token->getPayload($this->f3->get('POST.otp_params'));
+            $params['secret'] = base64_decode($params['secret']);
             $this->f3->set('otp_params', $this->f3->get('POST.otp_params'));
 
             if (($this->f3->exists('POST.tk') === false) || (!$token->verify($this->f3->get('POST.tk'), 'otp'))) {
@@ -109,7 +110,10 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
                 'drift' => 0,
                 'remember' => []
             ];
-            $this->f3->set('otp_params', $token->generate($params, SecurityToken::OPTION_BIND_SESSION));
+            // SecurityToken requires everything to be UTF-8
+            $params_token = $params;
+            $params_token['secret'] = base64_encode($params['secret']);
+            $this->f3->set('otp_params', $token->generate($params_token, SecurityToken::OPTION_BIND_SESSION));
         }
 
         $secret = new BigNum($params['secret'], 256);
