@@ -49,6 +49,25 @@ class HTTPResponseTest extends TestCase {
         ];
     }
 
+    protected function getRedirectAndOKResponse() {
+        return [
+            'body' => '<html><body><h1>Login</h1></body></html>',
+            'headers' => [
+                'HTTP/2 302',
+                'server: nginx/1.20.1',
+                'date: Tue, 22 Feb 2022 22:22:22 GMT',
+                'content-type: text/html; charset=utf-8',
+                'content-length: 222',
+                'location: login',
+                'HTTP/2 200',
+                'server: nginx/1.20.1',
+                'date: Tue, 22 Feb 2022 22:22:22 GMT',
+                'content-type: text/html; charset=utf-8',
+                'content-length: 2222',
+            ]
+        ];
+    }
+
     protected function getInstance($response) {
         return new HTTPResponse($response);
     }
@@ -77,6 +96,15 @@ class HTTPResponseTest extends TestCase {
     public function testAlternativeOK() {
         $response = $this->getInstance($this->getAlternativeOKResponse());
         $this->assertEquals('<html><body><h1>It works!</h1></body></html>', $response->getBody());
+        $this->assertEquals(200, $response->getResponseCode());
+        $this->assertEquals('text/html; charset=utf-8', $response->getHeader('Content-Type'));
+        $this->assertEquals(2222, $response->getHeader('Content-Length'));
+        $this->assertFalse($response->isHTTPError());
+    }
+
+    public function testRedirectAndOK() {
+        $response = $this->getInstance($this->getRedirectAndOKResponse());
+        $this->assertEquals('<html><body><h1>Login</h1></body></html>', $response->getBody());
         $this->assertEquals(200, $response->getResponseCode());
         $this->assertEquals('text/html; charset=utf-8', $response->getHeader('Content-Type'));
         $this->assertEquals(2222, $response->getHeader('Content-Length'));
