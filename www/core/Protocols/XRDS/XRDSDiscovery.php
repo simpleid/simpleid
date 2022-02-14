@@ -296,7 +296,7 @@ class XRDSDiscovery extends Prefab {
      */
     protected function request($url, $headers = '') {
         $web = \Web::instance();
-        $result = $web->request($url, [ 'headers' => $headers ]);
+        $result = $web->request($url, [ 'header' => $headers ]);
         return new HTTPResponse($result);
     }
 }
