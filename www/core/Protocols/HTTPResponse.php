@@ -50,9 +50,13 @@ class HTTPResponse {
         }
 
         $this->body = $response['body'];
+        $this->readHeaders($response['headers']);
+    }
 
+    private function readHeaders($headers)
+    {
         // Get the status line
-        $status = array_shift($response['headers']);
+        $status = array_shift($headers);
 
         // Parse the status line
         list($protocol, $code) = explode(' ', trim($status), 3);
@@ -73,11 +77,16 @@ class HTTPResponse {
             $this->responseCode = floor($code / 100) * 100;
         }
 
-        if (!in_array($this->responseCode, [200, 304])) {
-            $this->isHTTPError = true;
-        }
+        $this->isHTTPError = !in_array($this->responseCode, [200, 304]);
 
-        while ($field = array_shift($response['headers'])) {
+        while ($headers) {
+            // Encountering another HTTP status line means there is a follow-up response
+            // after a redirect. In this case drop all previous headers and start anew.
+            if (preg_match('@^HTTP/\d+(\.\d+)? \d{3}@', $headers[0])) {
+                $this->headers = [];
+                return $this->readHeaders($headers);
+            }
+            $field = array_shift($headers);
             list($header, $value) = explode(':', trim($field), 2);
             
             // Headers are case insensitive
