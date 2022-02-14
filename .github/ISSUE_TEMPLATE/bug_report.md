@@ -34,5 +34,5 @@ For instructions on generating log files
  - PHP: [version, extension loaded]
  - Browser [e.g. chrome, safari]
 
-**Expected behaviour**
+**Additional information**
 Any other information which you think would be useful in diagnosing the problem.
