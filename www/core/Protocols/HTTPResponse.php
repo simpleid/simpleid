@@ -55,7 +55,7 @@ class HTTPResponse {
         $status = array_shift($response['headers']);
 
         // Parse the status line
-        list($protocol, $code, $reason) = explode(' ', trim($status), 3);
+        list($protocol, $code) = explode(' ', trim($status), 3);
         $this->version = substr($protocol, strpos($protocol, '/') + 1);
         $this->responseCode = $code;
 
