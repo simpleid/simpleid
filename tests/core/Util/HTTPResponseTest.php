@@ -36,6 +36,19 @@ class HTTPResponseTest extends TestCase {
         );
     }
 
+    protected function getAlternativeOKResponse() {
+        return [
+            'body' => '<html><body><h1>It works!</h1></body></html>',
+            'headers' => [
+                'HTTP/2 200',
+                'date: Tue, 22 Feb 2022 22:22:22 GMT',
+                'server: nginx/1.20.1',
+                'content-type: text/html; charset=utf-8',
+                'content-length: 2222',
+            ]
+        ];
+    }
+
     protected function getInstance($response) {
         return new HTTPResponse($response);
     }
@@ -50,7 +63,7 @@ class HTTPResponseTest extends TestCase {
         $response = $this->getInstance($this->getErrorResponse());
         $this->assertFalse($response->isNetworkError());
         $this->assertTrue($response->isHTTPError());
-    }    
+    }
 
     public function testOK() {
         $response = $this->getInstance($this->getOKResponse());
@@ -58,6 +71,16 @@ class HTTPResponseTest extends TestCase {
         $this->assertEquals(200, $response->getResponseCode());
         $this->assertEquals('"10000000565a5-2c-3e94b66c2e680"', $response->getHeader('ETag'));
         $this->assertFalse($response->hasHeader('X-XRDS-Location'));
+        $this->assertFalse($response->isHTTPError());
+    }
+
+    public function testAlternativeOK() {
+        $response = $this->getInstance($this->getAlternativeOKResponse());
+        $this->assertEquals('<html><body><h1>It works!</h1></body></html>', $response->getBody());
+        $this->assertEquals(200, $response->getResponseCode());
+        $this->assertEquals('text/html; charset=utf-8', $response->getHeader('Content-Type'));
+        $this->assertEquals(2222, $response->getHeader('Content-Length'));
+        $this->assertFalse($response->isHTTPError());
     }
 }
 
