@@ -57,14 +57,15 @@ class Response extends Message {
      * response will contain the same OpenID version, as well as the same
      * extension URI-to-alias mapping as the underlying request.
      * 
-     * @param Request $request the request to which the response will
+     * @param Request|array|null $request the request to which the response will
      * be made
      */
     public function __construct($request = NULL) {
-        if ($request != NULL) {
-            $this->setVersion($request->getVersion());
-            $this->extension_map = $request->getExtensionMap();
-        }
+        if ($request === null) return;
+        if (!$request instanceof Request) $request = new Request($request);
+
+        $this->setVersion($request->getVersion());
+        $this->extension_map = $request->getExtensionMap();
 
         foreach ($request as $key => $value) {
             if (strpos($key, 'openid.ns.') === 0) {
