@@ -123,7 +123,12 @@ class SecurityToken {
     }
 
     /**
-     * Generates a token
+     * Generates a token.
+     * 
+     * Note that as part of creating the token, `$payload` is encoded using
+     * `json_encode()`.  Therefore `$payload` must be capable of being
+     * JSON encoded.  In particular, all strings within `$payload` must be
+     * UTF-8 encoded.
      *
      * @param mixed $payload the payload to include in the token
      * @param int $options the options for generating the token

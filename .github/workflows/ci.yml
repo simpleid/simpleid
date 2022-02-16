@@ -3,7 +3,8 @@ name: Continuous integration tests
 on: [ push, pull_request ]
 
 jobs:
-  tests:
+  phpunit:
+    name: Unit tests (PHP ${{ matrix.php-versions }})
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -13,7 +14,6 @@ jobs:
           - 7.4
           - 8.0
           - 8.1
-    name: Tests on PHP ${{ matrix.php-versions }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -33,10 +33,34 @@ jobs:
           restore-keys: "php${{ matrix.php-versions }}-composer-"
 
       - name: Install dependencies
-        run: composer install
-
-      - name: Perform static analysis
-        run: composer phpstan
+        run: composer update && composer install
 
       - name: Run tests
         run: composer test
+
+  stan:
+    name: Static analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.0
+          extensions: openssl, hash, gmp, xml
+          tools: composer
+
+      - name: Cache dependencies
+        uses: actions/cache@v1
+        with:
+          path: "~/.composer/cache"
+          key: "phpstan-composer-${{ hashFiles('**/composer.json') }}"
+          restore-keys: "phpstan-composer-"
+
+      - name: Install dependencies
+        run: composer update && composer install
+
+      - name: Perform static analysis
+        run: composer phpstan
