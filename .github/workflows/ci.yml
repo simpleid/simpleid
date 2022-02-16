@@ -59,7 +59,7 @@ jobs:
           restore-keys: "phpstan-composer-"
 
       - name: Install dependencies
-        run: composer update && install
+        run: composer update && composer install
 
       - name: Perform static analysis
         run: composer phpstan
