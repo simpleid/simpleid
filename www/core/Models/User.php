@@ -139,7 +139,7 @@ class User extends ArrayWrapper implements Serializable, Storable {
         return $this->activities;
     }
 
-    public function offsetSet($offset, $value) {
+    public function offsetSet($offset, $value): void {
         switch ($offset) {
             case 'uid':
                 $this->uid = $value;
@@ -152,7 +152,7 @@ class User extends ArrayWrapper implements Serializable, Storable {
         }
     }
 
-    public function offsetExists($offset) {
+    public function offsetExists($offset): bool {
         switch ($offset) {
             case 'uid':
                 return true;
@@ -165,7 +165,7 @@ class User extends ArrayWrapper implements Serializable, Storable {
         }
     }
 
-    public function offsetGet($offset) {
+    public function offsetGet($offset): mixed {
         switch ($offset) {
             case 'uid':
                 return $this->uid;

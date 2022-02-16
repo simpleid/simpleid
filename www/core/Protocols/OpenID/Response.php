@@ -294,7 +294,7 @@ class Response extends Message {
     }
 
     /** Signed fields*/
-    public function offsetSet($offset, $value) {
+    public function offsetSet($offset, $value): void {
         if (is_null($offset)) {
             parent::offsetSet($offset, $value);
         } else {
@@ -303,7 +303,7 @@ class Response extends Message {
     }
 
     /** Signed fields*/
-    public function offsetUnset($offset) {
+    public function offsetUnset($offset): void {
         parent::offsetUnset($offset);
         $this->signed_fields = array_diff($this->signed_fields, [ $offset ]);
     }
