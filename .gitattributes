@@ -4,4 +4,7 @@
 /.gitignore             export-ignore
 /phpstan.neon.dist      export-ignore
 /phpunit.xml.dist       export-ignore
-/RoboFile.phpunit       export-ignore
+/RoboFile.php           export-ignore
+
+# Add commit/tag name to version.inc.php
+/www/version.inc.php    export-subst
