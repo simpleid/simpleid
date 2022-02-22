@@ -77,8 +77,8 @@ class HTTPResponse {
             $this->isHTTPError = true;
         }
 
-        while ($field = trim(array_shift($response['headers']))) {
-            list($header, $value) = explode(':', $field, 2);
+        while ($field = array_shift($response['headers'])) {
+            list($header, $value) = explode(':', trim($field), 2);
             
             // Headers are case insensitive
             $header = self::httpCase($header);

@@ -109,7 +109,7 @@ class ArrayWrapper implements ArrayAccess, Countable {
     /**
      * Implementation of ArrayAccess
      */
-    public function offsetSet($offset, $value) {
+    public function offsetSet($offset, $value): void {
         if (is_null($offset)) {
             $this->container[] = $value;
         } else {
@@ -120,28 +120,28 @@ class ArrayWrapper implements ArrayAccess, Countable {
     /**
      * Implementation of ArrayAccess
      */
-    public function offsetExists($offset) {
+    public function offsetExists($offset): bool {
         return isset($this->container[$offset]);
     }
 
     /**
      * Implementation of ArrayAccess
      */
-    public function offsetUnset($offset) {
+    public function offsetUnset($offset): void {
         unset($this->container[$offset]);
     }
 
     /**
      * Implementation of ArrayAccess
      */
-    public function offsetGet($offset) {
+    public function offsetGet($offset): mixed {
         return isset($this->container[$offset]) ? $this->container[$offset] : null;
     }
 
     /**
      * Implementation of Countable
      */
-    public function count() {
+    public function count(): int {
         return count($this->container);
     }
 
