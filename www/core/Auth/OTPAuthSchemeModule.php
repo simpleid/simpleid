@@ -223,7 +223,6 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
         if ($form_state['mode'] == AuthManager::MODE_VERIFY) {
             $store = StoreManager::instance();
 
-            $uid = $form_state['uid'];
             $test_user = $store->loadUser($form_state['uid']);
             $params = $test_user['otp'];
             
