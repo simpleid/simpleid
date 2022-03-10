@@ -222,10 +222,6 @@ class AuthManager extends Prefab {
         $level = $result->getAuthLevel();
         $modules = $result->getAuthModuleNames();
 
-        if (($user == null) && isset($form_state['uid'])) {
-            $user = $store->loadUser($form_state['uid']);
-        }
-
         $this->f3->set('user', $user);
 
         $this->auth_info['uid'] = $user['uid'];

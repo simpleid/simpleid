@@ -42,18 +42,13 @@ class LoginFormSubmitEvent extends FormSubmitEvent implements AuthResultInterfac
      */
     public function __construct($form_state, $eventName = null) {
         parent::__construct($form_state, $eventName);
-
-        if (isset($form_state['auth_level'])) $this->auth_level = $form_state['auth_level'];
     }
 
     /**
      * {@inheritdoc}
      */
     public function isAuthSuccessful() {
-        if ($this->user != null) return true;
-
-        if (isset($this->form_state['mode']) && ($this->auth_level >= $this->form_state['mode'])) return true;
-        return false;
+        return ($this->user != null);
     }
 
     /**

@@ -154,11 +154,7 @@ class AuthModule extends Module {
         }
 
         if ($submit_event->isAuthSuccessful()) {
-            // $submit_event->getUser() can be null when mode is MODE_VERIFY or MODE_REENTER_CREDENTIALS
-            // In these cases $form_state['uid'] would already be populated
-            $test_user = $submit_event->getUser();
-            if ($test_user != null) $form_state['uid'] = $test_user['uid'];
-
+            $form_state['uid'] ??= $submit_event->getUser()['uid'];
             $form_state['auth_level'] = $submit_event->getAuthLevel();
             $form_state['modules'] = $submit_event->getAuthModuleNames();
         } else {
