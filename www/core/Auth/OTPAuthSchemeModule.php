@@ -187,7 +187,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             if ($test_user['otp']['type'] == 'recovery') return;
 
             $uaid = $auth->assignUAID();
-            if (isset($test_user->auth[$uaid]) && isset($test_user->auth[$uaid]['otp']) && $test_user->auth[$uaid]['otp']['remember']) return;
+            if ($test_user->pathRef("auth.$uaid.otp.remember", false)) return;
 
             $tpl = new \Template();
 
@@ -255,12 +255,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
 
         if (($level >= AuthManager::AUTH_LEVEL_VERIFIED) && isset($form_state['otp_remember']) && ($form_state['otp_remember'] == 1)) {
             $uaid = $auth->assignUAID();
-
-            if (!isset($user->auth[$uaid])) $user->auth[$uaid] = [];
-            if (!isset($user->auth[$uaid]['otp'])) $user->auth[$uaid]['otp'] = [];
-            
-            $user->auth[$uaid]['otp']['remember'] = true;
-
+            $user->pathSet("auth.$uaid.otp.remember", true);
             $store->saveUser($user);
         }
     }
