@@ -237,6 +237,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             $store->saveUser($test_user); // Save the drift
 
             $event->addAuthModuleName(self::class);
+            $event->setUser($test_user);
             $event->setAuthLevel($form_state['mode']);
         }
     }
