@@ -72,8 +72,8 @@ class HTTPResponse {
         if (!in_array($code, $valid_codes)) {
             $this->responseCode = floor($code / 100) * 100;
         }
-        
-        if (($this->responseCode != 200) && ($this->responseCode != 304)) {
+
+        if (!in_array($this->responseCode, [200, 304])) {
             $this->isHTTPError = true;
         }
 
