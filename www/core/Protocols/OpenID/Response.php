@@ -173,7 +173,7 @@ class Response extends Message {
     /**
      * Encodes the response in application/x-www-form-urlencoded format.
      *
-     * @param string $indirect_url the URL to which the OpenID response is sent.
+     * @param string $url the URL to which the OpenID response is sent.
      * @return string the encoded message
      * @since 0.8
      */

@@ -68,7 +68,7 @@ class OpenIDResponseBuildEvent {
     /**
      * Retrieves the OpenID request.
      * 
-     * @return SimpleID\Protocols\OpenID\Request the OpenID request
+     * @return \SimpleID\Protocols\OpenID\Request the OpenID request
      */
     public function getRequest() {
         return $this->request;
@@ -78,7 +78,7 @@ class OpenIDResponseBuildEvent {
      * Retrieves the OpenID response.  This response can be
      * modified.
      * 
-     * @return SimpleID\Protocols\OpenID\Response the OpenID response to modify
+     * @return \SimpleID\Protocols\OpenID\Response the OpenID response to modify
      */
     public function getResponse() {
         return $this->response;

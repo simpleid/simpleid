@@ -168,7 +168,6 @@ class DiffieHellman {
      *
      * @param resource $ZZ the Diffie-Hellman key exchange shared secret as a bignum
      * @param string $mac_key a byte stream containing the MAC key
-     * @param string $hash_func the hash function
      * @return string the encrypted MAC key in Base64 representation
      */
     protected function cryptMACKey($ZZ, $mac_key) {
@@ -187,7 +186,6 @@ class DiffieHellman {
      * @param BigNum $key the encryption key.  This is usually
      * the shared secret (ZZ) calculated from the Diffie-Hellman key exchange
      * @param string $plain_cipher the plaintext or ciphertext
-     * @param string $hash_func the hash function
      * @return string the ciphertext or plaintext
      */
     protected function xorCrypt($key, $plain_cipher) {
@@ -205,8 +203,6 @@ class DiffieHellman {
     /**
      * Generates a key pair for Diffie-Hellman key exchange.
      *
-     * @param string $dh_modulus modulus, in Base64 representation
-     * @param string $dh_gen generator, in Base64 representation
      */
     private function generateKeyPair() {
         // Generate the private key - a random number which is less than p

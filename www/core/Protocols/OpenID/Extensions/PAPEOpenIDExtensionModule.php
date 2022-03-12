@@ -51,7 +51,7 @@ class PAPEOpenIDExtensionModule extends Module implements ProtocolResult {
     /**
      * Returns the support for PAPE in SimpleID XRDS document
      *
-     * @param SimpleID\Util\Event\BaseDataCollectionEvent $event
+     * @param BaseDataCollectionEvent $event
      */
     public function onXrdsTypes(BaseDataCollectionEvent $event) {
         $event->addResult([

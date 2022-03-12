@@ -291,8 +291,8 @@ class XRDSDiscovery extends Prefab {
      * included in $headers.
      *
      * @param string $url the URL
-     * @param array $headers HTTP headers containing name => value pairs
-     * @return SimpleID\Protocols\HTTPResponse
+     * @param array|string $headers HTTP headers containing name => value pairs
+     * @return HTTPResponse
      */
     protected function request($url, $headers = '') {
         $web = \Web::instance();

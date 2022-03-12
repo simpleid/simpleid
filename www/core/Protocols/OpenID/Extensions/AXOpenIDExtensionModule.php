@@ -53,7 +53,7 @@ class AXOpenIDExtensionModule extends Module {
     /**
      * Returns the support for AX in SimpleID XRDS document
      *
-     * @param SimpleID\Util\Event\BaseDataCollectionEvent $event
+     * @param BaseDataCollectionEvent $event
      */
     function onXrdsTypes(BaseDataCollectionEvent $event) {
         $event->addResult(self::OPENID_NS_AX);

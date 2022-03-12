@@ -62,7 +62,7 @@ class RelyingParty extends Client {
      * Note that these discovered services may not be current.  The time
      * discovery was last made can be obtained from {@link getDiscoveryTime()}.
      *
-     * @return SimpleID\Protocols\XRDS\XRDSServices the XRDS services or null
+     * @return \SimpleID\Protocols\XRDS\XRDSServices the XRDS services or null
      */
     public function getServices() {
         return $this->container['openid']['services'];
