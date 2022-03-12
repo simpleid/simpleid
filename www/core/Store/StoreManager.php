@@ -98,8 +98,8 @@ class StoreManager extends Prefab {
      * This is called by {@link SimpleID\Store\StoreModule::__construct()}, so this
      * function should generally not needed to be called
      *
-     * @param StoreModule a store module
-     * @param array an array of stores that the module supports
+     * @param StoreModule $module a store module
+     * @param array $stores an array of stores that the module supports
      */
     public function addStore($module, $stores) {
         foreach ($stores as $store) {
@@ -127,7 +127,7 @@ class StoreManager extends Prefab {
      *
      * The criteria name is specified as a FatFree path.
      *
-     * @param string $item the item type
+     * @param string $type the item type
      * @param string $criteria the criteria name
      * @param string $value the criteria value
      * @return Storable the item or null if no item is found
@@ -145,7 +145,7 @@ class StoreManager extends Prefab {
      * The item ID must exist.  You should check whether the item ID exists with
      * the {@link exists()} function
      *
-     * @param string $item the item type
+     * @param string $type the item type
      * @param string $id the identifier of the item to load
      * @return Storable data for the specified item
      */
@@ -201,9 +201,10 @@ class StoreManager extends Prefab {
      * Loads a user.
      *
      * @param string $uid the user ID
-     * @return SimpleID\Models\User the user or null
+     * @return \SimpleID\Models\User the user or null
      */
     public function loadUser($uid) {
+        /** @var \SimpleID\Models\User $user */
         $user = $this->load('user', $uid);
         if ($user == null) return null;
 
@@ -218,7 +219,7 @@ class StoreManager extends Prefab {
     /**
      * Saves a user.
      * 
-     * @param SimpleID\Models\User the user to save
+     * @param \SimpleID\Models\User $user the user to save
      */
     public function saveUser($user) {
         if ($this->getStore('user:write', false) != null) {
@@ -237,9 +238,10 @@ class StoreManager extends Prefab {
      * @param string $cid the client ID
      * @param string $class_name the name of the class in which the data is
      * to be cast, nor null
-     * @return SimpleID\Models\Client the client or null
+     * @return \SimpleID\Models\Client the client or null
      */
     public function loadClient($cid, $class_name = null) {
+        /** @var \SimpleID\Models\Client $client */
         $client = $this->load('client', $cid);
         if ($client == null) return null;
 
