@@ -82,6 +82,11 @@ use SimpleID\Models\User;
  * - **Settings.** Convenience methods {@link getSetting()}, {@link setSetting()}
  *   and {@link deleteSetting()} are provided.
  *
+ * @method Storable loadAuth(string $id)
+ * @method void saveAuth(Storable $item)
+ * @method void deleteAuth(Storable $item)
+ * @method void saveClient(Storable $item)
+ * @method Storable|null findUser(string $criteria, string $value)
  */
 class StoreManager extends Prefab {
     /** @var array a mapping between the identifier of a store and its store module */

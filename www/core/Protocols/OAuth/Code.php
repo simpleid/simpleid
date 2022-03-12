@@ -173,6 +173,7 @@ class Code implements TokenSource {
      */
     public function getAuthorization() {
         $store = StoreManager::instance();
+        /** @var Authorization $authorization */
         $authorization = $store->loadAuth($this->aid);
         if ($authorization == null) return null;
         if ($authorization->getAuthState() != $this->auth_state) return null;

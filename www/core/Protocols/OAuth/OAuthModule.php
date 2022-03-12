@@ -365,6 +365,7 @@ class OAuthModule extends Module implements ProtocolResult {
             }
         }
 
+        /** @var Authorization $authorization */
         $authorization = $store->loadAuth(Authorization::buildID($user, $client));
 
         if ($authorization == null) {
@@ -787,6 +788,7 @@ class OAuthModule extends Module implements ProtocolResult {
 
         $aid = Authorization::buildID($user, $client);
 
+        /** @var Authorization $authorization */
         $authorization = $store->loadAuth($aid);
 
         if ($authorization != null) {
