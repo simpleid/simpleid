@@ -173,7 +173,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
     }
 
     /**
-     * @param SimpleID\Util\Form\FormBuildEvent $event
+     * @param FormBuildEvent $event
      */
     public function onLoginFormBuild(FormBuildEvent $event) {
         $form_state = $event->getFormState();
@@ -182,6 +182,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             $auth = AuthManager::instance();
             $store = StoreManager::instance();
 
+            /** @var \SimpleID\Models\User $test_user */
             $test_user = $store->loadUser($form_state['uid']);
             if (!isset($test_user['otp'])) return;
             if ($test_user['otp']['type'] == 'recovery') return;
@@ -201,7 +202,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
     }
 
     /**
-     * @param SimpleID\Util\Form\FormSubmitEvent $event
+     * @param FormSubmitEvent $event
      */
     public function onLoginFormValidate(FormSubmitEvent $event) {
         $form_state = $event->getFormState();
@@ -215,7 +216,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
     }
 
     /**
-     * @param SimpleID\Auth\LoginFormSubmitEvent $event
+     * @param LoginFormSubmitEvent $event
      */
     public function onLoginFormSubmit(LoginFormSubmitEvent $event) {
         $form_state = $event->getFormState();

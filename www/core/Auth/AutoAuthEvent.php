@@ -50,7 +50,7 @@ class AutoAuthEvent implements AuthResultInterface {
      * Set the user object for the user that has been automatically
      * authenticated.
      * 
-     * @param SimpleID\Models\User $user the user
+     * @param User $user the user
      * @param string $auth_module_name the name of the module that
      * authenticated the user
      */
@@ -62,7 +62,7 @@ class AutoAuthEvent implements AuthResultInterface {
     /**
      * Returns the authenticated user
      * 
-     * @return SimpleID\Models\User the user
+     * @return User the user
      */
     public function getUser(): User {
         return $this->user;

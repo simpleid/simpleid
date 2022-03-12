@@ -73,7 +73,7 @@ class OpenIDCheckEvent implements ProtocolResult {
     /**
      * Returns the OpenID request.
      * 
-     * @return SimpleID\Protocols\OpenID\Request the OpenID request
+     * @return \SimpleID\Protocols\OpenID\Request the OpenID request
      */
     public function getRequest() {
         return $this->request;

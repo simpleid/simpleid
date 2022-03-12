@@ -35,7 +35,7 @@ class CertAuthSchemeModule extends AuthSchemeModule {
     /**
      * Attempts to automatically login using the client certificate
      * 
-     * @param SimpleID\Auth\AutoAuthEvent $event the event
+     * @param AutoAuthEvent $event the event
      */
     public function onAutoAuthEvent(AutoAuthEvent $event) {
         if (!$this->hasClientCert()) return NULL;

@@ -221,7 +221,7 @@ class DefaultStoreModule extends StoreModule {
      * The client name must exist.  You should check whether the client name exists with
      * the {@link hasClient()} function
      *
-     * @param string $client the name of the client to load
+     * @param string $cid the name of the client to load
      * @return User data for the specified user
      */
     protected function readClient($cid) {
@@ -260,7 +260,7 @@ class DefaultStoreModule extends StoreModule {
      * This data is stored in the client store file.
      *
      * @param string $cid the name of the client
-     * @param Client $data the data to save
+     * @param Client $client the data to save
      */
     protected function writeClient($cid, $client) {
         if (!$this->isValidName($cid)) {
@@ -279,8 +279,8 @@ class DefaultStoreModule extends StoreModule {
     /**
      * Returns whether a key-value item exists.
      *
+     * @param string $type the item type
      * @param string $name the name of the key-value item to return
-     * @param mixed $default the default value to use if this variable has never been set
      * @return bool the value of the key-value item
      *
      */
@@ -293,8 +293,8 @@ class DefaultStoreModule extends StoreModule {
     /**
      * Loads a key-value item.
      *
+     * @param string $type the item type
      * @param string $name the name of the key-value item to return
-     * @param mixed $default the default value to use if this variable has never been set
      * @return mixed the value of the key-value item
      *
      */
@@ -310,6 +310,7 @@ class DefaultStoreModule extends StoreModule {
     /**
      * Saves a key-value item.
      *
+     * @param string $type the item type
      * @param string $name the name of the key-value item to save
      * @param mixed $value the value of the key-value item
      *
@@ -329,6 +330,7 @@ class DefaultStoreModule extends StoreModule {
     /**
      * Deletes a key-value item.
      *
+     * @param string $type the item type
      * @param string $name the name of the setting to delete
      *
      */

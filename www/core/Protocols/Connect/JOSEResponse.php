@@ -65,8 +65,8 @@ class JOSEResponse extends ArrayWrapper {
      * - `connect.userinfo_encrypted_response_alg`
      * - `connect.userinfo_encrypted_response_enc`
      *
-     * @param string the issuer ID
-     * @param SimpleID\OAuth\OAuthClient $client the OAuth client to which the response
+     * @param string $issuer the issuer ID
+     * @param \SimpleID\Protocols\OAuth\OAuthClient $client the OAuth client to which the response
      * will be sent
      * @param string $path_prefix the prefix from which paths will be formed and passed
      * to {@link ArrayWrapper::pathGet()} to get the client configuration
@@ -129,11 +129,12 @@ class JOSEResponse extends ArrayWrapper {
      * algorithm is RS256, the underlying hash algorithm is SHA-256, and this function
      * will return the encoded value of the left-most 128 bits of the SHA-256 hash.
      *
-     * @param string $name the name of the claim
+     * @param string $claim the name of the claim
      * @param string $value the value over which the short hash to be calculated
      */
     function setShortHashClaim($claim, $value) {
         $alg = ($this->signed_response_alg) ? $this->signed_response_alg : 'HS256';
+        /** @var \SimpleJWT\Crypt\SignatureAlgorithm $signer */
         $signer = AlgorithmFactory::create($alg);
 
         if ($signer) {
@@ -147,7 +148,7 @@ class JOSEResponse extends ArrayWrapper {
      * This function calls the {@link buildJOSE()} method to get the response
      * body, then renders it with the appropriate HTTP headers.
      *
-     * @param SimpleJWT\Keys\KeySet $set the key set to be passed to the
+     * @param \SimpleJWT\Keys\KeySet $set the key set to be passed to the
      * {@link buildJOSE()} method.
      */
     function render($set = null) {
@@ -171,7 +172,7 @@ class JOSEResponse extends ArrayWrapper {
      * - A JWE containing a nested JWT, if both {@link $signed_response_alg}
      *   and {@link $encrypted_response_alg} are set
      *
-     * @param SimpleJWT\Keys\KeySet $set the key set used to sign and/or
+     * @param \SimpleJWT\Keys\KeySet $set the key set used to sign and/or
      * encrypt the token.  If set to null, the default set of keys
      * configured for the client and the server are loaded
      * @return string the response body

@@ -52,7 +52,9 @@ class OpenID2MigrationModule extends Module {
     public function userJSON($f3, $params) {
         $mgr = ModuleManager::instance();
 
-        $iss = $mgr->getModule('SimpleID\Protocols\Connect\ConnectModule')->getCanonicalHost();
+        /** @var \SimpleID\Protocols\Connect\ConnectModule $connect_module */
+        $connect_module = $mgr->getModule('SimpleID\Protocols\Connect\ConnectModule');
+        $iss = $connect_module->getCanonicalHost();
         $store = StoreManager::instance();
         $user = $store->loadUser($params['uid']);
         

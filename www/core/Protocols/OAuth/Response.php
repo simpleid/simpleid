@@ -87,7 +87,7 @@ class Response extends ArrayWrapper {
      * Sets the response mode to be used in redirect responses.  This should
      * be either QUERY_RESPONSE_MODE or FRAGMENT_RESPONSE_MODE
      *
-     * @param string $flow the response mode
+     * @param string $response_mode the response mode
      */
     public function setResponseMode($response_mode) {
         $this->response_mode = $response_mode;

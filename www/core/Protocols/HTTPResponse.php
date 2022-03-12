@@ -74,7 +74,7 @@ class HTTPResponse {
         // RFC 2616 states that all unknown HTTP codes must be treated the same as the
         // base code in their class.
         if (!in_array($code, $valid_codes)) {
-            $this->responseCode = floor($code / 100) * 100;
+            $this->responseCode = floor(intval($code) / 100) * 100;
         }
 
         $this->isHTTPError = !in_array($this->responseCode, [200, 304]);

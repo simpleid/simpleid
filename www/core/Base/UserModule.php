@@ -39,7 +39,8 @@ class UserModule extends Module {
     /**
      * Returns the user's public page.
      * 
-     * @param string $uid the user ID
+     * @param \Base $f3
+     * @param array $params
      */
     function user($f3, $params) {
         $web = \Web::instance();
@@ -63,10 +64,14 @@ class UserModule extends Module {
                 $content_type = $web->acceptable([ 'text/html', 'application/xml', 'application/xhtml+xml', 'application/xrds+xml', 'application/json' ]);
                 
                 if (($content_type == 'application/xrds+xml') && ($mgr->isModuleLoaded('SimpleID\Protocols\OpenID\OpenIDModule'))) {
-                    $mgr->getModule('SimpleID\Protocols\OpenID\OpenIDModule')->userXRDS($f3, $params);
+                    /** @var \SimpleID\Protocols\OpenID\OpenIDModule $openid_module */
+                    $openid_module = $mgr->getModule('SimpleID\Protocols\OpenID\OpenIDModule');
+                    $openid_module->userXRDS($f3, $params);
                     return;
                 } elseif (($content_type == 'application/json') && ($mgr->isModuleLoaded('SimpleID\Protocols\Connect\OpenID2MigrationModule'))) {
-                    $mgr->getModule('SimpleID\Protocols\Connect\OpenID2MigrationModule')->userJSON($f3, $params);
+                    /** @var \SimpleID\Protocols\Connect\OpenID2MigrationModule $migration_module */
+                    $migration_module = $mgr->getModule('SimpleID\Protocols\Connect\OpenID2MigrationModule');
+                    $migration_module->userJSON($f3, $params);
                 } else {
                     $xrds_location = $this->getCanonicalURL('@openid_user_xrds');
                     header('X-XRDS-Location: ' . $xrds_location);
@@ -90,7 +95,7 @@ class UserModule extends Module {
     /**
      * Returns a block containing OpenID Connect user information.
      *
-     * @param UIBuildEvent the event to collect the
+     * @param UIBuildEvent $event the event to collect the
      * OpenID Connect user information block
      */
     function onProfileBlocks(UIBuildEvent $event) {

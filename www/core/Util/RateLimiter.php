@@ -73,7 +73,7 @@ class RateLimiter {
      * of requests the sources could have before the limit is reached.
      *
      * @param string $src the source
-     * @param bool $return_reminder whether to return the remaining number
+     * @param bool $return_remainder whether to return the remaining number
      * of allowed requests
      * @return bool|int
      */
@@ -143,7 +143,7 @@ class RateLimiter {
     /**
      * Returns the key
      *
-     * @param string the key
+     * @return string the key
      */
     public function getKey() {
         return $this->key;

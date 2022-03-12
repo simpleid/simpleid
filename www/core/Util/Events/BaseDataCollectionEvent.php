@@ -65,7 +65,7 @@ class BaseDataCollectionEvent implements \GenericEventInterface {
      * Creates a data collection event
      * 
      * @param string $eventName the name of the event, or the name
-     * @param bool $mergeStrategy whether the merge will be mergeStrategy
+     * @param int $mergeStrategy whether the merge will be mergeStrategy
      */
     public function __construct($eventName = null, $mergeStrategy = self::MERGE_DEFAULT) {
         $this->setEventName($eventName);

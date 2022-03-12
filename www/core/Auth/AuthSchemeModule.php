@@ -38,7 +38,7 @@ abstract class AuthSchemeModule extends Module {
     /** @var AuthManager */
     protected $auth;
 
-    /** @var SimpleID\ModuleManager */
+    /** @var ModuleManager */
     protected $mgr;
 
     public function __construct() {

@@ -43,7 +43,7 @@ abstract class Module extends \Prefab {
     protected $f3;
 
     /** Logger
-     * @var Psr\Log\LoggerInterface 
+     * @var \Psr\Log\LoggerInterface 
      */
     protected $logger;
 

@@ -113,7 +113,7 @@ class OpenIDModule extends Module implements ProtocolResult {
             default:
                 if (isset($request['openid.return_to'])) {
                     // Indirect communication - send error via indirect communication.
-                    $this->f3->fatalError($this->f3->get('intl.core.openid.invalid_message'));
+                    $this->fatalError($this->f3->get('intl.core.openid.invalid_message'));
                 } else {
                     // Direct communication
                     $this->directError('Invalid OpenID message.', [], $request);
@@ -474,8 +474,6 @@ class OpenIDModule extends Module implements ProtocolResult {
      * Returns an OpenID response indicating a positive assertion.
      *
      * @param Request $request the OpenID request
-     * @param int $result the authentication result providing the positive
-     * assertion
      * @return Response an OpenID response with a positive assertion
      * @link http://openid.net/specs/openid-authentication-1_1.html#anchor17, http://openid.net/specs/openid-authentication-1_1.html#anchor23, http://openid.net/specs/openid-authentication-2_0.html#positive_assertions
      */
@@ -843,7 +841,7 @@ class OpenIDModule extends Module implements ProtocolResult {
     /**
      * Processes a cancellation from the login form.
      *
-     * @param SimpleID\Util\Forms\FormSubmitEvent $event the form cancellation
+     * @param FormSubmitEvent $event the form cancellation
      * event
      */
     public function onLoginFormCancel(FormSubmitEvent $event) {
@@ -960,6 +958,8 @@ class OpenIDModule extends Module implements ProtocolResult {
         $store = StoreManager::instance();
 
         $cid = RelyingParty::buildID($realm);
+
+        /** @var RelyingParty $relying_party */
         $relying_party = $store->loadClient($cid);
         if ($relying_party == null) $relying_party = new RelyingParty($realm);
 

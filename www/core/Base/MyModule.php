@@ -192,7 +192,7 @@ class MyModule extends Module {
         }
 
         usort($consent_info, function ($a, $b) {
-            return $this->f3->cmp($a['weight'], $b['weight']);
+            return $a['weight'] - $b['weight'];
         });
         $results['consents'] = $consent_info;
 

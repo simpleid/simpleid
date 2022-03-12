@@ -35,7 +35,7 @@ class FormBuildEvent extends UIBuildEvent implements FormEventInterface {
     /**
      * Creates a form build event
      * 
-     * @param SimpleID\Util\Forms\FormState $form_state a reference to the form state array
+     * @param \SimpleID\Util\Forms\FormState $form_state a reference to the form state array
      * @param string $eventName the name of the event, or the name
      */
     public function __construct($form_state, $eventName = null) {

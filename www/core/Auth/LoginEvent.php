@@ -70,7 +70,7 @@ class LoginEvent implements FormEventInterface {
      * 
      * This is a proxy for `getAuthResult()->getUser()`.
      * 
-     * @return SimpleID\Models\User the user
+     * @return \SimpleID\Models\User the user
      */
     public function getUser() {
         return $this->result->getUser();

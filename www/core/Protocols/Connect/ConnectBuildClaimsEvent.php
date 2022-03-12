@@ -51,7 +51,7 @@ class ConnectBuildClaimsEvent extends BaseDataCollectionEvent {
     /**
      * Returns the user about which the ID token is created
      * 
-     * @return SimpleID\Models\User the user about which the ID
+     * @return User the user about which the ID
      * token is created
      */
     public function getUser() {
@@ -62,7 +62,7 @@ class ConnectBuildClaimsEvent extends BaseDataCollectionEvent {
      * Returns the client to which the ID token will be
      * sent.
      * 
-     * @return SimpleID\Models\Client the client to which the
+     * @return Client the client to which the
      * ID token will be sent
      */
     public function getClient() {

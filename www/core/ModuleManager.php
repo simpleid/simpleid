@@ -113,7 +113,7 @@ class ModuleManager extends Prefab {
     /**
      * Retrieves information on a SimpleID module
      *
-     * @param string $name the fully qualified class name of the module
+     * @param string $class the fully qualified class name of the module
      */
     public function getModuleInfo($class) {
         $loader = $this->f3->get('class_loader');

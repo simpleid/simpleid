@@ -149,7 +149,7 @@ class ArrayWrapper implements ArrayAccess, Countable {
      * Retrieve contents of the container based on a FatFree-like path
      * expression
      *
-     * @param $path string the path
+     * @param string $path the path
      * @return mixed the contents of the container matching the path
      */
     public function pathGet($path) {
@@ -161,7 +161,7 @@ class ArrayWrapper implements ArrayAccess, Countable {
      * Determines whether a FatFree-like path
      * expression can be resolved
      *
-     * @param $path string the path
+     * @param string $path the path
      * @return bool true if the path can be resolved
      */
     public function pathExists($path) {
@@ -173,8 +173,8 @@ class ArrayWrapper implements ArrayAccess, Countable {
      * Sets the value of the element specified by a FatFree-like path
      * expression
      *
-     * @param $path string the path
-     * @param $value mixed the value to set
+     * @param string $path the path
+     * @param mixed $value the value to set
      */
     public function pathSet($path, $value) {
         $ref = &$this->pathRef($path);
@@ -185,7 +185,7 @@ class ArrayWrapper implements ArrayAccess, Countable {
      * Removes the element specified by a FatFree-like path
      * expression
      *
-     * @param $path string the path
+     * @param string $path the path
      */
     public function pathUnset($path) {
         if (!$this->pathExists($path)) return;
@@ -214,8 +214,8 @@ class ArrayWrapper implements ArrayAccess, Countable {
      * If $add is set to true, adds non-existent keys,
      * array elements, and object properties
      *
-     * @param $path string the path
-     * @param $add adds non-existent keys, array elements, and object properties
+     * @param string $path the path
+     * @param bool $add adds non-existent keys, array elements, and object properties
      * @return mixed the contents of the container matching the path
      */
     public function &pathRef($path, $add = TRUE) {
@@ -229,8 +229,10 @@ class ArrayWrapper implements ArrayAccess, Countable {
      * If $add is set to true, adds non-existent keys,
      * array elements, and object properties
      *
-     * @param $path string the path
-     * @param $add adds non-existent keys, array elements, and object properties
+     * @param string $path the path
+     * @param bool $add adds non-existent keys, array elements, and object properties
+     * @param int|null $limit the number of path elements to traverse, or null for
+     * unlimited
      * @return mixed the contents of the container matching the path
      */
     protected function &pathRefLimit($path, $add = TRUE, $limit = NULL) {

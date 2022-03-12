@@ -45,7 +45,7 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
      * Displays the login form, with input fields for the user name
      * and password
      *
-     * @param SimpleID\Util\Form\FormBuildEvent $event
+     * @param FormBuildEvent $event
      */
     public function onLoginFormBuild(FormBuildEvent $event) {
         $form_state = $event->getFormState();
@@ -62,7 +62,7 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
     /**
      * Validates the login form.
      *
-     * @param SimpleID\Util\Form\FormSubmitEvent $event
+     * @param FormSubmitEvent $event
      */
     public function onLoginFormValidate(FormSubmitEvent $event) {
         $form_state = $event->getFormState();
@@ -85,7 +85,7 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
      * Processes the login form by verifying password credentials supplied
      * by the user.
      *
-     * @param SimpleID\Auth\LoginFormSubmitEvent $event
+     * @param LoginFormSubmitEvent $event
      */
     public function onLoginFormSubmit(LoginFormSubmitEvent $event) {
         $store = StoreManager::instance();

@@ -96,8 +96,8 @@ class Request extends Message {
      *        realm following the "*." wildcard, or
      *    (b) The URL's domain is identical to the realm's domain
      *
-     * @param string $url to URL to test
      * @param string $realm the realm
+     * @param bool $strict whether the scheme also needs to match
      * @return bool true if the URL matches the realm
      * @since 0.6
      */

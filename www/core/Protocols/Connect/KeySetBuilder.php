@@ -45,7 +45,7 @@ class KeySetBuilder {
     /**
      * Creates a key set builder for the specified client.
      *
-     * @param SimpleID\Protocols\OAuth\OAuthClient $client the client
+     * @param \SimpleID\Protocols\OAuth\OAuthClient $client the client
      */
     function __construct($client) {
         $this->set = new KeySet();
@@ -122,7 +122,7 @@ class KeySetBuilder {
     /**
      * Returns the completed key set.
      *
-     * @return SimpleJWT\Keys\KeySet
+     * @return \SimpleJWT\Keys\KeySet
      */
     function toKeySet() {
         return $this->set;

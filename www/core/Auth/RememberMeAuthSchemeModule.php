@@ -45,7 +45,7 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
     /**
      * Attempts to automatically login using the auto login cookie
      * 
-     * @see SimpleID\Auth\AutoAuthEvent
+     * @see AutoAuthEvent
      */
     public function onAutoAuthEvent(AutoAuthEvent $event) {
         if (!$this->f3->exists('COOKIE.' . $this->cookie_name)) return null;
@@ -93,7 +93,7 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
     /**
      * Displays the login form, with a remember-me checkbox.
      *
-     * @param SimpleID\Util\Form\FormBuildEvent $event
+     * @param FormBuildEvent $event
      */
     public function onLoginFormBuild(FormBuildEvent $event) {
         $form_state = $event->getFormState();
@@ -108,7 +108,7 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
      * Processes the login form by storing the user's remember-me setting
      * in the form state.
      *
-     * @param SimpleID\Auth\LoginFormSubmitEvent $event
+     * @param LoginFormSubmitEvent $event
      */
     public function onLoginFormSubmit(LoginFormSubmitEvent $event) {
         $form_state = $event->getFormState();
@@ -124,7 +124,7 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
      * Completes the login process by issuing a auto login cookie (if
      * so selected by the user).
      *
-     * @see SimpleID\Auth\LoginEvent
+     * @see LoginEvent
      */
     public function onLoginEvent(LoginEvent $event) {
         $level = $event->getAuthLevel();

@@ -40,7 +40,7 @@ class OAuthInitTokenEvent implements StoppableEventInterface {
      * 
      * Once this method is called, the event stops.
      * 
-     * @param SimpleID\Protocols\OAuth\AccessToken $access_token the access token
+     * @param \SimpleID\Protocols\OAuth\AccessToken $access_token the access token
      */
     public function setToken(AccessToken $access_token) {
         $this->access_token = $access_token;
@@ -49,7 +49,7 @@ class OAuthInitTokenEvent implements StoppableEventInterface {
     /**
      * Returns the access token set by the listeners.
      * 
-     * @return SimpleID\Protocols\OAuth\AccessToken the access token, or null
+     * @return \SimpleID\Protocols\OAuth\AccessToken the access token, or null
      */
     public function getToken() {
         return $this->access_token;

@@ -91,7 +91,7 @@ class OAuthProtectedResource extends Module {
      *
      * This is a shortcut for {@link SimpleID\Protocols\OAuth\Authorization::getOwner()}.
      *
-     * @return Storable the owner
+     * @return \SimpleID\Store\Storable the owner
      */
     protected function getTokenOwner() {
         if (!$this->oauth->getAccessToken()) return null;
@@ -104,7 +104,7 @@ class OAuthProtectedResource extends Module {
      *
      * This is a shortcut for {@link SimpleID\Protocols\OAuth\Authorization::getClient()}.
      *
-     * @return Storable the client
+     * @return \SimpleID\Store\Storable the client
      */
     protected function getTokenClient() {
         if (!$this->oauth->getAccessToken()) return null;
@@ -133,8 +133,8 @@ class OAuthProtectedResource extends Module {
      * @param string $error_description human readable error information
      * @param array $additional any additional data to be sent with the error
      * message
-     * @param string $html the format of the error message
-     * @param string $status the HTTP status to send
+     * @param string $format the format of the error message
+     * @param int $status the HTTP status to send
      */
     protected function unauthorizedError($error, $error_description = NULL, $additional = [], $format = 'html', $status = 401) {
         $this->f3->status($status);

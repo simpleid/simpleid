@@ -84,6 +84,7 @@ class ConnectSessionModule extends Module {
                 } else {
                     $this->f3->set('message', $this->f3->get('intl.common.logout_cancelled'));
 
+                    /** @var \SimpleID\Base\IndexModule $index_module */
                     $index_module = ModuleManager::instance()->getModule('SimpleID\Base\IndexModule');
                     $index_module->index();                    
                 }
@@ -142,6 +143,7 @@ class ConnectSessionModule extends Module {
             } else {
                 // User has already been logged out
                 $this->f3->set('message', $this->f3->get('intl.core.auth.logout_success'));
+                /** @var \SimpleID\Auth\AuthModule $auth_module */
                 $auth_module = ModuleManager::instance()->getModule('SimpleID\Auth\AuthModule');
                 $auth_module->loginForm();
                 return;
@@ -178,7 +180,7 @@ class ConnectSessionModule extends Module {
         $payload = $token->getPayload($params['token']);
 
         if ($payload === null) {
-            $this->f3->fatalError($this->f3->get('intl.common.invalid_request'));
+            $this->fatalError($this->f3->get('intl.common.invalid_request'));
             return;
         }
 

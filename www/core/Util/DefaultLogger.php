@@ -102,7 +102,7 @@ class DefaultLogger extends Log implements LoggerInterface {
      * Converts an array into a string for logging purposes.
      *
      * @param array $array the array the convert
-     * @param array $keys an array of keys to include in the converted string.  Set
+     * @param array|false $keys an array of keys to include in the converted string.  Set
      * to false if all the keys in the array should be included
      * @return string the converted string.
      */

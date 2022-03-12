@@ -52,7 +52,7 @@ class FormSubmitEvent implements \GenericEventInterface, StoppableEventInterface
     /**
      * Creates a form submission event.
      * 
-     * @param SimpleID\Util\Forms\FormState $form_state a reference to the form state array
+     * @param \SimpleID\Util\Forms\FormState $form_state a reference to the form state array
      * @param string $eventName the name of the event, or the name
      */
     public function __construct($form_state, $eventName = null) {

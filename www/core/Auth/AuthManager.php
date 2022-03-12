@@ -154,7 +154,7 @@ class AuthManager extends Prefab {
     /**
      * Returns the current logged in user
      *
-     * @return SimpleID\Models\User the current logged in user
+     * @return \SimpleID\Models\User the current logged in user
      */
     public function getUser() {
         if ($this->isLoggedIn()) return $this->f3->get('user');
@@ -207,12 +207,8 @@ class AuthManager extends Prefab {
     /**
      * Sets the user specified by the parameter as the active user.
      *
-     * @param SimpleID\Models\User $user the user to log in
-     * @param int $level the level of authentication achieved in this
-     * session
-     * @param array $modules array of authentication modules used to
-     * authenticate the user in this session
-     * @param SimpleID\Util\Forms\FormState $form_state
+     * @param AuthResultInterface $result the authentication result
+     * @param \SimpleID\Util\Forms\FormState $form_state
      */
     public function login(AuthResultInterface $result, $form_state = null) {
         if ($form_state == null) $form_state = new FormState();
