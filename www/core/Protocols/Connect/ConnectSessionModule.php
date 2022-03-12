@@ -180,7 +180,7 @@ class ConnectSessionModule extends Module {
         $payload = $token->getPayload($params['token']);
 
         if ($payload === null) {
-            $this->f3->fatalError($this->f3->get('intl.common.invalid_request'));
+            $this->fatalError($this->f3->get('intl.common.invalid_request'));
             return;
         }
 

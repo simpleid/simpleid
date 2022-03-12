@@ -113,7 +113,7 @@ class OpenIDModule extends Module implements ProtocolResult {
             default:
                 if (isset($request['openid.return_to'])) {
                     // Indirect communication - send error via indirect communication.
-                    $this->f3->fatalError($this->f3->get('intl.core.openid.invalid_message'));
+                    $this->fatalError($this->f3->get('intl.core.openid.invalid_message'));
                 } else {
                     // Direct communication
                     $this->directError('Invalid OpenID message.', [], $request);
