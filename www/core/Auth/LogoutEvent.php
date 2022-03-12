@@ -44,7 +44,7 @@ class LogoutEvent {
     /**
      * Returns the user being logged out.
      * 
-     * @return SimpleID\Models\User the user
+     * @return User the user
      */
     public function getUser(): User {
         return $this->user;

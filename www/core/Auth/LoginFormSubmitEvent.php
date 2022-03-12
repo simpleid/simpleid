@@ -37,7 +37,7 @@ class LoginFormSubmitEvent extends FormSubmitEvent implements AuthResultInterfac
     /**
      * Creates a form submission event
      * 
-     * @param SimpleID\Util\Forms\FormState $form_state a reference to the form state array
+     * @param \SimpleID\Util\Forms\FormState $form_state a reference to the form state array
      * @param string $eventName the name of the event, or the name
      */
     public function __construct($form_state, $eventName = null) {
@@ -60,7 +60,7 @@ class LoginFormSubmitEvent extends FormSubmitEvent implements AuthResultInterfac
      * Set the user object for the user that has been automatically
      * authenticated.
      * 
-     * @param SimpleID\Models\User $user the user
+     * @param \SimpleID\Models\User $user the user
      */
     public function setUser(User $user) {
         $this->user = $user;
@@ -69,7 +69,7 @@ class LoginFormSubmitEvent extends FormSubmitEvent implements AuthResultInterfac
     /**
      * Returns the authenticated user
      * 
-     * @return SimpleID\Models\User the user
+     * @return \SimpleID\Models\User the user
      */
     public function getUser(): ?User {
         return $this->user;

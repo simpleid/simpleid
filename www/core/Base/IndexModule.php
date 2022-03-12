@@ -61,6 +61,7 @@ class IndexModule extends Module {
         $auth = AuthManager::instance();
     
         if (!$auth->isLoggedIn()) {
+            /** @var \SimpleID\Auth\AuthModule $auth_module */
             $auth_module = $mgr->getModule('SimpleID\Auth\AuthModule');
             $auth_module->loginForm();
         } elseif ($mgr->isModuleLoaded('SimpleID\Base\MyModule')) {
@@ -89,7 +90,7 @@ class IndexModule extends Module {
         $payload = $token->getPayload($params['token']);
 
         if ($payload === null) {
-            $this->f3->fatalError($this->f3->get('intl.common.invalid_request'));
+            $this->fatalError($this->f3->get('intl.common.invalid_request'));
             return;
         }
         

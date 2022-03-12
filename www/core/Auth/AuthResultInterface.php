@@ -43,7 +43,7 @@ interface AuthResultInterface extends StoppableEventInterface {
     /**
      * Returns the authenticated user
      * 
-     * @return SimpleID\Models\User the user, or null if no users can
+     * @return User the user, or null if no users can
      * be authenticated
      */
     public function getUser(): ?User;
