@@ -62,7 +62,7 @@ class AccessToken extends Token {
      * @param array $scope the scope of this token - this must be a subset
      * of the scope provided in `$authorization`
      * @param int $expires_in the time to expiry or {@link Token::TTL_PERPETUAL}
-     * @param TokenSource $source_id if the token is created from a previous authorisation
+     * @param TokenSource $source if the token is created from a previous authorisation
      * code or refresh token, the ID of those artefacts
      * @param array $additional any additional data to be stored on the server for this token
      * @return AccessToken|null 

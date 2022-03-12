@@ -189,7 +189,7 @@ class Request extends ArrayWrapper {
      * values
      *
      * @param string $param the parameter name to check
-     * @param string $contains the value to remove
+     * @param string $value the value to remove
      * @param string $delimiter a regular expression to determine
      * the delimiter between values
      */

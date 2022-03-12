@@ -44,7 +44,7 @@ class OAuthAuthGrantEvent extends OAuthEvent {
     /**
      * Returns the underlying authorisation object
      * 
-     * @return SimpleID\Protocols\OAuth\Authorization the authorisation to
+     * @return Authorization the authorisation to
      * be granted
      */
     public function getAuthorization() {

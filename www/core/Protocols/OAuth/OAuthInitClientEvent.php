@@ -45,7 +45,7 @@ class OAuthInitClientEvent implements StoppableEventInterface {
     /**
      * Returns the OpenID request.
      * 
-     * @return SimpleID\Protocols\OpenID\Request the OpenID request
+     * @return \SimpleID\Protocols\OpenID\Request the OpenID request
      */
     public function getRequest() {
         return $this->request;
@@ -57,7 +57,7 @@ class OAuthInitClientEvent implements StoppableEventInterface {
      * 
      * Once this method is called, the event stops.
      * 
-     * @param SimpleID\Protocols\OAuth\OAuthClient $client the client authenticated
+     * @param \SimpleID\Protocols\OAuth\OAuthClient $client the client authenticated
      * @param string $client_auth_method the authentication method used
      */
     public function setClient(OAuthClient $client, string $client_auth_method) {
@@ -67,7 +67,7 @@ class OAuthInitClientEvent implements StoppableEventInterface {
     /**
      * Returns the client set by the listeners.
      * 
-     * @return SimpleID\Protocols\OAuth\OAuthClient the client, or null
+     * @return \SimpleID\Protocols\OAuth\OAuthClient the client, or null
      */
     public function getClient() {
         return $this->client;

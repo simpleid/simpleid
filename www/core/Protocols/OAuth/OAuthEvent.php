@@ -50,7 +50,7 @@ class OAuthEvent extends BaseStoppableEvent {
     /**
      * Returns the OAuth request.
      * 
-     * @return SimpleID\Protocols\OAuth\Request the OAuth request
+     * @return Request the OAuth request
      */
     public function getRequest() {
         return $this->request;
@@ -59,7 +59,7 @@ class OAuthEvent extends BaseStoppableEvent {
     /**
      * Returns the OAuth response.
      * 
-     * @return SimpleID\Protocols\OAuth\Response the OAuth response
+     * @return Response the OAuth response
      */
     public function getResponse() {
         return $this->response;

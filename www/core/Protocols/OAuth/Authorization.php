@@ -217,7 +217,7 @@ class Authorization implements Storable {
     /**
      * Returns the current authorisation state
      *
-     * @param string the authorisation state
+     * @return string the authorisation state
      */
     public function getAuthState() {
         return $this->auth_state;
@@ -226,7 +226,7 @@ class Authorization implements Storable {
     /**
      * Resets the current authorisation state
      *
-     * @param string the new authorisation state
+     * @return string the new authorisation state
      */
     public function resetAuthState() {
         $rand = new Random();

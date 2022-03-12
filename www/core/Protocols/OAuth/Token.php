@@ -325,7 +325,7 @@ class Token {
      * scope items with a reference to this map.
      *
      * @param array $scope the scope to compress
-     * @param string the compressed scope reference
+     * @return string the compressed scope reference
      */
     protected function getScopeRef($scope) {
         $ref = [];

@@ -375,9 +375,9 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
     /**
      * Build a set of claims to be included in an ID token or UserInfo response
      *
-     * @param SimpleID\Models\User $user the user about which the ID
+     * @param \SimpleID\Models\User $user the user about which the ID
      * token is created
-     * @param SimpleID\Models\Client $client the client to which the
+     * @param \SimpleID\Models\Client $client the client to which the
      * ID token will be sent
      * @param string $context the context, either `id_token` or `userinfo`
      * @param array $scopes the scope
@@ -458,9 +458,9 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
      * or pairwise.  The type chosen is dependent on the client's
      * registration settings.
      *
-     * @param SimpleID\Models\User $user the user about which the ID
+     * @param \SimpleID\Models\User $user the user about which the ID
      * token is created
-     * @param SimpleID\Models\Client $client the client to which the
+     * @param \SimpleID\Models\Client $client the client to which the
      * ID token will be sent
      * @return string the subject
      */
@@ -494,7 +494,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
     /**
      * Returns the OpenID Connect scopes supported by this server.
      *
-     * @see SimpleID\Base\ScopeInfoCollectionEvent
+     * @see ScopeInfoCollectionEvent
      */
     public function scopesHook(ScopeInfoCollectionEvent $event) {
         $event->addScopeInfo('oauth', [
