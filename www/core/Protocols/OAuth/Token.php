@@ -265,7 +265,9 @@ class Token {
         if (isset($token_data[self::KEY_EXPIRE])) $this->expire = $token_data[self::KEY_EXPIRE];
         if (isset($token_data[self::KEY_SOURCEREF])) $this->source_ref = $token_data[self::KEY_SOURCEREF];
 
-        $this->authorization = $store->loadAuth($aid);
+        /** @var Authorization $authorization */
+        $authorization = $store->loadAuth($aid);
+        $this->authorization = $authorization;
         if ($this->authorization == NULL) return;
         if ($this->authorization->getAuthState() != $auth_state) return;
 
