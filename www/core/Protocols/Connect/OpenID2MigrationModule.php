@@ -64,7 +64,7 @@ class OpenID2MigrationModule extends Module {
         } else {
             $this->f3->status(404);
             
-            $this->fatalError($this->f3->get('intl.common.user_not_found', $user['uid']));
+            $this->fatalError($this->f3->get('intl.common.user_not_found', $params['uid']));
         }
     }
 
