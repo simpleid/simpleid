@@ -43,7 +43,7 @@ class XRDSDiscovery extends Prefab {
      * @param string $identifier the identifier
      * @param bool $openid if true, performs additional discovery of OpenID services
      * by looking for link elements within the discovered document
-     * @return XRDSServices
+     * @return XRDSServices|null
      */
     public function discover($identifier, $openid = FALSE) {
         $identifier = $this->normalize($identifier);
@@ -111,7 +111,7 @@ class XRDSDiscovery extends Prefab {
      * @param bool $check whether to check the content type of the response is
      * application/xrds+xml
      * @param int $retries the number of tries to make
-     * @return string the contents of the XRDS document
+     * @return string|null the contents of the XRDS document
      */
     protected function getXRDSDocument($url, $check = TRUE, $retries = 5) {
         if ($retries == 0) return NULL;
@@ -223,7 +223,7 @@ class XRDSDiscovery extends Prefab {
      * Parses an XRDS document to return services available.
      *
      * @param string $xrds the XRDS document
-     * @return array the parsed structure
+     * @return XRDSServices the parsed structure
      *
      * @see XRDSParser
      */

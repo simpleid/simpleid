@@ -58,7 +58,7 @@ class BaseDataCollectionEvent implements \GenericEventInterface {
     /** @var array */
     protected $results = [];
 
-    /** @var bool */
+    /** @var int */
     protected $mergeStrategy;
 
     /**

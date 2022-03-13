@@ -115,7 +115,7 @@ class SecurityToken {
      * @param string $expected the expected payload
      * @param int $ttl the number of seconds from which the token is considered
      * expired
-     * @return true if the token is valid and the payload matches the expected
+     * @return bool true if the token is valid and the payload matches the expected
      * string
      */
     public function verify($token, $expected, $ttl = null) {

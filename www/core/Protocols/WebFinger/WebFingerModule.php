@@ -91,7 +91,7 @@ class WebFingerModule extends Module {
      * SimpleID installation as the OpenID connect provider.
      *
      * @param array $resource the resource identifier
-     * @return array the JRD document
+     * @return array|null the JRD document
      */
     protected function getJRD($resource) {
         $store = StoreManager::instance();
@@ -138,7 +138,7 @@ class WebFingerModule extends Module {
      * URL or e-mail), then supplies the appropriate path(s) to search
      * for.
      * @param string $resource the resource identifier
-     * @return array an array of criteria paths and their corresponding
+     * @return array|null an array of criteria paths and their corresponding
      * values
      */
     protected function getResourceCriteria($resource) {

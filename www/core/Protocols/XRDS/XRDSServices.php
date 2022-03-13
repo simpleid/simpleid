@@ -76,7 +76,7 @@ class XRDSServices {
      * a specified ID.
      *
      * @param string $id the XML ID of the service in the XRDS document
-     * @return array the matching service, or NULL of no services
+     * @return array|null the matching service, or NULL of no services
      * are found
      */
     public function getById($id) {

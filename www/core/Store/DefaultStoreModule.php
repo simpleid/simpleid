@@ -112,7 +112,7 @@ class DefaultStoreModule extends StoreModule {
      *
      * @param string $criteria the criteria name
      * @param string $value the criteria value
-     * @return User the item or null if no item is found
+     * @return User|null the item or null if no item is found
      */
     protected function findUser($criteria, $value) {
         $cache = \Cache::instance();
@@ -179,7 +179,7 @@ class DefaultStoreModule extends StoreModule {
      * the {@link store_user_exists()} function
      *
      * @param string $uid the name of the user to load
-     * @return User data for the specified user
+     * @return User|null data for the specified user
      */
     protected function readUser($uid) {
         if (!$this->isValidName($uid) || !$this->hasUser($uid)) return null;
@@ -222,7 +222,7 @@ class DefaultStoreModule extends StoreModule {
      * the {@link hasClient()} function
      *
      * @param string $cid the name of the client to load
-     * @return User data for the specified user
+     * @return Client|null data for the specified user
      */
     protected function readClient($cid) {
         if (!$this->isValidName($cid) || !$this->hasClient($cid)) return null;

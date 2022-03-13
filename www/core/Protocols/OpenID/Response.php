@@ -243,7 +243,7 @@ class Response extends Message {
      * have an alias in the current OpenID request.  If this parameter is a string,
      * then the string specified is the preferred alias to be created, unless a collision
      * occurs
-     * @return string the alias, or NULL if the Type URI does not already
+     * @return string|null the alias, or NULL if the Type URI does not already
      * have an alias in the current OpenID request <i>and</i> $create is false
      */
     public function getAliasForExtension($ns, $create = FALSE) {        

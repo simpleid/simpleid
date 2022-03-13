@@ -135,7 +135,7 @@ class StoreManager extends Prefab {
      * @param string $type the item type
      * @param string $criteria the criteria name
      * @param string $value the criteria value
-     * @return Storable the item or null if no item is found
+     * @return Storable|null the item or null if no item is found
      */
     public function find($type, $criteria, $value) {
         $store = $this->getStore($type . ':read');
@@ -152,7 +152,7 @@ class StoreManager extends Prefab {
      *
      * @param string $type the item type
      * @param string $id the identifier of the item to load
-     * @return Storable data for the specified item
+     * @return Storable|null data for the specified item
      */
     public function load($type, $id) {
         $cache_name = $type . ':' . $id;
@@ -206,7 +206,7 @@ class StoreManager extends Prefab {
      * Loads a user.
      *
      * @param string $uid the user ID
-     * @return \SimpleID\Models\User the user or null
+     * @return \SimpleID\Models\User|null the user or null
      */
     public function loadUser($uid) {
         /** @var \SimpleID\Models\User $user */
@@ -243,7 +243,7 @@ class StoreManager extends Prefab {
      * @param string $cid the client ID
      * @param string $class_name the name of the class in which the data is
      * to be cast, nor null
-     * @return \SimpleID\Models\Client the client or null
+     * @return \SimpleID\Models\Client|null the client or null
      */
     public function loadClient($cid, $class_name = null) {
         /** @var \SimpleID\Models\Client $client */
@@ -331,7 +331,7 @@ class StoreManager extends Prefab {
      * @param string $store the name of the store
      * @param bool $use_defaults if true, also search for default
      * stores
-     * @return StoreModule the store module
+     * @return StoreModule|null the store module
      */
     protected function getStore($store, $use_defaults = true) {
         if (isset($this->stores[$store])) return $this->stores[$store];

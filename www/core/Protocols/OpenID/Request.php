@@ -144,7 +144,7 @@ class Request extends Message {
     /**
      * Calculates the base string from which an OpenID signature is generated.
      *
-     * @return string the signature base string
+     * @return string|null the signature base string
      * @link http://openid.net/specs/openid-authentication-2_0.html#anchor11
      */
     public function getSignatureBaseString() {

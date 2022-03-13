@@ -134,7 +134,7 @@ abstract class Message extends ArrayWrapper {
      * The response will be encoded using Key-Value Form Encoding.
      *
      * @param array $data the data in the response
-     * @return string the message in key-value form encoding
+     * @return string|null the message in key-value form encoding
      * @link http://openid.net/specs/openid-authentication-1_1.html#anchor32, http://openid.net/specs/openid-authentication-2_0.html#kvform
      */
     static protected function toKeyValueForm($data) {

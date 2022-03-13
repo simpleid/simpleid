@@ -251,7 +251,7 @@ class AXOpenIDExtensionModule extends Module {
      * Extension (sreg section).
      *
      * @param string $type the type URI to look up
-     * @return string the value or NULL if not found
+     * @return string|null the value or NULL if not found
      */
     protected function getValue($user, $type) {
         $ax = (isset($user['ax'])) ? $user['ax'] : [];

@@ -198,7 +198,7 @@ class SRegOpenIDExtensionModule extends Module {
      * OpenID Connect user information (user_info section).
      *
      * @param string $field the field to look up
-     * @return string the value or NULL if not found
+     * @return string|null the value or NULL if not found
      */
     protected function getValue($user, $field) {
         $sreg = (isset($user['sreg'])) ? $user['sreg'] : [];
