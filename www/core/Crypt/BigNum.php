@@ -45,7 +45,7 @@ if (function_exists('gmp_init')) {
  * A generic big integer using the GMP or the BCMath library.
  */
 class BigNum {
-    /** @var resource the internal representation of the value */
+    /** @var \GMP|string the internal representation of the value */
     protected $value;
 
     /**
@@ -63,7 +63,6 @@ class BigNum {
      *
      * @param mixed $str An integer, a string in base 2 to 36, or a byte stream in base 256
      * @param int $base an integer between 2 and 36, or 256
-     * @return resource a bignum
      */
     public function __construct($str, $base = 10) {
         switch ($base) {
@@ -108,7 +107,7 @@ class BigNum {
      * (base 256)
      *
      * @param int $base an integer between 2 and 36, or 256
-     * @return string the converted bignum
+     * @return string|false the converted bignum
      */
     function val($base = 10) {
         switch ($base) {
@@ -278,9 +277,9 @@ class BigNum {
     /**
      * Adds two bignums
      *
-     * @param resource $a
-     * @param resource $b
-     * @return resource a bignum representing a + b
+     * @param \GMP|string $a
+     * @param \GMP|string $b
+     * @return \GMP|string a bignum representing a + b
      */
     protected function _add($a, $b) {
         if (BIGNUM_GMP) {
@@ -293,9 +292,9 @@ class BigNum {
     /**
      * Multiplies two bignums
      *
-     * @param resource $a
-     * @param resource $b
-     * @return resource a bignum representing a * b
+     * @param \GMP|string $a
+     * @param \GMP|string $b
+     * @return \GMP|string a bignum representing a * b
      */
     protected function _mul($a, $b) {
         if (BIGNUM_GMP) {
@@ -308,9 +307,9 @@ class BigNum {
     /**
      * Divides two bignums
      *
-     * @param resource $a
-     * @param resource $b
-     * @return resource a bignum representing a / b
+     * @param \GMP|string $a
+     * @param \GMP|string $b
+     * @return \GMP|string a bignum representing a / b
      */
     protected function _div($a, $b) {
         if (BIGNUM_GMP) {
@@ -323,9 +322,9 @@ class BigNum {
     /**
      * Raise base to power exp
      *
-     * @param resource $base the base
+     * @param \GMP|string $base the base
      * @param mixed $exp the exponent, as an integer or a bignum
-     * @return resource a bignum representing base ^ exp
+     * @return \GMP|string a bignum representing base ^ exp
      */
     function _pow($base, $exp) {
         if (BIGNUM_GMP) {
@@ -341,9 +340,9 @@ class BigNum {
     /**
      * Returns n modulo d
      *
-     * @param resource $n
-     * @param resource $d
-     * @return resource a bignum representing n mod d
+     * @param \GMP|string $n
+     * @param \GMP|string $d
+     * @return \GMP|string a bignum representing n mod d
      */
     protected function _mod($n, $d) {
         if (BIGNUM_GMP) {
@@ -356,10 +355,10 @@ class BigNum {
     /**
      * Raise a number into power with modulo
      *
-     * @param resource $base the base
-     * @param resource $exp the exponent
-     * @param resource $mod the modulo
-     * @return resource a bignum representing base ^ exp mod mod
+     * @param \GMP|string $base the base
+     * @param \GMP|string $exp the exponent
+     * @param \GMP|string $mod the modulo
+     * @return \GMP|string a bignum representing base ^ exp mod mod
      */
     protected function _powmod($base, $exp, $mod) {
         if (BIGNUM_GMP) {
@@ -383,8 +382,8 @@ class BigNum {
     /**
      * Compares two bignum
      *
-     * @param resource $a
-     * @param resource $b
+     * @param \GMP|string $a
+     * @param \GMP|string $b
      * @return int positive value if a > b, zero if a = b and a negative value if a < b
      */
     protected function _cmp($a, $b) {

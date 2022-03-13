@@ -32,6 +32,8 @@ use SimpleID\Util\Forms\FormSubmitEvent;
 class LoginFormSubmitEvent extends FormSubmitEvent implements AuthResultInterface {
     protected $user = null;
     protected $auth_level = AuthManager::AUTH_LEVEL_SESSION;
+
+    /** @var array<string> */
     protected $auth_module_names = [];
 
     /**
@@ -108,7 +110,7 @@ class LoginFormSubmitEvent extends FormSubmitEvent implements AuthResultInterfac
     /**
      * Returns the name of the modules that authenticated user.
      * 
-     * @return string the name of the modules
+     * @return array<string> the name of the modules
      */
     public function getAuthModuleNames() {
         return array_unique($this->auth_module_names);

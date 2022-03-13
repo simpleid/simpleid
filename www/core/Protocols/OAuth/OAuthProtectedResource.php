@@ -78,7 +78,7 @@ class OAuthProtectedResource extends Module {
      *
      * This is a shortcut for {@link SimpleID\Protocols\OAuth\OAuthManager::getAuthorization()}.
      *
-     * @return Authorization the authorisation
+     * @return Authorization|null the authorisation
      */
     protected function getAuthorization() {
         if (!$this->oauth->getAccessToken()) return null;
@@ -91,7 +91,7 @@ class OAuthProtectedResource extends Module {
      *
      * This is a shortcut for {@link SimpleID\Protocols\OAuth\Authorization::getOwner()}.
      *
-     * @return \SimpleID\Store\Storable the owner
+     * @return \SimpleID\Store\Storable|null the owner
      */
     protected function getTokenOwner() {
         if (!$this->oauth->getAccessToken()) return null;
@@ -104,7 +104,7 @@ class OAuthProtectedResource extends Module {
      *
      * This is a shortcut for {@link SimpleID\Protocols\OAuth\Authorization::getClient()}.
      *
-     * @return \SimpleID\Store\Storable the client
+     * @return \SimpleID\Store\Storable|null the client
      */
     protected function getTokenClient() {
         if (!$this->oauth->getAccessToken()) return null;

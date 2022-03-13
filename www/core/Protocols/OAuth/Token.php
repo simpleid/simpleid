@@ -62,16 +62,16 @@ class Token {
     /** @var array */
     protected $scope;
 
-    /** @var int the expiry time */
+    /** @var int|null the expiry time */
     protected $expire = NULL;
 
-    /** @var string the source reference (a reference to the authorization code or refresh token) */
+    /** @var string|null the source reference (a reference to the authorization code or refresh token) */
     protected $source_ref = NULL;
 
     /** @var array additional data to be stored on the server in relation to the token */
     protected $additional = [];
 
-    /** @var string the encoded token */
+    /** @var string|null the encoded token */
     protected $encoded = NULL;
 
     /** @var bool whether the token has been parsed properly */
@@ -354,7 +354,7 @@ class Token {
      * This function is the reverse of {@link getScopeRef()}.
      *
      * @param string $ref the compressed scope reference
-     * @return string a space-delimiated string of scope items
+     * @return array<string> array of scope items
      */
     protected function resolveScope($ref) {
         $scope = [];

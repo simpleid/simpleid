@@ -141,7 +141,7 @@ class OAuthManager extends Prefab {
     /**
      * Returns the authenticated OAuth client, if any.
      *
-     * @return OAuthClient the authenticated OAuth client, or null
+     * @return OAuthClient|null the authenticated OAuth client, or null
      */
     public function getClient() {
         if ($this->f3->exists('oauth_client')) return $this->f3->get('oauth_client');

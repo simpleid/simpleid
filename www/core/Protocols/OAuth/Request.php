@@ -123,7 +123,7 @@ class Request extends ArrayWrapper {
      * those name-value pairs will be returned.
      *
      * @param bool $parse_credentials whether to parse the credential information
-     * @return array the parsed `Authorization` header, or `null` if none
+     * @return array|null the parsed `Authorization` header, or `null` if none
      * exists
      */
     public function getAuthorizationHeader($parse_credentials = false) {
@@ -159,7 +159,7 @@ class Request extends ArrayWrapper {
      * @param string $param the parameter name to check
      * @param string $delimiter a regular expression to determine
      * the delimiter between values
-     * @return array an array of values, or `null` if the parameter
+     * @return array|null an array of values, or `null` if the parameter
      * is not found
      */
     public function paramToArray($param, $delimiter = '/\s+/') {

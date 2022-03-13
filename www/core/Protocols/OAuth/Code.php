@@ -72,7 +72,7 @@ class Code implements TokenSource {
      * authorization code before using it to issue tokens.
      *
      * @param string $code the authorization code
-     * @return Code the authorization code object
+     * @return Code|null the authorization code object
      */
     static public function decode($code) {
         $results = self::load($code);
@@ -90,7 +90,7 @@ class Code implements TokenSource {
      * Loads an existing authorization code.
      *
      * @param string $code the authorization code
-     * @return Code the authorization code object
+     * @return Code|null the authorization code object
      */
     static protected function load($code) {
         $cache = \Cache::instance();
@@ -169,7 +169,7 @@ class Code implements TokenSource {
      * the authorization code has been issued, this function will return
      * `null`.
      *
-     * @return Authorization the OAuth authorization or `null`.
+     * @return Authorization|null the OAuth authorization or `null`.
      */
     public function getAuthorization() {
         $store = StoreManager::instance();

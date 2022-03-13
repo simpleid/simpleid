@@ -43,7 +43,7 @@ class Response extends ArrayWrapper {
     /** Parameter for {@link $response_mode} */
     const FORM_POST_RESPONSE_MODE = 'form_post';
 
-    /** @var int for redirect response, the response mode.
+    /** @var string for redirect response, the response mode.
      * This can be one of {@link QUERY_RESPONSE_MODE}
      * (the query string), {@link FRAGMENT_RESPONSE_MODE} (the fragment) or
      * {@link FORM_POST_RESPONSE_MODE} (as a page with an automaticlly submitting

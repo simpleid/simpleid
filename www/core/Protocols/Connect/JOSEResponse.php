@@ -175,7 +175,7 @@ class JOSEResponse extends ArrayWrapper {
      * @param \SimpleJWT\Keys\KeySet $set the key set used to sign and/or
      * encrypt the token.  If set to null, the default set of keys
      * configured for the client and the server are loaded
-     * @return string the response body
+     * @return string|null the response body
      */
     function buildJOSE($set = null) {
         $rand = new Random();

@@ -462,7 +462,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
      * token is created
      * @param \SimpleID\Models\Client $client the client to which the
      * ID token will be sent
-     * @return string the subject
+     * @return string|null the subject
      */
     public static function getSubject($user, $client) {
         if (isset($client['connect']['sector_identifier_uri'])) {

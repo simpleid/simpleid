@@ -154,7 +154,7 @@ class AuthManager extends Prefab {
     /**
      * Returns the current logged in user
      *
-     * @return \SimpleID\Models\User the current logged in user
+     * @return \SimpleID\Models\User|null the current logged in user
      */
     public function getUser() {
         if ($this->isLoggedIn()) return $this->f3->get('user');
