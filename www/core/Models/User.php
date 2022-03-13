@@ -165,7 +165,7 @@ class User extends ArrayWrapper implements Serializable, Storable {
         }
     }
 
-    public function offsetGet($offset): mixed {
+    public function offsetGet($offset) {
         switch ($offset) {
             case 'uid':
                 return $this->uid;
