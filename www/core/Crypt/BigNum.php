@@ -87,7 +87,8 @@ class BigNum {
                 return;
                 break;
             default:
-                if (!is_integer($base) || ($base < 2) || ($base > 36)) return FALSE;
+                if (!is_integer($base) || ($base < 2) || ($base > 36))
+                    throw new \InvalidArgumentException('Invalid base');
 
                 $value = (new BigNum(0))->value;
 
