@@ -215,6 +215,7 @@ class User extends ArrayWrapper implements Serializable, Storable {
     public function unserialize($data) {
         $f3 = Base::instance();
 
+        /** @var array $array */
         $array = $f3->unserialize($data);
         foreach ($array as $var => $value) {
             $this->$var = $value;
