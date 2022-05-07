@@ -1,0 +1,4 @@
+contact_links:
+  - name: Documentation issues
+    url: https://github.com/simpleid/simpleid.github.io/issues/new/choose
+    about: "If there is an issue with SimpleID's documentation, report it here"
