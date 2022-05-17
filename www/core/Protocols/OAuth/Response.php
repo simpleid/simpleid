@@ -66,11 +66,20 @@ class Response extends ArrayWrapper {
      * @param array $data the initial response parameters
      */
     public function __construct($request = NULL, $data = []) {
+        if (isset($data['#response_mode'])) {
+            $this->response_mode = $data['#response_mode'];
+            unset($data['#response_mode']);
+        }
+        if (isset($data['#redirect_uri'])) {
+            $this->redirect_uri = $data['#redirect_uri'];
+            unset($data['#redirect_uri']);
+        }
+
         parent::__construct($data);
 
         if ($request != NULL) {
             if (isset($request['state'])) $this->container['state'] = $request['state'];
-            if (isset($request['redirect_uri'])) $this->redirect_uri = $request['redirect_uri'];
+            if (isset($request['redirect_uri']) && ($this->redirect_uri == null)) $this->redirect_uri = $request['redirect_uri'];
         }
     }
 
@@ -231,6 +240,16 @@ class Response extends ArrayWrapper {
         $form = new FormResponse($this->container);
         if ($url == NULL) $url = $this->redirect_uri;
         $form->render($url);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toArray() {
+        $array = parent::toArray();
+        $array['#response_mode'] = $this->response_mode;
+        $array['#redirect_uri'] = $this->redirect_uri;
+        return $array;
     }
 
     /**

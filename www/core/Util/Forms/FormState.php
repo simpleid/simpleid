@@ -72,10 +72,14 @@ class FormState extends ArrayWrapper {
         if (!is_array($data)) return new FormState();
 
         if (isset($data[self::REQUEST_KEY]) && $request_class != null) {
-            $data[self::REQUEST_KEY] = new $request_class($data[self::REQUEST_KEY]);
+            $request = new $request_class($data[self::REQUEST_KEY]);
+        } else {
+            $request = null;
         }
+        if ($request != null) $data[self::REQUEST_KEY] = $request;
+
         if (isset($data[self::RESPONSE_KEY]) && $response_class != null) {
-            $data[self::RESPONSE_KEY] = new $response_class($data[self::RESPONSE_KEY]);
+            $data[self::RESPONSE_KEY] = new $response_class($request, $data[self::RESPONSE_KEY]);
         }
         return new FormState($data);
     }
