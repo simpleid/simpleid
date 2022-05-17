@@ -496,7 +496,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
      *
      * @see ScopeInfoCollectionEvent
      */
-    public function scopesHook(ScopeInfoCollectionEvent $event) {
+    public function onScopeInfoCollectionEvent(ScopeInfoCollectionEvent $event) {
         $event->addScopeInfo('oauth', [
             'openid' => [
                 'description' => $this->f3->get('intl.common.scope.id'),
