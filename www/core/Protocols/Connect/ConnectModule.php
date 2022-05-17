@@ -542,7 +542,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
         $jwt_encryption_enc_algs = AlgorithmFactory::getSupportedAlgs(Algorithm::ENCRYPTION_ALGORITHM);
 
         $claims_supported = [ 'sub', 'iss', 'auth_time', 'acr' ];
-        foreach ($scopes['oauth'] as $scope => $settings) {
+        foreach ($scopes as $scope => $settings) {
             if (isset($settings['claims'])) {
                 $claims_supporteds = array_merge($claims_supported, $settings['claims']);
             }
