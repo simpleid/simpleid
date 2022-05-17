@@ -165,6 +165,12 @@ class Response extends ArrayWrapper {
         $f3 = Base::instance();
 
         if ($redirect_uri == NULL) $redirect_uri = $this->redirect_uri;
+        // If $redirect_uri is still null we should output an error
+        if ($redirect_uri == NULL) {
+            $this->setError('server_error', 'Missing redirect_uri');
+            $this->renderJSON();
+            return;
+        }
 
         if ($this->response_mode == self::FORM_POST_RESPONSE_MODE) $this->renderFormPost($redirect_uri);
 
