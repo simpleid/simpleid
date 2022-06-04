@@ -24,6 +24,9 @@ namespace SimpleID\Util;
 
 use \ArrayAccess;
 use \Countable;
+use \IteratorAggregate;
+use \Traversable;
+use \ArrayIterator;
 
 /**
  * A class that wraps around an array while providing array-like and
@@ -69,7 +72,7 @@ use \Countable;
  * </code>
  *
  */
-class ArrayWrapper implements ArrayAccess, Countable {
+class ArrayWrapper implements ArrayAccess, Countable, IteratorAggregate {
     /** @var array the underlying array */
     protected $container = [];
 
@@ -143,6 +146,13 @@ class ArrayWrapper implements ArrayAccess, Countable {
      */
     public function count(): int {
         return count($this->container);
+    }
+
+    /**
+     * Implementation of IteratorAggregate
+     */
+    public function getIterator(): Traversable {
+        return new ArrayIterator($this->container);
     }
 
     /**
