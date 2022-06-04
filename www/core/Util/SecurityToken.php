@@ -21,12 +21,12 @@
 
 namespace SimpleID\Util;
 
-use Fernet\Fernet;
+use Branca\Branca;
 use SimpleID\Crypt\Random;
 use SimpleID\Store\StoreManager;
 
 /**
- * A security token generator based on the Fernet token specification.
+ * A security token generator based on the branca token specification.
  *
  * A security token is a string which contains signed and encrypted data
  * which only the generator can decode.  It is used for various
@@ -34,6 +34,8 @@ use SimpleID\Store\StoreManager;
  *
  * - encoding state data to be passed between HTTP requests
  * - generating CSRF tokens
+ * 
+ * @see https://branca.io/
  */
 class SecurityToken {
 
@@ -47,8 +49,8 @@ class SecurityToken {
     /** The security token can only be verified once */
     const OPTION_NONCE = 2;
 
-    /** @var Fernet the fernet token generator */
-    private $fernet;
+    /** @var Branca the branca token generator */
+    private $branca;
 
     /** @var array the data (i.e. payload plus headers) to be encoded in
      * the token */
@@ -69,7 +71,8 @@ class SecurityToken {
             $key = self::$site_token;
         }
 
-        $this->fernet = new Fernet($key);
+        // Decode from base64url
+        $this->branca = new Branca(base64_decode(strtr($key, '-_', '+/')));
     }
 
     /**
@@ -81,8 +84,11 @@ class SecurityToken {
      * @return mixed the payload or NULL if the security token is not valid
      */
     public function getPayload($token, $ttl = null) {
-        $message = $this->fernet->decode($token, $ttl);
-        if ($message === null) return null;
+        try {
+            $message = $this->branca->decode($token, $ttl);
+        } catch (\RuntimeException $e) {
+            return null;
+        }
 
         $this->data = json_decode(gzuncompress($message), true);
 
@@ -145,7 +151,7 @@ class SecurityToken {
             $this->data['s'] = session_id();
         }
 
-        $token = $this->fernet->encode(gzcompress(json_encode($this->data)));
+        $token = $this->branca->encode(gzcompress(json_encode($this->data)));
 
         if (($options & self::OPTION_NONCE) == self::OPTION_NONCE) {
             $cache = \Cache::instance();
@@ -172,7 +178,7 @@ class SecurityToken {
         if ($site_token == NULL) {
             $rand = new Random();
 
-            $site_token = Fernet::base64url_encode($rand->bytes(32));
+            $site_token = strtr(base64_encode($rand->bytes(32)), '+/', '-_');
             $store->setSetting('site-token', $site_token);
         }
 

@@ -22,7 +22,6 @@
 
 namespace SimpleID\Protocols\OAuth;
 
-use Fernet\Fernet;
 use Psr\Log\LogLevel;
 use SimpleID\Auth\AuthManager;
 use SimpleID\Module;
@@ -525,7 +524,7 @@ class OAuthModule extends Module implements ProtocolResult {
                     $test_code_challenge = $request['code_verifier'];
                     break;
                 case 'S256':
-                    $test_code_challenge = Fernet::base64url_encode(hash('sha256', $request['code_verifier'], true));                    
+                    $test_code_challenge = trim(strtr(base64_encode(hash('sha256', $request['code_verifier'], true)), '+/', '-_'), '=');
                     break;
                 default:
                     $this->logger->log(LogLevel::ERROR, 'Token request failed: unknown code_challenge_method: ' . $additional['code_challenge_method']);

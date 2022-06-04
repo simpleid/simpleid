@@ -22,7 +22,6 @@
 
 namespace SimpleID\Protocols\Connect;
 
-use Fernet\Fernet;
 use Psr\Log\LogLevel;
 use SimpleID\ModuleManager;
 use SimpleID\Auth\AuthManager;
