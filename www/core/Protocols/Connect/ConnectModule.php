@@ -578,7 +578,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
             'request_parameter_supported' => true,
             'request_uri_parameter_supported' => true,
             'require_request_uri_registration' => false,
-            'service_documentation' => 'http://simpleid.org/docs/'
+            'service_documentation' => 'https://simpleid.org/docs/'
         ];
 
         $config_event = new BaseDataCollectionEvent('connect_configuration');
