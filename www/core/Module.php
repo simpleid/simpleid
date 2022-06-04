@@ -170,7 +170,8 @@ abstract class Module extends \Prefab {
      * @param string $path the FatFree path or alias
      * @param string $query a properly encoded query string
      * @param string $secure if $relative is false, either 'https' to force an HTTPS connection, 'http' to force
-     * an unencrypted HTTP connection, 'detect' to base on the current connection, or NULL to vary based on SIMPLEID_BASE_URL
+     * an unencrypted HTTP connection, 'detect' to base on the current connection, or NULL to vary based on the
+     * `canonical_base_path` configuration
      * @return string the url
      *
      * @since 0.7

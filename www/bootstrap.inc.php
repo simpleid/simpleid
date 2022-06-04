@@ -164,6 +164,10 @@ if (!function_exists('openssl_sign')) {
     $f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'openssl PHP extension not loaded.');
     $f3->error(500, $f3->get('intl.bootstrap.extension', [ 'openssl', 'http://simpleid.org/docs/2/system-requirements/' ]));
 }
+if (!function_exists('sodium_crypto_aead_xchacha20poly1305_ietf_encrypt')) {
+    $f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'sodium PHP extension not loaded.');
+    $f3->error(500, $f3->get('intl.bootstrap.extension', [ 'sodium', 'http://simpleid.org/docs/2/system-requirements/' ]));
+}
 if (is_numeric(@ini_get('suhosin.get.max_value_length')) && (@ini_get('suhosin.get.max_value_length') < 1024)) {
     $f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'suhosin.get.max_value_length < 1024');
     $f3->error(500, $f3->get('intl.bootstrap.suhosin', 'http://simpleid.org/docs/2/system-requirements/'));

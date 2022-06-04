@@ -94,7 +94,7 @@ class BaseDataCollectionEvent implements \GenericEventInterface {
             $merge_strategy = $this->mergeStrategy;
         }
 
-        switch ($this->mergeStrategy) {
+        switch ($merge_strategy) {
             case self::MERGE_APPEND:
                 $this->results[] = $result;
                 break;

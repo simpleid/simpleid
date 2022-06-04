@@ -126,7 +126,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
         $url = 'otpauth://totp/SimpleID?secret=' . $code . '&digits=' . $params['digits'] . '&period=' . $params['period'];
         $this->f3->set('qr', addslashes($url));
 
-        $this->f3->set('otp_recovery_url', 'http://simpleid.org/docs/2/common_problems/#otp');
+        $this->f3->set('otp_recovery_url', 'http://simpleid.org/docs/2/common-problems/#otp');
         
         $this->f3->set('tk', $token->generate('otp', SecurityToken::OPTION_BIND_SESSION));
 
@@ -188,7 +188,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             if ($test_user['otp']['type'] == 'recovery') return;
 
             $uaid = $auth->assignUAID();
-            if (isset($test_user->auth[$uaid]) && isset($test_user->auth[$uaid]['otp']) && $test_user->auth[$uaid]['otp']['remember']) return;
+            if (in_array($uaid, $test_user['otp']['remember'])) return;
 
             $tpl = new \Template();
 
@@ -239,6 +239,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             $store->saveUser($test_user); // Save the drift
 
             $event->addAuthModuleName(self::class);
+            $event->setUser($test_user);
             $event->setAuthLevel($form_state['mode']);
         }
     }
@@ -256,11 +257,9 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
 
         if (($level >= AuthManager::AUTH_LEVEL_VERIFIED) && isset($form_state['otp_remember']) && ($form_state['otp_remember'] == 1)) {
             $uaid = $auth->assignUAID();
-
-            if (!isset($user->auth[$uaid])) $user->auth[$uaid] = [];
-            if (!isset($user->auth[$uaid]['otp'])) $user->auth[$uaid]['otp'] = [];
-            
-            $user->auth[$uaid]['otp']['remember'] = true;
+            $remember = $user['otp']['remember'];
+            $remember[] = $uaid;
+            $user->pathSet('otp.remember', array_unique($remember));
 
             $store->saveUser($user);
         }

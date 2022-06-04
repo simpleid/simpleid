@@ -80,7 +80,7 @@ class AuthModule extends Module {
     public function login($f3, $params) {
         $dispatcher = \Events::instance();
 
-        $params['destination'] = (isset($params[1])) ? $params[1] : '';
+        $params['destination'] = (isset($params['*'])) ? $params['*'] : '';
         $this->f3->set('PARAMS.destination', $params['destination']);
 
         $token = new SecurityToken();
@@ -195,7 +195,7 @@ class AuthModule extends Module {
      * @param array $params
      */
     public function logout($f3, $params) {
-        $params['destination'] = (isset($params[1])) ? $params[1] : '';
+        $params['destination'] = (isset($params['*'])) ? $params['*'] : '';
         $this->f3->set('PARAMS.destination', $params['destination']);
 
         // Require HTTPS, redirect if necessary

@@ -22,7 +22,6 @@
 
 namespace SimpleID\Protocols\Connect;
 
-use Fernet\Fernet;
 use Psr\Log\LogLevel;
 use SimpleID\ModuleManager;
 use SimpleID\Auth\AuthManager;
@@ -496,7 +495,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
      *
      * @see ScopeInfoCollectionEvent
      */
-    public function scopesHook(ScopeInfoCollectionEvent $event) {
+    public function onScopeInfoCollectionEvent(ScopeInfoCollectionEvent $event) {
         $event->addScopeInfo('oauth', [
             'openid' => [
                 'description' => $this->f3->get('intl.common.scope.id'),
@@ -542,7 +541,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
         $jwt_encryption_enc_algs = AlgorithmFactory::getSupportedAlgs(Algorithm::ENCRYPTION_ALGORITHM);
 
         $claims_supported = [ 'sub', 'iss', 'auth_time', 'acr' ];
-        foreach ($scopes['oauth'] as $scope => $settings) {
+        foreach ($scopes as $scope => $settings) {
             if (isset($settings['claims'])) {
                 $claims_supporteds = array_merge($claims_supported, $settings['claims']);
             }
@@ -578,7 +577,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
             'request_parameter_supported' => true,
             'request_uri_parameter_supported' => true,
             'require_request_uri_registration' => false,
-            'service_documentation' => 'http://simpleid.org/docs/'
+            'service_documentation' => 'https://simpleid.org/docs/'
         ];
 
         $config_event = new BaseDataCollectionEvent('connect_configuration');

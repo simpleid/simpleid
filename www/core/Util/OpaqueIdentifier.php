@@ -21,7 +21,6 @@
 
 namespace SimpleID\Util;
 
-use Fernet\Fernet;
 use SimpleID\Crypt\Random;
 use SimpleID\Store\StoreManager;
 

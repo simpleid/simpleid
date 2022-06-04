@@ -21,7 +21,7 @@
 
 namespace SimpleID\Protocols\OAuth;
 
-use Fernet\Fernet;
+use Branca\Branca;
 use SimpleID\Crypt\Random;
 use SimpleID\Store\StoreManager;
 
@@ -50,8 +50,8 @@ class Token {
     const KEY_SCOPEREF = 's';
     const KEY_EXPIRE = 'x';
 
-    /** @var Fernet the fernet token generator */
-    protected $fernet;
+    /** @var Branca the branca token generator */
+    protected $branca;
 
     /** @var string the unique ID of this token */
     protected $id;
@@ -79,7 +79,7 @@ class Token {
 
     /** Creates a token */
     protected function __construct() {
-        $this->fernet = new Fernet(self::getKey());
+        $this->branca = new Branca(base64_decode(strtr(self::getKey(), '-_', '+/')));
     }
 
     /**
@@ -254,7 +254,7 @@ class Token {
         $store = StoreManager::instance();
         $cache = \Cache::instance();
 
-        $message = $this->fernet->decode($this->encoded);
+        $message = $this->branca->decode($this->encoded);
         if ($message === null) return null;
 
         $token_data = json_decode($message, true);
@@ -316,7 +316,7 @@ class Token {
         $cache->set($this->getCacheKey(), $server_data, ($this->expire != NULL) ? $this->expire - time() : 0);
         $token_data[self::KEY_CACHE_HASH] = base64_encode(hash('sha256', serialize($server_data), true));
 
-        $this->encoded = $this->fernet->encode(json_encode($token_data));
+        $this->encoded = $this->branca->encode(json_encode($token_data));
     }
 
     /**
@@ -394,13 +394,13 @@ class Token {
     static protected function getKey() {
         $store = StoreManager::instance();
 
-        $key = $store->getSetting('oauth-fernet');
+        $key = $store->getSetting('oauth-token');
 
         if ($key == NULL) {
             $rand = new Random();
 
-            $key = Fernet::base64url_encode($rand->bytes(32));
-            $store->setSetting('oauth-fernet', $key);
+            $key = strtr(base64_encode($rand->bytes(32)), '+/', '-_');
+            $store->setSetting('oauth-token', $key);
         }
 
         return $key;

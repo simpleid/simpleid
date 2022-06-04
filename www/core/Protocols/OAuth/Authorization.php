@@ -230,7 +230,7 @@ class Authorization implements Storable {
      */
     public function resetAuthState() {
         $rand = new Random();
-        $this->auth_state = substr($rand->id(), -9);
+        $this->auth_state = substr($rand->secret(7), -9);
         return $this->auth_state;
     }
 
