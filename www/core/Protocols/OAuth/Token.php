@@ -254,29 +254,31 @@ class Token {
         $store = StoreManager::instance();
         $cache = \Cache::instance();
 
-        $message = $this->branca->decode($this->encoded);
-        if ($message === null) return null;
+        try {
+            $message = $this->branca->decode($this->encoded);
+            $token_data = json_decode($message, true);
 
-        $token_data = json_decode($message, true);
+            $this->id = $token_data[self::KEY_ID];
+            list($auth_state, $aid) = explode('.', $token_data[self::KEY_FQAID]);
+            $this->scope = $this->resolveScope($token_data[self::KEY_SCOPEREF]);
+            if (isset($token_data[self::KEY_EXPIRE])) $this->expire = $token_data[self::KEY_EXPIRE];
+            if (isset($token_data[self::KEY_SOURCEREF])) $this->source_ref = $token_data[self::KEY_SOURCEREF];
 
-        $this->id = $token_data[self::KEY_ID];
-        list($auth_state, $aid) = explode('.', $token_data[self::KEY_FQAID]);
-        $this->scope = $this->resolveScope($token_data[self::KEY_SCOPEREF]);
-        if (isset($token_data[self::KEY_EXPIRE])) $this->expire = $token_data[self::KEY_EXPIRE];
-        if (isset($token_data[self::KEY_SOURCEREF])) $this->source_ref = $token_data[self::KEY_SOURCEREF];
+            /** @var Authorization $authorization */
+            $authorization = $store->loadAuth($aid);
+            $this->authorization = $authorization;
+            if ($this->authorization == NULL) return;
+            if ($this->authorization->getAuthState() != $auth_state) return;
 
-        /** @var Authorization $authorization */
-        $authorization = $store->loadAuth($aid);
-        $this->authorization = $authorization;
-        if ($this->authorization == NULL) return;
-        if ($this->authorization->getAuthState() != $auth_state) return;
+            $server_data = $cache->get($this->getCacheKey());
+            if ($server_data === false) return;
+            if (base64_encode(hash('sha256', serialize($server_data), true)) !== $token_data[self::KEY_CACHE_HASH]) return;
+            $this->additional = $server_data['additional'];
 
-        $server_data = $cache->get($this->getCacheKey());
-        if ($server_data === false) return;
-        if (base64_encode(hash('sha256', serialize($server_data), true)) !== $token_data[self::KEY_CACHE_HASH]) return;
-        $this->additional = $server_data['additional'];
-
-        $this->is_parsed = true;
+            $this->is_parsed = true;            
+        } catch (\RuntimeException $e) {
+            return null;
+        }
     }
 
     /**
