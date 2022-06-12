@@ -66,12 +66,6 @@ class XRDSParser {
      * @var XMLReader
      */
     private $reader;
-
-    /**
-     * XML parser
-     * @var resource
-     */
-    private $parser;
     
     /**
      * Discovered services

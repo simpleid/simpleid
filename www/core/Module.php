@@ -47,11 +47,6 @@ abstract class Module extends \Prefab {
      */
     protected $logger;
 
-    /** Asset domain
-     * @var string
-     */
-    private $domain;
-
     /**
      * Initialises the module.
      * 

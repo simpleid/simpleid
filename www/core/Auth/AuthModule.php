@@ -43,7 +43,6 @@ use SimpleID\Util\Forms\FormSubmitEvent;
 class AuthModule extends Module {
 
     private $auth;
-    private $mgr;
 
     static function init($f3) {
         $f3->route('GET|POST /auth/login', 'SimpleID\Auth\AuthModule->login');
@@ -55,7 +54,6 @@ class AuthModule extends Module {
     public function __construct() {
         parent::__construct();
         $this->auth = AuthManager::instance();
-        $this->mgr = ModuleManager::instance();
     }
 
     /**
