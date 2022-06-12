@@ -73,7 +73,6 @@ class BigNum {
                     $this->value = $str;
                 }
                 return;
-                break;
             case 256:
                 $bytes = array_merge(unpack('C*', $str));
 
@@ -85,7 +84,6 @@ class BigNum {
                 }
                 $this->value = $value;
                 return;
-                break;
             default:
                 if (!is_integer($base) || ($base < 2) || ($base > 36))
                     throw new \InvalidArgumentException('Invalid base');
@@ -99,8 +97,6 @@ class BigNum {
                 $this->value = $value;
                 return;
         }
-
-        throw new \RuntimeException();
     }
 
     /**
@@ -120,7 +116,6 @@ class BigNum {
                 }
 
                 return $base10;
-                break;
         
             case 256:
                 $cmp = $this->_cmp($this->value, 0);
@@ -152,7 +147,7 @@ class BigNum {
                 }
           
                 return $byte_stream;
-                break;
+
             default:
                 if (!is_integer($base) || ($base < 2) || ($base > 36)) return FALSE;
 
@@ -181,8 +176,6 @@ class BigNum {
      
                 return $str;
         }
-        
-        return FALSE;
     }
 
     /**

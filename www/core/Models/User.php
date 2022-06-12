@@ -156,10 +156,8 @@ class User extends ArrayWrapper implements Serializable, Storable {
         switch ($offset) {
             case 'uid':
                 return true;
-                break;
             case 'identity':
                 return $this->hasLocalOpenIDIdentity();
-                break;
             default:
                 return parent::offsetExists($offset);
         }
@@ -169,12 +167,10 @@ class User extends ArrayWrapper implements Serializable, Storable {
         switch ($offset) {
             case 'uid':
                 return $this->uid;
-                break;
             case 'identity':
                 // Retained for compatibility purposes
                 $mod = UserModule::instance();
                 return ($this->hasLocalOpenIDIdentity()) ? $this->getLocalOpenIDIdentity() : $mod->getCanonicalURL('user/' . rawurlencode($this['uid']));
-                break;
             default:
                 return parent::offsetGet($offset);
         }

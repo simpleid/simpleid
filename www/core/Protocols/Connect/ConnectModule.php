@@ -481,13 +481,10 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
         switch ($subject_type) {
             case 'public':
                 return $user->getStoreID();
-                break;
             case 'pairwise':
                 return $user->getPairwiseIdentity($sector_id);
-                break;
             default:
                 return null;
-                break;
         }
     }
 

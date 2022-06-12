@@ -130,7 +130,6 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
             case '2y':
                 $bcrypt = Bcrypt::instance();
                 return $bcrypt->verify($credentials['password']['password'], $test_user['password']['password']);
-                break;
             case 'pbkdf2':
                 $params = [];
                 list($param_string, $hash, $salt) = explode('$', $content, 3);
@@ -139,7 +138,6 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
                 if (!isset($params['dk'])) $params['dk'] = 0;
                 return $this->secureCompare(hash_pbkdf2($params['f'], $credentials['password']['password'], base64_decode($salt), $params['c'], $params['dk'], true),
                     base64_decode($hash));
-                break;
             default:
                 $this->logger->log(LogLevel::WARNING, 'Unknown password prefix: ' . $prefix);
                 return false;

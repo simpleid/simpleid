@@ -265,7 +265,6 @@ class DefaultStoreModule extends StoreModule {
     protected function writeClient($cid, $client) {
         if (!$this->isValidName($cid)) {
             trigger_error("Invalid client name for filesystem store", E_USER_ERROR);
-            return;
         }
         
         $store_file = $this->config['store_dir'] . "/$cid.client";
@@ -318,7 +317,6 @@ class DefaultStoreModule extends StoreModule {
     protected function writeKeyValue($type, $name, $value) {
         if (!$this->isValidName($name . '.' . $type)) {
             trigger_error("Invalid name for filesystem store", E_USER_ERROR);
-            return;
         }
 
         $file = $this->getKeyValueFile($type, $name);
@@ -337,7 +335,6 @@ class DefaultStoreModule extends StoreModule {
     protected function deleteKeyValue($type, $name) {
         if (!$this->isValidName($name . '.' . $type)) {
             trigger_error("Invalid name for filesystem store", E_USER_ERROR);
-            return;
         }
 
         $file = $this->getKeyValueFile($type, $name);

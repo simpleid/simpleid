@@ -149,7 +149,6 @@ abstract class Module extends \Prefab {
             header('Connection: Upgrade');
             $this->fatalError($this->f3->get('intl.common.require_https'));
             exit;
-            return;
         }
         
         if ($redirect_url == null) $redirect_url = $this->getCanonicalURL($this->f3->get('PATH'), $this->f3->get('SERVER.QUERY_STRING'), 'https');
