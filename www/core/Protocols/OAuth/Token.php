@@ -212,7 +212,7 @@ class Token {
      *
      * @param Authorization $authorization the authorisation for which
      * tokens are to be revoked
-     * @param TokenSource $source if specified, only delete tokens issued
+     * @param TokenSource|string $source if specified, only delete tokens issued
      * from this source
      */
     public static function revokeAll($authorization, $source = null) {

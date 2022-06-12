@@ -115,6 +115,7 @@ class OAuthModule extends Module implements ProtocolResult {
 
         $resolve_event = new OAuthEvent($request, $response, 'oauth_auth_check');
         $dispatcher->dispatch($resolve_event);
+        /** @phpstan-ignore-next-line */
         if ($response->isError()) {
             if (isset($request['redirect_uri'])) {
                 $response->renderRedirect();

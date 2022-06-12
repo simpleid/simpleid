@@ -40,7 +40,8 @@ class HTTPResponse {
      * Constructs a HTTPResponse object from a response made using the
      * FatFree framework.
      * 
-     * @param array $response the response from the HTTP request
+     * @param array|false $response the response from the HTTP request
+     * @see https://fatfreeframework.com/3.8/web#request
      */
     public function __construct($response) {
         if ($response === false) {

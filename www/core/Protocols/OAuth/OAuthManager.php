@@ -209,7 +209,7 @@ class OAuthManager extends Prefab {
     /**
      * Returns the access token included in the request.
      *
-     * @return AccessToken the access token
+     * @return AccessToken|null the access token
      */
     public function getAccessToken() {
         return $this->access_token;

@@ -97,6 +97,7 @@ class Code implements TokenSource {
 
         if (!$cache->exists($code . '.code')) return null;
 
+        /** @var Code $payload */
         $payload = $cache->get($code . '.code');
         if ($payload->expires < time()) return null;
         $payload->is_valid = true;
