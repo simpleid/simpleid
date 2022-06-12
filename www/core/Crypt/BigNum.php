@@ -136,7 +136,9 @@ class BigNum {
                 $num = $this->value;
           
                 while ($this->_cmp($num, 0) > 0) {
-                    array_unshift($bytes, $this->_mod($num, 256));
+                    $x = $this->_mod($num, 256);
+                    if ($x instanceof \GMP) $x = gmp_intval($x);
+                    array_unshift($bytes, (int) $x);
                     $num = $this->_div($num, 256);
                 }
           
