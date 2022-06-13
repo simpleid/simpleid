@@ -824,7 +824,7 @@ class OpenIDModule extends Module implements ProtocolResult {
             $event = new FormSubmitEvent($form_state, 'openid_consent_form_submit');
             \Events::instance()->dispatch($event);
 
-            $consents = [ 'openid' => ($this->f3->exists('POST.prefs.consents.openid') && ($this->f3->exists('POST.prefs.consents.openid') == 'true')) ];
+            $consents = [ 'openid' => ($this->f3->exists('POST.prefs.consents.openid') && ($this->f3->get('POST.prefs.consents.openid') == 'true')) ];
             $this->logActivity($request, $consents);
             
             $this->signResponse($response, isset($response['assoc_handle']) ? $response['assoc_handle'] : NULL);
