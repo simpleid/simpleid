@@ -223,6 +223,9 @@ class Token {
                 $source_ref = $source->getSourceRef();
             } elseif (is_string($source)) {
                 $source_ref = $source;
+            } else {
+                // This shouldn't happen
+                throw new \InvalidArgumentException('$source must be TokenSource or string');
             }
             $suffix = self::SOURCE_REF_SEPARATOR . $source_ref;
         } else {
