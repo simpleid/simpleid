@@ -221,7 +221,7 @@ class DiffieHellman {
      * @return BigNum the random integer as a bignum
      */
     private function generateRandom($stop) {
-        $duplicate_cache = [];
+        static $duplicate_cache = [];
         $rand = new Random();
       
         // Used as the key for the duplicate cache
