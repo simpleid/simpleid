@@ -287,7 +287,7 @@ class ArrayWrapper implements ArrayAccess, Countable, IteratorAggregate {
     }
 
     private function pathSplit($path) {
-        return preg_split('/\[\h*[\'"]?(.+?)[\'"]?\h*\]|(->)|\./', $path, NULL, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        return preg_split('/\[\h*[\'"]?(.+?)[\'"]?\h*\]|(->)|\./', $path, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
     }
 }
 ?>
