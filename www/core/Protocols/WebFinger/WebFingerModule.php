@@ -175,8 +175,8 @@ class WebFingerModule extends Module {
                     $found = TRUE;
                     break;
                 }
-                if (!$found) $jrd['aliases'][] = $resource;
             }
+            if (!$found) $jrd['aliases'][] = $resource;
         } else {
             $jrd['aliases'] = [ $resource ];
         }
