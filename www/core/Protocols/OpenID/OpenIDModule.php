@@ -194,7 +194,7 @@ class OpenIDModule extends Module implements ProtocolResult {
 
         $response = new Response($request);
         $response->setArray($association->getOpenIDResponse($session_type, $dh_consumer_public, $dh_modulus, $dh_gen));
-        $response->set('expires_in', SIMPLEID_SHORT_TOKEN_EXPIRES_IN);
+        $response->set('expires_in', strval(SIMPLEID_SHORT_TOKEN_EXPIRES_IN));
         $this->logger->log(LogLevel::INFO, 'Association response', $response->toArray());
 
         $response->render();
@@ -750,7 +750,7 @@ class OpenIDModule extends Module implements ProtocolResult {
 
         if ($cancel) {
             $this->f3->set('requested_identity', $request['openid.identity']);
-            $this->f3->set('switch_url', $this->getCanonicalURL('auth/logout/continue/' .  rawurlencode($token->generate($request->toArray())), '', true));
+            $this->f3->set('switch_url', $this->getCanonicalURL('auth/logout/continue/' .  rawurlencode($token->generate($request->toArray())), '', 'detect'));
         } else {
             $base_path = $this->f3->get('base_path');
             
@@ -1039,7 +1039,7 @@ class OpenIDModule extends Module implements ProtocolResult {
         
         $this->f3->set('js_locale', [ 'code' => addslashes($this->f3->get('intl.core.openid.profile_js')) ]);
 
-        $xrds_url = $this->getCanonicalURL('user/'. $user['uid'] . '/xrds', '', true);
+        $xrds_url = $this->getCanonicalURL('user/'. $user['uid'] . '/xrds', '', 'detect');
         $hive = [
             'config' => $this->f3->get('config'),
             'intl' => $this->f3->get('intl'),
