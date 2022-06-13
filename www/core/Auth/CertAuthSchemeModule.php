@@ -44,6 +44,7 @@ class CertAuthSchemeModule extends AuthSchemeModule {
         $this->logger->log(LogLevel::DEBUG, 'Client SSL certificate: ' . $cert);
 
         $store = StoreManager::instance();
+        /** @var \SimpleID\Models\User $test_user */
         $test_user = $store->findUser('cert.certs', $cert);
         if ($test_user != NULL) {
             $this->logger->log(LogLevel::DEBUG, 'Client SSL certificate accepted for ' . $test_user['uid']);

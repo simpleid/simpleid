@@ -218,7 +218,7 @@ class AuthModule extends Module {
      * Displays a user login or a login verification form.
      *
      * @param array $params the F3 parameters
-     * @param array $form_state the form state
+     * @param FormState $form_state the form state
      */
     public function loginForm($params = [ 'destination' => null ], $form_state = null) {
         $tpl = new \Template();

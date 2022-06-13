@@ -288,8 +288,8 @@ class BigNum {
     /**
      * Multiplies two bignums
      *
-     * @param \GMP|string $a
-     * @param \GMP|string $b
+     * @param \GMP|int|string $a
+     * @param \GMP|int|string $b
      * @return \GMP|string a bignum representing a * b
      */
     protected function _mul($a, $b) {
@@ -303,8 +303,8 @@ class BigNum {
     /**
      * Divides two bignums
      *
-     * @param \GMP|string $a
-     * @param \GMP|string $b
+     * @param \GMP|int|string $a
+     * @param \GMP|int|string $b
      * @return \GMP|string a bignum representing a / b
      */
     protected function _div($a, $b) {
@@ -336,8 +336,8 @@ class BigNum {
     /**
      * Returns n modulo d
      *
-     * @param \GMP|string $n
-     * @param \GMP|string $d
+     * @param \GMP|int|string $n
+     * @param \GMP|int|string $d
      * @return \GMP|string a bignum representing n mod d
      */
     protected function _mod($n, $d) {
@@ -378,8 +378,8 @@ class BigNum {
     /**
      * Compares two bignum
      *
-     * @param \GMP|string $a
-     * @param \GMP|string $b
+     * @param \GMP|int|string $a
+     * @param \GMP|int|string $b
      * @return int positive value if a > b, zero if a = b and a negative value if a < b
      */
     protected function _cmp($a, $b) {

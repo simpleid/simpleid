@@ -120,6 +120,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
         if (isset($request['request'])) {
             $this->logger->log(LogLevel::INFO, 'OpenID request object token: ' . $request['request']);
 
+            /** @var \SimpleID\Protocols\OAuth\OAuthClient $client */
             $client = $store->loadClient($request['client_id'], 'SimpleID\Protocols\OAuth\OAuthClient');
 
             if (!isset($client['connect']['request_object_signing_alg'])) {
@@ -276,6 +277,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
 
         if ($request->paramContains('scope', 'openid')) {
             $user = AuthManager::instance()->getUser();
+            /** @var \SimpleID\Protocols\OAuth\OAuthClient $client */
             $client = StoreManager::instance()->loadClient($request['client_id'], 'SimpleID\Protocols\OAuth\OAuthClient');
 
             if (isset($request['claims']) && is_string($request['claims'])) $request['claims'] = json_decode($request['claims'], true);
@@ -359,7 +361,9 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
         }
 
         $authorization = $this->getAuthorization();
+        /** @var \SimpleID\Models\User $user */
         $user = $authorization->getOwner();
+        /** @var \SimpleID\Protocols\OAuth\OAuthClient $client */
         $client = $authorization->getClient('SimpleID\Protocols\OAuth\OAuthClient');
         $scope = $this->getAccessToken()->getScope();
 

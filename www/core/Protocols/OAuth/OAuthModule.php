@@ -828,8 +828,8 @@ class OAuthModule extends Module implements ProtocolResult {
      *    key called `weight`, it is sorted using that weight.
      * 3. Otherwise, scopes are sorted in alphabetical order
      *
-     * @param array $a
-     * @param array $b
+     * @param string $a
+     * @param string $b
      * @return int
      * @since 2.0
      */

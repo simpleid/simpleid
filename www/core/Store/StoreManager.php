@@ -213,6 +213,7 @@ class StoreManager extends Prefab {
         $user = $this->load('user', $uid);
         if ($user == null) return null;
 
+        /** @var \SimpleID\Models\User $user_config */
         $user_config = $this->load('user_cfg', $uid);
         if ($user_config != null) {
             $user->loadData($user_config);

@@ -90,6 +90,7 @@ class DefaultStoreModule extends StoreModule {
     public function write($type, $id, $value) {
         switch ($type) {
             case 'client':
+                /** @var Client $value */
                 return $this->writeClient($id, $value);
             case 'user':
                 // user settings are written using the keyvalue:write store
@@ -112,7 +113,7 @@ class DefaultStoreModule extends StoreModule {
      *
      * @param string $criteria the criteria name
      * @param string $value the criteria value
-     * @return User|null the item or null if no item is found
+     * @return string|null the item or null if no item is found
      */
     protected function findUser($criteria, $value) {
         $cache = \Cache::instance();

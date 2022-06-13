@@ -166,7 +166,7 @@ class DiffieHellman {
     /**
      * Encrypts/decrypts and encodes the MAC key.
      *
-     * @param resource $ZZ the Diffie-Hellman key exchange shared secret as a bignum
+     * @param BigNum $ZZ the Diffie-Hellman key exchange shared secret as a bignum
      * @param string $mac_key a byte stream containing the MAC key
      * @return string the encrypted MAC key in Base64 representation
      */

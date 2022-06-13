@@ -56,7 +56,7 @@ abstract class StoreModule extends Module {
      * @param string $type the item type
      * @param string $criteria the criteria name
      * @param mixed $value the criteria value
-     * @return Storable|null the item or null if no item matches the
+     * @return string|null the item identifier or null if no item matches the
      * specified criteria
      */
     abstract public function find($type, $criteria, $value);

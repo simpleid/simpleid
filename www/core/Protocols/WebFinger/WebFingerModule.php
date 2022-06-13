@@ -90,7 +90,7 @@ class WebFingerModule extends Module {
      * The JRD document created is very simple - it merely points to the
      * SimpleID installation as the OpenID connect provider.
      *
-     * @param array $resource the resource identifier
+     * @param string $resource the resource identifier
      * @return array|null the JRD document
      */
     protected function getJRD($resource) {
