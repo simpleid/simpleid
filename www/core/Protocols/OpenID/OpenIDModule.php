@@ -48,7 +48,10 @@ class OpenIDModule extends Module implements ProtocolResult {
 
     const DEFAULT_SCOPE = 'tag:simpleid.sf.net,2021:openid:default';
 
+    /** @var \Cache */
     protected $cache;
+
+    /** @var ModuleManager */
     protected $mgr;
 
     static function init($f3) {
@@ -63,6 +66,9 @@ class OpenIDModule extends Module implements ProtocolResult {
         $this->mgr = ModuleManager::instance();
     }
 
+    /**
+     * @return void
+     */
     public function onIndexEvent(IndexEvent $event) {
         $_request = $event->getRequest();
 
@@ -94,19 +100,21 @@ class OpenIDModule extends Module implements ProtocolResult {
      * variable.
      *
      * @param Request $request the OpenID request
+     * @return void
      */
     public function start($request) {
         switch ($request['openid.mode']) {
             case 'associate':
                 $this->associate($request);
-                return;
+                break;
             case 'checkid_immediate':
             case 'checkid_setup':
                 $token = new SecurityToken();
                 $state = [ 'rq' => $request->toArray() ];
                 $this->checkHttps('redirect', true, $this->getCanonicalURL('continue/' . rawurlencode($token->generate($state)), '', 'https'));
                 
-                return $this->checkid($request);
+                $this->checkid($request);
+                break;
             case 'check_authentication':
                 $this->check_authentication($request);
                 break;
@@ -131,6 +139,7 @@ class OpenIDModule extends Module implements ProtocolResult {
      * the relying party.
      *
      * @param Request $request the OpenID request
+     * @return void
      * @link http://openid.net/specs/openid-authentication-1_1.html#mode_associate, http://openid.net/specs/openid-authentication-2_0.html#associations
      */
     protected function associate($request) {
@@ -218,6 +227,7 @@ class OpenIDModule extends Module implements ProtocolResult {
      * assertion.
      *
      * @param Request $request the OpenID request
+     * @return void
      */
     public function checkid($request) {      
         $immediate = ($request['openid.mode'] == 'checkid_immediate');
@@ -327,6 +337,7 @@ class OpenIDModule extends Module implements ProtocolResult {
                         $form_state['mode'] = AuthManager::MODE_REENTER_CREDENTIALS;
                     }
 
+                    /** @var \SimpleID\Auth\AuthModule */
                     $auth_module = $this->mgr->getModule('SimpleID\Auth\AuthModule');
                     $auth_module->loginForm([
                         'destination' => 'continue/' . rawurlencode($token->generate($state))
@@ -649,6 +660,7 @@ class OpenIDModule extends Module implements ProtocolResult {
      * to verify signatures generated using stateless mode.
      *
      * @param Request $request the OpenID request
+     * @return void
      * @see http://openid.net/specs/openid-authentication-1_1.html#mode_check_authentication, http://openid.net/specs/openid-authentication-2_0.html#verifying_signatures
      */
     protected function check_authentication($request) {
@@ -730,6 +742,7 @@ class OpenIDModule extends Module implements ProtocolResult {
      * verification
      * @param int $reason either CHECKID_APPROVAL_REQUIRED, CHECKID_RETURN_TO_SUSPECT,
      * CHECKID_IDENTITIES_NOT_MATCHING or CHECKID_IDENTITY_NOT_EXIST
+     * @return void
      */
     protected function consentForm($request, $response, $reason = self::CHECKID_APPROVAL_REQUIRED) {
         $tpl = new \Template();
@@ -789,6 +802,8 @@ class OpenIDModule extends Module implements ProtocolResult {
      *
      * If the user verifies the relying party, an OpenID response will be sent to
      * the relying party.  Otherwise, the dashboard will be displayed to the user.
+     * 
+     * @return void
      */
     public function consent() {
         $auth = AuthManager::instance();
@@ -796,6 +811,7 @@ class OpenIDModule extends Module implements ProtocolResult {
         $store = StoreManager::instance();
     
         if (!$auth->isLoggedIn()) {
+            /** @var \SimpleID\Auth\AuthModule */
             $auth_module = $this->mgr->getModule('SimpleID\Auth\AuthModule');
             $auth_module->loginForm();
             return;
@@ -803,7 +819,9 @@ class OpenIDModule extends Module implements ProtocolResult {
         $user = $auth->getUser();
 
         $form_state = FormState::decode($token->getPayload($this->f3->get('POST.fs')), Request::class, Response::class);
+        /** @var Request */
         $request = $form_state->getRequest();
+        /** @var Response */
         $response = $form_state->getResponse();
         $reason = $form_state['code'];
 
@@ -843,11 +861,13 @@ class OpenIDModule extends Module implements ProtocolResult {
      *
      * @param FormSubmitEvent $event the form cancellation
      * event
+     * @return void
      */
     public function onLoginFormCancel(FormSubmitEvent $event) {
         $form_state = $event->getFormState();
 
         if ($form_state['cancel'] == 'openid') {
+            /** @var \SimpleID\Protocols\OpenID\Request */
             $request = $form_state->getRequest();
             if (isset($request['openid.return_to'])) {
                 $return_to = $request['openid.return_to'];
@@ -863,7 +883,8 @@ class OpenIDModule extends Module implements ProtocolResult {
      * Logs the authentication activity against the user.
      *
      * @param Request $request the OpenID request
-     * @param array $consents if not `null`, saves the consents
+     * @param array<string, mixed>|null $consents if not `null`, saves the consents
+     * @return void
      */
     protected function logActivity($request, $consents = NULL) {
         $store = StoreManager::instance();
@@ -916,9 +937,10 @@ class OpenIDModule extends Module implements ProtocolResult {
      * for {@link renderDirectResponse()}.
      *
      * @param string $error the error message
-     * @param array $additional any additional data to be sent with the error
+     * @param array<string, string> $additional any additional data to be sent with the error
      * message
      * @param Request $request the request in response to which the error is made
+     * @return void
      */
     protected function directError($error, $additional = [], $request = NULL) {
         $this->f3->status(400);
@@ -933,9 +955,10 @@ class OpenIDModule extends Module implements ProtocolResult {
      *
      * @param string $url the URL to which the error message is to be sent
      * @param string $error the error message or code
-     * @param array $additional any additional data to be sent with the error
+     * @param array<string, string> $additional any additional data to be sent with the error
      * message
      * @param Request $request the request in response to which the error is made
+     * @return void
      */
     protected function indirectError($url, $error, $additional = [], $request = NULL) {
         $error = Response::createError($error, $additional, $request);
@@ -975,6 +998,7 @@ class OpenIDModule extends Module implements ProtocolResult {
     /**
      * Displays the XRDS document for this SimpleID installation.
      * 
+     * @return void
      */
     public function providerXRDS() {
         $this->logger->log(LogLevel::DEBUG, 'Providing XRDS.');
@@ -993,6 +1017,10 @@ class OpenIDModule extends Module implements ProtocolResult {
 
     /**
      * Returns the user's public XRDS page.
+     * 
+     * @param \Base $f3
+     * @param array<string, mixed> $params
+     * @return void
      */
     public function userXRDS($f3, $params) {
         $store = StoreManager::instance();
@@ -1016,6 +1044,7 @@ class OpenIDModule extends Module implements ProtocolResult {
     /**
      * Returns the OpenID Connect scopes supported by this server.
      *
+     * @return void
      * @since 2.0
      */
     public function onScopeInfoCollectionEvent(ScopeInfoCollectionEvent $event) {
@@ -1031,6 +1060,7 @@ class OpenIDModule extends Module implements ProtocolResult {
      *
      * @param UIBuildEvent $event the event to collect
      * the discovery block
+     * @return void
      */
     public function onProfileBlocks(UIBuildEvent $event) {
         $auth = AuthManager::instance();

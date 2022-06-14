@@ -41,11 +41,15 @@ class User extends ArrayWrapper implements Serializable, Storable {
     /** @var string the user ID */
     protected $uid;
 
-    /** @var array the activity log */
+    /** @var array<string, array<string, mixed>> the activity log */
     protected $activities = [];
 
+    /** @var array<string, array<string, mixed>> */
     public $clients = [];
 
+    /**
+     * @param array<string, mixed> $data
+     */
     public function __construct($data = [ 'openid' => [] ]) {
         parent::__construct($data);
     }
@@ -118,7 +122,8 @@ class User extends ArrayWrapper implements Serializable, Storable {
      * @param string $id the ID of the agent creating the activity - this could
      * be the user agent ID assigned by SimpleID (in case of user logins) or
      * the client ID
-     * @param array $data additional data
+     * @param array<string, mixed> $data additional data
+     * @return void
      */
     public function addActivity($id, $data) {
         $this->activities[$id] = $data;
@@ -133,7 +138,7 @@ class User extends ArrayWrapper implements Serializable, Storable {
     /**
      * Returns the user's recent activity log.
      *
-     * @return array the activity log
+     * @return array<string, array<string, mixed>> the activity log
      */
     public function getActivities() {
         return $this->activities;
@@ -176,7 +181,10 @@ class User extends ArrayWrapper implements Serializable, Storable {
         }
     }
 
-
+    /**
+     * @param string|null $hidden_value
+     * @return array<string, mixed>
+     */
     private function toSecureArray($hidden_value = null) {
         $event = new BaseDataCollectionEvent('user_secret_data_paths');
         $copy = new ArrayWrapper($this->container);
@@ -211,7 +219,7 @@ class User extends ArrayWrapper implements Serializable, Storable {
     public function unserialize($data) {
         $f3 = Base::instance();
 
-        /** @var array $array */
+        /** @var array<string, mixed> $array */
         $array = $f3->unserialize($data);
         foreach ($array as $var => $value) {
             $this->$var = $value;
@@ -236,6 +244,8 @@ class User extends ArrayWrapper implements Serializable, Storable {
     /**
      * Returns a string representation of the user, with sensitive
      * information removed.
+     * 
+     * @return string
      */
     public function toString() {
         $result = [];

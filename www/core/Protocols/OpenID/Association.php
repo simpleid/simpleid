@@ -112,7 +112,7 @@ class Association {
      * @param string $dh_consumer_public for Diffie-Hellman key exchange, the public key of the relying party encoded in Base64
      * @param string $dh_modulus for Diffie-Hellman key exchange, the modulus encoded in Base64
      * @param string $dh_gen for Diffie-Hellman key exchange, g encoded in Base64
-     * @return array data that can be fed into an OpenID association response
+     * @return array<string, string> data that can be fed into an OpenID association response
      * @link http://openid.net/specs/openid-authentication-1_1.html#anchor14, http://openid.net/specs/openid-authentication-2_0.html#anchor20
      */
     function getOpenIDResponse($session_type = 'no-encryption', $dh_consumer_public = NULL, $dh_modulus = NULL, $dh_gen = NULL) {        
@@ -171,7 +171,7 @@ class Association {
     /**
      * Returns the association types supported by this server.
      *
-     * @return array an array containing the association types supported by this server as keys
+     * @return array<string, mixed> an array containing the association types supported by this server as keys
      * and an array containing the key size (mac_size) and HMAC algorithm (algo) as
      * values
      */
@@ -191,7 +191,7 @@ class Association {
      * @param bool $is_https whether the transport layer encryption is used for the current
      * connection
      * @param float $version the OpenID version, either OPENID_VERSION_1_1 and OPENID_VERSION_2
-     * @return array an array containing the session types supported by this server as keys
+     * @return array<string, mixed> an array containing the session types supported by this server as keys
      * and an array containing the hash function (hash_func) as
      * values
      */

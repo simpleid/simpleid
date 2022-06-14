@@ -63,20 +63,23 @@ class Authorization implements Storable {
     /** Separator for the authorisation ID and the authorisation state */
     const AUTH_STATE_SEPARATOR = '.';
 
+    /** @var string */
     private $id;
+
+    /** @var string */
     private $auth_state;
     
     /** @var string the type and ID of the resource owner */
     protected $owner_ref;
     /** @var string the type and ID of the client */
     protected $client_ref;
-    /** @var array the scope of the authorisation */
+    /** @var array<string> the scope of the authorisation */
     protected $available_scope;
 
     /** @var bool whether refresh tokens are issued */
     protected $issue_refresh_token = true;
 
-    /** @var array additional data to be stored with the authorization */
+    /** @var array<string, mixed> additional data to be stored with the authorization */
     public $additional = [];
 
     /**
@@ -89,10 +92,12 @@ class Authorization implements Storable {
      * owner
      * @param Storable $client the Storable object representing the
      * client
-     * @param string|array $scope a space-delimited string representing the scope
+     * @param string|array<string> $scope a space-delimited string representing the scope
      * of the authorization
      * @param bool $issue_refresh_token whether to issue a refresh token if
      * permitted
+     * @param string|null $auth_state an existing authorisation state, or null to
+     * reset the authorisation state
      */
     public function __construct($owner, $client, $scope = '', $issue_refresh_token = true, $auth_state = NULL) {
         $this->owner_ref = $owner->getStoreType() . ':' . $owner->getStoreID();
@@ -137,7 +142,7 @@ class Authorization implements Storable {
      * {@link SimpleID\Store\Storable::getStoreID()}), separated by a colon.
      *
      * @param string $ref the reference to the storable object
-     * @param array $args additional parameters
+     * @param array<mixed> $args additional parameters
      * @return Storable the storable object or null
      */
     protected function getStorable($ref, $args = []) {
@@ -152,8 +157,7 @@ class Authorization implements Storable {
     /**
      * Returns the scope of the authorisation.
      *
-     * @return array the scope
-     * of this authorisation.
+     * @return array<string> the scope of this authorisation
      */
     public function getScope() {
         return $this->available_scope;
@@ -167,8 +171,9 @@ class Authorization implements Storable {
      * authorisation state can be obtained using the {@link getAuthState()}
      * method.
      *
-     * @param string|array $scope the new scope as a space-delimited string
+     * @param string|array<string> $scope the new scope as a space-delimited string
      * or an array
+     * @return void
      */
     public function setScope($scope) {
         if (!is_array($scope)) $scope = explode(' ', $scope);
@@ -193,7 +198,7 @@ class Authorization implements Storable {
      * This method will return true if the authorisation covers *all* of the
      * scope specified by `$scope`.
      *
-     * @param string|array $scope the scope to test
+     * @param string|array<string> $scope the scope to test
      * @return bool true if the authorisation covers all of the specified
      * scope
      */
@@ -206,8 +211,8 @@ class Authorization implements Storable {
      * Filter a scope parameter so that it is equal to or narrower than
      * the scope authorised under this authorization.
      *
-     * @param string|array $scope the scope to filter
-     * @return array the filtered scope
+     * @param string|array<string> $scope the scope to filter
+     * @return array<string> the filtered scope
      */
     public function filterScope($scope) {
         if (!is_array($scope)) $scope = explode(' ', $scope);
@@ -251,10 +256,10 @@ class Authorization implements Storable {
      * Creates an OAuth authorisation code.
      *
      * @param string $redirect_uri the redirect URI associated with the code
-     * @param string|array $scope the allowed scope - this should be a subset of
+     * @param string|array<string> $scope the allowed scope - this should be a subset of
      * the scope provided by the authorisation, or null if all of the authorisation's
      * scope is to be included
-     * @param array $additional additional data to be stored in the code
+     * @param array<string, mixed> $additional additional data to be stored in the code
      * @return string the authorisation code
      */
     public function issueCode($redirect_uri, $scope = null, $additional = []) {
@@ -271,14 +276,14 @@ class Authorization implements Storable {
      * It will also call {@link issueRefreshToken()} if the authorisation was
      * created with $issue_refresh_token set to true.
      *
-     * @param array $scope the scope to be included in the tokens
+     * @param array<string> $scope the scope to be included in the tokens
      * @param int $expires_in the time over which the access token will be valid,
      * in seconds, or {@link SimpleID\Protocols\OAuth\Token::TTL_PERPETUAL} if the token is not to expire
      * @param TokenSource $source the source, if any, from which the token is to be
      * generated
-     * @param array $additional additional data to be stored on the server for this
+     * @param array<string, mixed> $additional additional data to be stored on the server for this
      * token
-     * @return array an array of parameters that can be included in the OAuth token
+     * @return array<string, string> an array of parameters that can be included in the OAuth token
      * endpoint response
      */
     public function issueTokens($scope = [], $expires_in = Token::TTL_PERPETUAL, $source = null, $additional = []) {
@@ -293,14 +298,14 @@ class Authorization implements Storable {
     /**
      * Issues an access token.
      *
-     * @param array $scope the scope to be included in the access token
+     * @param array<string> $scope the scope to be included in the access token
      * @param int $expires_in the time over which the access token will be valid,
      * in seconds, or {@link SimpleID\Protocols\OAuth\Token::TTL_PERPETUAL} if the token is not to expire
      * @param TokenSource $source the source, if any, from which the token is to be
      * generated
-     * @param array $additional additional data to be stored on the server for this
+     * @param array<string, mixed> $additional additional data to be stored on the server for this
      * token
-     * @return array an array of parameters that can be included in the OAuth token
+     * @return array<string, string> an array of parameters that can be included in the OAuth token
      * endpoint response
      */
     public function issueAccessToken($scope = [], $expires_in = Token::TTL_PERPETUAL, $source = null, $additional = []) {
@@ -310,7 +315,7 @@ class Authorization implements Storable {
 
         $results['access_token'] = $token->getEncoded();
         $results['token_type'] = $token->getTokenType();
-        if ($expires_in != Token::TTL_PERPETUAL) $results['expires_in'] = $expires_in;
+        if ($expires_in != Token::TTL_PERPETUAL) $results['expires_in'] = strval($expires_in);
 
         return $results;
     }
@@ -318,12 +323,12 @@ class Authorization implements Storable {
     /**
      * Issues a refresh token.
      *
-     * @param array $scope the scope to be included in the access token
+     * @param array<string> $scope the scope to be included in the access token
      * @param TokenSource $source the source, if any, from which the token is to be
      * generated
-     * @param array $additional additional data to be stored on the server for this
+     * @param array<string, mixed> $additional additional data to be stored on the server for this
      * token
-     * @return array an array of parameters that can be included in the OAuth token
+     * @return array<string, string> an array of parameters that can be included in the OAuth token
      * endpoint response
      */
     protected function issueRefreshToken($scope = [], $source = NULL, $additional = []) {
@@ -336,6 +341,7 @@ class Authorization implements Storable {
      * a particular token source.
      *
      * @param TokenSource $source the token source
+     * @return void
      */
     public function revokeTokensFromSource($source) {
         Token::revokeAll($this, $source);
@@ -344,6 +350,7 @@ class Authorization implements Storable {
     /**
      * Revokes all access and refresh tokens for this authorisation.
      *
+     * @return void
      */
     public function revokeAllTokens() {
         Token::revokeAll($this);

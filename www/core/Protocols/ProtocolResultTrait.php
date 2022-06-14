@@ -28,6 +28,7 @@ namespace SimpleID\Protocols;
  * from identity protocols
  */
 trait ProtocolResultTrait {
+    /** @var int */
     protected $result = null;
 
     /**
@@ -41,6 +42,7 @@ trait ProtocolResultTrait {
      * {@link SimpleID\Protocols\ProtocolResult}.
      * 
      * @param int $result the assertion result
+     * @return void
      */
     public function setResult(int $result) {
         if ($this->result == null) {

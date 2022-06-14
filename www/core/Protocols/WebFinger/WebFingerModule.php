@@ -39,6 +39,9 @@ class WebFingerModule extends Module {
         $f3->route('GET|HEAD /.well-known/webfinger', 'SimpleID\Protocols\WebFinger\WebFingerModule->start');
     }
 
+    /**
+     * @return void
+     */
     function start() {
         $config = $this->f3->get('config');
         $limiter = new RateLimiter('webfinger');
@@ -91,7 +94,7 @@ class WebFingerModule extends Module {
      * SimpleID installation as the OpenID connect provider.
      *
      * @param string $resource the resource identifier
-     * @return array|null the JRD document
+     * @return array<string, mixed>|null the JRD document
      */
     protected function getJRD($resource) {
         $store = StoreManager::instance();
@@ -138,7 +141,7 @@ class WebFingerModule extends Module {
      * URL or e-mail), then supplies the appropriate path(s) to search
      * for.
      * @param string $resource the resource identifier
-     * @return array|null an array of criteria paths and their corresponding
+     * @return array<string, string>|null an array of criteria paths and their corresponding
      * values
      */
     protected function getResourceCriteria($resource) {
@@ -161,9 +164,9 @@ class WebFingerModule extends Module {
      * Ensures that a specified resource URI occurs in either the subject or
      * the aliases member of a JRD document.
      *
-     * @param array $jrd the JRD document
+     * @param array<string, mixed> $jrd the JRD document
      * @param string $resource the resource URI
-     * @return array the fixed JRD document
+     * @return array<string, mixed> the fixed JRD document
      */
     protected function fixJRDAliases($jrd, $resource) {
         if (isset($jrd['subject']) && ($jrd['subject'] == $resource)) return $jrd;
@@ -186,10 +189,10 @@ class WebFingerModule extends Module {
     /**
      * Filters a JRD document for specified link relations.
      *
-     * @param array $jrd the JRD document
-     * @param string|array $rels a string contain a link relation, or an array containing
+     * @param array<string, mixed> $jrd the JRD document
+     * @param string|array<string> $rels a string contain a link relation, or an array containing
      * multiple link relations, to filter
-     * @return array the filtered JRD document
+     * @return array<string, mixed> the filtered JRD document
      */
     protected function filterJRDRels($jrd, $rels) {
         if (isset($jrd['links'])) {

@@ -36,9 +36,10 @@ class CertAuthSchemeModule extends AuthSchemeModule {
      * Attempts to automatically login using the client certificate
      * 
      * @param AutoAuthEvent $event the event
+     * @return void
      */
     public function onAutoAuthEvent(AutoAuthEvent $event) {
-        if (!$this->hasClientCert()) return NULL;
+        if (!$this->hasClientCert()) return;
 
         $cert = trim($_SERVER['SSL_CLIENT_M_SERIAL']) . ';' . trim($_SERVER['SSL_CLIENT_I_DN']);
         $this->logger->log(LogLevel::DEBUG, 'Client SSL certificate: ' . $cert);
@@ -88,7 +89,9 @@ class CertAuthSchemeModule extends AuthSchemeModule {
         return true;
     }
 
-    
+    /**
+     * @return void
+     */
     public function onUserSecretDataPaths(BaseDataCollectionEvent $event) {
         $event->addResult('cert.certs');
     }

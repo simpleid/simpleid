@@ -30,7 +30,7 @@ use SimpleID\Util\ArrayWrapper;
  * methods which are useful for processing OAuth-related requests.
  */
 class Request extends ArrayWrapper {
-    /** @var array the HTTP headers */
+    /** @var array<string, string> the HTTP headers */
     protected $headers = [];
 
     /** @var bool whether the request prohibits user intervention */
@@ -39,8 +39,8 @@ class Request extends ArrayWrapper {
     /**
      * Creates a HTTP request.
      *
-     * @param array $params the request parameters
-     * @param array $headers the HTTP request headers
+     * @param array<string, mixed> $params the request parameters
+     * @param array<string, string> $headers the HTTP request headers
      */
     public function __construct($params = NULL, $headers = NULL) {
         if ($params == NULL) $params = $_REQUEST;
@@ -82,6 +82,7 @@ class Request extends ArrayWrapper {
      * interaction is to be made.
      *
      * @param bool $immediate true if no user interaction is to be made
+     * @return void
      */
     public function setImmediate($immediate) {
         $this->immediate = $immediate;
@@ -123,7 +124,7 @@ class Request extends ArrayWrapper {
      * those name-value pairs will be returned.
      *
      * @param bool $parse_credentials whether to parse the credential information
-     * @return array|null the parsed `Authorization` header, or `null` if none
+     * @return array<string, string>|null the parsed `Authorization` header, or `null` if none
      * exists
      */
     public function getAuthorizationHeader($parse_credentials = false) {
@@ -159,7 +160,7 @@ class Request extends ArrayWrapper {
      * @param string $param the parameter name to check
      * @param string $delimiter a regular expression to determine
      * the delimiter between values
-     * @return array|null an array of values, or `null` if the parameter
+     * @return array<string>|null an array of values, or `null` if the parameter
      * is not found
      */
     public function paramToArray($param, $delimiter = '/\s+/') {
@@ -192,10 +193,11 @@ class Request extends ArrayWrapper {
      * @param string $value the value to remove
      * @param string $delimiter a regular expression to determine
      * the delimiter between values
+     * @return void
      */
     public function paramRemove($param, $value, $delimiter = '/\s+/') {
-        if (!isset($this->container[$param])) return null;
-        if (!$this->paramContains($param, $value)) return $this->container[$param];
+        if (!isset($this->container[$param])) return;
+        if (!$this->paramContains($param, $value)) return;
 
         $items = preg_split($delimiter, $this->container[$param]);
         $items = array_diff($items, [ $value ]);

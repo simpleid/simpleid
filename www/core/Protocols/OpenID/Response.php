@@ -36,7 +36,7 @@ class Response extends Message {
     /** Parameter for {@link $indirect_component} */
     const OPENID_RESPONSE_FRAGMENT = 1;
 
-    /** @var array an array of fields to be signed */
+    /** @var array<string> an array of fields to be signed */
     private $signed_fields = [];
 
     /**
@@ -57,7 +57,7 @@ class Response extends Message {
      * response will contain the same OpenID version, as well as the same
      * extension URI-to-alias mapping as the underlying request.
      * 
-     * @param Request|array|null $request the request to which the response will
+     * @param Request|array<string, string>|null $request the request to which the response will
      * be made
      */
     public function __construct($request = NULL) {
@@ -82,6 +82,7 @@ class Response extends Message {
      * namespace will be added to the response.
      *
      * @param int $version the OpenID version
+     * @return void
      */
     public function setVersion($version) {
         if ($version == Message::OPENID_VERSION_2) {
@@ -98,6 +99,7 @@ class Response extends Message {
      * @param string $value the value
      * @param bool|null $signed whether this field should be included in the
      * signature
+     * @return void
      */
     public function set($field, $value, $signed = NULL) {
         $this->container[$field] = $value;
@@ -110,9 +112,10 @@ class Response extends Message {
     /**
      * Sets multiple fields in the response.
      *
-     * @param array $data the fields and values to set
+     * @param array<string, string> $data the fields and values to set
      * @param bool|null $signed whether this field should be included in the
      * signature
+     * @return void
      */
     public function setArray($data, $signed = NULL) {
         foreach ($data as $key => $value) {
@@ -134,6 +137,7 @@ class Response extends Message {
      * be either OPENID_RESPONSE_QUERY or OPENID_RESPONSE_FRAGMENT
      *
      * @param int $indirect_component the component
+     * @return void
      */
     public function setIndirectComponent($indirect_component) {
         $this->indirect_component = $indirect_component;
@@ -148,7 +152,7 @@ class Response extends Message {
      *
      * @param string $indirect_url the URL to which the OpenID response is sent.  If
      * this is null, the response is sent via direct communication
-     * 
+     * @return void
      */
     public function render($indirect_url = NULL) {
         if ($indirect_url) {
@@ -284,9 +288,10 @@ class Response extends Message {
      * Convenient function to create an error response.
      *
      * @param string $error the error message
-     * @param array $additional any additional data to be sent with the error
+     * @param array<string, string> $additional any additional data to be sent with the error
      * message
      * @param Request $request the request
+     * @return Response
      */
     static public function createError($error, $additional = [], $request = NULL) {
         $response = new Response($request);

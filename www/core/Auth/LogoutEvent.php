@@ -35,6 +35,7 @@ use SimpleID\Models\User;
  * 
  */
 class LogoutEvent {
+    /** @var User */
     protected $user;
 
     public function __construct(User $user) {

@@ -33,6 +33,7 @@ use SimpleID\Protocols\OAuth\OAuthClient;
  * the {@link setToken()} method.
  */
 class OAuthInitTokenEvent implements StoppableEventInterface {
+    /** @var \SimpleID\Protocols\OAuth\AccessToken */
     protected $access_token = null;
 
     /**
@@ -41,6 +42,7 @@ class OAuthInitTokenEvent implements StoppableEventInterface {
      * Once this method is called, the event stops.
      * 
      * @param \SimpleID\Protocols\OAuth\AccessToken $access_token the access token
+     * @return void
      */
     public function setToken(AccessToken $access_token) {
         $this->access_token = $access_token;

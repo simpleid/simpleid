@@ -31,7 +31,7 @@ use SimpleID\Models\Client;
  * its storage requirements.
  */
 class DefaultStoreModule extends StoreModule {
-
+    /** @var array<string, mixed> */
     protected $config;
 
     public function __construct() {
@@ -41,6 +41,7 @@ class DefaultStoreModule extends StoreModule {
         $this->checkConfig();
     }
 
+    /** @return void */
     protected function checkConfig() {
         if (!is_dir($this->config['identities_dir'])) {
             $this->logger->log(\Psr\Log\LogLevel::CRITICAL, 'Identities directory not found.');
@@ -91,12 +92,13 @@ class DefaultStoreModule extends StoreModule {
         switch ($type) {
             case 'client':
                 /** @var Client $value */
-                return $this->writeClient($id, $value);
+                $this->writeClient($id, $value);
+                break;
             case 'user':
                 // user settings are written using the keyvalue:write store
-                return;
+                break;
             default:
-                return $this->writeKeyValue($type, $id, $value);
+                $this->writeKeyValue($type, $id, $value);
         }
 
     }
@@ -104,7 +106,7 @@ class DefaultStoreModule extends StoreModule {
     public function delete($type, $id) {
         switch ($type) {
             default:
-                return $this->deleteKeyValue($type, $id);
+                $this->deleteKeyValue($type, $id);
         }
     }
 
@@ -262,6 +264,7 @@ class DefaultStoreModule extends StoreModule {
      *
      * @param string $cid the name of the client
      * @param Client $client the data to save
+     * @return void
      */
     protected function writeClient($cid, $client) {
         if (!$this->isValidName($cid)) {
@@ -313,7 +316,7 @@ class DefaultStoreModule extends StoreModule {
      * @param string $type the item type
      * @param string $name the name of the key-value item to save
      * @param mixed $value the value of the key-value item
-     *
+     * @return void
      */
     protected function writeKeyValue($type, $name, $value) {
         if (!$this->isValidName($name . '.' . $type)) {
@@ -331,7 +334,7 @@ class DefaultStoreModule extends StoreModule {
      *
      * @param string $type the item type
      * @param string $name the name of the setting to delete
-     *
+     * @return void
      */
     protected function deleteKeyValue($type, $name) {
         if (!$this->isValidName($name . '.' . $type)) {
@@ -350,12 +353,16 @@ class DefaultStoreModule extends StoreModule {
      *
      * @param string $name the name to check
      * @return boolean whether the name is valid for use with this store 
-     *
      */
     protected function isValidName($name) {
         return preg_match('!\A[^/\\\\]*\z!', $name);
     }
 
+    /**
+     * @param string $type
+     * @param string $name
+     * @return string
+     */
     private function getKeyValueFile($type, $name) {
         $name = str_replace('%7E', '~', rawurlencode($name));
         if (preg_match('/^\.+$/', $name)) $name = str_replace('.', '%2E', $name);

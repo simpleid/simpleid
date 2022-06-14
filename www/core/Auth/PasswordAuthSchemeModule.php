@@ -46,6 +46,7 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
      * and password
      *
      * @param FormBuildEvent $event
+     * @return void
      */
     public function onLoginFormBuild(FormBuildEvent $event) {
         $form_state = $event->getFormState();
@@ -63,6 +64,7 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
      * Validates the login form.
      *
      * @param FormSubmitEvent $event
+     * @return void
      */
     public function onLoginFormValidate(FormSubmitEvent $event) {
         $form_state = $event->getFormState();
@@ -86,6 +88,7 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
      * by the user.
      *
      * @param LoginFormSubmitEvent $event
+     * @return void
      */
     public function onLoginFormSubmit(LoginFormSubmitEvent $event) {
         $store = StoreManager::instance();
@@ -113,7 +116,7 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
      * method.
      *
      * @param string $uid the name of the user to verify
-     * @param array $credentials the credentials supplied by the browser
+     * @param array<string, mixed> $credentials the credentials supplied by the browser
      * @return bool whether the credentials supplied matches those for the specified
      * user
      */
@@ -144,6 +147,9 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
         }
     }
 
+    /**
+     * @return void
+     */
     public function onUserSecretDataPaths(BaseDataCollectionEvent $event) {
         $event->addResult('password.password');
     }

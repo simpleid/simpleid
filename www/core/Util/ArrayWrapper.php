@@ -71,15 +71,17 @@ use \ArrayIterator;
  * print $array_wrapper->pathGet('dim1.foo');  # Now prints 3
  * </code>
  *
+ * @implements ArrayAccess<string, mixed>
+ * @implements IteratorAggregate<string, mixed>
  */
 class ArrayWrapper implements ArrayAccess, Countable, IteratorAggregate {
-    /** @var array the underlying array */
+    /** @var array<mixed> the underlying array */
     protected $container = [];
 
     /**
      * Creates a new ArrayWrapper over an underlying array
      *
-     * @param array $container the underlying array
+     * @param array<mixed> $container the underlying array
      */
     public function __construct($container = []) {
         if (is_array($container)) $this->container = $container;
@@ -90,7 +92,8 @@ class ArrayWrapper implements ArrayAccess, Countable, IteratorAggregate {
      *
      * This data is typically read from another source
      *
-     * @param array|ArrayWrapper $data the data
+     * @param array<mixed>|ArrayWrapper $data the data
+     * @return void
      */
     public function loadData($data) {
         if ($data instanceof ArrayWrapper) {
@@ -103,7 +106,7 @@ class ArrayWrapper implements ArrayAccess, Countable, IteratorAggregate {
     /**
      * Returns this object as an array.
      *
-     * @return array
+     * @return array<mixed>
      */
     public function toArray() {
         return $this->container;
@@ -185,6 +188,7 @@ class ArrayWrapper implements ArrayAccess, Countable, IteratorAggregate {
      *
      * @param string $path the path
      * @param mixed $value the value to set
+     * @return void
      */
     public function pathSet($path, $value) {
         $ref = &$this->pathRef($path);
@@ -196,6 +200,7 @@ class ArrayWrapper implements ArrayAccess, Countable, IteratorAggregate {
      * expression
      *
      * @param string $path the path
+     * @return void
      */
     public function pathUnset($path) {
         if (!$this->pathExists($path)) return;
@@ -286,6 +291,10 @@ class ArrayWrapper implements ArrayAccess, Countable, IteratorAggregate {
         return $var;
     }
 
+    /**
+     * @param string $path
+     * @return array<string>|false
+     */
     private function pathSplit($path) {
         return preg_split('/\[\h*[\'"]?(.+?)[\'"]?\h*\]|(->)|\./', $path, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
     }

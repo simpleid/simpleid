@@ -63,7 +63,7 @@ class Response extends ArrayWrapper {
      * 
      * @param Request $request the request to which the response will
      * be made
-     * @param array $data the initial response parameters
+     * @param array<string, string> $data the initial response parameters
      */
     public function __construct($request = NULL, $data = []) {
         if (isset($data['#response_mode'])) {
@@ -97,6 +97,7 @@ class Response extends ArrayWrapper {
      * be either QUERY_RESPONSE_MODE or FRAGMENT_RESPONSE_MODE
      *
      * @param string $response_mode the response mode
+     * @return void
      */
     public function setResponseMode($response_mode) {
         $this->response_mode = $response_mode;
@@ -106,6 +107,7 @@ class Response extends ArrayWrapper {
      * Sets the redirect URI.
      *
      * @param string $redirect_uri the redirect URI to set
+     * @return void
      */
     public function setRedirectURI($redirect_uri) {
         $this->redirect_uri = $redirect_uri;
@@ -139,7 +141,7 @@ class Response extends ArrayWrapper {
      *
      * @param string $error the OAuth error code
      * @param string $error_description the OAuth error description
-     * @param array $additional additional parameters to include
+     * @param array<string, string> $additional additional parameters to include
      * @return Response this object (for chaining)
      */
     public function setError($error, $error_description = NULL, $additional = []) {
@@ -159,7 +161,7 @@ class Response extends ArrayWrapper {
      *
      * @param string $redirect_uri the URL to which the response is sent.
      * If null, the {@link $redirect_uri} property will be used
-     * 
+     * @return void
      */
     public function renderRedirect($redirect_uri = NULL) {
         $f3 = Base::instance();
@@ -178,34 +180,36 @@ class Response extends ArrayWrapper {
         $query = str_replace([ '+', '%7E' ], [ '%20', '~' ], http_build_query($this->container));
         
         // 2. If there is no query string, then we just return the URL
-        if (!$query) return $redirect_uri;
-        
-        // 3. The URL may already have a query and a fragment.  If this is so, we
-        //    need to slot in the new query string properly.  We disassemble and
-        //    reconstruct the URL.
-        $parts = parse_url($redirect_uri);
-        
-        $url = $parts['scheme'] . '://';
-        if (isset($parts['user'])) {
-            $url .= $parts['user'];
-            if (isset($parts['pass'])) $url .= ':' . $parts['pass'];
-            $url .= '@';
-        }
-        $url .= $parts['host'];
-        if (isset($parts['port'])) $url .= ':' . $parts['port'];
-        if (isset($parts['path'])) $url .= $parts['path'];
-        
-        if (($this->response_mode == self::QUERY_RESPONSE_MODE) || (strpos($url, '#') === FALSE)) {
-            $url .= '?' . ((isset($parts['query'])) ? $parts['query'] . '&' : '') . $query;
-            if (isset($parts['fragment'])) $url .= '#' . $parts['fragment'];
-        } elseif ($this->response_mode == self::FRAGMENT_RESPONSE_MODE) {
-            // In theory $parts['fragment'] should be an empty string, but the
-            // current draft specification does not prohibit putting other things
-            // in the fragment.
-            if (isset($parts['query'])) {
-                $url .= '?' . $parts['query'] . '#' . $parts['fragment'] . '&' . $query;
-            } else {
-                $url .= '#' . $parts['fragment'] . '&' . $query;
+        if (!$query) {
+            $url = $redirect_uri;
+        } else {
+            // 3. The URL may already have a query and a fragment.  If this is so, we
+            //    need to slot in the new query string properly.  We disassemble and
+            //    reconstruct the URL.
+            $parts = parse_url($redirect_uri);
+            
+            $url = $parts['scheme'] . '://';
+            if (isset($parts['user'])) {
+                $url .= $parts['user'];
+                if (isset($parts['pass'])) $url .= ':' . $parts['pass'];
+                $url .= '@';
+            }
+            $url .= $parts['host'];
+            if (isset($parts['port'])) $url .= ':' . $parts['port'];
+            if (isset($parts['path'])) $url .= $parts['path'];
+            
+            if (($this->response_mode == self::QUERY_RESPONSE_MODE) || (strpos($url, '#') === FALSE)) {
+                $url .= '?' . ((isset($parts['query'])) ? $parts['query'] . '&' : '') . $query;
+                if (isset($parts['fragment'])) $url .= '#' . $parts['fragment'];
+            } elseif ($this->response_mode == self::FRAGMENT_RESPONSE_MODE) {
+                // In theory $parts['fragment'] should be an empty string, but the
+                // current draft specification does not prohibit putting other things
+                // in the fragment.
+                if (isset($parts['query'])) {
+                    $url .= '?' . $parts['query'] . '#' . $parts['fragment'] . '&' . $query;
+                } else {
+                    $url .= '#' . $parts['fragment'] . '&' . $query;
+                }
             }
         }
 
@@ -220,7 +224,7 @@ class Response extends ArrayWrapper {
      *
      * @param int $status the HTTP status code.  If null, the status code is `400`
      * for error responses and `200` otherwise.
-     * 
+     * @return void
      */
     public function renderJSON($status = NULL) {
         $f3 = Base::instance();
@@ -240,7 +244,7 @@ class Response extends ArrayWrapper {
      * Renders the response as a POST request.
      *
      * @param string $url the URL to which the response is sent
-     * 
+     * @return void
      */
     public function renderFormPost($url = NULL) {
         $form = new FormResponse($this->container);
@@ -261,7 +265,7 @@ class Response extends ArrayWrapper {
     /**
      * Returns the response modes supported by this class.
      *
-     * @return array list of response modes
+     * @return array<string> list of response modes
      */
     public static function getResponseModesSupported() {
         return [ self::QUERY_RESPONSE_MODE, self::FRAGMENT_RESPONSE_MODE, self::FORM_POST_RESPONSE_MODE ];

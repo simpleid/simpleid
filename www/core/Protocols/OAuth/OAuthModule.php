@@ -47,10 +47,13 @@ class OAuthModule extends Module implements ProtocolResult {
 
     const DEFAULT_SCOPE = 'tag:simpleid.sf.net,2014:oauth:default';
 
+    /** @var array<string, mixed>|null */
     static private $oauth_scope_settings = NULL;
 
+    /** @var OAuthManager */
     protected $oauth;
 
+    /** @var ModuleManager */
     protected $mgr;
 
     static function init($f3) {
@@ -70,6 +73,7 @@ class OAuthModule extends Module implements ProtocolResult {
      * Run post-initialisation procedures.  This event is only called in the main
      * SimpleID invocation, and not during the upgrade process.
      *
+     * @return void
      */
     public function onPostInit(BaseStoppableEvent $event) {
         $event = new ScopeInfoCollectionEvent();
@@ -84,7 +88,8 @@ class OAuthModule extends Module implements ProtocolResult {
      * This function checks the request for protocol compliance via
      * {@link checkAuthRequest()} before passing it to {@link processAuthRequest()} 
      * for processing.
-     *
+     * 
+     * @return void
      * @see checkAuthRequest()
      * @see processAuthRequest()
      * @since 2.0
@@ -115,7 +120,6 @@ class OAuthModule extends Module implements ProtocolResult {
 
         $resolve_event = new OAuthEvent($request, $response, 'oauth_auth_check');
         $dispatcher->dispatch($resolve_event);
-        /** @phpstan-ignore-next-line */
         if ($response->isError()) {
             if (isset($request['redirect_uri'])) {
                 $response->renderRedirect();
@@ -133,8 +137,8 @@ class OAuthModule extends Module implements ProtocolResult {
      *
      * @param Request $request the original request
      * @param Response $response the OAuth response
+     * @return void
      * @see processAuthRequest()
-     *
      */
     protected function checkAuthRequest($request, $response) {
         $store = StoreManager::instance();
@@ -233,8 +237,8 @@ class OAuthModule extends Module implements ProtocolResult {
      *
      * @param Request $request the original request
      * @param Response $response the OAuth response
+     * @return void
      * @see checkAuthRequest()
-     *
      */
     protected function processAuthRequest($request, $response) {
         $this->logger->log(LogLevel::INFO, 'Expanded OAuth authorisation request: ', $request->toArray());
@@ -285,6 +289,7 @@ class OAuthModule extends Module implements ProtocolResult {
                         $form_state['mode'] = AuthManager::MODE_REENTER_CREDENTIALS;
                     }
 
+                    /** @var \SimpleID\Auth\AuthModule $auth_module */
                     $auth_module = $this->mgr->getModule('SimpleID\Auth\AuthModule');
                     $auth_module->loginForm([
                         'destination' => 'continue/' . rawurlencode($token->generate($state))
@@ -349,7 +354,8 @@ class OAuthModule extends Module implements ProtocolResult {
      *
      * @param Request $request the authorisation request
      * @param Response $response the authorisation response
-     * @param array $scopes the requested scope
+     * @param array<string>|null $scopes the requested scope
+     * @return void
      */
     protected function grantAuth($request, $response, $scopes = NULL) {
         $dispatcher = \Events::instance();
@@ -411,7 +417,8 @@ class OAuthModule extends Module implements ProtocolResult {
 
     /**
      * Processes an OAuth token request.
-     *
+     * 
+     * @return void
      * @since 2.0
      */
     public function token() {
@@ -429,7 +436,7 @@ class OAuthModule extends Module implements ProtocolResult {
             return;
         }
         
-        $this->oauth->initClient(true);
+        $this->oauth->initClient();
         $client = $this->oauth->getClient();
 
         if (!$this->oauth->isClientAuthenticated(true, isset($client['oauth']['token_endpoint_auth_method']) ? $client['oauth']['token_endpoint_auth_method'] : null)) {
@@ -449,10 +456,10 @@ class OAuthModule extends Module implements ProtocolResult {
         
         switch ($request['grant_type']) {
             case 'authorization_code':
-                $authorization = $this->tokenFromCode($request, $response);
+                $this->tokenFromCode($request, $response);
                 break;
             case 'refresh_token':
-                $authorization = $this->tokenFromRefreshToken($request, $response);
+                $this->tokenFromRefreshToken($request, $response);
                 break;
             case 'password':
             case 'client_credentials':
@@ -473,6 +480,7 @@ class OAuthModule extends Module implements ProtocolResult {
      *
      * @param Request $request the OAuth token request
      * @param Response $response the OAuth response
+     * @return void
      * @since 2.0
      */
     protected function tokenFromCode($request, $response) {
@@ -550,8 +558,6 @@ class OAuthModule extends Module implements ProtocolResult {
         // Call modules
         $event = new OAuthTokenGrantEvent('authorization_code', $authorization, $request, $response, $scope);
         \Events::instance()->dispatch($event);
-
-        return $authorization;
     }
 
     /**
@@ -559,6 +565,7 @@ class OAuthModule extends Module implements ProtocolResult {
      *
      * @param Request $request the OAuth token request
      * @param Response $response the response
+     * @return void
      */
     protected function tokenFromRefreshToken($request, $response) {
         $store = StoreManager::instance();
@@ -598,8 +605,6 @@ class OAuthModule extends Module implements ProtocolResult {
         // Call modules
         $event = new OAuthTokenGrantEvent('refresh_token', $authorization, $request, $response, $scope);
         \Events::instance()->dispatch($event);
-
-        return $authorization;
     }
 
 
@@ -608,6 +613,7 @@ class OAuthModule extends Module implements ProtocolResult {
      *
      * @param Request $request the OAuth request
      * @param Response $response the OAuth response
+     * @return void
      * @since 2.0
      */
     protected function consentForm($request, $response) {
@@ -695,6 +701,7 @@ class OAuthModule extends Module implements ProtocolResult {
     /**
      * Processes a user response from the {@link consentForm()} function.
      *
+     * @return void
      * @since 2.0
      */
     function consent() {
@@ -703,6 +710,7 @@ class OAuthModule extends Module implements ProtocolResult {
         $store = StoreManager::instance();
     
         if (!$auth->isLoggedIn()) {
+            /** @var \SimpleID\Auth\AuthModule $auth_module */
             $auth_module = $this->mgr->getModule('SimpleID\Auth\AuthModule');
             $auth_module->loginForm();
             return;
@@ -710,7 +718,9 @@ class OAuthModule extends Module implements ProtocolResult {
         $user = $auth->getUser();
         
         $form_state = FormState::decode($token->getPayload($this->f3->get('POST.fs')), Request::class, Response::class);
+        /** @var Request $request */
         $request = $form_state->getRequest();
+        /** @var Response $response */
         $response = $form_state->getResponse();
 
         if (!$token->verify($this->f3->get('POST.tk'), 'oauth_consent')) {
@@ -762,6 +772,7 @@ class OAuthModule extends Module implements ProtocolResult {
 
     /**
      * @see SimpleID\Base\ScopeInfoCollectionEvent
+     * @return void
      */
     public function onScopeInfoCollectionEvent(ScopeInfoCollectionEvent $event) {
         $event->addScopeInfo('oauth', [
@@ -772,12 +783,17 @@ class OAuthModule extends Module implements ProtocolResult {
         ]);
     }
 
-
+    /**
+     * @return void
+     */
     public function onOauthResponseTypes(BaseDataCollectionEvent $event) {
         $event->addResult([ 'token', 'code' ]);
     }
 
-    /** @see SimpleID\API\MyHooks::revokeAppHook() */
+    /** 
+     * @see SimpleID\API\MyHooks::revokeAppHook()
+     * @return void
+     */
     public function onConsentRevoke(ConsentEvent $event) {
         $cid = $event->getConsentID();
         $auth = AuthManager::instance();

@@ -33,7 +33,7 @@ class FormResponse extends ArrayWrapper {
     /**
      * Creates a form response.
      *
-     * @param array $data the initial response parameters
+     * @param array<string, string> $data the initial response parameters
      */
     public function __construct($data = []) {
         parent::__construct($data);
@@ -43,7 +43,7 @@ class FormResponse extends ArrayWrapper {
      * Renders the response as a POST request.
      *
      * @param string $url the URL to which the response is sent
-     * 
+     * @return void
      */
     public function render($url) {
         $f3 = Base::instance();

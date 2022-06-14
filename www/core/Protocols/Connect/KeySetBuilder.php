@@ -38,8 +38,10 @@ use \Base;
  * method.
  */
 class KeySetBuilder {
-
+    /** @var KeySet */
     protected $set;
+
+    /** @var \SimpleID\Protocols\OAuth\OAuthClient */
     protected $client;
 
     /**

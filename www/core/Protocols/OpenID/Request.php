@@ -37,7 +37,7 @@ class Request extends Message {
     /**
      * Constructs a new OpenID request.
      *
-     * @param array $request the request in array form
+     * @param array<string, string> $request the request in array form
      */
     public function __construct($request) {
         $this->container = $request;

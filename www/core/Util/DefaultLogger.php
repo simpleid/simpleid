@@ -40,8 +40,10 @@ class DefaultLogger extends Log implements LoggerInterface {
 
     use LoggerTrait;
 
+    /** @var string */
     protected $log_level;
 
+    /** @var array<string, int> */
     protected static $log_levels = [
         LogLevel::EMERGENCY => 0,
         LogLevel::ALERT => 1,
@@ -58,7 +60,7 @@ class DefaultLogger extends Log implements LoggerInterface {
      * will be placed under the directory specified by the Fat-Free
      * LOGS variable
      *
-     * @param array $config the SimpleID configuration
+     * @param array<string, mixed> $config the SimpleID configuration
      */
     function __construct($config) {
         parent::__construct(basename($config['log_file']));
@@ -83,7 +85,7 @@ class DefaultLogger extends Log implements LoggerInterface {
      *
      * @param string $level the log level
      * @param string $message the message to log
-     * @param array $context the context
+     * @param array<string, mixed> $context the context
      */
     function log($level, $message, array $context = []) {
         $fw = \Base::instance();
@@ -101,8 +103,8 @@ class DefaultLogger extends Log implements LoggerInterface {
     /**
      * Converts an array into a string for logging purposes.
      *
-     * @param array $array the array the convert
-     * @param array|false $keys an array of keys to include in the converted string.  Set
+     * @param array<string, mixed> $array the array the convert
+     * @param array<string>|false $keys an array of keys to include in the converted string.  Set
      * to false if all the keys in the array should be included
      * @return string the converted string.
      */

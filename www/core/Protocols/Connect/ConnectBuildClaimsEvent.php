@@ -31,13 +31,28 @@ use SimpleID\Util\Events\BaseDataCollectionEvent;
  *
  */
 class ConnectBuildClaimsEvent extends BaseDataCollectionEvent {
-
+    /** @var User */
     protected $user;
+
+    /** @var Client */
     protected $client;
+
+    /** @var string */
     protected $context;
+
+    /** @var array<string> */
     protected $scope;
+
+    /** @var array<string, mixed>|null */
     protected $claims_requested;
 
+    /**
+     * @param User $user
+     * @param Client $client
+     * @param string $context
+     * @param array<string> $scope
+     * @param array<string, mixed>|null $claims_requested
+     */
     public function __construct(User $user, Client $client, $context, $scope, $claims_requested = NULL) {
         parent::__construct();
 
@@ -83,7 +98,7 @@ class ConnectBuildClaimsEvent extends BaseDataCollectionEvent {
     /**
      * Returns the scope for the response.
      * 
-     * @return array the scope
+     * @return array<string> the scope
      */
     public function getScope() {
         return $this->scope;
@@ -92,7 +107,7 @@ class ConnectBuildClaimsEvent extends BaseDataCollectionEvent {
     /**
      * Returns the specific claims requested, if any
      * 
-     * @return array an array of claims or null
+     * @return array<string, mixed>|null an array of claims or null
      */
     public function getRequestedClaims() {
         return $this->claims_requested;

@@ -34,12 +34,19 @@ use SimpleID\Util\SecurityToken;
  * The manager handling OAuth based authentication
  */
 class OAuthManager extends Prefab {
-
+    /** @var Base */
     protected $f3;
+
+    /** @var \Psr\Log\LoggerInterface */
     protected $logger;
+
+    /** @var ModuleManager */
     protected $mgr;
 
+    /** @var AccessToken|null */
     private $access_token = NULL;
+
+    /** @var string */
     private $client_auth_method;
 
     public function __construct() {
@@ -53,6 +60,8 @@ class OAuthManager extends Prefab {
      *
      * This function detects whether credentials for an OAuth client is
      * presented in the `Authorization` header or the POST body.
+     * 
+     * @return void
      */
     public function initClient() {
         $this->logger->log(LogLevel::DEBUG, 'SimpleID\Protocols\OAuth\OAuthManager->initClient');
@@ -107,7 +116,7 @@ class OAuthManager extends Prefab {
      * not present
      *
      * @param bool $send_challenge if a challenge is to be sent
-     * @param array $auth_methods expected authentication method
+     * @param array<string>|null $auth_methods expected authentication method
      * @return bool true if an authenticated OAuth client is present
      */
     public function isClientAuthenticated($send_challenge = false, $auth_methods = null) {
@@ -164,6 +173,7 @@ class OAuthManager extends Prefab {
      *
      * @param bool $include_request_body if true, also detects access tokens
      * from the request body
+     * @return void
      */
     public function initAccessToken($include_request_body = false) {
         $this->logger->log(LogLevel::DEBUG, 'SimpleID\Protocols\OAuth\OAuthManager->initAccessToken');
@@ -187,6 +197,7 @@ class OAuthManager extends Prefab {
      *
      * @param bool $include_request_body if true, also detects access tokens
      * from the request body
+     * @return string
      */
     protected function initBearerAccessToken($include_request_body = false) {
         $encoded_token = null;
@@ -219,7 +230,7 @@ class OAuthManager extends Prefab {
      * Returns whether the current access token is authorised under the
      * specified scope.
      *
-     * @param array|string $scope the scope
+     * @param array<string>|string $scope the scope
      * @param string &$error the error code returned if the access token
      * is not authorised
      * @return bool true if the access token is authorised

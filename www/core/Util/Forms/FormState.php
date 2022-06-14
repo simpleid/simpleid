@@ -35,27 +35,47 @@ class FormState extends ArrayWrapper {
     public const REQUEST_KEY = 'rq';
     public const RESPONSE_KEY = 'rs';
 
+    /**
+     * @param array<mixed> $data
+     */
     public function __construct($data = []) {
         if (!is_array($data)) $data = [];
         parent::__construct($data);
     }
 
+    /**
+     * @return void
+     */
     public function setRequest(ArrayWrapper $request) {
         $this->offsetSet(self::REQUEST_KEY, $request);
     }
 
+    /**
+     * @return ArrayWrapper
+     */
     public function getRequest() {
         return $this->offsetGet(self::REQUEST_KEY);
     }
 
+    /**
+     * @return void
+     */
     public function setResponse(ArrayWrapper $response) {
         $this->offsetSet(self::RESPONSE_KEY, $response);
     }
 
-    public function getResponse() {
+    /**
+     * @return ArrayWrapper
+     */
+    public function getResponse(): ArrayWrapper {
         return $this->offsetGet(self::RESPONSE_KEY);
     }
 
+    /**
+     * Encodes the data
+     * 
+     * @return array<mixed>
+     */
     public function encode() {
         $data = $this->container;
 
@@ -68,6 +88,14 @@ class FormState extends ArrayWrapper {
         return $data;
     }
 
+    /**
+     * Decodes the data and returns a FormState
+     * 
+     * @param array<string, array<mixed>> $data
+     * @param string $request_class the name of the class representing the request
+     * @param string $response_class the name of the class representing the response
+     * @return FormState
+     */
     public static function decode($data, $request_class = null, $response_class = null) {
         if (!is_array($data)) return new FormState();
 

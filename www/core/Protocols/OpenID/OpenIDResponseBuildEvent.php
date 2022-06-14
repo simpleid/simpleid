@@ -45,8 +45,13 @@ use SimpleID\Protocols\ProtocolResult;
  * ```
  */
 class OpenIDResponseBuildEvent {
+    /** @var bool */
     protected $assertion;
+
+    /** @var Request */
     protected $request;
+
+    /** @var Response */
     protected $response;
 
     public function __construct(bool $assertion, Request $request, Response $response) {

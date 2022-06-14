@@ -55,7 +55,7 @@ class BaseDataCollectionEvent implements \GenericEventInterface {
     // alias
     public const MERGE_MERGE = self::MERGE_PLAIN;
 
-    /** @var array */
+    /** @var array<mixed> */
     protected $results = [];
 
     /** @var int */
@@ -80,6 +80,7 @@ class BaseDataCollectionEvent implements \GenericEventInterface {
      * If the data to be added is a scalar, it is appended to the existing data.
      * 
      * @param mixed $result the data to add
+     * @return void
      */
     public function addResult($result) {
         /** @phpstan-ignore-next-line */
@@ -113,7 +114,7 @@ class BaseDataCollectionEvent implements \GenericEventInterface {
      * 
      * If no data is collected, an empty array is returned.
      * 
-     * @return array
+     * @return array<mixed>
      */
     public function getResults() {
         return $this->results;

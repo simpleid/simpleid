@@ -81,15 +81,25 @@ class AuthManager extends Prefab {
     const MODE_REENTER_CREDENTIALS = self::AUTH_LEVEL_REENTER_CREDENTIALS;
     const MODE_VERIFY = self::AUTH_LEVEL_VERIFIED;
 
+    /** @var string|null */
     static private $cookie_prefix = null;
 
+    /** @var Base */
     protected $f3;
+
+    /** @var Cache */
     protected $cache;
+
+    /** @var \Psr\Log\LoggerInterface */
     protected $logger;
+
+    /** @var ModuleManager */
     protected $mgr;
 
+    /** @var array<string, mixed> */
     private $auth_info = [];
 
+    /** @var string|null */
     private $ua_login_state = null;
 
     public function __construct() {
@@ -101,6 +111,8 @@ class AuthManager extends Prefab {
 
     /**
      * Initialises the PHP session system.
+     * 
+     * @return void
      */
     public function initSession() {
         $this->logger->log(LogLevel::DEBUG, 'SimpleID\Auth\AuthManager->initSession');
@@ -121,6 +133,7 @@ class AuthManager extends Prefab {
      * be logged in automatically
      *
      * @param bool $auto_auth performs automatic authentication
+     * @return void
      */
     public function initUser($auto_auth = true) {
         $this->logger->log(LogLevel::DEBUG, 'SimpleID\Auth\AuthManager->initUser');
@@ -209,6 +222,7 @@ class AuthManager extends Prefab {
      *
      * @param AuthResultInterface $result the authentication result
      * @param \SimpleID\Util\Forms\FormState $form_state
+     * @return void
      */
     public function login(AuthResultInterface $result, $form_state = null) {
         if ($form_state == null) $form_state = new FormState();
@@ -260,6 +274,8 @@ class AuthManager extends Prefab {
 
     /**
      * Logs out the user by deleting the relevant session information.
+     * 
+     * @return void
      */
     public function logout() {
         $user = $this->getUser();
@@ -362,6 +378,9 @@ class AuthManager extends Prefab {
         return self::$cookie_prefix . $suffix;
     }
 
+    /**
+     * @return string
+     */
     public function toString() {
         return print_r($this->auth_info, true);
     }

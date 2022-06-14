@@ -38,7 +38,7 @@ use SimpleID\Store\StoreManager;
  * @see https://branca.io/
  */
 class SecurityToken {
-
+    /** @var string */
     static private $site_token = null;
 
     const OPTION_DEFAULT = 0;
@@ -52,7 +52,7 @@ class SecurityToken {
     /** @var Branca the branca token generator */
     private $branca;
 
-    /** @var array the data (i.e. payload plus headers) to be encoded in
+    /** @var array<string, mixed> the data (i.e. payload plus headers) to be encoded in
      * the token */
     private $data = null;
 

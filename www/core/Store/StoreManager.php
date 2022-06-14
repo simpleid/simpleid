@@ -89,9 +89,10 @@ use SimpleID\Models\User;
  * @method Storable|null findUser(string $criteria, string $value)
  */
 class StoreManager extends Prefab {
-    /** @var array a mapping between the identifier of a store and its store module */
+    /** @var array<string, StoreModule> a mapping between the identifier of a store and its store module */
     protected $stores = [];
 
+    /** @var array<string, Storable> */
     private $cache = [];
 
     /** @var string a space delimited list of stores that must be implemented */
@@ -104,7 +105,8 @@ class StoreManager extends Prefab {
      * function should generally not needed to be called
      *
      * @param StoreModule $module a store module
-     * @param array $stores an array of stores that the module supports
+     * @param array<string> $stores an array of stores that the module supports
+     * @return void
      */
     public function addStore($module, $stores) {
         foreach ($stores as $store) {
@@ -117,6 +119,8 @@ class StoreManager extends Prefab {
      *
      * This function triggers a PHP error if there is a store that
      * is not handled by at least one store module.
+     * 
+     * @return void
      */
     public function checkStores() {
         foreach (explode(' ', self::REQUIRED_STORES) as $store) {
@@ -177,6 +181,7 @@ class StoreManager extends Prefab {
      *
      * @param string $type the item type
      * @param Storable $item the item to save
+     * @return void
      *
      * @since 0.7
      */
@@ -194,6 +199,7 @@ class StoreManager extends Prefab {
      *
      * @param string $type the item type
      * @param Storable $item the item to delete
+     * @return void
      */
     public function delete($type, $item) {
         $cache_name = $type . ':' . $item->getStoreID();
@@ -226,6 +232,7 @@ class StoreManager extends Prefab {
      * Saves a user.
      * 
      * @param \SimpleID\Models\User $user the user to save
+     * @return void
      */
     public function saveUser($user) {
         if ($this->getStore('user:write', false) != null) {
@@ -266,7 +273,6 @@ class StoreManager extends Prefab {
      * @param string $name the name of the setting to return
      * @param mixed $default the default value to use if this variable has never been set
      * @return mixed the value of the setting
-     *
      */
     public function getSetting($name, $default = NULL) {
         $cache_name = 'setting:' . $name;
@@ -289,7 +295,7 @@ class StoreManager extends Prefab {
      *
      * @param string $name the name of the setting to save
      * @param mixed $value the value of the setting
-     *
+     * @return void
      */
     public function setSetting($name, $value) {
         $this->cache['setting:' . $name] = $value;
@@ -302,7 +308,7 @@ class StoreManager extends Prefab {
      * Deletes an application setting.
      *
      * @param string $name the name of the setting to delete
-     *
+     * @return void
      */
     public function deleteSetting($name) {
         $cache_name = 'setting:' . $name;
@@ -315,7 +321,8 @@ class StoreManager extends Prefab {
      * Magic method which calls {@link load()}, {@link save()} and {@link delete()}.
      *
      * @param string $method
-     * @param array $args
+     * @param array<mixed> $args
+     * @return mixed
      */
     public function __call($method, $args) {
         $f3 = Base::instance();

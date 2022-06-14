@@ -36,12 +36,17 @@ use SimpleID\Util\Events\StoppableEventTrait;
 class IndexEvent implements StoppableEventInterface {
     use StoppableEventTrait;
 
+    /** @var array<string, mixed> */
     protected $request;
 
+    /**
+     * @param array<string, mixed> $request
+     */
     public function __construct($request) {
         $this->request = $request;
     }
 
+    /** @return array<string, mixed> */
     public function getRequest() {
         return $this->request;
     }

@@ -63,11 +63,11 @@ class RefreshToken extends Token implements TokenSource {
      *
      * @param Authorization $authorization the authorisation to use to create
      * this token
-     * @param array $scope the scope of this token - this must be a subset
+     * @param array<string> $scope the scope of this token - this must be a subset
      * of the scope provided in `$authorization`
      * @param TokenSource $source if the token is created from a previous authorisation
      * code or refresh token, the ID of those artefacts
-     * @param array $additional any additional data to be stored on the server for this token
+     * @param array<string, mixed> $additional any additional data to be stored on the server for this token
      * @return RefreshToken|null 
      */
     static public function create($authorization, $scope = [], $source = NULL, $additional = []) {

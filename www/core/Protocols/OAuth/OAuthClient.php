@@ -28,9 +28,14 @@ use SimpleID\Models\Client;
  * A class representing an OAuth client.
  */
 class OAuthClient extends Client {
-
+    /** @var bool */
     protected $dynamic = false;
 
+    /**
+     * Creates a new OAuth client
+     * 
+     * @param array<string, mixed> $data
+     */
     public function __construct($data) {
         parent::__construct(array_replace_recursive([
             'oauth' => [

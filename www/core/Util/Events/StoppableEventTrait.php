@@ -27,6 +27,7 @@ namespace SimpleID\Util\Events;
  * A utility trait for implementing {@link Psr\EventDispatcher\StoppableEventInterface}.
  */
 trait StoppableEventTrait {
+    /** @var bool */
     protected $stopped = false;
 
     /**
@@ -38,6 +39,8 @@ trait StoppableEventTrait {
 
     /**
      * Stops further propagation of the event
+     * 
+     * @return $this
      */
     public function stopPropagation() {
         $this->stopped = true;

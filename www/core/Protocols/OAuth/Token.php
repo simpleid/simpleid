@@ -59,7 +59,7 @@ class Token {
     /** @var Authorization the authorisation */
     protected $authorization;
 
-    /** @var array */
+    /** @var array<string> */
     protected $scope;
 
     /** @var int|null the expiry time */
@@ -68,7 +68,7 @@ class Token {
     /** @var string|null the source reference (a reference to the authorization code or refresh token) */
     protected $source_ref = NULL;
 
-    /** @var array additional data to be stored on the server in relation to the token */
+    /** @var array<string, mixed> additional data to be stored on the server in relation to the token */
     protected $additional = [];
 
     /** @var string|null the encoded token */
@@ -86,12 +86,13 @@ class Token {
      * Initialises a token.
      *
      * @param Authorization $authorization the underlying authorisation
-     * @param array|string $scope the scope of the token
+     * @param array<string>|string $scope the scope of the token
      * @param int $expires_in the validity of the token, in seconds, or
      * {@link TTL_PERPETUAL}
      * @param TokenSource $source the token source
-     * @param array $additional additional data to be stored on the
+     * @param array<string, mixed> $additional additional data to be stored on the
      * server
+     * @return void
      */
     protected function init($authorization, $scope = [], $expires_in = self::TTL_PERPETUAL, $source = NULL, $additional = []) {
         $rand = new Random();
@@ -148,7 +149,7 @@ class Token {
     /**
      * Returns the scope covered by the token
      *
-     * @return array the scope
+     * @return array<string> the scope
      */
     public function getScope() {
         return $this->scope;
@@ -160,7 +161,7 @@ class Token {
      * This method will return true if the token covers *all* of the
      * scope specified by `$scope`.
      *
-     * @param string|array $scope the scope to test
+     * @param string|array<string> $scope the scope to test
      * @return bool true if the token covers all of the specified
      * scope
      */
@@ -172,7 +173,7 @@ class Token {
     /**
      * Returns additional data stored on the server for this token
      *
-     * @return array the additional data
+     * @return array<string, mixed> the additional data
      */
     public function getAdditionalData() {
         return $this->additional;
@@ -200,6 +201,8 @@ class Token {
 
     /**
      * Revokes a token
+     * 
+     * @return void
      */
     public function revoke() {
         $cache = \Cache::instance();
@@ -214,6 +217,7 @@ class Token {
      * tokens are to be revoked
      * @param TokenSource|string $source if specified, only delete tokens issued
      * from this source
+     * @return void
      */
     public static function revokeAll($authorization, $source = null) {
         $cache = \Cache::instance();
@@ -252,6 +256,8 @@ class Token {
 
     /**
      * Parses an encoded token
+     * 
+     * @return void
      */
     protected function parse() {
         $store = StoreManager::instance();
@@ -280,16 +286,16 @@ class Token {
 
             $this->is_parsed = true;            
         } catch (\RuntimeException $e) {
-            return null;
+            return;
         }
     }
 
     /**
      * Encodes a token.
      *
-     * @param array $server_data data to be stored on the server side
-     * @param array $token_data data to be encoded in the token
-     *
+     * @param array<string, mixed> $server_data data to be stored on the server side
+     * @param array<string, mixed> $token_data data to be encoded in the token
+     * @return void
      */
     protected function encode($server_data = [], $token_data = []) {
         $cache = \Cache::instance();
@@ -331,7 +337,7 @@ class Token {
      * This function compresses a scope string by replacing the individual
      * scope items with a reference to this map.
      *
-     * @param array $scope the scope to compress
+     * @param array<string> $scope the scope to compress
      * @return string the compressed scope reference
      */
     protected function getScopeRef($scope) {
@@ -381,7 +387,7 @@ class Token {
      * Returns the current scope map used in the {@link getScopeRef()} and
      * {@link resolveScope()} functions.
      *
-     * @return array the scope map
+     * @return array<string> the scope map
      */
     static function getScopeRefMap() {
         $store = StoreManager::instance();

@@ -36,7 +36,10 @@ use SimpleID\Models\User;
  * 
  */
 class AutoAuthEvent implements AuthResultInterface {
+    /** @var User|null */
     protected $user = null;
+
+    /** @var string|null */
     protected $auth_module_name = null;
 
     /**
@@ -53,6 +56,7 @@ class AutoAuthEvent implements AuthResultInterface {
      * @param User $user the user
      * @param string $auth_module_name the name of the module that
      * authenticated the user
+     * @return void
      */
     public function setUser(User $user, string $auth_module_name) {
         $this->user = $user;

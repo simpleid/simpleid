@@ -71,6 +71,9 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
         $this->checkConfig();
     }
 
+    /**
+     * @return void
+     */
     protected function checkConfig() {
         $config = $this->f3->get('config');
 
@@ -89,6 +92,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
      * Resolves an OpenID Connect authorisation request by decoding any
      * `request` and `request_uri` parameters.
      *
+     * @return void
      */
     public function onOauthAuthResolve(OAuthEvent $event) {
         $store = StoreManager::instance();
@@ -162,6 +166,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
      * protocol, including processing the `prompt`, `max_age` and
      * `acr` paramters.
      *
+     * @return void
      * @see SimpleID\Protocols\OAuth\OAuthProcessAuthRequestEvent
      */
     function onOAuthAuthRequestEvent(OAuthAuthRequestEvent $event) {
@@ -261,6 +266,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
      *   response; and/or
      * - save the claims to be returned as part of the token response.
      * 
+     * @return void
      * @see SimpleID\Protocols\OAuth\OAuthAuthGrantEvent
      */
     function onOAuthAuthGrantEvent(OAuthAuthGrantEvent $event) {
@@ -324,6 +330,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
      * response may contain an ID token containing the claims that the
      * OpenID Connect client requested earlier.
      * 
+     * @return void
      * @see SimpleID\Protocols\OAuth\OAuthTokenGrantEvent
      */
     function onOAuthTokenGrantEvent(OAuthTokenGrantEvent $event) {
@@ -344,6 +351,9 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
         }
     }
 
+    /**
+     * @return void
+     */
     public function onOauthResponseTypes(BaseDataCollectionEvent $event) {
         $event->addResult('id_token');
     }
@@ -351,6 +361,8 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
     /**
      * The UserInfo endpoint.  The UserInfo endpoint returns a set
      * of claims requested by the OpenID Connect client.
+     * 
+     * @return void
      */
     public function userinfo() {
         $this->checkHttps('error');
@@ -383,10 +395,10 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
      * @param \SimpleID\Models\Client $client the client to which the
      * ID token will be sent
      * @param string $context the context, either `id_token` or `userinfo`
-     * @param array $scopes the scope
-     * @param array $claims_requested the claims requested in the request object,
+     * @param array<string> $scopes the scope
+     * @param array<string, mixed>|null $claims_requested the claims requested in the request object,
      * or null if the request object is not present
-     * @return array an array of claims
+     * @return array<string, mixed> an array of claims
      */
     private function buildClaims($user, $client, $context, $scopes, $claims_requested = NULL) {
         $auth = AuthManager::instance();
@@ -412,7 +424,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
                     default:
                         $consent_scope = null;
                         foreach (array_keys($scope_info) as $scope => $settings) {
-                            /** @var array $settings */
+                            /** @var array<string, mixed> $settings */
                             if (!isset($settings['claims'])) continue;
                             if (in_array($claim, $settings['claims'])) $consent_scope = $scope;
                         }
@@ -496,6 +508,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
      * Returns the OpenID Connect scopes supported by this server.
      *
      * @see ScopeInfoCollectionEvent
+     * @return void
      */
     public function onScopeInfoCollectionEvent(ScopeInfoCollectionEvent $event) {
         $event->addScopeInfo('oauth', [
@@ -526,6 +539,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
     /**
      * Displays the OpenID Connect configuration file for this installation.
      *
+     * @return void
      */
     public function openid_configuration() {
         $mgr = ModuleManager::instance();
@@ -536,7 +550,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
 
         $scope_info_event = new ScopeInfoCollectionEvent();
         $dispatcher->dispatch($scope_info_event);
-        $scopes = $scope_info_event->getScopesForType('oauth');
+        $scopes = $scope_info_event->getScopeInfoForType('oauth');
 
         $jwt_signing_algs = AlgorithmFactory::getSupportedAlgs(Algorithm::SIGNATURE_ALGORITHM);
         $jwt_encryption_algs = AlgorithmFactory::getSupportedAlgs(Algorithm::KEY_ALGORITHM);
@@ -591,6 +605,8 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
 
     /**
      * Displays the JSON web key for this installation.
+     * 
+     * @return void
      */
     public function jwks() {
         $config = $this->f3->get('config');

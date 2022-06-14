@@ -74,6 +74,8 @@ class MyModule extends Module {
 
     /**
      * Displays the dashboard page.
+     * 
+     * @return void
      */
     public function dashboard() {
         $this->blocksPage($this->f3->get('intl.core.my.dashboard_title'), 'dashboard_blocks');
@@ -81,6 +83,8 @@ class MyModule extends Module {
 
     /**
      * Displays the profile page.
+     * 
+     * @return void
      */
     public function profile() {
         $this->blocksPage($this->f3->get('intl.core.my.profile_title'), 'profile_blocks');
@@ -88,6 +92,8 @@ class MyModule extends Module {
 
     /**
      * Returns the sites page.
+     * 
+     * @return void
      */
     public function apps_sync() {
         // Require HTTPS, redirect if necessary
@@ -102,6 +108,9 @@ class MyModule extends Module {
         print $tpl->render('page.html');
     }
 
+    /**
+     * @return void
+     */
     public function apps_ajax() {
         $this->checkHttps('error', true);
 
@@ -132,6 +141,11 @@ class MyModule extends Module {
         print json_encode($results);
     }
 
+    /**
+     * @param \Base $f3
+     * @param array<string, mixed> $params
+     * @return void
+     */
     public function get($f3, $params) {
         $this->checkHttps('error', true);
 
@@ -199,6 +213,11 @@ class MyModule extends Module {
         print json_encode($results);
     }
 
+    /**
+     * @param \Base $f3
+     * @param array<string, mixed> $params
+     * @return void
+     */
     public function delete($f3, $params) {
         $this->checkHttps('error', true);
         parse_str($this->f3->get('BODY'), $delete);
@@ -241,6 +260,9 @@ class MyModule extends Module {
         ]);
     }
 
+    /**
+     * @return void
+     */
     public function onNav(OrderedDataCollectionEvent $event) {
         $event->addResult([ 'name' => $this->f3->get('intl.core.my.dashboard_title'), 'path' =>'my/dashboard' ], -10);
         $event->addResult([ 'name' => $this->f3->get('intl.core.my.profile_title'), 'path' =>'my/profile' ], -9);
@@ -251,6 +273,7 @@ class MyModule extends Module {
      * Returns the welcome block.
      *
      * @param UIBuildEvent $event the event to pick up the welcome block
+     * @return void
      */
     public function onDashboardBlocks(UIBuildEvent $event) {
         $auth = AuthManager::instance();
@@ -276,6 +299,9 @@ class MyModule extends Module {
         }
     }
 
+    /**
+     * @return void
+     */
     public function insertNav() {
         $event = new OrderedDataCollectionEvent('nav');
         $event = \Events::instance()->dispatch($event);
@@ -288,6 +314,7 @@ class MyModule extends Module {
      *
      * @param string $title the page title
      * @param string $event_name the hook to call
+     * @return void
      */
     protected function blocksPage($title, $event_name) {
         // Require HTTPS, redirect if necessary

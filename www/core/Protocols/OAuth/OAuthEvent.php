@@ -38,7 +38,10 @@ use SimpleID\Util\Events\BaseStoppableEvent;
  * methods to obtain and modify the request and response accordingly.
  */
 class OAuthEvent extends BaseStoppableEvent {
+    /** @var Request */
     protected $request;
+
+    /** @var Response */
     protected $response;
 
     public function __construct(Request $request, Response $response, $eventName = null) {

@@ -291,7 +291,7 @@ class XRDSDiscovery extends Prefab {
      * included in $headers.
      *
      * @param string $url the URL
-     * @param array|string $headers HTTP headers containing name => value pairs
+     * @param array<string>|string $headers HTTP headers containing name => value pairs
      * @return HTTPResponse
      */
     protected function request($url, $headers = '') {

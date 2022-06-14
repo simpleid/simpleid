@@ -30,13 +30,15 @@ namespace SimpleID\Protocols\XRDS;
  */
 class XRDSServices {
 
-    /** Array of discovered services */
+    /** @var array<array<string, mixed>> Array of discovered services */
     private $services = [];
 
     /**
      * Adds a service.
      *
-     * @param array $service the service to add
+     * @param array<string, mixed> $service the service to add
+     * @param bool $sort whether to sort the services in place
+     * @return void
      */
     public function add($service, $sort = true) {
         $this->services[] = $service;
@@ -57,7 +59,7 @@ class XRDSServices {
      * a particular type.
      *
      * @param string $type the URI of the type of service to obtain
-     * @return array an array of matching services, or an empty array of no services
+     * @return array<array<string, mixed>> an array of matching services, or an empty array of no services
      * match
      */
     public function getByType($type) {
@@ -76,7 +78,7 @@ class XRDSServices {
      * a specified ID.
      *
      * @param string $id the XML ID of the service in the XRDS document
-     * @return array|null the matching service, or NULL of no services
+     * @return array<string, mixed>|null the matching service, or NULL of no services
      * are found
      */
     public function getById($id) {
@@ -94,8 +96,8 @@ class XRDSServices {
      * as Service and URI.  The specification allows an attribute called priority
      * so that the document creator can specify the order the elements should be used.
      *
-     * @param array $a
-     * @param array $b
+     * @param array<string, mixed> $a
+     * @param array<string, mixed> $b
      * @return int
      */
     static public function sortByPriority($a, $b) {

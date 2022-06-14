@@ -34,11 +34,15 @@ use SimpleID\Store\Storable;
  * clients are known as *relying parties* in OpenID 2.
  */
 class Client extends ArrayWrapper implements Storable {
-
+    /** @var string */
     public $cid;
 
+    /** @var bool */
     protected $dynamic;
 
+    /**
+     * @param array<string, mixed> $data
+     */
     public function __construct($data = []) {
         parent::__construct($data);
     }
@@ -47,6 +51,7 @@ class Client extends ArrayWrapper implements Storable {
      * Loads fields from another client.
      *
      * @param Client $from the client from which fields are to be loaded
+     * @return void
      */
     public function loadFieldsFrom($from) {
         $this->cid = $from->cid;

@@ -170,7 +170,7 @@ class BigNum {
                     } else {
                         $r = intval($r);
                     }
-                    $str = base_convert($r, 10, $base) . $str;
+                    $str = base_convert(strval($r), 10, $base) . $str;
                     $num = $this->_div($num, $base);
                 }
      

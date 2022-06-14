@@ -89,6 +89,7 @@ class XRDSParser {
      * Note that only the memory associated with the underlying XML parser is
      * freed.  Memory associated with the class itself is not freed.
      *
+     * @return void
      */
     public function close() {
         $this->reader->close();
@@ -98,6 +99,7 @@ class XRDSParser {
      * Loads an XRDS document.
      *
      * @param string $xml the XML document to load
+     * @return void
      */
     public function load($xml) {
         $this->reader->xml($xml);
@@ -124,6 +126,9 @@ class XRDSParser {
         return $this->services;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function parseService() {
         $service = [];
 
@@ -192,10 +197,10 @@ class XRDSParser {
      * takes this array, sorts the elements using the #priority keys (if $sort is
      * true), then collapses the array using the value associated with the #uri key.
      *
-     * @param array $array the service array, with URIs and priorities
+     * @param array<array<string, mixed>> $array the service array, with URIs and priorities
      * @param bool $sort whether to sort the service array using the #priority
      * keys
-     * @return array the services array with URIs sorted by priority
+     * @return array<array<string, mixed>> the services array with URIs sorted by priority
      */
     protected function flatten_uris($array, $sort = TRUE) {
         $result = [];

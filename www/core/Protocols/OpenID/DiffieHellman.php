@@ -100,7 +100,7 @@ class DiffieHellman {
      *
      * @param string $mac_key the MAC key, in binary representation
      * @param string $dh_consumer_public the consumer's public key, in Base64 representation
-     * @return array an array containing (a) dh_server_public - the server's public key (in Base64), and (b)
+     * @return array<string, string> an array containing (a) dh_server_public - the server's public key (in Base64), and (b)
      * enc_mac_key encrypted MAC key (in Base64), encrypted using the Diffie-Hellman shared secret
      */
     public function associateAsServer($mac_key, $dh_consumer_public) {        
@@ -203,6 +203,7 @@ class DiffieHellman {
     /**
      * Generates a key pair for Diffie-Hellman key exchange.
      *
+     * @return void
      */
     private function generateKeyPair() {
         // Generate the private key - a random number which is less than p

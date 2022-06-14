@@ -34,7 +34,11 @@ use SimpleID\Util\Forms\FormBuildEvent;
  * via a cookie stored in the user agent.
  */
 class RememberMeAuthSchemeModule extends AuthSchemeModule {
-    /** The name of the cookie */
+    /** 
+     * The name of the cookie
+     * 
+     * @var string
+     */
     protected $cookie_name;
 
     public function __construct() {
@@ -46,9 +50,10 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
      * Attempts to automatically login using the auto login cookie
      * 
      * @see AutoAuthEvent
+     * @return void
      */
     public function onAutoAuthEvent(AutoAuthEvent $event) {
-        if (!$this->f3->exists('COOKIE.' . $this->cookie_name)) return null;
+        if (!$this->f3->exists('COOKIE.' . $this->cookie_name)) return;
        
         $cookie = $this->f3->get('COOKIE.' . $this->cookie_name);
 
@@ -58,23 +63,23 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
         if ($data === null) {
             $this->logger->log(LogLevel::NOTICE, 'Automatic login: Invalid token - clearing');
             $this->removeCookie();
-            return null;
+            return;
         }
     
-        if ($data['typ'] != 'rememberme') return NULL;
+        if ($data['typ'] != 'rememberme') return;
 
         $this->logger->log(LogLevel::DEBUG, 'Automatic login token detected', $data);
     
         if ($data['exp'] < time()) {  // Cookie expired
             $this->logger->log(LogLevel::NOTICE, 'Automatic login: Expired - clearing');
             $this->removeCookie();
-            return NULL;
+            return;
         }
 
         if ($data['uaid'] != $this->auth->assignUAID()) {
             $this->logger->log(LogLevel::WARNING, 'Automatic login: User agent ID does not match - clearing');
             $this->removeCookie();
-            return NULL;
+            return;
         }
 
         $store = StoreManager::instance();
@@ -94,6 +99,7 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
      * Displays the login form, with a remember-me checkbox.
      *
      * @param FormBuildEvent $event
+     * @return void
      */
     public function onLoginFormBuild(FormBuildEvent $event) {
         $form_state = $event->getFormState();
@@ -109,6 +115,7 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
      * in the form state.
      *
      * @param LoginFormSubmitEvent $event
+     * @return void
      */
     public function onLoginFormSubmit(LoginFormSubmitEvent $event) {
         $form_state = $event->getFormState();
@@ -125,6 +132,7 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
      * so selected by the user).
      *
      * @see LoginEvent
+     * @return void
      */
     public function onLoginEvent(LoginEvent $event) {
         $level = $event->getAuthLevel();
@@ -135,7 +143,9 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
         }
     }
 
-
+    /**
+     * @return void
+     */
     public function onLogoutEvent(LogoutEvent $event) {
         $this->removeCookie();
     }
@@ -143,6 +153,7 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
     /**
      * Removes the auto login cookie from the user agent.
      *
+     * @return void
      */
     public function removeCookie() {
         if ($this->f3->exists('COOKIE.' . $this->cookie_name)) {
@@ -160,7 +171,7 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
      * @param int $expires the time at which the cookie will expire.  If none is specified
      * the time specified in {@link SIMPLEID_REMEMBERME_EXPIRES_IN} will be
      * used
-     *
+     * @return void
      */
     protected function createCookie($id = NULL, $expires = NULL) {
         $user = $this->auth->getUser();

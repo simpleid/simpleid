@@ -44,15 +44,28 @@ class Code implements TokenSource {
      */
     const CODE_SEPARATOR = '.';
 
+    /** @var string */
     private $cid;
+
+    /** @var string */
     private $aid;
+
+    /** @var string */
     private $auth_state;
     
+    /** @var string|null */
     private $redirect_uri;
+
+    /** @var array<string> */
     private $scope;
+
+    /** @var int */
     private $expires;
+
+    /** @var array<string, mixed> */
     private $additional;
 
+    /** @var bool */
     private $is_valid = false;
 
     /**
@@ -114,9 +127,9 @@ class Code implements TokenSource {
      * this code
      * @param string|null $redirect_uri the redirect_uri parameter in the authorisation request, if
      * present
-     * @param array $scope the allowed scope - this should be a subset of the scope provided by the
+     * @param array<string> $scope the allowed scope - this should be a subset of the scope provided by the
      * authorization
-     * @param array $additional additional data to be stored in the authorization code
+     * @param array<string, mixed> $additional additional data to be stored in the authorization code
      * @return Code the authorization code object
      */
     static public function create($authorization, $redirect_uri, $scope, $additional = []) {
@@ -203,7 +216,7 @@ class Code implements TokenSource {
      * Returns the scope authorised by this authorization code.  Access tokens
      * issued from this authorization code must have this scope.
      *
-     * @return array the scope
+     * @return array<string> the scope
      */
     public function getScope() {
         return $this->scope;
@@ -212,7 +225,7 @@ class Code implements TokenSource {
     /**
      * Returns additional data associated with this authorization code.
      *
-     * @return array the additional data
+     * @return array<string, mixed> the additional data
      */
     public function getAdditional() {
         return $this->additional;
@@ -220,6 +233,8 @@ class Code implements TokenSource {
 
     /**
      * Deletes the authorization code from the cache, rendering it invalid.
+     * 
+     * @return void
      */
     public function clear() {
         $cache = \Cache::instance();

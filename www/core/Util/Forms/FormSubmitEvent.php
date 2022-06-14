@@ -44,8 +44,11 @@ class FormSubmitEvent implements \GenericEventInterface, StoppableEventInterface
     use GenericEventTrait;
     use StoppableEventTrait;
 
+    /** @var \SimpleID\Util\Forms\FormState */
     protected $form_state;
+    /** @var bool */
     protected $is_valid = true;
+    /** @var array<string> */
     protected $messages = [];
 
 
@@ -71,6 +74,7 @@ class FormSubmitEvent implements \GenericEventInterface, StoppableEventInterface
      * Adds a validation error message
      * 
      * @param string $message the error message
+     * @return void
      */
     public function addMessage($message) {
         $this->messages[] = $message;
@@ -79,7 +83,7 @@ class FormSubmitEvent implements \GenericEventInterface, StoppableEventInterface
     /**
      * Returns a list of error messages
      * 
-     * @return array the error messages
+     * @return array<string> the error messages
      */
     public function getMessages() {
         return $this->messages;
@@ -87,6 +91,8 @@ class FormSubmitEvent implements \GenericEventInterface, StoppableEventInterface
 
     /**
      * Sets the form validation result as invalid.
+     * 
+     * @return void
      */
     public function setInvalid() {
         $this->is_valid = false;
