@@ -34,6 +34,7 @@ namespace SimpleID\Protocols\OAuth;
  * 
  */
 class OAuthTokenGrantEvent extends OAuthAuthGrantEvent {
+    /** @var string */
     protected $grant_type;
 
     public function __construct(string $grant_type, Authorization $authorization, Request $request, Response $response, $scopes) {

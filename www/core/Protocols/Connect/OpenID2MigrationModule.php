@@ -47,6 +47,9 @@ class OpenID2MigrationModule extends Module {
     /**
      * Returns the user's OpenID 2.0 verification page.
      *
+     * @param \Base $f3
+     * @param array<string, mixed> $params
+     * @return void
      * @see SimpleID\Base\UserModule::user()
      */
     public function userJSON($f3, $params) {
@@ -64,12 +67,13 @@ class OpenID2MigrationModule extends Module {
         } else {
             $this->f3->status(404);
             
-            $this->fatalError($this->f3->get('intl.common.user_not_found', $user['uid']));
+            $this->fatalError($this->f3->get('intl.common.user_not_found', $params['uid']));
         }
     }
 
     /**
      * @see SimpleID\Protocols\Connect\ConnectBuildClaimsEvent
+     * @return void
      */
     public function onConnectBuildClaimsEvent(ConnectBuildClaimsEvent $event) {
         $context = $event->getContext();
@@ -85,6 +89,7 @@ class OpenID2MigrationModule extends Module {
 
     /**
      * @see SimpleID\Base\ScopeInfoCollectionEvent
+     * @return void
      */
     public function onScopeInfoCollectionEvent(ScopeInfoCollectionEvent $event) {
         $event->addScopeInfo('oauth', [

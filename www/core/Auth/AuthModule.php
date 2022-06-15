@@ -41,9 +41,8 @@ use SimpleID\Util\Forms\FormSubmitEvent;
  * @see SimpleID\API\AuthHooks
  */
 class AuthModule extends Module {
-
+    /** @var AuthManager */
     private $auth;
-    private $mgr;
 
     static function init($f3) {
         $f3->route('GET|POST /auth/login', 'SimpleID\Auth\AuthModule->login');
@@ -55,7 +54,6 @@ class AuthModule extends Module {
     public function __construct() {
         parent::__construct();
         $this->auth = AuthManager::instance();
-        $this->mgr = ModuleManager::instance();
     }
 
     /**
@@ -75,7 +73,8 @@ class AuthModule extends Module {
      * HTTP request.
      *
      * @param \Base $f3
-     * @param array $params
+     * @param array<string, mixed> $params
+     * @return void
      */
     public function login($f3, $params) {
         $dispatcher = \Events::instance();
@@ -192,7 +191,8 @@ class AuthModule extends Module {
      * Attempts to log out a user and returns to the login form.
      *
      * @param \Base $f3
-     * @param array $params
+     * @param array<string, mixed> $params
+     * @return void
      */
     public function logout($f3, $params) {
         $params['destination'] = (isset($params['*'])) ? $params['*'] : '';
@@ -219,8 +219,9 @@ class AuthModule extends Module {
     /**
      * Displays a user login or a login verification form.
      *
-     * @param array $params the F3 parameters
-     * @param array $form_state the form state
+     * @param array<string, mixed> $params the F3 parameters
+     * @param FormState $form_state|null the form state
+     * @return void
      */
     public function loginForm($params = [ 'destination' => null ], $form_state = null) {
         $tpl = new \Template();

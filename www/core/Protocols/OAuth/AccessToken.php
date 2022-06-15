@@ -27,7 +27,8 @@ namespace SimpleID\Protocols\OAuth;
  * To create and encode a token, use the {@link create()} static function.
  * To parse an encoded token, use the {@link decode()} static function.
  */
-class AccessToken extends Token {  
+class AccessToken extends Token {
+    /** @var string */
     private $token_type = 'bearer';
 
     protected function __construct() {
@@ -59,12 +60,12 @@ class AccessToken extends Token {
      *
      * @param Authorization $authorization the authorisation to use to create
      * this token
-     * @param array $scope the scope of this token - this must be a subset
+     * @param array<string> $scope the scope of this token - this must be a subset
      * of the scope provided in `$authorization`
      * @param int $expires_in the time to expiry or {@link Token::TTL_PERPETUAL}
      * @param TokenSource $source if the token is created from a previous authorisation
      * code or refresh token, the ID of those artefacts
-     * @param array $additional any additional data to be stored on the server for this token
+     * @param array<string, mixed> $additional any additional data to be stored on the server for this token
      * @return AccessToken|null 
      */
     static public function create($authorization, $scope = [], $expires_in = Token::TTL_PERPETUAL, $source = NULL, $additional = []) {

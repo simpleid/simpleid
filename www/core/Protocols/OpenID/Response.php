@@ -36,7 +36,7 @@ class Response extends Message {
     /** Parameter for {@link $indirect_component} */
     const OPENID_RESPONSE_FRAGMENT = 1;
 
-    /** @var array an array of fields to be signed */
+    /** @var array<string> an array of fields to be signed */
     private $signed_fields = [];
 
     /**
@@ -57,7 +57,7 @@ class Response extends Message {
      * response will contain the same OpenID version, as well as the same
      * extension URI-to-alias mapping as the underlying request.
      * 
-     * @param Request|array|null $request the request to which the response will
+     * @param Request|array<string, string>|null $request the request to which the response will
      * be made
      */
     public function __construct($request = NULL) {
@@ -68,6 +68,7 @@ class Response extends Message {
         $this->extension_map = $request->getExtensionMap();
 
         foreach ($request as $key => $value) {
+            $value = strval($value);
             if (strpos($key, 'openid.ns.') === 0) {
                 $alias = substr($key, 10);
                 $this->extension_map[$value] = $alias;
@@ -82,6 +83,7 @@ class Response extends Message {
      * namespace will be added to the response.
      *
      * @param int $version the OpenID version
+     * @return void
      */
     public function setVersion($version) {
         if ($version == Message::OPENID_VERSION_2) {
@@ -98,6 +100,7 @@ class Response extends Message {
      * @param string $value the value
      * @param bool|null $signed whether this field should be included in the
      * signature
+     * @return void
      */
     public function set($field, $value, $signed = NULL) {
         $this->container[$field] = $value;
@@ -110,9 +113,10 @@ class Response extends Message {
     /**
      * Sets multiple fields in the response.
      *
-     * @param array $data the fields and values to set
+     * @param array<string, string> $data the fields and values to set
      * @param bool|null $signed whether this field should be included in the
      * signature
+     * @return void
      */
     public function setArray($data, $signed = NULL) {
         foreach ($data as $key => $value) {
@@ -134,6 +138,7 @@ class Response extends Message {
      * be either OPENID_RESPONSE_QUERY or OPENID_RESPONSE_FRAGMENT
      *
      * @param int $indirect_component the component
+     * @return void
      */
     public function setIndirectComponent($indirect_component) {
         $this->indirect_component = $indirect_component;
@@ -148,7 +153,7 @@ class Response extends Message {
      *
      * @param string $indirect_url the URL to which the OpenID response is sent.  If
      * this is null, the response is sent via direct communication
-     * 
+     * @return void
      */
     public function render($indirect_url = NULL) {
         if ($indirect_url) {
@@ -191,6 +196,7 @@ class Response extends Message {
         //    need to slot in the new query string properly.  We disassemble and
         //    reconstruct the URL.
         $parts = parse_url($url);
+        if ($parts == false) return $url;
         
         $url = $parts['scheme'] . '://';
         if (isset($parts['user'])) {
@@ -198,7 +204,7 @@ class Response extends Message {
             if (isset($parts['pass'])) $url .= ':' . $parts['pass'];
             $url .= '@';
         }
-        $url .= $parts['host'];
+        if (isset($parts['host'])) $url .= $parts['host'];
         if (isset($parts['port'])) $url .= ':' . $parts['port'];
         if (isset($parts['path'])) $url .= $parts['path'];
         
@@ -209,7 +215,7 @@ class Response extends Message {
             // In theory $parts['fragment'] should be an empty string, but the
             // current draft specification does not prohibit putting other things
             // in the fragment.
-            
+            if (!isset($parts['fragment'])) $parts['fragment'] = '';
             if (isset($parts['query'])) {
                 $url .= '?' . $parts['query'] . '#' . $parts['fragment'] . '&' . $query;
             } else {
@@ -244,7 +250,7 @@ class Response extends Message {
      * have an alias in the current OpenID request.  If this parameter is a string,
      * then the string specified is the preferred alias to be created, unless a collision
      * occurs
-     * @return string the alias, or NULL if the Type URI does not already
+     * @return string|null the alias, or NULL if the Type URI does not already
      * have an alias in the current OpenID request <i>and</i> $create is false
      */
     public function getAliasForExtension($ns, $create = FALSE) {        
@@ -284,9 +290,10 @@ class Response extends Message {
      * Convenient function to create an error response.
      *
      * @param string $error the error message
-     * @param array $additional any additional data to be sent with the error
+     * @param array<string, string> $additional any additional data to be sent with the error
      * message
      * @param Request $request the request
+     * @return Response
      */
     static public function createError($error, $additional = [], $request = NULL) {
         $response = new Response($request);

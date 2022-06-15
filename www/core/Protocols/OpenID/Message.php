@@ -43,6 +43,8 @@ abstract class Message extends ArrayWrapper {
     /**
      * A mapping of Type URIs of OpenID extnesions to aliases provided in an OpenID
      * message.
+     * 
+     * @var array<string, string>
      */
     protected $extension_map = [ "http://openid.net/extensions/sreg/1.1" => "sreg" ]; // For sreg 1.0 compatibility
     
@@ -50,6 +52,8 @@ abstract class Message extends ArrayWrapper {
      * The version of the OpenID specification associated with
      * the current OpenID message.  This can be either {@link OPENID_VERSION_1_1}
      * or {@link OPENID_VERSION_2}.
+     * 
+     * @var int
      */
     protected $version;
 
@@ -57,7 +61,6 @@ abstract class Message extends ArrayWrapper {
      * Returns the OpenID version of the message
      *
      * @return int either OPENID_VERSION_2 or OPENID_VERSION_1_1
-     *
      */
     public function getVersion() {
         return $this->version;
@@ -72,7 +75,7 @@ abstract class Message extends ArrayWrapper {
      * OpenID request which starts with openid.example
      *
      * @param string $ns the Type URI of the extension
-     * @return array the filtered request, with the prefix (in the example above,
+     * @return array<string, string> the filtered request, with the prefix (in the example above,
      * openid.example.) stripped in the keys.
      */
     public function getParamsForExtension($ns) {
@@ -122,7 +125,7 @@ abstract class Message extends ArrayWrapper {
     /**
      * Obtains the mapping between namespace URIs and their aliases.
      *
-     * @return array the mapping between namespace URIs and their aliases
+     * @return array<string, string> the mapping between namespace URIs and their aliases
      */
     public function getExtensionMap() {
         return $this->extension_map;
@@ -133,8 +136,8 @@ abstract class Message extends ArrayWrapper {
      *
      * The response will be encoded using Key-Value Form Encoding.
      *
-     * @param array $data the data in the response
-     * @return string the message in key-value form encoding
+     * @param array<string, string> $data the data in the response
+     * @return string|null the message in key-value form encoding
      * @link http://openid.net/specs/openid-authentication-1_1.html#anchor32, http://openid.net/specs/openid-authentication-2_0.html#kvform
      */
     static protected function toKeyValueForm($data) {
@@ -155,7 +158,7 @@ abstract class Message extends ArrayWrapper {
      * Calculates the base string from which an OpenID signature is generated,
      * given a list of fields to sign.
      * 
-     * @param array $signed_fields the list of fields to sign
+     * @param array<string> $signed_fields the list of fields to sign
      * @param string $prefix the prefix to be prepended to $signed_field to obtain
      * the field value - used for Requests
      * @return string the signature base string

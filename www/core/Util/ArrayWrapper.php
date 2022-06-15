@@ -24,6 +24,9 @@ namespace SimpleID\Util;
 
 use \ArrayAccess;
 use \Countable;
+use \IteratorAggregate;
+use \Traversable;
+use \ArrayIterator;
 
 /**
  * A class that wraps around an array while providing array-like and
@@ -68,15 +71,17 @@ use \Countable;
  * print $array_wrapper->pathGet('dim1.foo');  # Now prints 3
  * </code>
  *
+ * @implements ArrayAccess<string, mixed>
+ * @implements IteratorAggregate<string, mixed>
  */
-class ArrayWrapper implements ArrayAccess, Countable {
-    /** @var array the underlying array */
+class ArrayWrapper implements ArrayAccess, Countable, IteratorAggregate {
+    /** @var array<mixed> the underlying array */
     protected $container = [];
 
     /**
      * Creates a new ArrayWrapper over an underlying array
      *
-     * @param array $container the underlying array
+     * @param array<mixed> $container the underlying array
      */
     public function __construct($container = []) {
         if (is_array($container)) $this->container = $container;
@@ -87,7 +92,8 @@ class ArrayWrapper implements ArrayAccess, Countable {
      *
      * This data is typically read from another source
      *
-     * @param array|ArrayWrapper $data the data
+     * @param array<mixed>|ArrayWrapper $data the data
+     * @return void
      */
     public function loadData($data) {
         if ($data instanceof ArrayWrapper) {
@@ -100,7 +106,7 @@ class ArrayWrapper implements ArrayAccess, Countable {
     /**
      * Returns this object as an array.
      *
-     * @return array
+     * @return array<mixed>
      */
     public function toArray() {
         return $this->container;
@@ -146,6 +152,13 @@ class ArrayWrapper implements ArrayAccess, Countable {
     }
 
     /**
+     * Implementation of IteratorAggregate
+     */
+    public function getIterator(): Traversable {
+        return new ArrayIterator($this->container);
+    }
+
+    /**
      * Retrieve contents of the container based on a FatFree-like path
      * expression
      *
@@ -175,6 +188,7 @@ class ArrayWrapper implements ArrayAccess, Countable {
      *
      * @param string $path the path
      * @param mixed $value the value to set
+     * @return void
      */
     public function pathSet($path, $value) {
         $ref = &$this->pathRef($path);
@@ -186,6 +200,7 @@ class ArrayWrapper implements ArrayAccess, Countable {
      * expression
      *
      * @param string $path the path
+     * @return void
      */
     public function pathUnset($path) {
         if (!$this->pathExists($path)) return;
@@ -276,8 +291,17 @@ class ArrayWrapper implements ArrayAccess, Countable {
         return $var;
     }
 
+    /**
+     * @param string $path
+     * @return array<string>
+     */
     private function pathSplit($path) {
-        return preg_split('/\[\h*[\'"]?(.+?)[\'"]?\h*\]|(->)|\./', $path, NULL, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        $split = preg_split('/\[\h*[\'"]?(.+?)[\'"]?\h*\]|(->)|\./', $path, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        if ($split === false) {
+            return [ $path ];
+        } else {
+            return $split;
+        }
     }
 }
 ?>

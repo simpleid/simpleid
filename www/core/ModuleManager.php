@@ -34,10 +34,13 @@ use Psr\Log\LogLevel;
  * calling hooks.
  */
 class ModuleManager extends Prefab {
-    /** @var array array of all loaded modules */
+    /** @var array<string, Module> array of all loaded modules */
     private $modules = [];
 
+    /** @var Base */
     private $f3;
+
+    /** @var \Psr\Log\LoggerInterface */
     private $logger;
 
     function __construct() {
@@ -49,6 +52,7 @@ class ModuleManager extends Prefab {
      * Loads a module.
      *
      * @param string $name the fully qualified class name of the module to load
+     * @return void
      */
     public function loadModule($name) {
         $this->logger->log(LogLevel::INFO, 'SimpleID\ModuleManager->loadModule: ' . $name);
@@ -57,7 +61,7 @@ class ModuleManager extends Prefab {
         
         $info = $this->getModuleInfo($name);
         $module = new $name();
-        $this->modules[$name] = $module;
+        if ($module instanceof Module) $this->modules[$name] = $module;
         
         if (isset($info['asset_domain'])) {
             $this->f3->set('UI', $this->f3->get('UI') . ';' . $info['asset_dir']);
@@ -88,7 +92,7 @@ class ModuleManager extends Prefab {
     /**
      * Returns a list of loaded modules
      *
-     * @return array an array of fully qualified class names of the loaded
+     * @return array<string> an array of fully qualified class names of the loaded
      * modules
      */
     public function getModules() {
@@ -97,6 +101,8 @@ class ModuleManager extends Prefab {
 
     /**
      * Initialises the loaded modules.
+     * 
+     * @return void
      */
     public function initModules() {
         $listeners = \Listeners::instance();
@@ -114,6 +120,7 @@ class ModuleManager extends Prefab {
      * Retrieves information on a SimpleID module
      *
      * @param string $class the fully qualified class name of the module
+     * @return array<string, string>
      */
     public function getModuleInfo($class) {
         $loader = $this->f3->get('class_loader');

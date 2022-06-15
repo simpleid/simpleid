@@ -40,7 +40,8 @@ class UserModule extends Module {
      * Returns the user's public page.
      * 
      * @param \Base $f3
-     * @param array $params
+     * @param array<string, mixed> $params
+     * @return void
      */
     function user($f3, $params) {
         $web = \Web::instance();
@@ -93,10 +94,11 @@ class UserModule extends Module {
     }
 
     /**
-     * Returns a block containing OpenID Connect user information.
+     * Returns a block containing user information.
      *
      * @param UIBuildEvent $event the event to collect the
-     * OpenID Connect user information block
+     * user information block
+     * @return void
      */
     function onProfileBlocks(UIBuildEvent $event) {
         $auth = AuthManager:: instance();

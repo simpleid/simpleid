@@ -29,7 +29,7 @@ use SimpleID\Util\Events\UIBuildEvent;
  *
  */
 class FormBuildEvent extends UIBuildEvent implements FormEventInterface {
-
+    /** @var \SimpleID\Util\Forms\FormState */
     protected $form_state = null;
 
     /**

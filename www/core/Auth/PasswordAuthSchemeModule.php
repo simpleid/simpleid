@@ -46,6 +46,7 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
      * and password
      *
      * @param FormBuildEvent $event
+     * @return void
      */
     public function onLoginFormBuild(FormBuildEvent $event) {
         $form_state = $event->getFormState();
@@ -63,6 +64,7 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
      * Validates the login form.
      *
      * @param FormSubmitEvent $event
+     * @return void
      */
     public function onLoginFormValidate(FormSubmitEvent $event) {
         $form_state = $event->getFormState();
@@ -86,6 +88,7 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
      * by the user.
      *
      * @param LoginFormSubmitEvent $event
+     * @return void
      */
     public function onLoginFormSubmit(LoginFormSubmitEvent $event) {
         $store = StoreManager::instance();
@@ -113,7 +116,7 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
      * method.
      *
      * @param string $uid the name of the user to verify
-     * @param array $credentials the credentials supplied by the browser
+     * @param array<string, mixed> $credentials the credentials supplied by the browser
      * @return bool whether the credentials supplied matches those for the specified
      * user
      */
@@ -130,7 +133,6 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
             case '2y':
                 $bcrypt = Bcrypt::instance();
                 return $bcrypt->verify($credentials['password']['password'], $test_user['password']['password']);
-                break;
             case 'pbkdf2':
                 $params = [];
                 list($param_string, $hash, $salt) = explode('$', $content, 3);
@@ -139,13 +141,15 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
                 if (!isset($params['dk'])) $params['dk'] = 0;
                 return $this->secureCompare(hash_pbkdf2($params['f'], $credentials['password']['password'], base64_decode($salt), $params['c'], $params['dk'], true),
                     base64_decode($hash));
-                break;
             default:
                 $this->logger->log(LogLevel::WARNING, 'Unknown password prefix: ' . $prefix);
                 return false;
         }
     }
 
+    /**
+     * @return void
+     */
     public function onUserSecretDataPaths(BaseDataCollectionEvent $event) {
         $event->addResult('password.password');
     }

@@ -34,8 +34,13 @@ use SimpleID\Protocols\OAuth\OAuthClient;
  * the {@link setClient()} method.
  */
 class OAuthInitClientEvent implements StoppableEventInterface {
+    /** @var Request */
     protected $request;
+
+    /** @var OAuthClient|null */
     protected $client = null;
+
+    /** @var string */
     protected $client_auth_method = null;
 
     public function __construct(Request $request) {
@@ -43,9 +48,9 @@ class OAuthInitClientEvent implements StoppableEventInterface {
     }
 
     /**
-     * Returns the OpenID request.
+     * Returns the OAuth request.
      * 
-     * @return \SimpleID\Protocols\OpenID\Request the OpenID request
+     * @return Request the OAuth request
      */
     public function getRequest() {
         return $this->request;
@@ -59,9 +64,11 @@ class OAuthInitClientEvent implements StoppableEventInterface {
      * 
      * @param \SimpleID\Protocols\OAuth\OAuthClient $client the client authenticated
      * @param string $client_auth_method the authentication method used
+     * @return void
      */
     public function setClient(OAuthClient $client, string $client_auth_method) {
         $this->client = $client;
+        $this->client_auth_method = $client_auth_method;
     }
 
     /**

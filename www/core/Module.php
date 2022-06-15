@@ -47,11 +47,6 @@ abstract class Module extends \Prefab {
      */
     protected $logger;
 
-    /** Asset domain
-     * @var string
-     */
-    private $domain;
-
     /**
      * Initialises the module.
      * 
@@ -63,6 +58,7 @@ abstract class Module extends \Prefab {
      * - register events
      *
      * @param \Base $f3 the FatFree framework
+     * @return void
      */
     public static function init($f3) {
 
@@ -90,6 +86,7 @@ abstract class Module extends \Prefab {
      * This event handler initialises the user system.  It starts the PHP session
      * and loads data for the currently logged-in user, if any.
      *
+     * @return void
      */
     public function beforeroute() {
         $auth = AuthManager::instance();
@@ -135,7 +132,8 @@ abstract class Module extends \Prefab {
      * to see if an unencrypted connection is allowed
      * @param string $redirect_url if $action is redirect, what URL to redirect to.
      * If null, this will redirect to the same page (albeit with an HTTPS connection)
-     * @param boolean $strict whether HTTP Strict Transport Security is active     
+     * @param boolean $strict whether HTTP Strict Transport Security is active   
+     * @return void  
      */
     protected function checkHttps($action = 'redirect', $allow_override = false, $redirect_url = null, $strict = true) {
         if ($this->isHttps()) {
@@ -154,7 +152,6 @@ abstract class Module extends \Prefab {
             header('Connection: Upgrade');
             $this->fatalError($this->f3->get('intl.common.require_https'));
             exit;
-            return;
         }
         
         if ($redirect_url == null) $redirect_url = $this->getCanonicalURL($this->f3->get('PATH'), $this->f3->get('SERVER.QUERY_STRING'), 'https');
@@ -221,6 +218,7 @@ abstract class Module extends \Prefab {
      * Displays a fatal error message and exits.
      *
      * @param string $error the message to set
+     * @return void
      */
     protected function fatalError($error) {
         $this->f3->set('title', $this->f3->get('intl.common.error'));

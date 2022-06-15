@@ -42,6 +42,7 @@ class SRegOpenIDExtensionModule extends Module {
     /** Namespace for the Simple Registration extension */
     const OPENID_NS_SREG = 'http://openid.net/extensions/sreg/1.1';
 
+    /** @var AuthManager */
     private $auth;
 
     public function __construct() {
@@ -51,6 +52,7 @@ class SRegOpenIDExtensionModule extends Module {
 
     /**
      * @see SimpleID\Protocols\OpenID\OpenIDResponseBuildEvent
+     * @return void
      */
     public function onOpenIDResponseBuildEvent(OpenIDResponseBuildEvent $event) {
         // We only deal with positive assertions
@@ -81,10 +83,13 @@ class SRegOpenIDExtensionModule extends Module {
 
     /**
      * @see SimpleID\Util\Forms\FormBuildEvent
+     * @return void
      */
     function onOpenidConsentFormBuild(FormBuildEvent $event) {
         $form_state = $event->getFormState();
+        /** @var \SimpleID\Protocols\OpenID\Request */
         $request = $form_state->getRequest();
+        /** @var \SimpleID\Protocols\OpenID\Response */
         $response = $form_state->getResponse();
         $prefs = $form_state['prefs'];
         
@@ -141,9 +146,11 @@ class SRegOpenIDExtensionModule extends Module {
 
     /**
      * @see SimpleID\Util\Forms\FormSubmitEvent
+     * @return void
      */
     function onOpenidConsentFormSubmit(FormSubmitEvent $event) {
         $form_state = $event->getFormState();
+        /** @var \SimpleID\Protocols\OpenID\Response */
         $response = $form_state->getResponse();
         $prefs =& $form_state->pathRef('prefs');
 
@@ -170,7 +177,9 @@ class SRegOpenIDExtensionModule extends Module {
         $prefs['consents']['sreg'] = $form;
     }
 
-
+    /**
+     * @return void
+     */
     public function onProfileBlocks(UIBuildEvent $event) {
         $user = $this->auth->getUser();
 
@@ -197,8 +206,9 @@ class SRegOpenIDExtensionModule extends Module {
      * specified field cannot be found, it looks up the corresponding field in the
      * OpenID Connect user information (user_info section).
      *
+     * @param \SimpleID\Models\User $user the user to look up
      * @param string $field the field to look up
-     * @return string the value or NULL if not found
+     * @return string|null the value or NULL if not found
      */
     protected function getValue($user, $field) {
         $sreg = (isset($user['sreg'])) ? $user['sreg'] : [];

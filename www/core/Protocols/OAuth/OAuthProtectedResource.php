@@ -57,6 +57,7 @@ class OAuthProtectedResource extends Module {
      * This event handler initialises the user system.  It starts the PHP session
      * and loads data for the currently logged-in user, if any.
      *
+     * @return void
      */
     public function beforeroute() {
         $this->oauth->initAccessToken($this->oauth_include_request_body);
@@ -78,7 +79,7 @@ class OAuthProtectedResource extends Module {
      *
      * This is a shortcut for {@link SimpleID\Protocols\OAuth\OAuthManager::getAuthorization()}.
      *
-     * @return Authorization the authorisation
+     * @return Authorization|null the authorisation
      */
     protected function getAuthorization() {
         if (!$this->oauth->getAccessToken()) return null;
@@ -91,7 +92,7 @@ class OAuthProtectedResource extends Module {
      *
      * This is a shortcut for {@link SimpleID\Protocols\OAuth\Authorization::getOwner()}.
      *
-     * @return \SimpleID\Store\Storable the owner
+     * @return \SimpleID\Store\Storable|null the owner
      */
     protected function getTokenOwner() {
         if (!$this->oauth->getAccessToken()) return null;
@@ -104,7 +105,7 @@ class OAuthProtectedResource extends Module {
      *
      * This is a shortcut for {@link SimpleID\Protocols\OAuth\Authorization::getClient()}.
      *
-     * @return \SimpleID\Store\Storable the client
+     * @return \SimpleID\Store\Storable|null the client
      */
     protected function getTokenClient() {
         if (!$this->oauth->getAccessToken()) return null;
@@ -117,7 +118,7 @@ class OAuthProtectedResource extends Module {
      *
      * This is a shortcut for {@link SimpleID\Protocols\OAuth\OAuthManager::isTokenAuthorized()}.
      *
-     * @param array|string $scope the scope
+     * @param array<string>|string $scope the scope
      * @param string &$error the error code returned if the access token
      * is not authorised
      * @return bool true if the access token is authorised
@@ -131,10 +132,11 @@ class OAuthProtectedResource extends Module {
      *
      * @param string $error the error code
      * @param string $error_description human readable error information
-     * @param array $additional any additional data to be sent with the error
+     * @param array<string, string> $additional any additional data to be sent with the error
      * message
      * @param string $format the format of the error message
      * @param int $status the HTTP status to send
+     * @return void
      */
     protected function unauthorizedError($error, $error_description = NULL, $additional = [], $format = 'html', $status = 401) {
         $this->f3->status($status);

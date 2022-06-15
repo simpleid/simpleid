@@ -41,9 +41,16 @@ use SimpleID\Util\Forms\FormEventInterface;
  * included.
  */
 class LoginEvent implements FormEventInterface {
+    /** @var AuthResultInterface */
     protected $result;
+
+    /** @var \SimpleID\Util\Forms\FormState|null */
     protected $form_state = null;
 
+    /**
+     * @param AuthResultInterface $result
+     * @param \SimpleID\Util\Forms\FormState|null $form_state
+     */
     public function __construct(AuthResultInterface $result, $form_state = null) {
         $this->result = $result;
         $this->form_state = $form_state;

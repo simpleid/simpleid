@@ -46,10 +46,13 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
     /**
      * Displays the page used to set up login verification using one-time
      * passwords.
+     * 
+     * @return void
      */
     public function setup() {
         $auth = AuthManager::instance();
         $store = StoreManager::instance();
+        /** @var \SimpleID\Models\User $user */
         $user = $auth->getUser();
 
         $tpl = new \Template();
@@ -117,7 +120,9 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
         }
 
         $secret = new BigNum($params['secret'], 256);
-        $code = strtr($secret->val(32), '0123456789abcdefghijklmnopqrstuv', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567');
+        $base32 = $secret->val(32);
+        assert($base32 != false);
+        $code = strtr($base32, '0123456789abcdefghijklmnopqrstuv', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567');
         $code = str_repeat('A', 16 - strlen($code)) . $code;
         for ($i = 0; $i < strlen($code); $i += 4) {
             $this->f3->set('secret' . ($i + 1), substr($code, $i, 4));
@@ -145,6 +150,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
      *
      * @param UIBuildEvent $event the event to collect
      * the dashboard OTP block
+     * @return void
      */
     public function onDashboardBlocks(UIBuildEvent $event) {
         $auth = AuthManager::instance();
@@ -174,6 +180,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
 
     /**
      * @param FormBuildEvent $event
+     * @return void
      */
     public function onLoginFormBuild(FormBuildEvent $event) {
         $form_state = $event->getFormState();
@@ -203,6 +210,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
 
     /**
      * @param FormSubmitEvent $event
+     * @return void
      */
     public function onLoginFormValidate(FormSubmitEvent $event) {
         $form_state = $event->getFormState();
@@ -217,6 +225,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
 
     /**
      * @param LoginFormSubmitEvent $event
+     * @return void
      */
     public function onLoginFormSubmit(LoginFormSubmitEvent $event) {
         $form_state = $event->getFormState();
@@ -225,12 +234,14 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             $store = StoreManager::instance();
 
             $uid = $form_state['uid'];
+            /** @var \SimpleID\Models\User $test_user */
             $test_user = $store->loadUser($form_state['uid']);
             $params = $test_user['otp'];
             
             if ($this->verifyOTP($params, $this->f3->get('POST.otp.otp'), 10) === false) {
                 $this->f3->set('message', $this->f3->get('intl.core.auth_otp.invalid_otp'));
-                return false;
+                $event->setInvalid();
+                return;
             }
 
             if ($this->f3->get('POST.otp.remember') == '1') $form_state['otp_remember'] = 1;
@@ -246,6 +257,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
 
     /**
      * @see SimpleID\Auth\LoginEvent
+     * @return void
      */
     public function onLoginEvent(LoginEvent $event) {
         $user = $event->getUser();
@@ -284,7 +296,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
      * adjusted time.  The maximum number of time steps is specified in
      * the $max_drift parameter.
      *
-     * @param array &$params the OTP parameters stored
+     * @param array<string, mixed> &$params the OTP parameters stored
      * @param string $code the OTP supplied by the user
      * @param int $max_drift the maximum drift allowed for network delay, in
      * time steps
@@ -353,7 +365,9 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
      */
     public function hotp($secret, $data, $algorithm = 'sha1', $digits = 6) {
         // unpack produces a 1-based array, we use array_merge to convert it to 0-based
-        $hmac = array_merge(unpack('C*', hash_hmac(strtolower($algorithm), $data, $secret, true)));
+        $unpacked = unpack('C*', hash_hmac(strtolower($algorithm), $data, $secret, true));
+        assert($unpacked != false);
+        $hmac = array_merge($unpacked);
         $offset = $hmac[19] & 0xf;
         $code = ($hmac[$offset + 0] & 0x7F) << 24 |
             ($hmac[$offset + 1] & 0xFF) << 16 |
@@ -362,7 +376,9 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
         return $code % pow(10, $digits);
     }
 
-    
+    /**
+     * @return void
+     */    
     public function onUserSecretDataPaths(BaseDataCollectionEvent $event) {
         $event->addResult([ 'otp.secret', 'otp.drift' ]);
     }

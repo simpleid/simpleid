@@ -41,13 +41,15 @@ namespace SimpleID\Base;
  * Listeners should use {@link addScopeInfo()} to add scope information.
  */
 class ScopeInfoCollectionEvent {
+    /** @var array<string, array<string, mixed>> */
     protected $scope_info = [];
 
     /**
      * Add scope information.
      * 
      * @param string $type the type of the scope information
-     * @param array $scopes the scope information
+     * @param array<string, array<string, mixed>> $scopes the scope information
+     * @return void
      */
     public function addScopeInfo($type, $scopes) {
         $this->scope_info = array_merge_recursive($this->scope_info, [ $type => $scopes ]);
@@ -57,7 +59,7 @@ class ScopeInfoCollectionEvent {
      * Returns scopes for a particular type.
      * 
      * @param string $type the type of scopes to return
-     * @return array an array of scopes, or an empty array
+     * @return array<string> an array of scopes, or an empty array
      * if no scope information is found for this particular type
      */
     public function getScopesForType($type) {
@@ -69,7 +71,7 @@ class ScopeInfoCollectionEvent {
      * Returns scope informations for a particular type.
      * 
      * @param string $type the type of scopes to return
-     * @return array an array containing scope information for the specified
+     * @return array<string, mixed> an array containing scope information for the specified
      * type, or an empty array if no scope information is found for this
      * particular type
      */
@@ -84,7 +86,7 @@ class ScopeInfoCollectionEvent {
      * as the key, and the scope information (equivalent to calling
      * {@link getScopesForType()}) as the value.
      * 
-     * @return array the scope information
+     * @return array<string, array<string, mixed>> the scope information
      */
     public function getAllScopeInfo() {
         return $this->scope_info;

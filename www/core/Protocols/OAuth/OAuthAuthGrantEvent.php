@@ -31,9 +31,15 @@ namespace SimpleID\Protocols\OAuth;
  * 
  */
 class OAuthAuthGrantEvent extends OAuthEvent {
+    /** @var Authorization */
     protected $authorization;
+
+    /** @var array<string> */
     protected $scopes;
 
+    /**
+     * @param array<string> $scopes
+     */
     public function __construct(Authorization $authorization, Request $request, Response $response, $scopes) {
         parent::__construct($request, $response);
 
@@ -54,7 +60,7 @@ class OAuthAuthGrantEvent extends OAuthEvent {
     /**
      * Returns the requested scope
      * 
-     * @return array the requested scope
+     * @return array<string> the requested scope
      */
     public function getRequestedScope() {
         return $this->scopes;

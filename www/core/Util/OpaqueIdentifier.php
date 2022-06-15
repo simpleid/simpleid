@@ -36,7 +36,7 @@ use SimpleID\Store\StoreManager;
  * the opaque identifier is bound to the recipient.
  */
 class OpaqueIdentifier {
-
+    /** @var string */
     static private $opaque_token = null;
 
     function __construct() {
@@ -48,7 +48,8 @@ class OpaqueIdentifier {
      *
      * @param string $token the identifier token
      * @param string $expected_id the expected identifier
-     * @param array $context additional data that have been encoded
+     * @param array<mixed> $context additional data that have been encoded
+     * @return bool true if the identifier token matches the expected identifier
      */
     public function verify($token, $expected_id, $context = []) {
         return ($this->generate($expected_id, $context) == $token);
@@ -58,7 +59,7 @@ class OpaqueIdentifier {
      * Generates an opaque identifier token
      *
      * @param string $id the identifier to encode
-     * @param array $context additional data to encode
+     * @param array<mixed> $context additional data to encode
      * @return string the opaque identifier token
      */
     public function generate($id, $context = []) {
@@ -72,8 +73,8 @@ class OpaqueIdentifier {
      * Converts an array into a string.  The array must be a single
      * dimension with string values.
      *
-     * @param array $array the array the convert
-     * @return string the converted string.
+     * @param array<string, string> $array the array the convert
+     * @return string the converted string
      */
     protected function formatArray($array) {
         $output = [];

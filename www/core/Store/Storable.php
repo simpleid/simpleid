@@ -49,6 +49,7 @@ interface Storable {
      * - able to be used as a file name.
      *
      * @param string $id the ID for this object
+     * @return void
      */
     public function setStoreID($id);
 }

@@ -43,6 +43,7 @@ class AXOpenIDExtensionModule extends Module {
     /** Namespace for the Simple Registration extension */
     const OPENID_NS_AX = 'http://openid.net/srv/ax/1.0';
 
+    /** @var AuthManager */
     private $auth;
 
     public function __construct() {
@@ -54,6 +55,7 @@ class AXOpenIDExtensionModule extends Module {
      * Returns the support for AX in SimpleID XRDS document
      *
      * @param BaseDataCollectionEvent $event
+     * @return void
      */
     function onXrdsTypes(BaseDataCollectionEvent $event) {
         $event->addResult(self::OPENID_NS_AX);
@@ -61,13 +63,16 @@ class AXOpenIDExtensionModule extends Module {
 
     /**
      * @see SimpleID\Protocols\OpenID\OpenIDResponseBuildEvent
+     * @return void
      */
     public function onOpenIDResponseBuildEvent(OpenIDResponseBuildEvent $event) {
         // We only deal with positive assertions
         if (!$event->isPositiveAssertion()) return;
         
         // We only respond if the extension is requested
+        /** @var \SimpleID\Protocols\OpenID\Request */
         $request = $event->getRequest();
+        /** @var \SimpleID\Protocols\OpenID\Response */
         $response = $event->getResponse();
         
         if (!$request->hasExtension(self::OPENID_NS_AX)) return;
@@ -116,9 +121,11 @@ class AXOpenIDExtensionModule extends Module {
 
     /**
      * @see SimpleID\Util\Forms\FormBuildEvent
+     * @return void
      */
     function onOpenidConsentFormBuild(FormBuildEvent $event) {
         $form_state = $event->getFormState();
+        /** @var \SimpleID\Protocols\OpenID\Request */
         $request = $form_state->getRequest();
         $prefs = $form_state['prefs'];
         
@@ -180,9 +187,11 @@ class AXOpenIDExtensionModule extends Module {
 
     /**
      * @see SimpleID\Util\Forms\FormSubmitEvent
+     * @return void
      */
     function onOpenidConsentFormSubmit(FormSubmitEvent $event) {
         $form_state = $event->getFormState();
+        /** @var \SimpleID\Protocols\OpenID\Response */
         $response = $form_state->getResponse();
         $prefs =& $form_state->pathRef('prefs');
 
@@ -224,6 +233,9 @@ class AXOpenIDExtensionModule extends Module {
         $prefs['consents']['sreg'] = $form;
     }
 
+    /**
+     * @return void
+     */
     public function onProfileBlocks(UIBuildEvent $event) {
         $user = $this->auth->getUser();
 
@@ -250,8 +262,9 @@ class AXOpenIDExtensionModule extends Module {
      * OpenID Connect user information (user_info section) and the Simple Registration
      * Extension (sreg section).
      *
+     * @param \SimpleID\Models\User $user the user to look up
      * @param string $type the type URI to look up
-     * @return string the value or NULL if not found
+     * @return string|array<mixed>|null the value or NULL if not found
      */
     protected function getValue($user, $type) {
         $ax = (isset($user['ax'])) ? $user['ax'] : [];

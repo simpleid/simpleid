@@ -34,6 +34,7 @@ trait GenericEventTrait {
      * 
      * @param string $eventName the name of the event, or the name of the
      * class if null
+     * @return void
      */
     protected function setEventName($eventName = null) {
         if ($eventName == null) {

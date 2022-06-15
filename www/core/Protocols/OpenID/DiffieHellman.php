@@ -100,7 +100,7 @@ class DiffieHellman {
      *
      * @param string $mac_key the MAC key, in binary representation
      * @param string $dh_consumer_public the consumer's public key, in Base64 representation
-     * @return array an array containing (a) dh_server_public - the server's public key (in Base64), and (b)
+     * @return array<string, string> an array containing (a) dh_server_public - the server's public key (in Base64), and (b)
      * enc_mac_key encrypted MAC key (in Base64), encrypted using the Diffie-Hellman shared secret
      */
     public function associateAsServer($mac_key, $dh_consumer_public) {        
@@ -137,7 +137,9 @@ class DiffieHellman {
      * @return string the public key in Base64
      */
     public function getPublicKey() {
-        return base64_encode($this->y->val(256));
+        $key = $this->y->val(256);
+        assert($key != false);
+        return base64_encode($key);
     }
 
     /**
@@ -166,7 +168,7 @@ class DiffieHellman {
     /**
      * Encrypts/decrypts and encodes the MAC key.
      *
-     * @param resource $ZZ the Diffie-Hellman key exchange shared secret as a bignum
+     * @param BigNum $ZZ the Diffie-Hellman key exchange shared secret as a bignum
      * @param string $mac_key a byte stream containing the MAC key
      * @return string the encrypted MAC key in Base64 representation
      */
@@ -190,6 +192,7 @@ class DiffieHellman {
      */
     protected function xorCrypt($key, $plain_cipher) {
         $keystream = $key->val(256);
+        assert($keystream != false);
         $hashed_key = hash($this->algo, $keystream, true);
         
         $cipher_plain = "";
@@ -203,6 +206,7 @@ class DiffieHellman {
     /**
      * Generates a key pair for Diffie-Hellman key exchange.
      *
+     * @return void
      */
     private function generateKeyPair() {
         // Generate the private key - a random number which is less than p
@@ -221,11 +225,12 @@ class DiffieHellman {
      * @return BigNum the random integer as a bignum
      */
     private function generateRandom($stop) {
-        $duplicate_cache = [];
+        static $duplicate_cache = [];
         $rand = new Random();
       
         // Used as the key for the duplicate cache
         $rbytes = $stop->val(256);
+        assert($rbytes != false);
       
         if (array_key_exists($rbytes, $duplicate_cache)) {
             list($duplicate, $nbytes) = $duplicate_cache[$rbytes];
@@ -237,7 +242,7 @@ class DiffieHellman {
             }
         
             $mxrand = new BigNum(256);
-            $mxrand = $mxrand->pow(new BigNum($nbytes));
+            $mxrand = $mxrand->pow($nbytes);
 
             // If we get a number less than this, then it is in the
             // duplicated range.

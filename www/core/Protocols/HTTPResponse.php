@@ -27,20 +27,29 @@ namespace SimpleID\Protocols;
  * FatFree framework.
  */
 class HTTPResponse {
-
+    /** @var bool */
     private $isNetworkError = false;
+    /** @var bool */
     private $isHTTPError = false;
 
+    /** @var string */
     private $version;
+
+    /** @var string|null */
     private $responseCode = null;
+
+    /** @var string */
     private $body;
+
+    /** @var array<string, string> */
     private $headers = [];
 
     /**
      * Constructs a HTTPResponse object from a response made using the
      * FatFree framework.
      * 
-     * @param array $response the response from the HTTP request
+     * @param array<string, mixed>|false $response the response from the HTTP request
+     * @see https://fatfreeframework.com/3.8/web#request
      */
     public function __construct($response) {
         if ($response === false) {
@@ -53,8 +62,11 @@ class HTTPResponse {
         $this->readHeaders($response['headers']);
     }
 
-    private function readHeaders($headers)
-    {
+    /**
+     * @param array<string> $headers
+     * @return void
+     */
+    private function readHeaders($headers) {
         // Get the status line
         $status = array_shift($headers);
 
@@ -74,7 +86,7 @@ class HTTPResponse {
         // RFC 2616 states that all unknown HTTP codes must be treated the same as the
         // base code in their class.
         if (!in_array($code, $valid_codes)) {
-            $this->responseCode = floor(intval($code) / 100) * 100;
+            $this->responseCode = strval(floor(intval($code) / 100) * 100);
         }
 
         $this->isHTTPError = !in_array($this->responseCode, [200, 304]);
@@ -84,7 +96,8 @@ class HTTPResponse {
             // after a redirect. In this case drop all previous headers and start anew.
             if (preg_match('@^HTTP/\d+(\.\d+)? \d{3}@', $headers[0])) {
                 $this->headers = [];
-                return $this->readHeaders($headers);
+                $this->readHeaders($headers);
+                return;
             }
             $field = array_shift($headers);
             list($header, $value) = explode(':', trim($field), 2);
@@ -142,7 +155,7 @@ class HTTPResponse {
     /**
      * Returns the HTTP version
      *
-     * @return float the HTTP version
+     * @return string the HTTP version
      */
     public function getVersion() {
         return $this->version;

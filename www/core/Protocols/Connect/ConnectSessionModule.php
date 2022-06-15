@@ -48,6 +48,7 @@ class ConnectSessionModule extends Module {
      * Provides a page for use in an iframe to determine whether session status
      * has changed
      *
+     * @return void
      */
     public function check_session() {
         $auth = AuthManager::instance();
@@ -60,6 +61,10 @@ class ConnectSessionModule extends Module {
 
     /**
      * Relying party-initiated logout endpoint
+     * 
+     * @param \Base $f3
+     * @param array<string, mixed> $params
+     * @return void
      */
     public function logout($f3, $params) {
         $store = StoreManager::instance();
@@ -151,6 +156,10 @@ class ConnectSessionModule extends Module {
         }
     }
 
+    /**
+     * @param FormState|null $form_state
+     * @return void
+     */
     protected function logoutForm($form_state = null) {
         if ($form_state == null) $form_state = new FormState();
         $tpl = new \Template();
@@ -172,7 +181,9 @@ class ConnectSessionModule extends Module {
     }
 
     /**
-     * 
+     * @param \Base $f3
+     * @param array<string, mixed> $params
+     * @return void
      */
     public function logoutComplete($f3, $params) {
         $token = new SecurityToken();
@@ -193,6 +204,7 @@ class ConnectSessionModule extends Module {
      * Builds the OpenID Connect Session Management response on a successful
      * authentication.
      * 
+     * @return void
      * @see SimpleID\Protocols\OAuth\OAuthAuthGrantEvent
      */
     function onOAuthAuthGrantEvent(OAuthAuthGrantEvent $event) {
@@ -203,7 +215,7 @@ class ConnectSessionModule extends Module {
     }
 
     /**
-     * 
+     * @return void
      */
     public function onConnectConfiguration(BaseDataCollectionEvent $event) {
         $event->addResult([
@@ -244,6 +256,7 @@ class ConnectSessionModule extends Module {
      */
     private function getOrigin($uri) {
         $parts = parse_url($uri);
+        if ($parts == false) return $uri;
         
         $origin = $parts['scheme'] . '://';
         $origin .= $parts['host'];

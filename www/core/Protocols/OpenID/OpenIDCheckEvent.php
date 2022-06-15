@@ -60,8 +60,13 @@ use SimpleID\Protocols\ProtocolResultTrait;
 class OpenIDCheckEvent implements ProtocolResult {
     use ProtocolResultTrait;
 
+    /** @var Request */
     protected $request;
+
+    /** @var bool */
     protected $immediate;
+
+    /** @var string|null */
     protected $identity = null;
 
     public function __construct(Request $request, bool $immediate, ?string $identity = null) {

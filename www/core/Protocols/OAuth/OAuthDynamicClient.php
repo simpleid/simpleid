@@ -41,6 +41,8 @@ class OAuthDynamicClient extends OAuthClient {
 
     /**
      * Fetches the JSON web key set from the `jwks_uri` parameter.
+     * 
+     * @return void
      */
     public function fetchJWKs() {
         if (isset($this->container['oauth']['jwks_uri'])) {
@@ -59,7 +61,7 @@ class OAuthDynamicClient extends OAuthClient {
     /**
      * Returns the dynamic client's metadata.
      *
-     * @return array the dynamic client's metadata
+     * @return array<string, mixed> the dynamic client's metadata
      */
     public function getDynamicClientInfo() {
         $results = array_merge($this->container['oauth'], [

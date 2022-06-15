@@ -30,8 +30,13 @@ use SimpleID\Util\Forms\FormSubmitEvent;
  * 
  */
 class LoginFormSubmitEvent extends FormSubmitEvent implements AuthResultInterface {
+    /** @var User */
     protected $user = null;
+
+    /** @var int */
     protected $auth_level = AuthManager::AUTH_LEVEL_SESSION;
+
+    /** @var array<string> */
     protected $auth_module_names = [];
 
     /**
@@ -61,6 +66,7 @@ class LoginFormSubmitEvent extends FormSubmitEvent implements AuthResultInterfac
      * authenticated.
      * 
      * @param \SimpleID\Models\User $user the user
+     * @return void
      */
     public function setUser(User $user) {
         $this->user = $user;
@@ -83,6 +89,7 @@ class LoginFormSubmitEvent extends FormSubmitEvent implements AuthResultInterfac
      * is ignored.
      * 
      * @param int $auth_level the authentication level
+     * @return void
      */
     public function setAuthLevel($auth_level) {
         $this->auth_level = max($auth_level, $this->auth_level);
@@ -100,6 +107,7 @@ class LoginFormSubmitEvent extends FormSubmitEvent implements AuthResultInterfac
      * 
      * @param string $auth_module_name the name of the module that
      * authenticated the user
+     * @return void
      */
     public function addAuthModuleName($auth_module_name) {
         $this->auth_module_names[] = $auth_module_name;
@@ -108,7 +116,7 @@ class LoginFormSubmitEvent extends FormSubmitEvent implements AuthResultInterfac
     /**
      * Returns the name of the modules that authenticated user.
      * 
-     * @return string the name of the modules
+     * @return array<string> the name of the modules
      */
     public function getAuthModuleNames() {
         return array_unique($this->auth_module_names);

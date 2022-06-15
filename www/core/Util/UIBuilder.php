@@ -37,10 +37,10 @@ namespace SimpleID\Util;
 class UIBuilder {
 
 
-    /** @var array */
+    /** @var array<array<mixed>> */
     protected $blocks = [];
 
-    /** @var array */
+    /** @var array<string, array<mixed>> */
     protected $attachments = [];
 
 
@@ -50,7 +50,7 @@ class UIBuilder {
      * @param string $id the block ID
      * @param string $content the contents
      * @param int $weight the weight
-     * @param array $additional additional data
+     * @param array<string, mixed> $additional additional data
      * @return UIBuilder
      */
     public function addBlock($id, $content, $weight = 0, $additional = []) {
@@ -104,7 +104,7 @@ class UIBuilder {
      * Retrieves the blocks from the builder, ordered by the
      * weight, from lowest to highest.
      * 
-     * @return array
+     * @return array<array<mixed>>
      */
     public function getBlocks() {
         uasort($this->blocks, function($a, $b) { if ($a['#weight'] == $b['#weight']) { return 0; } return ($a['#weight'] < $b['#weight']) ? -1 : 1; });
@@ -121,7 +121,7 @@ class UIBuilder {
      * Note that the value array may contain duplicates.  To filter
      * for unique values, use the {@link getAttachmentsByType()} method.
      * 
-     * @return array the attachments
+     * @return array<string, array<mixed>> the attachments
      */
     public function getAttachments() {
         return $this->attachments;
@@ -131,7 +131,7 @@ class UIBuilder {
      * Returns an array of attachment types currently attached to the
      * builder.
      * 
-     * @return array
+     * @return array<string>
      */
     public function getAttachmentTypes() {
         return array_keys($this->attachments);
@@ -143,7 +143,7 @@ class UIBuilder {
      * Only unique elements are returned.
      * 
      * @param string $attachment_type the attachment type
-     * @return array
+     * @return array<array<mixed>>
      */
     public function getAttachmentsByType($attachment_type) {
         if (!isset($this->attachments[$attachment_type])) return [];

@@ -44,6 +44,7 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
     const CLIENT_REGISTRATION_INIT_SCOPE = 'tag:simpleid.sf.net,2014:client_register:init';
     const CLIENT_REGISTRATION_ACCESS_SCOPE = 'tag:simpleid.sf.net,2014:client_register:access';
 
+    /** @var array<string, string>|null */
     static protected $metadata_map = NULL;
 
     static function init($f3) {
@@ -94,6 +95,8 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
 
     /**
      * Registration endpoint
+     * 
+     * @return void
      */
     public function register() {
         $rand = new Random();
@@ -136,6 +139,7 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
 
         foreach ($request['redirect_uris'] as $redirect_uri) {
             $parts = parse_url($redirect_uri);
+            if ($parts == false) continue;
 
             if (isset($parts['fragment'])) {
                 $response->setError('invalid_redirect_uri', 'redirect_uris cannot contain a fragment')->renderJSON();
@@ -211,6 +215,8 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
 
     /**
      * Configuration endpoint
+     * 
+     * @return void
      */
     public function get() {
         $this->checkHttps('error');
@@ -237,7 +243,7 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
     }
 
     /**
-     * 
+     * @return void
      */
     public function onConnectConfiguration(BaseDataCollectionEvent $event) {
         $event->addResult([ 'registration_endpoint' => $this->getCanonicalURL('@connect_client_register') ]);
@@ -250,7 +256,7 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
      * whether the URIs in that document are contained in `$expected_redirect_uris`
      *
      * @param string $sector_identifier_uri the sector identifier URI
-     * @param array $expected_redirect_uris an array of URIs that the document in `$sector_identifier_uri`
+     * @param array<string> $expected_redirect_uris an array of URIs that the document in `$sector_identifier_uri`
      * is expected to match
      * @return bool true if the sector identifier is verified
      */

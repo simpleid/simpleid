@@ -38,7 +38,7 @@ use SimpleID\Store\StoreManager;
  * @see https://branca.io/
  */
 class SecurityToken {
-
+    /** @var string */
     static private $site_token = null;
 
     const OPTION_DEFAULT = 0;
@@ -52,7 +52,7 @@ class SecurityToken {
     /** @var Branca the branca token generator */
     private $branca;
 
-    /** @var array the data (i.e. payload plus headers) to be encoded in
+    /** @var array<string, mixed> the data (i.e. payload plus headers) to be encoded in
      * the token */
     private $data = null;
 
@@ -90,7 +90,10 @@ class SecurityToken {
             return null;
         }
 
-        $this->data = json_decode(gzuncompress($message), true);
+        $decompressed = gzuncompress($message);
+        if ($decompressed == false) return null;
+
+        $this->data = json_decode($decompressed, true);
 
         if (($this->data['o'] & self::OPTION_BIND_SESSION) == self::OPTION_BIND_SESSION) {
             if (!isset($this->data['s'])) return null;
@@ -121,7 +124,7 @@ class SecurityToken {
      * @param string $expected the expected payload
      * @param int $ttl the number of seconds from which the token is considered
      * expired
-     * @return true if the token is valid and the payload matches the expected
+     * @return bool true if the token is valid and the payload matches the expected
      * string
      */
     public function verify($token, $expected, $ttl = null) {
@@ -151,7 +154,11 @@ class SecurityToken {
             $this->data['s'] = session_id();
         }
 
-        $token = $this->branca->encode(gzcompress(json_encode($this->data)));
+        $encoded = json_encode($this->data);
+        if ($encoded == false) return new \RuntimeException();
+        $compressed = gzcompress($encoded);
+        if ($compressed == false) return new \RuntimeException();
+        $token = $this->branca->encode($compressed);
 
         if (($options & self::OPTION_NONCE) == self::OPTION_NONCE) {
             $cache = \Cache::instance();

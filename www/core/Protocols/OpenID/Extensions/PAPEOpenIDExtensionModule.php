@@ -52,6 +52,7 @@ class PAPEOpenIDExtensionModule extends Module implements ProtocolResult {
      * Returns the support for PAPE in SimpleID XRDS document
      *
      * @param BaseDataCollectionEvent $event
+     * @return void
      */
     public function onXrdsTypes(BaseDataCollectionEvent $event) {
         $event->addResult([
@@ -62,12 +63,13 @@ class PAPEOpenIDExtensionModule extends Module implements ProtocolResult {
 
     /**
      * @see SimpleID\Protocols\OpenID\OpenIDCheckEvent
+     * @return void
      */
     public function onOpenIDCheckEvent(OpenIDCheckEvent $event) {
         $request = $event->getRequest();
 
         // We only respond if the extension is requested
-        if (!$request->hasExtension(self::OPENID_NS_PAPE)) return null;
+        if (!$request->hasExtension(self::OPENID_NS_PAPE)) return;
         
         // See if we are choosing an identity and save for later
         // This may be used by pape_response() to produce a private identifier
@@ -80,7 +82,7 @@ class PAPEOpenIDExtensionModule extends Module implements ProtocolResult {
             $auth = AuthManager::instance();
 
             // If we are not logged in then we don't need to do anything
-            if (!$auth->isLoggedIn()) return NULL;
+            if (!$auth->isLoggedIn()) return;
 
             $auth_level = $auth->getAuthLevel();
             if ($auth_level == null) $auth_level = AuthManager::AUTH_LEVEL_SESSION;
@@ -93,25 +95,26 @@ class PAPEOpenIDExtensionModule extends Module implements ProtocolResult {
             if (($auth_level < AuthManager::AUTH_LEVEL_CREDENTIALS) 
                 || ((time() - $auth->getAuthTime()) > $pape_request['max_auth_age'])) {
                 $this->f3->set('message', $this->f3->get('intl.common.reenter_credentials'));
-                return self::CHECKID_REENTER_CREDENTIALS;
+                $event->setResult(self::CHECKID_REENTER_CREDENTIALS);
             }
         }
     }
 
     /**
      * @see SimpleID\Protocols\OpenID\OpenIDResponseBuildEvent
+     * @return void
      */
     public function onOpenIDResponseBuildEvent(OpenIDResponseBuildEvent $event) {
         $auth = AuthManager::instance();
         
         // We only deal with positive assertions
-        if (!$event->isPositiveAssertion()) return [];
+        if (!$event->isPositiveAssertion()) return;
         
         // We only respond if we are using OpenID 2 or later
         $request = $event->getRequest();
         $response = $event->getResponse();
         
-        if ($request->getVersion() < Message::OPENID_VERSION_2) return [];
+        if ($request->getVersion() < Message::OPENID_VERSION_2) return;
         
         // Get what is requested
         $pape_request = $request->getParamsForExtension(self::OPENID_NS_PAPE);

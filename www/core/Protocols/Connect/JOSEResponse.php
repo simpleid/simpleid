@@ -43,14 +43,22 @@ use SimpleJWT\Crypt\CryptException;
  * and {@link setHeader()} methods.
  */
 class JOSEResponse extends ArrayWrapper {
-
+    /** @var string */
     protected $issuer;
+
+    /** @var \SimpleID\Protocols\OAuth\OAuthClient */
     protected $client;
 
+    /** @var string */
     protected $signed_response_alg = null;
+
+    /** @var string */
     protected $encrypted_response_alg = null;
+
+    /** @var string */
     protected $encrypted_response_enc = null;
 
+    /** @var array<string, string> */
     protected $headers = [];
 
     /**
@@ -70,7 +78,7 @@ class JOSEResponse extends ArrayWrapper {
      * will be sent
      * @param string $path_prefix the prefix from which paths will be formed and passed
      * to {@link ArrayWrapper::pathGet()} to get the client configuration
-     * @param array $data the initial claims
+     * @param array<string, mixed> $data the initial claims
      * @param string $default_signed_response_alg the default `_signed_response_alg` value
      * if the client configuration is not found
      */
@@ -98,7 +106,8 @@ class JOSEResponse extends ArrayWrapper {
     /**
      * Sets the headers for the JWT, overwriting all existing headers.
      *
-     * @param array $headers the headers to set
+     * @param array<string, string> $headers the headers to set
+     * @return void
      */
     function setHeaders($headers) {
         $this->headers = $headers;
@@ -109,6 +118,7 @@ class JOSEResponse extends ArrayWrapper {
      *
      * @param string $header the header to set
      * @param string $value the header value
+     * @return void
      */
     function setHeader($header, $value) {
         $this->headers[$header] = $value;
@@ -131,14 +141,17 @@ class JOSEResponse extends ArrayWrapper {
      *
      * @param string $claim the name of the claim
      * @param string $value the value over which the short hash to be calculated
+     * @return void
      */
     function setShortHashClaim($claim, $value) {
         $alg = ($this->signed_response_alg) ? $this->signed_response_alg : 'HS256';
-        /** @var \SimpleJWT\Crypt\SignatureAlgorithm $signer */
-        $signer = AlgorithmFactory::create($alg);
 
-        if ($signer) {
+        try {
+            /** @var \SimpleJWT\Crypt\SignatureAlgorithm $signer */
+            $signer = AlgorithmFactory::create($alg);
             $this->container[$claim] = $signer->shortHash($value);
+        } catch (\UnexpectedValueException $e) {
+            // Do nothing
         }
     }
 
@@ -150,6 +163,7 @@ class JOSEResponse extends ArrayWrapper {
      *
      * @param \SimpleJWT\Keys\KeySet $set the key set to be passed to the
      * {@link buildJOSE()} method.
+     * @return void
      */
     function render($set = null) {
         $jose = $this->buildJOSE($set);
@@ -175,13 +189,17 @@ class JOSEResponse extends ArrayWrapper {
      * @param \SimpleJWT\Keys\KeySet $set the key set used to sign and/or
      * encrypt the token.  If set to null, the default set of keys
      * configured for the client and the server are loaded
-     * @return string the response body
+     * @return string|null the response body
      */
     function buildJOSE($set = null) {
         $rand = new Random();
         $typ = $this->getType();
 
-        if ($typ == 'json') return json_encode($this->container);
+        if ($typ == 'json') {
+            $json = json_encode($this->container);
+            if ($json == false) return null;
+            return $json;
+        }
         
         if ($set == null) {
             $builder = new KeySetBuilder($this->client);

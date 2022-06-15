@@ -35,10 +35,15 @@ use SimpleID\Models\Client;
 class RelyingParty extends Client {
 
     // OpenID clients are always dynamic
+    /** @var bool */
     protected $dynamic = true;
 
+    /** @var string */
     private $store_id;
 
+    /**
+     * @param string $realm
+     */
     public function __construct($realm) {
         parent::__construct([
             'openid' => [ 'realm' => $realm, 'services' => NULL, 'discovery_time' => 0 ]
@@ -80,6 +85,8 @@ class RelyingParty extends Client {
 
     /**
      * Performs XRDS discovery on this relying party.
+     * 
+     * @return void
      */
     public function discover() {
         $discovery = XRDSDiscovery::instance();
@@ -101,6 +108,7 @@ class RelyingParty extends Client {
      */
     protected static function getDiscoveryURL($realm) {
         $parts = parse_url($realm);
+        if ($parts == false) return $realm;
         $host = strtr($parts['host'], [ '*.' => 'www.' ]);
         
         $url = $parts['scheme'] . '://';
@@ -117,6 +125,10 @@ class RelyingParty extends Client {
         return $url;
     }
 
+    /**
+     * @param string $realm
+     * @return string
+     */
     public static function buildID($realm) {
         $url = self::getDiscoveryURL($realm);
         return '_' . trim(strtr(base64_encode(sha1($url, true)), '+/', '-_'), '=') . '.openid';

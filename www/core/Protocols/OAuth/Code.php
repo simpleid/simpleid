@@ -44,15 +44,28 @@ class Code implements TokenSource {
      */
     const CODE_SEPARATOR = '.';
 
+    /** @var string */
     private $cid;
+
+    /** @var string */
     private $aid;
+
+    /** @var string */
     private $auth_state;
     
+    /** @var string|null */
     private $redirect_uri;
+
+    /** @var array<string> */
     private $scope;
+
+    /** @var int */
     private $expires;
+
+    /** @var array<string, mixed> */
     private $additional;
 
+    /** @var bool */
     private $is_valid = false;
 
     /**
@@ -72,7 +85,7 @@ class Code implements TokenSource {
      * authorization code before using it to issue tokens.
      *
      * @param string $code the authorization code
-     * @return Code the authorization code object
+     * @return Code|null the authorization code object
      */
     static public function decode($code) {
         $results = self::load($code);
@@ -90,13 +103,14 @@ class Code implements TokenSource {
      * Loads an existing authorization code.
      *
      * @param string $code the authorization code
-     * @return Code the authorization code object
+     * @return Code|null the authorization code object
      */
     static protected function load($code) {
         $cache = \Cache::instance();
 
         if (!$cache->exists($code . '.code')) return null;
 
+        /** @var Code $payload */
         $payload = $cache->get($code . '.code');
         if ($payload->expires < time()) return null;
         $payload->is_valid = true;
@@ -113,9 +127,9 @@ class Code implements TokenSource {
      * this code
      * @param string|null $redirect_uri the redirect_uri parameter in the authorisation request, if
      * present
-     * @param array $scope the allowed scope - this should be a subset of the scope provided by the
+     * @param array<string>|string $scope the allowed scope - this should be a subset of the scope provided by the
      * authorization
-     * @param array $additional additional data to be stored in the authorization code
+     * @param array<string, mixed> $additional additional data to be stored in the authorization code
      * @return Code the authorization code object
      */
     static public function create($authorization, $redirect_uri, $scope, $additional = []) {
@@ -169,7 +183,7 @@ class Code implements TokenSource {
      * the authorization code has been issued, this function will return
      * `null`.
      *
-     * @return Authorization the OAuth authorization or `null`.
+     * @return Authorization|null the OAuth authorization or `null`.
      */
     public function getAuthorization() {
         $store = StoreManager::instance();
@@ -202,7 +216,7 @@ class Code implements TokenSource {
      * Returns the scope authorised by this authorization code.  Access tokens
      * issued from this authorization code must have this scope.
      *
-     * @return array the scope
+     * @return array<string> the scope
      */
     public function getScope() {
         return $this->scope;
@@ -211,7 +225,7 @@ class Code implements TokenSource {
     /**
      * Returns additional data associated with this authorization code.
      *
-     * @return array the additional data
+     * @return array<string, mixed> the additional data
      */
     public function getAdditional() {
         return $this->additional;
@@ -219,6 +233,8 @@ class Code implements TokenSource {
 
     /**
      * Deletes the authorization code from the cache, rendering it invalid.
+     * 
+     * @return void
      */
     public function clear() {
         $cache = \Cache::instance();

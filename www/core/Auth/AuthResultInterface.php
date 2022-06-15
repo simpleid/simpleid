@@ -60,7 +60,7 @@ interface AuthResultInterface extends StoppableEventInterface {
      * Returns the name of the modules that used to
      * authenticate the user in this session.
      * 
-     * @return array an array of fully qualified class names of the modules
+     * @return array<string> an array of fully qualified class names of the modules
      * involved in the authentication process
      */
     public function getAuthModuleNames();

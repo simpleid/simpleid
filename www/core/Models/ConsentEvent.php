@@ -26,10 +26,17 @@ class ConsentEvent implements \GenericEventInterface {
     /** @var string */
     protected $eventName;
 
+    /** @var string */
     protected $cid;
 
+    /** @var array<string, mixed> */
     protected $prefs;
 
+    /**
+     * @param string $eventName
+     * @param string $cid
+     * @param array<string, mixed> $prefs
+     */
     public function __construct($eventName, $cid, $prefs) {
         if ($eventName == null) {
             // We use static::class instead of self::class or __CLASS__
@@ -52,10 +59,16 @@ class ConsentEvent implements \GenericEventInterface {
     }
 
 
+    /**
+     * @return string
+     */
     public function getConsentID() {
         return $this->cid;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getUserPrefs() {
         return $this->prefs;
     }

@@ -29,7 +29,7 @@ namespace SimpleID\Util\Events;
 class OrderedDataCollectionEvent implements \GenericEventInterface {
     use GenericEventTrait;
 
-    /** @var array */
+    /** @var array<array<mixed>> */
     protected $results = [];
 
     /**
@@ -47,8 +47,9 @@ class OrderedDataCollectionEvent implements \GenericEventInterface {
      * Unlike the {@link BaseDataCollectionEvent}, results are always
      * appended to the results array and never merged
      * 
-     * @param array $result the data to add
+     * @param array<mixed> $result the data to add
      * @param int $weight the weight
+     * @return void
      */
     public function addResult($result, $weight = 0) {
         if ($result == null) return;
@@ -63,7 +64,7 @@ class OrderedDataCollectionEvent implements \GenericEventInterface {
      * Retrieves the data collected from the event, ordered by the
      * weight, from lowest to highest.
      * 
-     * @return array
+     * @return array<mixed>
      */
     public function getResults() {
         uasort($this->results, function($a, $b) { if ($a['#weight'] == $b['#weight']) { return 0; } return ($a['#weight'] < $b['#weight']) ? -1 : 1; });

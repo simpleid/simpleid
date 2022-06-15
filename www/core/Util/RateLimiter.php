@@ -90,7 +90,7 @@ class RateLimiter {
         $i++;
         if ($i > $this->limit) { return false;}
         $cache->set($cache_name, $i, $this->interval);
-        return ($return_remainder) ? ($this->limit - $i) : true;
+        return ($return_remainder) ? intval($this->limit - $i) : true;
     }
 
     /**
@@ -101,6 +101,7 @@ class RateLimiter {
      * specified, the IP address is used.
      *
      * @param string $src the source
+     * @return void
      */
     public function penalize($src = null) {
         if ($src == null) {
@@ -122,6 +123,7 @@ class RateLimiter {
      * specified, the IP address is used.
      *
      * @param string $src the source
+     * @return void
      */
     public function reset($src = null) {
         if ($src == null) {
@@ -134,6 +136,8 @@ class RateLimiter {
 
     /**
      * Resets the rate limiter for all sources.
+     * 
+     * @return void
      */
     public function resetAll() {
         $cache = \Cache::instance();

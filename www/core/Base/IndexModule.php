@@ -47,6 +47,7 @@ class IndexModule extends Module {
      * - Otherwise, if MyModule is loaded, the dashboard is displayed
      * - If MyModule is not loaded, a blank page is displayed
      *
+     * @return void
      */
     public function index() {
         $mgr = ModuleManager::instance();
@@ -56,7 +57,8 @@ class IndexModule extends Module {
 
         $event = new IndexEvent($_REQUEST);
         $dispatcher = \Events::instance();
-        if ($dispatcher->dispatch($event)->isPropagationStopped()) return;
+        $dispatcher->dispatch($event);
+        if ($event->isPropagationStopped()) return;
 
         $auth = AuthManager::instance();
     
@@ -84,6 +86,10 @@ class IndexModule extends Module {
      * - mt the HTTP method (e.g. GET, POST)
      * - rt the FatFree routing path
      * - rq an array containing the request parameters
+     * 
+     * @param \Base $f3
+     * @param array<string, mixed> $params
+     * @return void
      */
     public function continueRequest($f3, $params) {
         $token = new SecurityToken();

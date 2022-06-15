@@ -31,7 +31,7 @@ use SimpleID\Models\Client;
  * its storage requirements.
  */
 class DefaultStoreModule extends StoreModule {
-
+    /** @var array<string, mixed> */
     protected $config;
 
     public function __construct() {
@@ -41,6 +41,7 @@ class DefaultStoreModule extends StoreModule {
         $this->checkConfig();
     }
 
+    /** @return void */
     protected function checkConfig() {
         if (!is_dir($this->config['identities_dir'])) {
             $this->logger->log(\Psr\Log\LogLevel::CRITICAL, 'Identities directory not found.');
@@ -90,12 +91,14 @@ class DefaultStoreModule extends StoreModule {
     public function write($type, $id, $value) {
         switch ($type) {
             case 'client':
-                return $this->writeClient($id, $value);
+                /** @var Client $value */
+                $this->writeClient($id, $value);
+                break;
             case 'user':
                 // user settings are written using the keyvalue:write store
-                return;
+                break;
             default:
-                return $this->writeKeyValue($type, $id, $value);
+                $this->writeKeyValue($type, $id, $value);
         }
 
     }
@@ -103,7 +106,7 @@ class DefaultStoreModule extends StoreModule {
     public function delete($type, $id) {
         switch ($type) {
             default:
-                return $this->deleteKeyValue($type, $id);
+                $this->deleteKeyValue($type, $id);
         }
     }
 
@@ -112,7 +115,7 @@ class DefaultStoreModule extends StoreModule {
      *
      * @param string $criteria the criteria name
      * @param string $value the criteria value
-     * @return User the item or null if no item is found
+     * @return string|null the item or null if no item is found
      */
     protected function findUser($criteria, $value) {
         $cache = \Cache::instance();
@@ -123,11 +126,12 @@ class DefaultStoreModule extends StoreModule {
         $result = NULL;
         
         $dir = opendir($this->config['identities_dir']);
+        if ($dir == false) return null;
         
         while (($file = readdir($dir)) !== false) {
             $filename = $this->config['identities_dir'] . '/' . $file;
             
-            if (is_link($filename)) $filename = readlink($filename);
+            if (is_link($filename) && readlink($filename)) $filename = readlink($filename);
             if ((filetype($filename) != "file") || (!preg_match('/^(.+)\.user\.yml$/', $file, $matches))) continue;
             
             $uid = $matches[1];
@@ -179,7 +183,7 @@ class DefaultStoreModule extends StoreModule {
      * the {@link store_user_exists()} function
      *
      * @param string $uid the name of the user to load
-     * @return User data for the specified user
+     * @return User|null data for the specified user
      */
     protected function readUser($uid) {
         if (!$this->isValidName($uid) || !$this->hasUser($uid)) return null;
@@ -222,7 +226,7 @@ class DefaultStoreModule extends StoreModule {
      * the {@link hasClient()} function
      *
      * @param string $cid the name of the client to load
-     * @return User data for the specified user
+     * @return Client|null data for the specified user
      */
     protected function readClient($cid) {
         if (!$this->isValidName($cid) || !$this->hasClient($cid)) return null;
@@ -261,16 +265,17 @@ class DefaultStoreModule extends StoreModule {
      *
      * @param string $cid the name of the client
      * @param Client $client the data to save
+     * @return void
      */
     protected function writeClient($cid, $client) {
         if (!$this->isValidName($cid)) {
             trigger_error("Invalid client name for filesystem store", E_USER_ERROR);
-            return;
         }
         
         $store_file = $this->config['store_dir'] . "/$cid.client";
         $this->f3->mutex($store_file, function($f3, $store_file, $client) {
             $file = fopen($store_file, 'w');
+            if ($file == false) return;
             fwrite($file, $f3->serialize($client));
             fclose($file);
         }, [ $this->f3, $store_file, $client ]);
@@ -313,12 +318,11 @@ class DefaultStoreModule extends StoreModule {
      * @param string $type the item type
      * @param string $name the name of the key-value item to save
      * @param mixed $value the value of the key-value item
-     *
+     * @return void
      */
     protected function writeKeyValue($type, $name, $value) {
         if (!$this->isValidName($name . '.' . $type)) {
             trigger_error("Invalid name for filesystem store", E_USER_ERROR);
-            return;
         }
 
         $file = $this->getKeyValueFile($type, $name);
@@ -332,12 +336,11 @@ class DefaultStoreModule extends StoreModule {
      *
      * @param string $type the item type
      * @param string $name the name of the setting to delete
-     *
+     * @return void
      */
     protected function deleteKeyValue($type, $name) {
         if (!$this->isValidName($name . '.' . $type)) {
             trigger_error("Invalid name for filesystem store", E_USER_ERROR);
-            return;
         }
 
         $file = $this->getKeyValueFile($type, $name);
@@ -352,12 +355,16 @@ class DefaultStoreModule extends StoreModule {
      *
      * @param string $name the name to check
      * @return boolean whether the name is valid for use with this store 
-     *
      */
     protected function isValidName($name) {
-        return preg_match('!\A[^/\\\\]*\z!', $name);
+        return (preg_match('!\A[^/\\\\]*\z!', $name) != false);
     }
 
+    /**
+     * @param string $type
+     * @param string $name
+     * @return string
+     */
     private function getKeyValueFile($type, $name) {
         $name = str_replace('%7E', '~', rawurlencode($name));
         if (preg_match('/^\.+$/', $name)) $name = str_replace('.', '%2E', $name);
