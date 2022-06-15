@@ -74,7 +74,9 @@ class BigNum {
                 }
                 return;
             case 256:
-                $bytes = array_merge(unpack('C*', $str));
+                $unpacked = unpack('C*', $str);
+                assert($unpacked != false);
+                $bytes = array_merge($unpacked);
 
                 $value = (new BigNum(0))->value;
           
@@ -112,6 +114,7 @@ class BigNum {
                 if (BIGNUM_GMP) {
                     $base10 = gmp_strval($this->value, 10);
                 } else {
+                    /** @var string $base10 */
                     $base10 = $this->value;
                 }
 
@@ -205,12 +208,12 @@ class BigNum {
     /**
      * Raise base to power exp
      *
-     * @param BigNum $exp the exponent
+     * @param int $exp the exponent
      * @return BigNum a bignum representing this ^ exp
      */
     function pow($exp) {
         $result = new BigNum(0);
-        $result->value = $this->_pow($this->value, $exp->value);
+        $result->value = $this->_pow($this->value, $exp);
         return $result;
     }
 
@@ -267,7 +270,8 @@ class BigNum {
      * @return string
      */
     function __toString() {
-        return $this->val();
+        $val = $this->val();
+        return ($val) ? $val : 'NaN';
     }
 
     /**
@@ -281,6 +285,8 @@ class BigNum {
         if (BIGNUM_GMP) {
             return gmp_add($a, $b);
         } else {
+            /** @var string $a */
+            /** @var string $b */
             return bcadd($a, $b);
         }
     }
@@ -296,6 +302,8 @@ class BigNum {
         if (BIGNUM_GMP) {
             return gmp_mul($a, $b);
         } else {
+            /** @var string $a */
+            /** @var string $b */
             return bcmul($a, $b);
         }
     }
@@ -311,6 +319,8 @@ class BigNum {
         if (BIGNUM_GMP) {
             return gmp_div($a, $b);
         } else {
+            /** @var string $a */
+            /** @var string $b */
             return bcdiv($a, $b);
         }
     }
@@ -319,17 +329,15 @@ class BigNum {
      * Raise base to power exp
      *
      * @param \GMP|string $base the base
-     * @param mixed $exp the exponent, as an integer or a bignum
+     * @param int|string $exp the exponent, as an integer or a bignum
      * @return \GMP|string a bignum representing base ^ exp
      */
     function _pow($base, $exp) {
         if (BIGNUM_GMP) {
-            if ((is_resource($exp) && (get_resource_type($exp) == 'GMP integer'))
-                || (is_object($exp) && (get_class($exp) == 'GMP')))
-                 $exp = gmp_intval($exp);
-            return gmp_pow($base, $exp);
+            return gmp_pow($base, intval($exp));
         } else {
-            return bcpow($base, $exp);
+            /** @var string $base */
+            return bcpow($base, strval($exp));
         }
     }
 
@@ -344,6 +352,8 @@ class BigNum {
         if (BIGNUM_GMP) {
             return gmp_mod($n, $d);
         } else {
+            /** @var string $n */
+            /** @var string $d */
             return bcmod($n, $d);
         }
     }
@@ -354,16 +364,21 @@ class BigNum {
      * @param \GMP|string $base the base
      * @param \GMP|string $exp the exponent
      * @param \GMP|string $mod the modulo
-     * @return \GMP|string a bignum representing base ^ exp mod mod
+     * @return \GMP|string|null a bignum representing base ^ exp mod mod
      */
     protected function _powmod($base, $exp, $mod) {
         if (BIGNUM_GMP) {
             return gmp_powm($base, $exp, $mod);
         } elseif (function_exists('bcpowmod')) {
-            return bcpowmod($base, $exp, $mod);
+            /** @var string $base */
+            /** @var string $exp */
+            /** @var string $mod */
+            $result = bcpowmod($base, $exp, $mod);
+            if ($result == false) return null;
+            return $result;
         } else {
             $square = $this->_mod($base, $mod);
-            $result = 1;
+            $result = '1';
             while ($this->_cmp($exp, 0) > 0) {
                 if ($this->_mod($exp, 2)) {
                     $result = $this->_mod($this->_mul($result, $square), $mod);
@@ -386,6 +401,8 @@ class BigNum {
         if (BIGNUM_GMP) {
             return gmp_cmp($a, $b);
         } else {
+            /** @var string $a */
+            /** @var string $b */
             return bccomp($a, $b);
         }
     }

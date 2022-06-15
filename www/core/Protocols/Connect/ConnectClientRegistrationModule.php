@@ -139,6 +139,7 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
 
         foreach ($request['redirect_uris'] as $redirect_uri) {
             $parts = parse_url($redirect_uri);
+            if ($parts == false) continue;
 
             if (isset($parts['fragment'])) {
                 $response->setError('invalid_redirect_uri', 'redirect_uris cannot contain a fragment')->renderJSON();

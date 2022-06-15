@@ -126,11 +126,12 @@ class DefaultStoreModule extends StoreModule {
         $result = NULL;
         
         $dir = opendir($this->config['identities_dir']);
+        if ($dir == false) return null;
         
         while (($file = readdir($dir)) !== false) {
             $filename = $this->config['identities_dir'] . '/' . $file;
             
-            if (is_link($filename)) $filename = readlink($filename);
+            if (is_link($filename) && readlink($filename)) $filename = readlink($filename);
             if ((filetype($filename) != "file") || (!preg_match('/^(.+)\.user\.yml$/', $file, $matches))) continue;
             
             $uid = $matches[1];
@@ -274,6 +275,7 @@ class DefaultStoreModule extends StoreModule {
         $store_file = $this->config['store_dir'] . "/$cid.client";
         $this->f3->mutex($store_file, function($f3, $store_file, $client) {
             $file = fopen($store_file, 'w');
+            if ($file == false) return;
             fwrite($file, $f3->serialize($client));
             fclose($file);
         }, [ $this->f3, $store_file, $client ]);
@@ -355,7 +357,7 @@ class DefaultStoreModule extends StoreModule {
      * @return boolean whether the name is valid for use with this store 
      */
     protected function isValidName($name) {
-        return preg_match('!\A[^/\\\\]*\z!', $name);
+        return (preg_match('!\A[^/\\\\]*\z!', $name) != false);
     }
 
     /**

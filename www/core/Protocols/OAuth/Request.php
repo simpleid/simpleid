@@ -133,7 +133,12 @@ class Request extends ArrayWrapper {
         $results = [];
 
         $header = $this->getHeader('Authorization');
-        list($scheme, $credentials) = preg_split('/\s+/', $header, 2);
+        $array = preg_split('/\s+/', $header, 2);
+        if ($array != false) {
+            list($scheme, $credentials) = $array;
+        } else {
+            return [ '#credentials' => $header ];
+        }
 
         $results['#scheme'] = HTTPResponse::httpCase($scheme);
         $results['#credentials'] = $credentials;
@@ -146,7 +151,7 @@ class Request extends ArrayWrapper {
             } else {
                 $matches = [];
                 preg_match_all('/([-a-zA-Z]+)=\"([^\"]+)\"/', $credentials, $matches, PREG_SET_ORDER);
-                foreach ($matches as $match) $results[$match[1]] = $match[2];
+                foreach ($matches as $match) $results[strval($match[1])] = $match[2];
             }
         }
 
@@ -165,7 +170,9 @@ class Request extends ArrayWrapper {
      */
     public function paramToArray($param, $delimiter = '/\s+/') {
         if (!isset($this->container[$param])) return null;
-        return preg_split($delimiter, $this->container[$param]);
+        $split = preg_split($delimiter, $this->container[$param]);
+        if ($split == false) return $this->container[$param];
+        return $split;
     }
 
     /**
@@ -200,6 +207,7 @@ class Request extends ArrayWrapper {
         if (!$this->paramContains($param, $value)) return;
 
         $items = preg_split($delimiter, $this->container[$param]);
+        if ($items == false) $items = $this->container[$param];
         $items = array_diff($items, [ $value ]);
 
         preg_match($delimiter, $this->container[$param], $matches);

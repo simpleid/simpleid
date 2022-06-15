@@ -108,6 +108,7 @@ class RelyingParty extends Client {
      */
     protected static function getDiscoveryURL($realm) {
         $parts = parse_url($realm);
+        if ($parts == false) return $realm;
         $host = strtr($parts['host'], [ '*.' => 'www.' ]);
         
         $url = $parts['scheme'] . '://';

@@ -90,7 +90,7 @@ class RateLimiter {
         $i++;
         if ($i > $this->limit) { return false;}
         $cache->set($cache_name, $i, $this->interval);
-        return ($return_remainder) ? ($this->limit - $i) : true;
+        return ($return_remainder) ? intval($this->limit - $i) : true;
     }
 
     /**

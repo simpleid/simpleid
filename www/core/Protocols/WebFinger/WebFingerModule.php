@@ -103,6 +103,7 @@ class WebFingerModule extends Module {
         if ($criteria == null) return null;
 
         foreach ($criteria as $criterion => $value) {
+            /** @var \SimpleID\Models\User $user */
             $user = $store->findUser($criterion, $value);
             if ($user != null) break;
         }

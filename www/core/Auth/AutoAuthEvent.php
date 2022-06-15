@@ -80,11 +80,12 @@ class AutoAuthEvent implements AuthResultInterface {
     }
 
     /**
-     * Returns the name of the module that authenticated user.
+     * Returns the name of the module that authenticated the user.
      * 
      * @return array<string> the name of the module
      */
     public function getAuthModuleNames() {
+        if ($this->auth_module_name == null) return [];
         return [ $this->auth_module_name ];
     }
 

@@ -490,6 +490,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
         } else {
             $sector_id = $client->getStoreID();
         }
+        if (!$sector_id) return null;
 
         $claims = [];
 
@@ -617,7 +618,8 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
         }
         
         $set = new KeySet();
-        $set->load(file_get_contents($config['public_jwks_file']));
+        $file = file_get_contents($config['public_jwks_file']);
+        if ($file) $set->load($file);
 
         if (!$set->isPublic()) {
             $this->f3->status(401);
@@ -642,6 +644,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
         $canonical_base_path = $config['canonical_base_path'];
 
         $parts = parse_url($canonical_base_path);
+        if ($parts == false) return $canonical_base_path;
         
         if ($secure == 'https') {
             $scheme = 'https';
@@ -657,7 +660,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
             if (isset($parts['pass'])) $url .= ':' . $parts['pass'];
             $url .= '@';
         }
-        $url .= $parts['host'];
+        if (isset($parts['host'])) $url .= $parts['host'];
         if (isset($parts['port'])) $url .= ':' . $parts['port'];
 
         return $url;

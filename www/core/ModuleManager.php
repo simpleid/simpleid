@@ -61,7 +61,7 @@ class ModuleManager extends Prefab {
         
         $info = $this->getModuleInfo($name);
         $module = new $name();
-        $this->modules[$name] = $module;
+        if ($module instanceof Module) $this->modules[$name] = $module;
         
         if (isset($info['asset_domain'])) {
             $this->f3->set('UI', $this->f3->get('UI') . ';' . $info['asset_dir']);

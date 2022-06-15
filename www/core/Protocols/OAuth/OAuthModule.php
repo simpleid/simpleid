@@ -151,7 +151,11 @@ class OAuthModule extends Module implements ProtocolResult {
         }
         
         $response_types = preg_split('/\s+/', $request['response_type']);
-        
+        if ($response_types == false) {
+            $this->logger->log(LogLevel::ERROR, 'Protocol Error: Incorrect response_type.');
+            $this->fatalError($this->f3->get('intl.core.oauth.invalid_repsonse_type'));
+            return;
+        }
         if (in_array('token', $response_types)) $response->setResponseMode(Response::FRAGMENT_RESPONSE_MODE);
 
         // 2. client_id (pass 1 - check that it exists)

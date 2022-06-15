@@ -402,6 +402,7 @@ class OpenIDModule extends Module implements ProtocolResult {
             $this->logger->log(LogLevel::INFO, 'OpenID identifier selection: Selected ' . $uid . ' [' . $identity . ']');
         } else {
             $identity = $request['openid.identity'];
+            /** @var \SimpleID\Models\User $test_user */
             $test_user = $store->findUser('openid.identity', $identity);
         }
         if ($test_user == NULL) return self::CHECKID_IDENTITY_NOT_EXIST;

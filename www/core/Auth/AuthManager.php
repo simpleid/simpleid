@@ -206,9 +206,11 @@ class AuthManager extends Prefab {
         if (isset($this->auth_info['modules'])) {
             $event = new BaseDataCollectionEvent('acr');
 
-            foreach ($this->auth_info['modules'] as $module) {
-                if (method_exists($module, 'onAcr')) {
-                    $module->onAcr($event);
+            foreach ($this->auth_info['modules'] as $module_name) {
+                /** @var string $module_name */
+                if (method_exists($module_name, 'onAcr')) {
+                    $module = $this->mgr->getModule($module_name);
+                    $module->onAcr($event);  // @phpstan-ignore-line
                 }
             }
             $module_acr = implode(' ', $event->getResults());

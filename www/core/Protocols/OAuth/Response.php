@@ -187,28 +187,32 @@ class Response extends ArrayWrapper {
             //    need to slot in the new query string properly.  We disassemble and
             //    reconstruct the URL.
             $parts = parse_url($redirect_uri);
-            
-            $url = $parts['scheme'] . '://';
-            if (isset($parts['user'])) {
-                $url .= $parts['user'];
-                if (isset($parts['pass'])) $url .= ':' . $parts['pass'];
-                $url .= '@';
-            }
-            $url .= $parts['host'];
-            if (isset($parts['port'])) $url .= ':' . $parts['port'];
-            if (isset($parts['path'])) $url .= $parts['path'];
-            
-            if (($this->response_mode == self::QUERY_RESPONSE_MODE) || (strpos($url, '#') === FALSE)) {
-                $url .= '?' . ((isset($parts['query'])) ? $parts['query'] . '&' : '') . $query;
-                if (isset($parts['fragment'])) $url .= '#' . $parts['fragment'];
-            } elseif ($this->response_mode == self::FRAGMENT_RESPONSE_MODE) {
-                // In theory $parts['fragment'] should be an empty string, but the
-                // current draft specification does not prohibit putting other things
-                // in the fragment.
-                if (isset($parts['query'])) {
-                    $url .= '?' . $parts['query'] . '#' . $parts['fragment'] . '&' . $query;
-                } else {
-                    $url .= '#' . $parts['fragment'] . '&' . $query;
+            if ($parts == false) {
+                $url = $redirect_uri;
+            } else {
+                $url = $parts['scheme'] . '://';
+                if (isset($parts['user'])) {
+                    $url .= $parts['user'];
+                    if (isset($parts['pass'])) $url .= ':' . $parts['pass'];
+                    $url .= '@';
+                }
+                if (isset($parts['host'])) $url .= $parts['host'];
+                if (isset($parts['port'])) $url .= ':' . $parts['port'];
+                if (isset($parts['path'])) $url .= $parts['path'];
+                
+                if (($this->response_mode == self::QUERY_RESPONSE_MODE) || (strpos($url, '#') === FALSE)) {
+                    $url .= '?' . ((isset($parts['query'])) ? $parts['query'] . '&' : '') . $query;
+                    if (isset($parts['fragment'])) $url .= '#' . $parts['fragment'];
+                } elseif ($this->response_mode == self::FRAGMENT_RESPONSE_MODE) {
+                    // In theory $parts['fragment'] should be an empty string, but the
+                    // current draft specification does not prohibit putting other things
+                    // in the fragment.
+                    if (!isset($parts['fragment'])) $parts['fragment'] = '';
+                    if (isset($parts['query'])) {
+                        $url .= '?' . $parts['query'] . '#' . $parts['fragment'] . '&' . $query;
+                    } else {
+                        $url .= '#' . $parts['fragment'] . '&' . $query;
+                    }
                 }
             }
         }

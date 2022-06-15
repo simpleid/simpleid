@@ -99,6 +99,7 @@ class Token {
 
         $this->id = $rand->id();
         $this->authorization = $authorization;
+        if (is_string($scope)) $scope = explode(' ', $scope);
         if (count($scope) == 0) {
             $this->scope = $authorization->getScope();
         } else {
@@ -327,7 +328,9 @@ class Token {
         $cache->set($this->getCacheKey(), $server_data, ($this->expire != NULL) ? $this->expire - time() : 0);
         $token_data[self::KEY_CACHE_HASH] = base64_encode(hash('sha256', serialize($server_data), true));
 
-        $this->encoded = $this->branca->encode(json_encode($token_data));
+        $json = json_encode($token_data);
+        assert($json != false);
+        $this->encoded = $this->branca->encode($json);
     }
 
     /**

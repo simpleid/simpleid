@@ -256,6 +256,7 @@ class ConnectSessionModule extends Module {
      */
     private function getOrigin($uri) {
         $parts = parse_url($uri);
+        if ($parts == false) return $uri;
         
         $origin = $parts['scheme'] . '://';
         $origin .= $parts['host'];

@@ -195,7 +195,11 @@ class JOSEResponse extends ArrayWrapper {
         $rand = new Random();
         $typ = $this->getType();
 
-        if ($typ == 'json') return json_encode($this->container);
+        if ($typ == 'json') {
+            $json = json_encode($this->container);
+            if ($json == false) return null;
+            return $json;
+        }
         
         if ($set == null) {
             $builder = new KeySetBuilder($this->client);

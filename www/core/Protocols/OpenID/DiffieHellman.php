@@ -137,7 +137,9 @@ class DiffieHellman {
      * @return string the public key in Base64
      */
     public function getPublicKey() {
-        return base64_encode($this->y->val(256));
+        $key = $this->y->val(256);
+        assert($key != false);
+        return base64_encode($key);
     }
 
     /**
@@ -190,6 +192,7 @@ class DiffieHellman {
      */
     protected function xorCrypt($key, $plain_cipher) {
         $keystream = $key->val(256);
+        assert($keystream != false);
         $hashed_key = hash($this->algo, $keystream, true);
         
         $cipher_plain = "";
@@ -227,6 +230,7 @@ class DiffieHellman {
       
         // Used as the key for the duplicate cache
         $rbytes = $stop->val(256);
+        assert($rbytes != false);
       
         if (array_key_exists($rbytes, $duplicate_cache)) {
             list($duplicate, $nbytes) = $duplicate_cache[$rbytes];
@@ -238,7 +242,7 @@ class DiffieHellman {
             }
         
             $mxrand = new BigNum(256);
-            $mxrand = $mxrand->pow(new BigNum($nbytes));
+            $mxrand = $mxrand->pow($nbytes);
 
             // If we get a number less than this, then it is in the
             // duplicated range.

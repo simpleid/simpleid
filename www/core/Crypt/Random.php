@@ -35,7 +35,7 @@ class Random {
     /**
      * Obtains a number of random bytes using the native `random_bytes()` function.
      *
-     * @param int $num_bytes the number of bytes to generate
+     * @param int<1, max> $num_bytes the number of bytes to generate
      * @return string a string containing random bytes
      */
     static function bytes($num_bytes) {
@@ -53,7 +53,7 @@ class Random {
      * characters are used so that users are not confused and attempt to decode
      * the returned string.
      *
-     * @param int $num_bytes the approximate number of bytes of entropy in the
+     * @param int<1, max> $num_bytes the approximate number of bytes of entropy in the
      * random string
      * @return string the random string
      */
@@ -69,7 +69,7 @@ class Random {
      * characters (case sensitive).  The conversion method is a form of Base58
      * encoding, which strips out confusing characters such as I, l, O and 0.
      *
-     * @param int $num_chars the number of characters in the password
+     * @param int<1, max> $num_chars the number of characters in the password
      * @return string the random password
      */
     function password($num_chars = 18) {
@@ -105,12 +105,14 @@ class Random {
      * 
      * Note that the identifier returned is not cryptographically secure.
      *
-     * @param int $num_digits the number of digits
+     * @param int<1, max> $num_digits the number of digits
      * @return string a short-lived code
      */
     function shortCode($num_digits = 6) {
         $base = new BigNum(self::bytes($num_digits), 256);
-        return substr($base->val(10), -$num_digits);
+        $val = $base->val(10);
+        assert($val != false);
+        return substr($val, -$num_digits);
     }
 }
 ?>

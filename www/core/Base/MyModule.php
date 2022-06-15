@@ -304,7 +304,7 @@ class MyModule extends Module {
      */
     public function insertNav() {
         $event = new OrderedDataCollectionEvent('nav');
-        $event = \Events::instance()->dispatch($event);
+        \Events::instance()->dispatch($event);
         $this->f3->set('nav', $event->getResults());
     }
 
@@ -321,7 +321,7 @@ class MyModule extends Module {
         $this->checkHttps('redirect', true);
 
         $event = new UIBuildEvent($event_name);
-        $event = \Events::instance()->dispatch($event);
+        \Events::instance()->dispatch($event);
 
         $tpl = new \Template();
         // TODO $event->getAttachments();

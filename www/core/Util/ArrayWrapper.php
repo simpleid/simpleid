@@ -293,10 +293,15 @@ class ArrayWrapper implements ArrayAccess, Countable, IteratorAggregate {
 
     /**
      * @param string $path
-     * @return array<string>|false
+     * @return array<string>
      */
     private function pathSplit($path) {
-        return preg_split('/\[\h*[\'"]?(.+?)[\'"]?\h*\]|(->)|\./', $path, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        $split = preg_split('/\[\h*[\'"]?(.+?)[\'"]?\h*\]|(->)|\./', $path, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        if ($split === false) {
+            return [ $path ];
+        } else {
+            return $split;
+        }
     }
 }
 ?>

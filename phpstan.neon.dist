@@ -1,6 +1,8 @@
 parameters:
-  level: 6
+  level: 7
   paths:
     - www/core
   scanFiles:
     - www/bootstrap.inc.php
+  ignoreErrors:
+    - "#^Parameter \\#1 \\$callback of function call_user_func(_array)? expects callable\\(\\)\\: mixed, array\\{[^}]+\\} given\\.$#"

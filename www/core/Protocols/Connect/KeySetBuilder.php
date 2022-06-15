@@ -77,7 +77,9 @@ class KeySetBuilder {
 
         if (isset($this->client['oauth']['jwks'])) {
             $client_jwks = new KeySet();
-            $client_jwks->load(json_encode($this->client['oauth']['jwks']));
+            $json = json_encode($this->client['oauth']['jwks']);
+            if ($json == false) return $this;
+            $client_jwks->load($json);
             $this->set->addAll($client_jwks);
         }
 
@@ -96,7 +98,9 @@ class KeySetBuilder {
 
         if (isset($config['private_jwks_file'])) {
             $server_jwks = new KeySet();
-            $server_jwks->load(file_get_contents($config['private_jwks_file']));
+            $file = file_get_contents($config['private_jwks_file']);
+            if ($file == false) return $this;
+            $server_jwks->load($file);
             $this->set->addAll($server_jwks);
         }
 
@@ -114,7 +118,9 @@ class KeySetBuilder {
 
         if (isset($config['public_jwks_file'])) {
             $server_jwks = new KeySet();
-            $server_jwks->load(file_get_contents($config['public_jwks_file']));
+            $file = file_get_contents($config['public_jwks_file']);
+            if ($file == false) return $this;
+            $server_jwks->load($file);
             $this->set->addAll($server_jwks);
         }
 

@@ -104,8 +104,10 @@ class Request extends Message {
     function returnToMatches($realm, $strict = true) {
         $url = parse_url($this->container['openid.return_to']);
         $realm = parse_url($realm);
+        if ($url == false) return false;
+        if ($realm == false) return false;
         
-        foreach(array('user', 'pass', 'fragment') as $key) {
+        foreach(['user', 'pass', 'fragment'] as $key) {
             if (array_key_exists($key, $url) || array_key_exists($key, $realm))
                 return false;
         }
@@ -123,18 +125,26 @@ class Request extends Message {
         if (($url['port'] != $realm['port']))
             return false;
         
+        $realm['host'] = strval($realm['host']);
         if (substr($realm['host'], 0, 2) == '*.') {
             $realm_re = '/^([^.]+\.)?' . preg_quote(substr($realm['host'], 2)) . '$/i';
         } else {
             $realm_re = '/^' . preg_quote($realm['host']) . '$/i';
         }
         
+        $url['host'] = strval($url['host']);
         if (!preg_match($realm_re, $url['host'])) return false;
         
-        if (!isset($url['path']))
+        if (!isset($url['path'])) {
             $url['path'] = '';
-        if (!isset($realm['path']))
+        } else {
+            $url['path'] = strval($url['path']);
+        }
+        if (!isset($realm['path'])) {
             $realm['path'] = '';
+        } else {
+            $realm['path'] = strval($realm['path']);
+        }
         if (substr($realm['path'], -1) == '/') $realm['path'] = substr($realm['path'], 0, -1);
         if (($url['path'] != $realm['path']) && !preg_match('#^' . preg_quote($realm['path']) . '/.*$#', $url['path'])) return false;
         

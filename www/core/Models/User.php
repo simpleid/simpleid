@@ -188,7 +188,8 @@ class User extends ArrayWrapper implements Serializable, Storable {
     private function toSecureArray($hidden_value = null) {
         $event = new BaseDataCollectionEvent('user_secret_data_paths');
         $copy = new ArrayWrapper($this->container);
-        $secret_paths = \Events::instance()->dispatch($event)->getResults();
+        \Events::instance()->dispatch($event);
+        $secret_paths = $event->getResults();
         if ($secret_paths == null) $secret_paths = [];
         $secret_paths[] = 'uid';
         foreach ($secret_paths as $path) {

@@ -52,6 +52,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
     public function setup() {
         $auth = AuthManager::instance();
         $store = StoreManager::instance();
+        /** @var \SimpleID\Models\User $user */
         $user = $auth->getUser();
 
         $tpl = new \Template();
@@ -119,7 +120,9 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
         }
 
         $secret = new BigNum($params['secret'], 256);
-        $code = strtr($secret->val(32), '0123456789abcdefghijklmnopqrstuv', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567');
+        $base32 = $secret->val(32);
+        assert($base32 != false);
+        $code = strtr($base32, '0123456789abcdefghijklmnopqrstuv', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567');
         $code = str_repeat('A', 16 - strlen($code)) . $code;
         for ($i = 0; $i < strlen($code); $i += 4) {
             $this->f3->set('secret' . ($i + 1), substr($code, $i, 4));
@@ -231,6 +234,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             $store = StoreManager::instance();
 
             $uid = $form_state['uid'];
+            /** @var \SimpleID\Models\User $test_user */
             $test_user = $store->loadUser($form_state['uid']);
             $params = $test_user['otp'];
             
@@ -361,7 +365,9 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
      */
     public function hotp($secret, $data, $algorithm = 'sha1', $digits = 6) {
         // unpack produces a 1-based array, we use array_merge to convert it to 0-based
-        $hmac = array_merge(unpack('C*', hash_hmac(strtolower($algorithm), $data, $secret, true)));
+        $unpacked = unpack('C*', hash_hmac(strtolower($algorithm), $data, $secret, true));
+        assert($unpacked != false);
+        $hmac = array_merge($unpacked);
         $offset = $hmac[19] & 0xf;
         $code = ($hmac[$offset + 0] & 0x7F) << 24 |
             ($hmac[$offset + 1] & 0xFF) << 16 |

@@ -127,7 +127,7 @@ class Code implements TokenSource {
      * this code
      * @param string|null $redirect_uri the redirect_uri parameter in the authorisation request, if
      * present
-     * @param array<string> $scope the allowed scope - this should be a subset of the scope provided by the
+     * @param array<string>|string $scope the allowed scope - this should be a subset of the scope provided by the
      * authorization
      * @param array<string, mixed> $additional additional data to be stored in the authorization code
      * @return Code the authorization code object

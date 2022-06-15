@@ -90,7 +90,10 @@ class SecurityToken {
             return null;
         }
 
-        $this->data = json_decode(gzuncompress($message), true);
+        $decompressed = gzuncompress($message);
+        if ($decompressed == false) return null;
+
+        $this->data = json_decode($decompressed, true);
 
         if (($this->data['o'] & self::OPTION_BIND_SESSION) == self::OPTION_BIND_SESSION) {
             if (!isset($this->data['s'])) return null;
@@ -151,7 +154,11 @@ class SecurityToken {
             $this->data['s'] = session_id();
         }
 
-        $token = $this->branca->encode(gzcompress(json_encode($this->data)));
+        $encoded = json_encode($this->data);
+        if ($encoded == false) return new \RuntimeException();
+        $compressed = gzcompress($encoded);
+        if ($compressed == false) return new \RuntimeException();
+        $token = $this->branca->encode($compressed);
 
         if (($options & self::OPTION_NONCE) == self::OPTION_NONCE) {
             $cache = \Cache::instance();

@@ -68,6 +68,7 @@ class Response extends Message {
         $this->extension_map = $request->getExtensionMap();
 
         foreach ($request as $key => $value) {
+            $value = strval($value);
             if (strpos($key, 'openid.ns.') === 0) {
                 $alias = substr($key, 10);
                 $this->extension_map[$value] = $alias;
@@ -195,6 +196,7 @@ class Response extends Message {
         //    need to slot in the new query string properly.  We disassemble and
         //    reconstruct the URL.
         $parts = parse_url($url);
+        if ($parts == false) return $url;
         
         $url = $parts['scheme'] . '://';
         if (isset($parts['user'])) {
@@ -202,7 +204,7 @@ class Response extends Message {
             if (isset($parts['pass'])) $url .= ':' . $parts['pass'];
             $url .= '@';
         }
-        $url .= $parts['host'];
+        if (isset($parts['host'])) $url .= $parts['host'];
         if (isset($parts['port'])) $url .= ':' . $parts['port'];
         if (isset($parts['path'])) $url .= $parts['path'];
         
@@ -213,7 +215,7 @@ class Response extends Message {
             // In theory $parts['fragment'] should be an empty string, but the
             // current draft specification does not prohibit putting other things
             // in the fragment.
-            
+            if (!isset($parts['fragment'])) $parts['fragment'] = '';
             if (isset($parts['query'])) {
                 $url .= '?' . $parts['query'] . '#' . $parts['fragment'] . '&' . $query;
             } else {

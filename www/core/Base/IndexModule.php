@@ -57,7 +57,8 @@ class IndexModule extends Module {
 
         $event = new IndexEvent($_REQUEST);
         $dispatcher = \Events::instance();
-        if ($dispatcher->dispatch($event)->isPropagationStopped()) return;
+        $dispatcher->dispatch($event);
+        if ($event->isPropagationStopped()) return;
 
         $auth = AuthManager::instance();
     
