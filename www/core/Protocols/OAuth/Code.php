@@ -35,7 +35,7 @@ use SimpleID\Store\StoreManager;
  * use the {@link isValid()} method to check whether the authorization code
  * is valid before using it to issue tokens, etc.
  */
-class Code implements TokenSource {
+class Code implements TokenGrantType {
     /**
      * Separator between the authorization code and the fully-qualified
      * authorisation ID.
@@ -241,7 +241,7 @@ class Code implements TokenSource {
         $cache->clear($this->getCode() . '.code');
     }
 
-    public function getSourceRef() {
+    public function getGrantRef() {
         return substr($this->cid, -9);
     }
 }

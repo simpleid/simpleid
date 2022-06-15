@@ -46,7 +46,7 @@ use SimpleID\Util\OpaqueIdentifier;
  * - a new authorisation is requested with a scope that is narrower (but not
  * wider) than the scope stored with the authorisation
  * - the user revokes the authorisation
- * - a token source (e.g. authorisation code or refresh token) is consumed
+ * - a token grant (e.g. authorisation code or refresh token) is consumed
  * - a security incident occurs
  *
  * Authorisation codes, access and refresh tokens are issued based on a particular
@@ -279,18 +279,18 @@ class Authorization implements Storable {
      * @param array<string> $scope the scope to be included in the tokens
      * @param int $expires_in the time over which the access token will be valid,
      * in seconds, or {@link SimpleID\Protocols\OAuth\Token::TTL_PERPETUAL} if the token is not to expire
-     * @param TokenSource $source the source, if any, from which the token is to be
+     * @param TokenGrantType $grant the grant, if any, from which the token is to be
      * generated
      * @param array<string, mixed> $additional additional data to be stored on the server for this
      * token
      * @return array<string, string> an array of parameters that can be included in the OAuth token
      * endpoint response
      */
-    public function issueTokens($scope = [], $expires_in = Token::TTL_PERPETUAL, $source = null, $additional = []) {
-        $results = $this->issueAccessToken($scope, $expires_in, $source, $additional);
+    public function issueTokens($scope = [], $expires_in = Token::TTL_PERPETUAL, $grant = null, $additional = []) {
+        $results = $this->issueAccessToken($scope, $expires_in, $grant, $additional);
         
         if ($this->issue_refresh_token) {
-            $results = array_merge($results, $this->issueRefreshToken($scope, $source, $additional));
+            $results = array_merge($results, $this->issueRefreshToken($scope, $grant, $additional));
         }
         return $results;
     }
@@ -301,17 +301,17 @@ class Authorization implements Storable {
      * @param array<string> $scope the scope to be included in the access token
      * @param int $expires_in the time over which the access token will be valid,
      * in seconds, or {@link SimpleID\Protocols\OAuth\Token::TTL_PERPETUAL} if the token is not to expire
-     * @param TokenSource $source the source, if any, from which the token is to be
+     * @param TokenGrantType $grant the grant, if any, from which the token is to be
      * generated
      * @param array<string, mixed> $additional additional data to be stored on the server for this
      * token
      * @return array<string, string> an array of parameters that can be included in the OAuth token
      * endpoint response
      */
-    public function issueAccessToken($scope = [], $expires_in = Token::TTL_PERPETUAL, $source = null, $additional = []) {
+    public function issueAccessToken($scope = [], $expires_in = Token::TTL_PERPETUAL, $grant = null, $additional = []) {
         $results = [];
 
-        $token = AccessToken::create($this, $scope, $expires_in, $source, $additional);
+        $token = AccessToken::create($this, $scope, $expires_in, $grant, $additional);
 
         $results['access_token'] = $token->getEncoded();
         $results['token_type'] = $token->getTokenType();
@@ -324,27 +324,27 @@ class Authorization implements Storable {
      * Issues a refresh token.
      *
      * @param array<string> $scope the scope to be included in the access token
-     * @param TokenSource $source the source, if any, from which the token is to be
+     * @param TokenGrantType $grant the grant, if any, from which the token is to be
      * generated
      * @param array<string, mixed> $additional additional data to be stored on the server for this
      * token
      * @return array<string, string> an array of parameters that can be included in the OAuth token
      * endpoint response
      */
-    protected function issueRefreshToken($scope = [], $source = NULL, $additional = []) {
-        $token = RefreshToken::create($this, $scope, $source, $additional);
+    protected function issueRefreshToken($scope = [], $grant = NULL, $additional = []) {
+        $token = RefreshToken::create($this, $scope, $grant, $additional);
         return [ 'refresh_token' => $token->getEncoded() ];
     }
 
     /**
      * Revokes all access and refresh tokens that were generated from
-     * a particular token source.
+     * a particular grant.
      *
-     * @param TokenSource $source the token source
+     * @param TokenGrantType $grant the grant
      * @return void
      */
-    public function revokeTokensFromSource($source) {
-        Token::revokeAll($this, $source);
+    public function revokeTokensFromGrant($grant) {
+        Token::revokeAll($this, $grant);
     }
 
     /**

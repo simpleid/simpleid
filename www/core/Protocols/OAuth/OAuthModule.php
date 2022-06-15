@@ -503,7 +503,7 @@ class OAuthModule extends Module implements ProtocolResult {
             $response->setError('invalid_grant', 'Authorization code not found or expired');
             return;
         }
-        $authorization->revokeTokensFromSource($code);
+        $authorization->revokeTokensFromGrant($code);
         
 
         // 3. Check for validity
@@ -595,7 +595,7 @@ class OAuthModule extends Module implements ProtocolResult {
             $response->renderJSON();
             return;
         }
-        $authorization->revokeTokensFromSource($refresh_token);
+        $authorization->revokeTokensFromGrant($refresh_token);
         
         $scope = $refresh_token->getScope();
 

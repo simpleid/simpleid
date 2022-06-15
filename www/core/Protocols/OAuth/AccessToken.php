@@ -63,14 +63,14 @@ class AccessToken extends Token {
      * @param array<string> $scope the scope of this token - this must be a subset
      * of the scope provided in `$authorization`
      * @param int $expires_in the time to expiry or {@link Token::TTL_PERPETUAL}
-     * @param TokenSource $source if the token is created from a previous authorisation
+     * @param TokenGrantType $grant if the token is created from a previous authorisation
      * code or refresh token, the ID of those artefacts
      * @param array<string, mixed> $additional any additional data to be stored on the server for this token
      * @return AccessToken|null 
      */
-    static public function create($authorization, $scope = [], $expires_in = Token::TTL_PERPETUAL, $source = NULL, $additional = []) {
+    static public function create($authorization, $scope = [], $expires_in = Token::TTL_PERPETUAL, $grant = NULL, $additional = []) {
         $token = new AccessToken();
-        $token->init($authorization, $scope, $expires_in, $source, $additional);
+        $token->init($authorization, $scope, $expires_in, $grant, $additional);
         $token->encode();
         $token->is_parsed = true;
         return $token;
