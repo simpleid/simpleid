@@ -38,7 +38,7 @@ use SimpleID\Store\StoreManager;
  */
 class Token {
     /** The separator between the token ID and the source reference */
-    const SOURCE_REF_SEPARATOR = '~';
+    const GRANT_REF_SEPARATOR = '~';
 
     /** Denotes a token without an expiry time */
     const TTL_PERPETUAL = 0;
@@ -46,7 +46,7 @@ class Token {
     const KEY_FQAID = 'a';
     const KEY_CACHE_HASH = 'h';
     const KEY_ID = 'i';
-    const KEY_SOURCEREF = 'r';
+    const KEY_GRANTREF = 'r';
     const KEY_SCOPEREF = 's';
     const KEY_EXPIRE = 'x';
 
@@ -65,8 +65,8 @@ class Token {
     /** @var int|null the expiry time */
     protected $expire = NULL;
 
-    /** @var string|null the source reference (a reference to the authorization code or refresh token) */
-    protected $source_ref = NULL;
+    /** @var string|null the grant reference (a reference to the authorization code or refresh token) */
+    protected $grant_ref = NULL;
 
     /** @var array<string, mixed> additional data to be stored on the server in relation to the token */
     protected $additional = [];
@@ -89,12 +89,12 @@ class Token {
      * @param array<string>|string $scope the scope of the token
      * @param int $expires_in the validity of the token, in seconds, or
      * {@link TTL_PERPETUAL}
-     * @param TokenSource $source the token source
+     * @param TokenGrantType $grant the token grant
      * @param array<string, mixed> $additional additional data to be stored on the
      * server
      * @return void
      */
-    protected function init($authorization, $scope = [], $expires_in = self::TTL_PERPETUAL, $source = NULL, $additional = []) {
+    protected function init($authorization, $scope = [], $expires_in = self::TTL_PERPETUAL, $grant = NULL, $additional = []) {
         $rand = new Random();
 
         $this->id = $rand->id();
@@ -106,7 +106,7 @@ class Token {
             $this->scope = $authorization->filterScope($scope);
         }
 
-        if ($source != null) $this->source_ref = $source->getSourceRef();
+        if ($grant != null) $this->grant_ref = $grant->getGrantRef();
         if ($expires_in > 0) $this->expire = time() + $expires_in;
         $this->additional = $additional;
     }
@@ -212,27 +212,27 @@ class Token {
 
     /**
      * Revokes all tokens issued from a specifed authorisation and,
-     * optionally, a token source.
+     * optionally, a grant.
      *
      * @param Authorization $authorization the authorisation for which
      * tokens are to be revoked
-     * @param TokenSource|string $source if specified, only delete tokens issued
-     * from this source
+     * @param TokenGrantType|string $grant if specified, only delete tokens issued
+     * from this grant
      * @return void
      */
-    public static function revokeAll($authorization, $source = null) {
+    public static function revokeAll($authorization, $grant = null) {
         $cache = \Cache::instance();
 
-        if ($source != null) {
-            if ($source instanceof TokenSource) {
-                $source_ref = $source->getSourceRef();
-            } elseif (is_string($source)) {
-                $source_ref = $source;
+        if ($grant != null) {
+            if ($grant instanceof TokenGrantType) {
+                $grant_ref = $grant->getGrantRef();
+            } elseif (is_string($grant)) {
+                $grant_ref = $grant;
             } else {
                 // This shouldn't happen
-                throw new \InvalidArgumentException('$source must be TokenSource or string');
+                throw new \InvalidArgumentException('$grant must be TokenGrantType or string');
             }
-            $suffix = self::SOURCE_REF_SEPARATOR . $source_ref;
+            $suffix = self::GRANT_REF_SEPARATOR . $grant_ref;
         } else {
             $suffix = ''; 
         }
@@ -248,8 +248,8 @@ class Token {
      */
     protected function getCacheKey() {
         $key = $this->id;
-        if ($this->source_ref != NULL) {
-            $key .= self::SOURCE_REF_SEPARATOR . $this->source_ref;
+        if ($this->grant_ref != NULL) {
+            $key .= self::GRANT_REF_SEPARATOR . $this->grant_ref;
         }
         $key .= '.' . $this->authorization->getFullyQualifiedID() . '.oauth_token';
         return $key;
@@ -272,7 +272,7 @@ class Token {
             list($auth_state, $aid) = explode('.', $token_data[self::KEY_FQAID]);
             $this->scope = $this->resolveScope($token_data[self::KEY_SCOPEREF]);
             if (isset($token_data[self::KEY_EXPIRE])) $this->expire = $token_data[self::KEY_EXPIRE];
-            if (isset($token_data[self::KEY_SOURCEREF])) $this->source_ref = $token_data[self::KEY_SOURCEREF];
+            if (isset($token_data[self::KEY_GRANTREF])) $this->grant_ref = $token_data[self::KEY_GRANTREF];
 
             /** @var Authorization $authorization */
             $authorization = $store->loadAuth($aid);
@@ -320,9 +320,9 @@ class Token {
             $token_data[self::KEY_EXPIRE] = $this->expire;
         }
 
-        if ($this->source_ref != NULL) {
-            $server_data['source_ref'] = $this->source_ref;
-            $token_data[self::KEY_SOURCEREF] = $this->source_ref;
+        if ($this->grant_ref != NULL) {
+            $server_data['grant_ref'] = $this->grant_ref;
+            $token_data[self::KEY_GRANTREF] = $this->grant_ref;
         }
 
         $cache->set($this->getCacheKey(), $server_data, ($this->expire != NULL) ? $this->expire - time() : 0);

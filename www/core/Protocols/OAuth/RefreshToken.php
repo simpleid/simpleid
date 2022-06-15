@@ -25,13 +25,13 @@ namespace SimpleID\Protocols\OAuth;
  * An OAuth refresh token.
  *
  * Refresh tokens are perpetual bearer tokens from which access tokens
- * can be created.  As such, it is a *token source* which implements the
- * {@link TokenSource} interface.
+ * can be granted.  As such, it implements the
+ * {@link TokenGrantType} interface.
  *
  * To create and encode a token, use the {@link create()} static function.
  * To parse an encoded token, use the {@link decode()} static function.
  */
-class RefreshToken extends Token implements TokenSource {
+class RefreshToken extends Token implements TokenGrantType {
     /** Creates a refresh token */
     protected function __construct() {
         parent::__construct();
@@ -65,7 +65,7 @@ class RefreshToken extends Token implements TokenSource {
      * this token
      * @param array<string> $scope the scope of this token - this must be a subset
      * of the scope provided in `$authorization`
-     * @param TokenSource $source if the token is created from a previous authorisation
+     * @param TokenGrantType $source if the token is created from a previous authorisation
      * code or refresh token, the ID of those artefacts
      * @param array<string, mixed> $additional any additional data to be stored on the server for this token
      * @return RefreshToken|null 
@@ -78,7 +78,7 @@ class RefreshToken extends Token implements TokenSource {
         return $token;
     }
 
-    public function getSourceRef() {
+    public function getGrantRef() {
         return substr($this->id, -9);
     }
 }
