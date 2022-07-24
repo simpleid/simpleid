@@ -221,6 +221,22 @@ return [
     'log_level' => 'warning',
 
     /*
+     * Debugging mode.
+     *
+     * Setting this to a number greater than `0` enables debugging mode. In debugging
+     * mode, Tracy (https://tracy.nette.org/) is enabled to provide debugging
+     * information directly to the browser.
+     *
+     * In addition, error reporting from the Fat-Free Framework is
+     * more detailed, with the level of detail corresponding to the value
+     * of this variable.  For further details of the accepted values, see
+     * https://fatfreeframework.com/3.8/quick-reference#DEBUG
+     *
+     * Only the default value of `0` should be used on production servers.
+     */
+    'debug' => 0,
+
+    /*
      * The SimpleID modules to be enabled.
      *
      * You can customise SimpleID's functionality by including and excluding
