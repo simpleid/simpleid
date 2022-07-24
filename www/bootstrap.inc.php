@@ -39,6 +39,7 @@ $default_config = [
     'openid_strict_realm_check' => true,
     'webfinger_access_control_allow_origin' => '*',
     'locale' => 'en',
+    'debug' => 0,
     'logger' => 'SimpleID\Util\DefaultLogger',
     'log_file' => '',
     'log_level' => 'info',
@@ -123,7 +124,10 @@ if (is_subclass_of($config['logger'], '\Log', true)) $f3->set('LOGS', dirname($c
 $logger = new $config['logger']($config);
 $f3->set('logger', $logger);
 
-if (isset($config['f3_DEBUG'])) $f3->set('DEBUG', $config['f3_DEBUG']);
+if ($config['debug']) {
+    Tracy\Debugger::enable();
+    if (is_int($config['debug'])) $f3->set('DEBUG', $config['debug']);
+}
 
 // 6. Fix up HTTP request
 fix_http_request($f3);
