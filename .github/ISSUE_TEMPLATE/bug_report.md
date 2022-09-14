@@ -7,22 +7,22 @@ assignees: ''
 
 ---
 
-**Description**
+### Description
 
 A clear and concise description of what the bug is.
 
-**Steps to reproduce**
+### Steps to reproduce
 
 Steps to reproduce the behaviour:
 1. Go to '...'
 2. Click on '....'
 3. See error or unexpected result
 
-**Expected behaviour**
+### Expected behaviour
 
 A clear and concise description of what you expected to happen.
 
-**Logs**
+### Logs
 
 Attach log files, with private information removed.
 
@@ -31,7 +31,7 @@ For instructions on generating log files
  - https://simpleid.org/docs/1/troubleshooting/#logging
  - https://simpleid.org/docs/2/troubleshooting/#logging
 
-**Environment:**
+### Environment
 
  - Version [e.g. 1.0.1]
  - SimpleID modules/extensions loaded
@@ -39,6 +39,6 @@ For instructions on generating log files
  - PHP: [version, extension loaded]
  - Browser [e.g. chrome, safari]
 
-**Additional information**
+### Additional information
 
 Any other information which you think would be useful in diagnosing the problem.
