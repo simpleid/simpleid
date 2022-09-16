@@ -134,9 +134,8 @@ oauth:
     # This cannot be used with jwks_uri
     #
     #jwks: {}
-},
 
-connect: {} # Remove empty baces if you wish to fill in this section
+connect: {} # Remove empty braces if you wish to fill in this section
     #
     # OPTIONAL - URI used to calculate pairwise pseudononymous identifiers.
     #
