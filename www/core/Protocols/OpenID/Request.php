@@ -124,7 +124,12 @@ class Request extends Message {
             $realm['port'] = '';
         if (($url['port'] != $realm['port']))
             return false;
-        
+
+        if (!isset($url['host']))
+            $url['host'] = '';
+        if (!isset($realm['host']))
+            $realm['host'] = '';
+
         $realm['host'] = strval($realm['host']);
         if (substr($realm['host'], 0, 2) == '*.') {
             $realm_re = '/^([^.]+\.)?' . preg_quote(substr($realm['host'], 2)) . '$/i';
