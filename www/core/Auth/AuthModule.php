@@ -106,7 +106,7 @@ class AuthModule extends Module {
         }
 
         if ($this->f3->exists('POST.tk') === false) {
-            if (isset($params['destination'])) {
+            if ($params['destination']) {
                 // User came from a log in form.
                 $this->f3->set('message', $this->f3->get('intl.core.auth.missing_tk'));
             }

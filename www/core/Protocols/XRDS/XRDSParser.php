@@ -148,6 +148,7 @@ class XRDSParser {
 
                 foreach ([ 'type', 'localid', 'uri' ] as $key) {
                     if (!isset($service[$key])) continue;
+                    /** @var array<array<string, mixed>> $service[$key] */
                     $service[$key] = $this->flatten_uris($service[$key]);
                 }
                 break;
@@ -169,6 +170,7 @@ class XRDSParser {
                         if ($this->reader->getAttribute('priority'))
                             $item['#priority'] = $this->reader->getAttribute('priority');
 
+                        /** @var array<array<string, string>> $service[$key] */
                         $service[$key][] = $item;
                         break;
                 }
