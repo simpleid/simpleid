@@ -147,7 +147,7 @@ class JOSEResponse extends ArrayWrapper {
         $alg = ($this->signed_response_alg) ? $this->signed_response_alg : 'HS256';
 
         try {
-            /** @var \SimpleJWT\Crypt\SignatureAlgorithm $signer */
+            /** @var \SimpleJWT\Crypt\Signature\SignatureAlgorithm $signer */
             $signer = AlgorithmFactory::create($alg);
             $this->container[$claim] = $signer->shortHash($value);
         } catch (\UnexpectedValueException $e) {
