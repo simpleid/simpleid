@@ -1,5 +1,5 @@
-<div class="login-security {{ @@security_class }}">
-    <form action="{{ @base_path }}auth/login/{{ @@destination }}" method="post" enctype="application/x-www-form-urlencoded" id="login-form">
+<div class="login-security {{ @@security_class }}" x-data="{ isSubmitted: false }">
+    <form action="{{ @base_path }}auth/login/{{ @@destination }}" method="post" enctype="application/x-www-form-urlencoded" @submit="isSubmitted = true">
         <input type="hidden" name="fs" value="{{ @@fs }}">
         <input type="hidden" name="tk" value="{{ @@tk }}">
 
@@ -8,32 +8,34 @@
         </repeat>
 
         {* @submit_button text may vary depending on auth module *}
-        <input type="submit" name="op" id="edit-submit" value="{{ @@submit_button }}" class="form-default" {{ @@security_disabled }}>
+        <input type="submit" name="op" value="{{ @@submit_button }}" class="form-default" :disabled="isSubmitted">
         <check if="{{ @@cancellable }}">
-            <input type="submit" name="op" id="edit-cancel" value="{{ @intl.common.cancel }}">
+            <input type="submit" name="op" value="{{ @intl.common.cancel }}">
         </check>
     </form>
 </div>
 
 <script type="text/javascript">
-(function ($) {
-    $(document).ready(function() {
-        if (!$('.login-security').is('.allow-autocomplete')) $('.credentials').attr('autocomplete', 'off');
-        $('#login-form').submit(function() {
-            $('#edit-submit').prop('disabled', true);
-        });
+    const formReady = function() {
+        if (!document.querySelector('.login-security').classList.contains('allow-autocomplete')) 
+            document.querySelectorAll('.credentials').forEach((el) => el.setAttribute('autocomplete', 'off'));
         
-        var focus = new Array();
-        $('input[data-focus-weight]').each(function() {
-            if ($(this).val() == '') {
-                focus.push({ weight: $(this).data('focusWeight'), el: this });
+        const focus = new Array();
+        document.querySelectorAll('input[data-focus-weight]').forEach((el) => {
+            if ((el.value == '') && el.hasAttribute('data-focus-weight')) {
+                focus.push({ weight: el.getAttribute('data-focus-weight'), el: el });
             }
         });
         if (focus.length == 0) return;
         focus.sort(function (a, b) {
             return a.weight - b.weight;
         });
-        $(focus[0].el).focus();
-    });
-})(jQuery);
+        focus[0].el.focus();
+    };
+
+    if (document.readyState != 'loading') {
+        formReady();
+    } else {
+        document.addEventListener('DOMContentLoaded', formReady);
+    }
 </script>
