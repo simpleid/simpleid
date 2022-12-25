@@ -21,15 +21,6 @@
             <repeat group="{{ @@js_locale }}" key="{{ @label }}" value="{{ @text }}">"{{ @label | raw }}": "{{ @text | raw }}",</repeat>
         };
         </script>
-        <check if="{{ @@framekiller }}">
-            <script type="text/javascript">
-                (function ($) {
-                    $(document).ready(function() {
-                        if (top !== self) top.location.replace(self.location.href);
-                    });
-                })(jQuery);
-            </script>
-        </check>
         {{ @@javascript | raw }}
     </head>
     <body class="{{ @@page_class }}">

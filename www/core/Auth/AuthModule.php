@@ -271,7 +271,6 @@ class AuthModule extends Module {
         
         $this->f3->set('fs', $token->generate($form_state->encode()));
         if (isset($params['destination'])) $this->f3->set('destination', $params['destination']);
-        $this->f3->set('framekiller', true);
         $this->f3->set('page_class', 'dialog-page');
         $this->f3->set('layout', 'auth_login.html');
 

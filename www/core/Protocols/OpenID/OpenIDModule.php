@@ -789,7 +789,6 @@ class OpenIDModule extends Module implements ProtocolResult {
 
         $this->f3->set('logout_destination', '/continue/' . rawurlencode($token->generate($request->toArray())));
         $this->f3->set('user_header', true);
-        $this->f3->set('framekiller', true);
         $this->f3->set('title', $this->f3->get('intl.core.openid.openid_title'));
         $this->f3->set('page_class', 'dialog-page');
         $this->f3->set('layout', 'openid_consent.html');
