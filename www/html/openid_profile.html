@@ -1,50 +1,53 @@
-<h3>{{ @intl.core.openid.link_tags_label }}</h3>
-        
-<div>
-    <label><input type="checkbox" name="openid1" value="1" id="discovery-openid1" class="discovery-checkbox">{{ @intl.core.openid.openid1_label }}</label>
-    <label><input type="checkbox" name="openid2" value="1" id="discovery-openid2" class="discovery-checkbox">{{ @intl.core.openid.openid2_label }}</label>
-    <label><input type="checkbox" name="local-id" value="1" id="discovery-local-id" class="discovery-checkbox"> {{ @intl.core.openid.localid_label }} </label>
-</div>
-<pre id="discovery-link-tags">
-</pre>
-<ul id="discovery-templates">
-    <li class="openid1">&lt;link rel=&quot;openid.server&quot; href=&quot;{{ rtrim(@config.canonical_base_path, '/') }}/&quot;&gt;</li>
-    <li class="openid2">&lt;link rel=&quot;openid2.provider&quot; href=&quot;{{ rtrim(@config.canonical_base_path, '/') }}/&quot;&gt;</li>
-    <li class="openid1-local-id">&lt;link rel=&quot;openid.delegate&quot; href=&quot;{{ @@user.openid.identity }}&quot;&gt;</li>
-    <li class="openid2-local-id">&lt;link rel=&quot;openid2.local_id&quot; href=&quot;{{ @@user.openid.identity }}&quot;&gt;</li>
-</ul>
-
-<h3>{{ @intl.core.openid.yadis_label }}</h3>
-<ol>
-    <li>{{ @intl.core.openid.yadis_doc_label, @xrds_url | format, raw }}</li>
-    <li>
-        <div>{{ @intl.core.openid.yadis_add_label }}</div>
-        <pre>&lt;meta http-equiv=&quot;X-XRDS-Location&quot; content=&quot;{{ @xrds_url }}&quot;&gt;</pre>
-    </li>
-</ol>
-
-
-
 <script>
-var discovery_refresh = function() {
-    var code = '';
-    
-    if ($('#discovery-openid1')[0].checked) {
-        code += $('#discovery-templates .openid1').html() + '\n';
-        if ($('#discovery-local-id')[0].checked) code += $('.openid1-local-id').html() + '\n';
-    }
-    if ($('#discovery-openid2')[0].checked) {
-        code += $('#discovery-templates .openid2').html() + '\n';
-        if ($('#discovery-local-id')[0].checked) code += $('.openid2-local-id').html() + '\n';
-    }
-    
-    if (code == '') code = l.code;
-    
-    $('#discovery-link-tags').html(code);
-}
+function openIdDiscoveryApp() {
+    return {
+        templates: {
+            openid1: '&lt;link rel="openid.server" href="{{ rtrim(@config.canonical_base_path, '/') }}/"&gt;',
+            openid2: '&lt;link rel="openid2.provider" href="{{ rtrim(@config.canonical_base_path, '/') }}/"&gt;',
+            openid1_local_id: '&lt;link rel="openid.delegate" href="{{ @@user.openid.identity }}"&gt;',
+            openid2_local_id: '&lt;link rel="openid2.local_id" href="{{ @@user.openid.identity }}"&gt;'
+        },
+        openid1: false,
+        openid2: false,
+        local_id: false,
 
-$(document).ready(function() {
-    $('.discovery-checkbox').click(discovery_refresh);
-    discovery_refresh();
-});
+        get discoveryCode() {
+            let code = '';
+            
+            if (this.openid1) {
+                code += this.templates.openid1 + '<br>';
+                if (this.local_id) code += this.templates.openid1_local_id + '<br>';
+            }
+            if (this.openid2) {
+                code += this.templates.openid2 + '<br>';
+                if (this.local_id) code += this.templates.openid2_local_id + '<br>';
+            }
+            
+            if (code == '') code = l.code;
+            
+            return code;
+        }
+    }
+}
 </script>
+
+<div x-data="openIdDiscoveryApp()">
+    <h3>{{ @intl.core.openid.link_tags_label }}</h3>
+            
+    <div>
+        <label><input type="checkbox" class="discovery-checkbox" x-model="openid1">{{ @intl.core.openid.openid1_label }}</label>
+        <label><input type="checkbox" class="discovery-checkbox" x-model="openid2">{{ @intl.core.openid.openid2_label }}</label>
+        <label><input type="checkbox" class="discovery-checkbox" x-model="local_id"> {{ @intl.core.openid.localid_label }} </label>
+    </div>
+    <pre x-html="discoveryCode">
+    </pre>
+
+    <h3>{{ @intl.core.openid.yadis_label }}</h3>
+    <ol>
+        <li>{{ @intl.core.openid.yadis_doc_label, @xrds_url | format, raw }}</li>
+        <li>
+            <div>{{ @intl.core.openid.yadis_add_label }}</div>
+            <pre>&lt;meta http-equiv=&quot;X-XRDS-Location&quot; content=&quot;{{ @xrds_url }}&quot;&gt;</pre>
+        </li>
+    </ol>
+</div>
