@@ -1,4 +1,11 @@
-<form action="{{ @base_path }}openid/consent" method="post" enctype="application/x-www-form-urlencoded" id="rp-form">
+<script>
+function confirmConsent(ev) {
+    if (ev.target.checked) return; // It's currently checked and we're unchecking it
+    if (!confirm(l.openid_suspect)) ev.stopPropagation();
+}
+</script>
+
+<form action="{{ @base_path }}openid/consent" method="post" enctype="application/x-www-form-urlencoded">
     <input type="hidden" name="fs" value="{{ @@fs }}">
     <input type="hidden" name="tk" value="{{ @@tk }}">
     
@@ -18,7 +25,7 @@
             
             <div class="form-item">
                 <label class="option">
-                    <input class="{{ @@realm_class }}" type="checkbox" name="prefs[consents][openid]" value="true" <check if="{{ @@openid_consent }}">checked="checked"</check>>
+                    <input type="checkbox" name="prefs[consents][openid]" value="true" <check if="{{ @@openid_consent }}">checked="checked"</check> <check if="{{ @@return_to_suspect }}">x-data @click="confirmConsent"</check>>
                     {{ @intl.core.openid.consent_label }}
                 </label>
             </div>
@@ -41,13 +48,3 @@
         </false>
     </check>
 </form>
-
-<script>
-$(document).ready(function() {
-    $('.return-to-suspect').click(function() {
-        if ($(this).attr('checked') == false) return true;
-        
-        return confirm(l.openid_suspect);
-    });
-});
-</script>
