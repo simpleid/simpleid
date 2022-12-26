@@ -13,7 +13,8 @@
     <li>{{ @intl.core.auth_otp.verify_code }}</li>
 </ol>
 
-<script src="{{ @base_path }}html/jquery.qrcode.js" type="text/javascript"></script><script type="text/javascript">$('#otp-key-qr').qrcode("{{ @qr | raw }}");</script>
+<script src="{{ @base_path }}html/qrcode.min.js" type="text/javascript"></script>
+<script type="text/javascript">new QRCode(document.getElementById("otp-key-qr"), "{{ @qr | raw }}");</script>
 
 <form action="{{ @base_path }}auth/otp" method="post" enctype="application/x-www-form-urlencoded">
     <input type="hidden" name="tk" value="{{ @tk }}"/>

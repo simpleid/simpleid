@@ -1,43 +1,47 @@
-<p>{{ @intl.upgrade.applying_upgrade }} <span id="upgrade-progress"></span></p>
+<script type="text/javascript">
+    function upgradeApp(initStep) {
+        return {
+            progress: '',
+            error: '',
+            step: initStep,
 
-<div id="upgrade-error">
-    <p></p>
+            upgradeApply() {
+                const params = new URLSearchParams({ step: this.step });
+                fetch('step', {
+                    method: 'POST',
+                    body: params,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(response => {
+                    if (response.status == 'step') {
+                        this.progress = '(' + response.progress + ')';
+                        this.step = response.next;
+
+                        $nextTick(() => { this.upgradeApply() });
+                    } else if (response.status == 'complete') {
+                        // Convert relative to absolute URL
+                        resolver = document.createElement('a');
+                        resolver.href = response.redirect;
+                        window.location.replace(resolver.href);
+                    } else if (response.status == 'error') {
+                        this.error = response.error_description;
+                    }
+                })
+                .catch(err => this.error = err.message);
+            }
+        };
+    }
+</script>
+
+<div x-data="upgradeApp('{{ @step }}')" x-init="upgradeApply">
+    <p>{{ @intl.upgrade.applying_upgrade }} <span x-html="progress"></span></p>
+
+    <div x-cloak x-show="error">
+        <p x-html="error"></p>
+    </div>
 </div>
 
-<div id="upgrade-data" data-step="{{ @step }}"></div>
-
-<script type="text/javascript">
-    (function ($) {
-        var upgrade_callback = function(data) {
-            if (data.status == 'step') {
-                $('#upgrade-progress').html('(' + data.progress + ')');
-                upgrade_apply(data.next);
-            } else if (data.status == 'complete') {
-                // Convert relative to absolute URL
-                resolver = document.createElement('a');
-                resolver.href = data.redirect;
-                window.location.replace(resolver.href);
-            } else if (data.status == 'error') {
-                $('#upgrade-error p').html(data.error_description);
-                $('#upgrade-error').show();
-            }
-        }
-
-        var upgrade_apply = function(step) {
-            var step_url = 'step';
-            $.ajax(step_url, {
-                data: { step: step },
-                dataType: 'json',
-                type: 'POST'
-            }).then(upgrade_callback, function(xhr, msg, err) {
-                $('#upgrade-error p').html(msg);
-                $('#upgrade-error').show();
-            });
-        }
-
-        $(document).ready(function() {
-            var step = $('#upgrade-data').data('step');
-            upgrade_apply(step);
-        });
-    })(jQuery);
-</script>

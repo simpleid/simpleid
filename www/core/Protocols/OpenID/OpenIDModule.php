@@ -778,7 +778,6 @@ class OpenIDModule extends Module implements ProtocolResult {
                 $this->f3->set('return_to_suspect', true);
                 $this->f3->set('suspect_url', 'http://simpleid.org/documentation/troubleshooting/returnto-discovery-failure');
                 $this->f3->set('js_locale', [ 'openid_suspect' => addslashes($this->f3->get('intl.core.openid.suspect_js_1')) . '\n\n' . addslashes($this->f3->get('intl.core.openid.suspect_js_2')) ]);
-                $this->f3->set('realm_class', 'return-to-suspect');
             }
         }
         
@@ -789,7 +788,6 @@ class OpenIDModule extends Module implements ProtocolResult {
 
         $this->f3->set('logout_destination', '/continue/' . rawurlencode($token->generate($request->toArray())));
         $this->f3->set('user_header', true);
-        $this->f3->set('framekiller', true);
         $this->f3->set('title', $this->f3->get('intl.core.openid.openid_title'));
         $this->f3->set('page_class', 'dialog-page');
         $this->f3->set('layout', 'openid_consent.html');

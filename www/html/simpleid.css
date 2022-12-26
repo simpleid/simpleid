@@ -77,6 +77,8 @@ pre {
 }
 pre.code { white-space: pre; overflow: initial; }
 
+[x-cloak] { display: none !important; }
+
 /* Page layout ------------------------------------------------------------- */
 /*.sticky { position: fixed; }*/
 #header {
@@ -261,7 +263,6 @@ span.last-time { display: none; }
 }
 
 #discovery label { display: inline; }
-#discovery-templates { display: none; }
 
 .otp-key {
     font-size: 18px;

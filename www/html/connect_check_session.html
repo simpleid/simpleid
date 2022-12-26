@@ -4,69 +4,69 @@
         <title></title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta name="robots" content="noindex,nofollow" />
-
-        <script src="{{ @base_path }}html/jquery.js" type="text/javascript"></script>
-        <script src="{{ @base_path }}html/hmac-sha256.js" type="text/javascript"></script>
     </head>
     <body>
-        <div id="check-session-params" data-cookie="{{ @cookie_name }}"></div>
+        <script src="{{ @base_path }}html/alpinejs.min.js" type="text/javascript"></script>
+        <script src="{{ @base_path }}html/hmac-sha256.js" type="text/javascript"></script>
         <script type="text/javascript">
-        (function($) {
-            var secure_compare = function(str1, str2) {
-                if (str1.length != str2.length) return false;
+            function checkSessionApp(options) {
+                return {
+                    cookieName: options.cookieName,
 
-                var result = 0;
-                for (var i = 0; i < str1.length - 1; i++) {
-                    result |= str1.charCodeAt(i) ^ str2.charCodeAt(i);
+                    secure_compare: function(str1, str2) {
+                        if (str1.length != str2.length) return false;
+
+                        let result = 0;
+                        for (var i = 0; i < str1.length - 1; i++) {
+                            result |= str1.charCodeAt(i) ^ str2.charCodeAt(i);
+                        }
+
+                        return (result == 0);
+                    },
+
+                    checkSession($ev) {
+                        const ev = $ev.originalEvent;
+
+                        if (ev.origin != window.parent.location.origin) return;
+
+                        const client_id = ev.data.split(' ')[0];
+                        const session_state = ev.data.split(' ')[1];
+                        if (typeof session_state == 'undefined') {
+                            ev.source.postMessage('error', ev.origin);
+                            return;
+                        }
+
+                        const salt = session_state.split('.')[1];
+                        if (typeof salt == 'undefined') {
+                            ev.source.postMessage('error', ev.origin);
+                            return;
+                        }
+
+                        const cookies = document.cookie.split(';').map(function(cookie) {
+                            return cookie.trim().split(/(=)/);
+                        }).reduce(function(prev, cur) {
+                            prev[cur[0]] = prev[cur[0]] ? prev[cur[0]] + ', ' + cur.slice(2).join('') : cur.slice(2).join('');
+                            return prev;
+                        }, {});
+
+                        const uals = cookies[this.cookieName];
+
+                        // This needs to match ConnectSessionModule::buildSessionState
+                        const expected_session_state = CryptoJS.HmacSHA256(client_id + ' ' + ev.origin + ' ' + salt, uals) + '.' + salt;
+
+                        let status;
+                        if (secure_compare(session_state, expected_session_state)) {
+                            status = 'unchanged';
+                        } else {
+                            status = 'changed';
+                        }
+
+                        ev.source.postMessage(status, ev.origin);
+                    }
                 }
-
-                return (result == 0);
-            };
-
-            var check_session = function($ev) {
-                var ev = $ev.originalEvent;
-
-                if (ev.origin != window.parent.location.origin) return;
-
-                var client_id = ev.data.split(' ')[0];
-                var session_state = ev.data.split(' ')[1];
-                if (typeof session_state == 'undefined') {
-                    ev.source.postMessage('error', ev.origin);
-                    return;
-                }
-
-                var salt = session_state.split('.')[1];
-                if (typeof salt == 'undefined') {
-                    ev.source.postMessage('error', ev.origin);
-                    return;
-                }
-
-                var cookie_name = $('#check-session-params').data('cookie');
-                var cookies = document.cookie.split(';').map(function(cookie) {
-                    return cookie.trim().split(/(=)/);
-                }).reduce(function(prev, cur) {
-                    prev[cur[0]] = prev[cur[0]] ? prev[cur[0]] + ', ' + cur.slice(2).join('') : cur.slice(2).join('');
-                    return prev;
-                }, {});
-
-                var uals = cookies[cookie_name];
-
-                // This needs to match ConnectSessionModule::buildSessionState
-                var expected_session_state = CryptoJS.HmacSHA256(client_id + ' ' + ev.origin + ' ' + salt, uals) + '.' + salt;
-
-                if (secure_compare(session_state, expected_session_state)) {
-                    status = 'unchanged';
-                } else {
-                    status = 'changed';
-                }
-
-                ev.source.postMessage(status, ev.origin);
             }
-
-            $(document).ready(function() {
-                $(window).bind('message', check_session);
-            });
-        })(jQuery);
         </script>
+
+        <div x-data="checkSessionApp({ cookieName: '{{ @cookie_name }}'})" @message.window="checkSession"></div>
     </body>
 </html>

@@ -138,10 +138,9 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
 
         $this->f3->set('page_class', 'dialog-page');
         $this->f3->set('title', $this->f3->get('intl.core.auth_otp.otp_title'));
-
-        $this->f3->set('framekiller', true);
-        
         $this->f3->set('layout', 'auth_otp_setup.html');
+
+        header('X-Frame-Options: DENY');
         print $tpl->render('page.html');
     }
 

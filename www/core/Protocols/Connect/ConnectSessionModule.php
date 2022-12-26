@@ -171,7 +171,6 @@ class ConnectSessionModule extends Module {
         // logout_label is already defined in Module
 
         $this->f3->set('user_header', true);
-        $this->f3->set('framekiller', true);
         $this->f3->set('title', $this->f3->get('intl.common.logout'));
         $this->f3->set('page_class', 'dialog-page');
         $this->f3->set('layout', 'connect_logout.html');
