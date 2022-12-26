@@ -65,10 +65,6 @@ designed by Mark James.
 The icon set is licensed under a
 [Creative Commons Attribution 2.5 License](http://creativecommons.org/licenses/by/2.5/).
 
-SimpleID uses the [jQuery JavaScript library](http://jquery.com),
-by John Resig and the jQuery team.
-Licensing information for this library can be found at <http://docs.jquery.com/Licensing>.
-
 SimpleID uses the [Alpine.js library](http://alpinejs.dev),
 by Caleb Porzio and other contributors.
 Licensing information for this library can be found at <https://github.com/alpinejs/alpine/blob/main/LICENSE.md>.
