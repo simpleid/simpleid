@@ -1,80 +1,99 @@
-<div class="message" style="display: none"><p></p></div>
-
-<table id="apps" data-tk="{{ @tk }}">
-    <tr class="loading">
-        <td colspan="2" style="text-align: center"><img src="{{ @base_path }}html/loading.gif"></td>
-    </tr>
-</table>
-
-<script src="{{ @base_path }}html/underscore-min.js" type="text/javascript"></script>
-<script type="text/template" id="app-tpl">
-    <tr data-cid="<%= cid %>">
-        <td class="app-name"><a href="#" class="get-app-details"><%= display_html %></a></td>
-        <td><a href="#" class="delete-app">{{ @intl.common.delete }}</a></td>
-    </tr>
-</script>
-<script type="text/template" id="details-tpl">
-    <div class="app-details" style="display:none">
-        <ul>
-            <li><%= t.first_time_label %> <%= first_time %></li>
-            <li><%= t.last_time_label %> <%= last_time %></li>
-            <% if (consents.length > 0) { %>
-            <li><%= t.consents_label %><ul>
-            <% _.each(consents, function(consent) { %><%= consent.description %><% }); %>
-            </ul></li>
-            <% } %>
-        </ul>
-    </div>
-</script>
 <script type="text/javascript">
-    (function ($) {
-        var get_app_details = function(ev) {
-            var details_tpl = _.template($('#details-tpl').html());
-            var tk = $('#apps').data('tk');
-            var target = $(ev.target);
-            var cid = target.closest('*[data-cid]').data('cid');
-            var cell = target.closest('.app-name');
+    function appsApp(tk) {
+        return {
+            apps: [],
+            message: '',
+            isLoading: true,
+            tk: tk,
 
-            if (cell.has('.app-details').length == 0) {
-                $.getJSON('apps/' + encodeURIComponent(cid), {tk: tk}).done(function(data) {
-                    cell.append(details_tpl(data));
-                    cell.children('.app-details').first().slideToggle();
+            loadApps() {
+                const params = new URLSearchParams({tk: this.tk});
+                fetch('apps?' + params, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(response => {
+                    this.apps = response;
+                    this.apps.forEach((app) => {
+                        app.details = null,
+                        app.openDetails = false
+                    })
+                    this.isLoading = false;
                 });
-            } else {
-                cell.children('.app-details').first().slideToggle();
+            },
+
+            toggleDetails(cid) {
+                const currentApp = this.apps.find((app) => (app.cid == cid));
+
+                if (!currentApp.details) {
+                    const params = new URLSearchParams({tk: this.tk});
+                    fetch('apps/' + encodeURIComponent(cid) + '?' + params, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(response => currentApp.details = response);
+                }
+
+                currentApp.openDetails = !currentApp.openDetails;
+            },
+
+            deleteApp(cid) {
+                const params = new URLSearchParams({tk: this.tk});
+                fetch('apps/' + encodeURIComponent(cid) + '?' + params, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => {
+                    const body = response.json();
+                    if (response.ok) {
+                        this.message = body.result_description;
+                        this.apps = this.apps.filter((app) => app.cid != cid);
+                    } else {
+                        this.message = body.error_description;
+                    }
+                })
             }
-        };
-
-        var delete_app = function(ev) {
-            var tk = $('#apps').data('tk');
-            var target = $(ev.target);
-            var cid = target.closest('*[data-cid]').data('cid');
-
-            $.ajax('apps/' + encodeURIComponent(cid), {
-                data: { tk: tk },
-                dataType: 'json',
-                type: 'DELETE'
-            }).then(function (data) {
-                target.closest('*[data-cid]').slideUp('normal', function() { $(this).remove(); });
-                $('.message p').first().html(data.result_description);
-                $('.message').fadeIn('normal', function() { $(this).delay(3000).fadeOut(); });
-            }, function (xhr) {
-                $('.message p').first().html(xhr.responseJSON.error_description);
-                $('.message').fadeIn('normal', function() { $(this).delay(3000).fadeOut(); });
-            });
-        };
-
-        $(document).ready(function() {
-            var app_tpl = _.template($('#app-tpl').html());
-            var tk = $('#apps').data('tk');
-            $.getJSON('apps', { tk: tk }).done(function(data) {
-                $('.loading').hide();
-                _.each(data, function(app) {
-                    $('#apps').append(app_tpl(app));
-                });
-                $('.get-app-details').click(get_app_details);
-                $('.delete-app').click(delete_app);
-            });
-        });
-    })(jQuery);
+        }
+    }
 </script>
+
+<div x-data="appsApp('{{ @tk }}')" x-init="loadApps">
+    <div class="message" x-cloak x-show="message"><p x-html="message"></p></div>
+
+    <table id="apps">
+        <tr class="loading" x-show="isLoading">
+            <td colspan="2" style="text-align: center"><img src="{{ @base_path }}html/loading.gif"></td>
+        </tr>
+        <tr x-cloak x-show="!isLoading && (apps.length == 0)">
+            <td colspan="2" style="text-align: center">{{ @intl.core.my.app_none }}</td>
+        </tr>
+        <template x-for="app in apps" :key="app.cid">
+            <tr>
+                <td class="app-name">
+                    <a href="#" class="get-app-details" x-html="app.display_html"></a>
+                    <div class="app-details" x-show="app.details && app.openDetails">
+                        <ul>
+                            <li><%= t.first_time_label %> <%= first_time %></li>
+                            <li><%= t.last_time_label %> <%= last_time %></li>
+                            <% if (consents.length > 0) { %>
+                            <li><%= t.consents_label %><ul>
+                            <% _.each(consents, function(consent) { %><%= consent.description %><% }); %>
+                            </ul></li>
+                            <% } %>
+                        </ul>
+                    </div>
+                </td>
+                <td><a href="#" class="delete-app" @click="deleteApp(app.cid)">{{ @intl.common.delete }}</a></td>
+            </tr>
+        </template>
+    </table>
+</div>

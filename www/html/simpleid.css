@@ -77,6 +77,8 @@ pre {
 }
 pre.code { white-space: pre; overflow: initial; }
 
+[x-cloak] { display: none !important; }
+
 /* Page layout ------------------------------------------------------------- */
 /*.sticky { position: fixed; }*/
 #header {
