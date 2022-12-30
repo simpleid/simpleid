@@ -157,29 +157,45 @@ function cache_gc($expiry, $type = NULL) {
  * or an array specifiying the expiry time for each type
  */
 function cache_expire($params) {
-    $dir = opendir(CACHE_DIR);
-    
-    while (($file = readdir($dir)) !== false) {
-        $expiry = NULL;
-        $filename = CACHE_DIR . '/' . $file;
-        
-        if (is_int($params)) {
-            $expiry = $params;
-        } elseif (is_array($params)) {
-            foreach ($params as $type => $param) {
-                if (strpos($file, $type . '-') === 0) {
-                    $expiry = $param;
-                    break;
+
+    $dirs = array();
+    array_push($dirs, CACHE_DIR);
+    while (sizeof($dirs)) {
+        $dirname = array_pop($dirs);
+        if (($dir = opendir($dirname)) === false) {
+            continue;
+        }
+
+        while (($file = readdir($dir)) !== false) {
+            $expiry = NULL;
+            if ($file == '.' || $file == '..') {
+                continue;
+            }
+            $filename = $dirname . '/' . $file;
+
+            if (is_dir($filename)) {
+                array_push($dirs, $filename);
+                continue;
+            }
+
+            if (is_int($params)) {
+                $expiry = $params;
+            } elseif (is_array($params)) {
+                foreach ($params as $type => $param) {
+                    if (strpos($filename, $type) !== false) {
+                        $expiry = $param;
+                        break;
+                    }
                 }
             }
+
+            if (!is_null($expiry) && (filetype($filename) == "file") && (filectime($filename) < time() - $expiry)) {
+                unlink($filename);
+            }
         }
-        
-        if (!is_null($expiry) && (filetype($filename) == "file") && (filectime($filename) < time() - $expiry)) {
-            unlink($filename);
-        }
+
+        closedir($dir);
     }
-    
-    closedir($dir);
 }
 
 /**
