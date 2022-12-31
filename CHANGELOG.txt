@@ -1,3 +1,10 @@
+SimpleID 1.0.4 - 2022-12-31
+---------------------------
+
+- Bug fixes:
+    * #81 Cache cleanup does not cover subdirectories
+
+
 SimpleID 1.0.3 - 2020-09-21
 ---------------------------
 
