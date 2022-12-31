@@ -48,11 +48,11 @@ class RoboFile extends \Robo\Tasks {
     }
 
     public function build() {
-        $ref = getenv('GITHUB_REF');
+        $ref = getenv('GITHUB_REF_NAME');
         if ($ref === false) {
             $version = 'master';
         } else {
-            $version = str_replace('ref/tags/release-', '', $ref);
+            $version = str_replace('release-', '', $ref);
         }
 
         $dist_file = 'simpleid-' . $version . '.tar.gz';
