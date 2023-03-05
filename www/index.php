@@ -858,9 +858,9 @@ function simpleid_sign(&$response, $assoc_handle = NULL) {
     } else {
         $assoc = cache_get('association', $assoc_handle);
         
-        if ($assoc['created'] + SIMPLEID_ASSOC_EXPIRES_IN < time()) {
+        if (!is_array($assoc) || ($assoc['created'] + SIMPLEID_ASSOC_EXPIRES_IN < time())) {
             // Association has expired, need to create a new one
-            log_notice('Association handle ' . $assoc['assoc_handle'] . ' expired.  Using stateless mode.');
+            log_notice('Association handle ' . ($assoc['assoc_handle'] ?? '(none)') . ' expired.  Using stateless mode.');
             $response['openid.invalidate_handle'] = $assoc_handle;
             $assoc = _simpleid_create_association(ASSOCIATION_PRIVATE);
             $response['openid.assoc_handle'] = $assoc['assoc_handle'];

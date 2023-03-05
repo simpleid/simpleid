@@ -919,7 +919,7 @@ function user_cookieauth_user_auto_login() {
     list($authtype, $uid_hash, $id, $token) = explode(':', $cookie);
     if ($authtype != 'cookieauth') return NULL;
 
-    log_debug('Automatic login token detected: ' . implode(':', $cookieauth, $uid_hash, $id));
+    log_debug('Automatic login token detected: ' . implode(':', ['cookieauth', $uid_hash, $id]));
     
     cache_expire(array('autologin-' . $uid_hash => SIMPLEID_USER_AUTOLOGIN_EXPIRES_IN));
     $data = cache_get('autologin-' . $uid_hash, $id);
