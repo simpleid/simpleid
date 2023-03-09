@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public
  * License along with this program; if not, write to the Free
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- * 
+ *
  * $Id$
  */
 
@@ -33,7 +33,7 @@
  * @package simpleid
  * @filesource
  */
- 
+
 /**
  * The time the nonce used in the login process will last.
  */
@@ -62,21 +62,21 @@ $user = NULL;
 function user_init($q = NULL) {
     global $user;
     global $xtpl;
-    
+
     log_debug('user_init');
-    
+
     $user = NULL;
-    
+
     // session_name() has to be called before session_set_cookie_params()
     session_name(simpleid_cookie_name('sess'));
-    
+
     // Note the last parameter (httponly) requires PHP 5.2
     session_set_cookie_params(0, get_base_path(), ini_get('session.cookie_domain'), false, true);
     session_start();
-    
+
     if (isset($_SESSION['user']) && (cache_get('user', $_SESSION['user']) == session_id())) {
         $user = user_load($_SESSION['user']);
-        
+
         // If user has just been actively been authenticated in the previous request, then we
         // make it as actively authenticated in this request.
         if (isset($_SESSION['user_auth_active']) && $_SESSION['user_auth_active']) {
@@ -99,11 +99,11 @@ function user_init($q = NULL) {
  */
 function user_auto_login() {
     global $simpleid_extensions;
-    
+
     $extensions = $simpleid_extensions;
-    
+
     if (!in_array('user_cookieauth', $extensions)) $extensions[] = 'user_cookieauth';
-    
+
     foreach ($extensions as $extension) {
         $test_user = extension_invoke($extension, 'user_auto_login');
         if ($test_user != NULL) {
@@ -124,14 +124,14 @@ function user_load($uid) {
     if (store_user_exists($uid)) {
         $user = store_user_load($uid);
         $user["uid"] = $uid;
-        
+
         if (isset($user["identity"])) {
             $user["local_identity"] = true;
         } else {
             $user["identity"] = simpleid_url('user/' . rawurlencode($uid));
             $user["local_identity"] = false;
         }
-        
+
         return $user;
     } else {
         return NULL;
@@ -149,7 +149,7 @@ function user_load($uid) {
 function user_load_from_identity($identity) {
     $uid = store_get_uid($identity);
     if ($uid !== NULL) return user_load($uid);
-    
+
     return NULL;
 }
 
@@ -169,26 +169,26 @@ function user_save($user) {
  */
 function user_login() {
     global $user, $GETPOST;
-    
+
     // If the user is already logged in, return
     if (isset($user['uid'])) openid_indirect_response(simpleid_url(), '');
-    
+
     // Require HTTPS or return an error
     check_https('error', true);
-    
+
     $destination = (isset($GETPOST['destination'])) ? $GETPOST['destination'] : '';
     $state = (isset($GETPOST['s'])) ? $GETPOST['s'] : '';
     $fixed_uid = (isset($_POST['fixed_uid'])) ? $_POST['name'] : NULL;
     $mode = $_POST['mode'];
-    
+
     $query = ($state) ? 's=' . rawurlencode($state) : '';
-    
+
     if (isset($_POST['op']) && $_POST['op'] == t('Cancel')) {
         global $version;
-        
+
         $request = unpickle($state);
         $version = openid_get_version($request);
-        
+
         if (isset($request['openid.return_to'])) {
             $return_to = $request['openid.return_to'];
             $response = simpleid_checkid_error(FALSE);
@@ -218,7 +218,7 @@ function user_login() {
     // Some old versions of PHP does not recognise the T in the ISO 8601 date.  We may need to convert the T to a space
     if (($time == -1) || ($time === FALSE)) $time = strtotime(strtr(substr($_POST['nonce'], 0, 20), 'T', ' '));
     $nonce = cache_get('user-nonce', $_POST['nonce']);
-    
+
     if (!$nonce) {
         log_warn('Login attempt: Nonce ' . $_POST['nonce'] . ' not issued or is being reused.');
         set_message(t('SimpleID detected a potential security attack on your log in.  Please log in again.'));
@@ -241,7 +241,7 @@ function user_login() {
         case 'credentials':
             if (!isset($_POST['name'])) $_POST['name'] = '';
             if (!isset($_POST['pass'])) $_POST['pass'] = '';
-            
+
             if (($_POST['name'] == '') || ($_POST['pass'] == '')) {
                 if (isset($_POST['destination'])) {
                     // User came from a log in form.
@@ -284,9 +284,9 @@ function user_login() {
 
             break;
     }
-    
+
     _user_login($test_user, true);
-    
+
     openid_indirect_response(simpleid_url($destination, $query), '');
 }
 
@@ -308,7 +308,7 @@ function user_login() {
  * {@link user_login()} function.  Thus it will generally contain the keys 'pass' and
  * 'digest'.
  *
- * This function calls the {@link hook_user_verify_credentials()} hook to 
+ * This function calls the {@link hook_user_verify_credentials()} hook to
  * check whether the credentials supplied matches the credentials
  * for the specified user in the store.
  *
@@ -319,18 +319,18 @@ function user_login() {
  */
 function user_verify_credentials($uid, $credentials) {
     global $simpleid_extensions;
-    
+
     $extensions = $simpleid_extensions;
-    
+
     if (!in_array('user_passauth', $extensions)) $extensions[] = 'user_passauth';
-    
+
     foreach ($extensions as $extension) {
         $result = extension_invoke($extension, 'user_verify_credentials', $uid, $credentials);
         if ($result === true) {
             return true;
         }
     }
-    
+
     return false;
 }
 
@@ -366,7 +366,7 @@ function user_verify_otp(&$params, $code, $max_drift = 1) {
             $time = time();
 
             $test_code = user_totp($params['secret'], $time, $params['period'], $params['drift'], $params['algorithm'], $params['digits']);
-            
+
             if ($test_code == intval($code)) return true;
 
             for ($i = -$max_drift; $i <= $max_drift; $i++) {
@@ -399,7 +399,7 @@ function _user_login($login_user, $auth_active = false) {
         // Set the current authentication time
         $login_user['auth_time'] = time();
         user_save($login_user);
-    
+
         // Set user has been actively authenticated this and the next request only
         $login_user['auth_active'] = true;
         $_SESSION['user_auth_active'] = true;
@@ -425,10 +425,10 @@ function _user_login($login_user, $auth_active = false) {
  */
 function user_logout($destination = NULL) {
     global $user, $GETPOST;
-    
+
     // Require HTTPS, redirect if necessary
     check_https('redirect', true);
-    
+
     $state = (isset($GETPOST['s'])) ? $GETPOST['s'] : '';
     if ($destination == NULL) {
         if (isset($GETPOST['destination'])) {
@@ -437,11 +437,11 @@ function user_logout($destination = NULL) {
             $destination = '';
         }
     }
-    
+
     _user_logout();
-    
+
     set_message(t('You have been logged out.'));
-    
+
     user_login_form($destination, $state);
 }
 
@@ -452,10 +452,10 @@ function _user_logout() {
     global $user;
 
     $uid = $user['uid'];
-    
+
     user_cookieauth_invalidate();
     session_destroy();
-    
+
     cache_delete('user', $uid);
     unset($_SESSION['user']);
     $user = NULL;
@@ -476,7 +476,7 @@ function _user_logout() {
  */
 function user_login_form($destination = '', $state = NULL, $fixed_uid = NULL, $mode = 'credentials') {
     global $xtpl;
-    
+
     // Require HTTPS, redirect if necessary
     check_https('redirect', true);
 
@@ -485,11 +485,11 @@ function user_login_form($destination = '', $state = NULL, $fixed_uid = NULL, $m
         $xtpl->assign('cancel_button', t('Cancel'));
         $xtpl->parse('main.login.state');
     }
-    
+
     cache_expire(array('user-nonce' => SIMPLEID_LOGIN_NONCE_EXPIRES_IN));
     $nonce = openid_nonce();
     cache_set('user-nonce', $nonce, array('mode' => $mode, 'uid' => $fixed_uid));
-    
+
     $base_path = get_base_path();
     $xtpl->assign('javascript', '<script src="' . $base_path . 'html/user-login.js" type="text/javascript"></script>');
 
@@ -535,7 +535,7 @@ function user_login_form($destination = '', $state = NULL, $fixed_uid = NULL, $m
             $xtpl->assign('otp_label', t('Verification code:'));
             $xtpl->assign('autologin', (isset($_POST['autologin']) && ($_POST['autologin'] == 1)) ? '1' : '0');
             $xtpl->parse('main.login.otp');
-            
+
             $xtpl->assign('submit_button', t('Verify'));
             $xtpl->assign('title', t('Enter Verification Code'));
         default:
@@ -546,7 +546,7 @@ function user_login_form($destination = '', $state = NULL, $fixed_uid = NULL, $m
     $xtpl->assign('page_class', 'dialog-page');
     $xtpl->assign('destination', htmlspecialchars($destination, ENT_QUOTES, 'UTF-8'));
     $xtpl->assign('nonce', htmlspecialchars($nonce, ENT_QUOTES, 'UTF-8'));
-    
+
     $xtpl->parse('main.login');
     $xtpl->parse('main.framekiller');
     $xtpl->parse('main');
@@ -562,7 +562,7 @@ function user_otp_page() {
 
     // Require HTTPS, redirect if necessary
     check_https('redirect', true);
-    
+
     if ($user == NULL) {
         user_login_form('my/profile');
         return;
@@ -643,44 +643,44 @@ function user_otp_page() {
 
     $xtpl->parse('main.otp');
     $xtpl->parse('main.framekiller');
-    
+
     $xtpl->parse('main');
     $xtpl->out('main');
-    
+
 }
 
 
 /**
  * Returns the user's public page.
- * 
+ *
  * @param string $uid the user ID
  */
 function user_public_page($uid = NULL) {
     global $xtpl, $user;
-    
+
     $xtpl->assign('title', t('User Page'));
     if ($uid == NULL) {
         header_response_code('400 Bad Request');
         set_message(t('No user specified.'));
     } else {
         $user = user_load($uid);
-        
+
         if ($user == NULL) {
             header_response_code('404 Not Found');
             set_message(t('User %uid not found.', array('%uid' => $uid)));
         } else {
             header('Vary: Accept');
-            
+
             $content_type = negotiate_content_type(array('text/html', 'application/xml', 'application/xhtml+xml', 'application/xrds+xml'));
-            
+
             if ($content_type == 'application/xrds+xml') {
                 user_xrds($uid);
                 return;
             } else {
                 header('X-XRDS-Location: ' . simpleid_url('xrds/' . rawurlencode($uid)));
-                
+
                 set_message(t('This is the user %uid\'s SimpleID page.  It contains hidden information for the use by OpenID consumers.', array('%uid' => $uid)));
-                
+
                 $xtpl->assign('title', htmlspecialchars($uid, ENT_QUOTES, 'UTF-8'));
                 $xtpl->assign('provider', htmlspecialchars(simpleid_url(), ENT_QUOTES, 'UTF-8'));
                 $xtpl->assign('xrds', htmlspecialchars(simpleid_url('xrds/' . rawurlencode($uid)), ENT_QUOTES, 'UTF-8'));
@@ -690,7 +690,7 @@ function user_public_page($uid = NULL) {
             }
         }
     }
-    
+
     $xtpl->parse('main.provider');
     if ($user["local_identity"]) $xtpl->parse('main.local_id');
     $xtpl->parse('main');
@@ -704,15 +704,15 @@ function user_public_page($uid = NULL) {
  */
 function user_ppid_page($ppid = NULL) {
     global $xtpl;
-    
+
     header('Vary: Accept');
-            
+
     $content_type = negotiate_content_type(array('text/html', 'application/xml', 'application/xhtml+xml', 'application/xrds+xml'));
-            
+
     if (($content_type == 'application/xrds+xml') || ($_GET['format'] == 'xrds')) {
         header('Content-Type: application/xrds+xml');
         header('Content-Disposition: inline; filename=yadis.xml');
-    
+
         $xtpl->assign('simpleid_base_url', htmlspecialchars(simpleid_url(), ENT_QUOTES, 'UTF-8'));
         $xtpl->parse('xrds.user_xrds');
         $xtpl->parse('xrds');
@@ -720,36 +720,36 @@ function user_ppid_page($ppid = NULL) {
         return;
     } else {
         header('X-XRDS-Location: ' . simpleid_url('ppid/' . rawurlencode($ppid), 'format=xrds'));
-                
+
         $xtpl->assign('title', t('Private Personal Identifier'));
-                
+
         set_message(t('This is a private personal identifier.'));
-        
+
         $xtpl->parse('main');
         $xtpl->out('main');
-    }   
+    }
 }
 
 /**
  * Returns the user's public XRDS page.
- * 
+ *
  * @param string $uid the user ID
  */
 function user_xrds($uid) {
     global $xtpl;
-    
+
     $user = user_load($uid);
-    
+
     if ($user != NULL) {
         header('Content-Type: application/xrds+xml');
         header('Content-Disposition: inline; filename=yadis.xml');
-    
+
         if (($user != NULL) && ($user["local_identity"])) {
             $xtpl->assign('local_id', htmlspecialchars($user["identity"], ENT_QUOTES, 'UTF-8'));
             $xtpl->parse('xrds.user_xrds.local_id');
             $xtpl->parse('xrds.user_xrds.local_id2');
         }
-    
+
         $xtpl->assign('simpleid_base_url', htmlspecialchars(simpleid_url(), ENT_QUOTES, 'UTF-8'));
         $xtpl->parse('xrds.user_xrds');
         $xtpl->parse('xrds');
@@ -760,7 +760,7 @@ function user_xrds($uid) {
         } else {
             header($_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found');
         }
-        
+
         set_message('User <strong>' . htmlspecialchars($uid, ENT_QUOTES, 'UTF-8') . '</strong> not found.');
         $xtpl->parse('main');
         $xtpl->out('main');
@@ -774,12 +774,12 @@ function user_xrds($uid) {
  */
 function _user_page_profile() {
     global $user;
-    
-    $html = '<p>' . t('SimpleID may, with your consent, send the following information to sites which supports OpenID Connect.') . '</p>';    
+
+    $html = '<p>' . t('SimpleID may, with your consent, send the following information to sites which supports OpenID Connect.') . '</p>';
     $html .= '<p>' . t('To change these, <a href="!url">edit your identity file</a>.', array('!url' => 'http://simpleid.org/docs/1/identity-files/')) . '</p>';
-    
+
     $html .= "<table><tr><th>" . t('Member') . "</th><th>" . t('Value') . "</th></tr>";
-    
+
     if (isset($user['user_info'])) {
         foreach ($user['user_info'] as $member => $value) {
             if (is_array($value)) {
@@ -791,9 +791,9 @@ function _user_page_profile() {
             }
         }
     }
-    
+
     $html .= "</table>";
-    
+
     return array(array(
         'id' => 'userinfo',
         'title' => t('OpenID Connect'),
@@ -810,7 +810,7 @@ function _user_page_profile() {
 function user_header($state = NULL) {
     global $user;
     global $xtpl;
-    
+
     if ($user != NULL) {
         $xtpl->assign('uid', htmlspecialchars($user['uid'], ENT_QUOTES, 'UTF-8'));
         $xtpl->assign('identity', htmlspecialchars($user['identity'], ENT_QUOTES, 'UTF-8'));
@@ -839,15 +839,15 @@ function user_passauth_user_verify_credentials($uid, $credentials) {
     $allowed_algorithms = array('md5', 'sha1');
     if (function_exists('hash_algos')) $allowed_algorithms = array_merge($allowed_algorithms, hash_algos());
     if (function_exists('hash_pbkdf2')) $allowed_algorithms[] = 'pbkdf2';
-    
+
     $test_user = user_load($uid);
-    
+
     if ($test_user == NULL) return false;
-    
+
     $hash_function_salt = explode(':', $test_user['pass'], 3);
-    
+
     $hash = $hash_function_salt[0];
-    $function = (isset($hash_function_salt[1])) ? $hash_function_salt[1] : 'md5';    
+    $function = (isset($hash_function_salt[1])) ? $hash_function_salt[1] : 'md5';
     if (!in_array($function, $allowed_algorithms)) $function = 'md5';
     $salt_suffix = (isset($hash_function_salt[2])) ? ':' . $hash_function_salt[2] : '';
 
@@ -882,13 +882,13 @@ function user_passauth_user_verify_credentials($uid, $credentials) {
  */
 function user_cookieauth_create_cookie($id = NULL, $expires = NULL) {
     global $user;
-    
+
     if ($expires == NULL) {
         log_debug('Automatic login token created for ' . $user['uid']);
     } else {
         log_debug('Automatic login token renewed for ' . $user['uid']);
     }
-    
+
     if ($id == NULL) $id = random_id();
     if ($expires == NULL) $expires = time() + SIMPLEID_USER_AUTOLOGIN_EXPIRES_IN;
     $token = random_secret();
@@ -901,9 +901,9 @@ function user_cookieauth_create_cookie($id = NULL, $expires = NULL) {
         'uaid' => get_user_agent_id(),
         'ip' => $_SERVER['REMOTE_ADDR']
     );
-    
+
     cache_set('autologin-'. $uid_hash, $id, $data);
-    
+
     // Note the last parameter (httponly) requires PHP 5.2
     setcookie(simpleid_cookie_name('auth'), 'cookieauth:' . $uid_hash . ':' . $id . ':' . $token, $expires, get_base_path(), '', false, true);
 }
@@ -913,27 +913,27 @@ function user_cookieauth_create_cookie($id = NULL, $expires = NULL) {
  */
 function user_cookieauth_user_auto_login() {
     if (!isset($_COOKIE[simpleid_cookie_name('auth')])) return NULL;
-        
+
     $cookie = $_COOKIE[simpleid_cookie_name('auth')];
-    
+
     list($authtype, $uid_hash, $id, $token) = explode(':', $cookie);
     if ($authtype != 'cookieauth') return NULL;
 
-    log_debug('Automatic login token detected: ' . implode(':', $cookieauth, $uid_hash, $id));
-    
+    log_debug('Automatic login token detected: ' . implode(':', ['cookieauth', $uid_hash, $id]));
+
     cache_expire(array('autologin-' . $uid_hash => SIMPLEID_USER_AUTOLOGIN_EXPIRES_IN));
     $data = cache_get('autologin-' . $uid_hash, $id);
-    
+
     if (!$data) {  // Cookie doesn't exist
         log_notice('Automatic login: Token does not exist on server');
         return NULL;
     }
-    
+
     if ($data['expires'] < time()) {  // Cookie expired
         log_notice('Automatic login: Token on server expired');
         return NULL;
     }
-    
+
     if ($data['token'] != $token) {
         log_warn('Automatic login: Token on server does not match');
         // Token not the same - panic
@@ -949,18 +949,18 @@ function user_cookieauth_user_auto_login() {
         user_cookieauth_invalidate();
         return NULL;
     }
-    
+
     // Load the user, tag it as an auto log in
     $test_user = user_load($data['uid']);
-    
+
     if ($test_user != NULL) {
         log_debug('Automatic login token accepted for ' . $data['uid']);
-        
+
         $test_user['autologin'] = TRUE;
-    
+
         // Renew the token
         user_cookieauth_create_cookie($id, $data['expires']);
-        
+
         return $test_user;
     } else {
         log_warn('Automatic login token accepted for ' . $data['uid'] . ', but no such user exists');
@@ -975,11 +975,11 @@ function user_cookieauth_user_auto_login() {
 function user_cookieauth_invalidate() {
     if (isset($_COOKIE[simpleid_cookie_name('auth')])) {
         $cookie = $_COOKIE[simpleid_cookie_name('auth')];
-        
+
         list($uid_hash, $id, $token) = explode(':', $cookie);
-        
+
         cache_delete('autologin-' . $uid_hash, $id);
-        
+
         setcookie(simpleid_cookie_name('auth'), "", time() - 3600);
     }
 }

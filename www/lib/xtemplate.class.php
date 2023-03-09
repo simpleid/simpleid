@@ -906,8 +906,6 @@ class XTemplate {
      */
 	public function scan_globals () {
 
-		reset($GLOBALS);
-
 		foreach ($GLOBALS as $k => $v) {
 			$GLOB[$k] = $v;
 		}
