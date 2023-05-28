@@ -1,6 +1,16 @@
 name: Continuous integration tests
 
-on: [ push, pull_request ]
+on:
+  push:
+    paths:
+      - '**.php'
+      - 'phpstan.*'
+      - 'phpunit.*'
+  pull_request:
+    paths:
+      - '**.php'
+      - 'phpstan.*'
+      - 'phpunit.*'
 
 jobs:
   phpunit:
