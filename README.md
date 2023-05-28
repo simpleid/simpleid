@@ -38,15 +38,6 @@ Licensing
 
 Licensing information for SimpleID can be found in the file `COPYING.txt`.
 
-Donate
-------
-
-If you enjoy using SimpleID, please consider making a donation to support the
-ongoing development work.  To find out more on how to donate, visit
-<http://simpleid.org/donate>.
-
-Your donation is very much appreciated.
-
 Acknowledgements
 ----------------
 
