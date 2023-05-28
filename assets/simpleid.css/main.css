@@ -1,10 +1,11 @@
 /*! SimpleID | GPL-2.0-or-later | simpleid.org */
 
-@import url(normalize.css);
+@import 'modern-normalize';
 
 /* General elements -------------------------------------------------------- */
 html {
-    font: 12px/19px Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    line-height: 19px;
 }
 
 h1 {
