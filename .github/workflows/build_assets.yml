@@ -20,7 +20,9 @@ jobs:
           cache: 'npm'
 
       - name: Build assets
-        run: npm run build
+        run: |
+          npm ci
+          npm run build
 
       - name: Commit
         uses: stefanzweifel/git-auto-commit-action@v4
