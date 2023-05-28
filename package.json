@@ -3,8 +3,12 @@
   "description": "A simple, personal OpenID provider written in PHP",
   "license": "GPL-2.0-or-later",
   "private": true,
-  "dependencies": {
+  "scripts": {
+    "build": "node build/build_assets.js"
+  },
+  "devDependencies": {
     "alpinejs": "^3.12.1",
+    "arg": "^5.0.2",
     "esbuild": "^0.17.19"
   }
 }
