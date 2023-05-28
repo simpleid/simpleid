@@ -2,5 +2,9 @@
   "name": "simpleid",
   "description": "A simple, personal OpenID provider written in PHP",
   "license": "GPL-2.0-or-later",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "alpinejs": "^3.12.1",
+    "esbuild": "^0.17.19"
+  }
 }
