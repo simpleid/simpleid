@@ -42,7 +42,7 @@ async function buildStylesheet(package) {
         bundle: true,
         platform: 'browser',
         sourcemap: 'external',
-        external: ['*.png', '*.css'],
+        external: ['*.png'],
         minify: !args.watch,
         define: { 
             'process.env.NODE_ENV': args.watch ? `'development'` : `'production'`
