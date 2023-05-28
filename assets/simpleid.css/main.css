@@ -4,7 +4,8 @@
 
 /* General elements -------------------------------------------------------- */
 html {
-    font: 12px/19px Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    line-height: 19px;
 }
 
 h1 {
