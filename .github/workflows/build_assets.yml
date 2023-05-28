@@ -5,6 +5,7 @@ on:
       - '*'   # Ignore all branches which do not have a slash
     paths:
       - 'assets/**'
+      - 'build/build_assets.js'
 
 jobs:
   build:
