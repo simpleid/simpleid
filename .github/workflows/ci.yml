@@ -16,7 +16,7 @@ jobs:
           - 8.1
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -25,25 +25,29 @@ jobs:
           extensions: openssl, hash, gmp, xml
           tools: composer
 
-      - name: Cache dependencies
-        uses: actions/cache@v1
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
         with:
-          path: "~/.composer/cache"
+          path: ${{ steps.composer-cache.outputs.dir }}
           key: "php${{ matrix.php-versions }}-composer-${{ hashFiles('**/composer.json') }}"
           restore-keys: "php${{ matrix.php-versions }}-composer-"
 
-      - name: Install dependencies
+      - name: Install Composer dependencies
         run: composer update && composer install
 
       - name: Run tests
         run: composer test
 
   stan:
-    name: Static analysis
+    name: PHP static analysis
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -52,10 +56,14 @@ jobs:
           extensions: openssl, hash, gmp, xml
           tools: composer
 
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
       - name: Cache dependencies
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
-          path: "~/.composer/cache"
+          path: ${{ steps.composer-cache.outputs.dir }}
           key: "phpstan-composer-${{ hashFiles('**/composer.json') }}"
           restore-keys: "phpstan-composer-"
 
