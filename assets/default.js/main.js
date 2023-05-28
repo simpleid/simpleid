@@ -1,6 +1,6 @@
-const Alpine = require('alpinejs');
+import Alpine from 'alpinejs';
 
 window.Alpine = Alpine;
 queueMicrotask(() => {
-    window.Alpine.start();
+    Alpine.start();
 })
