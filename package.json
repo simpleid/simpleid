@@ -4,7 +4,8 @@
   "license": "GPL-2.0-or-later",
   "private": true,
   "scripts": {
-    "build": "node build/build_assets.js"
+    "build": "node build/build_assets.js",
+    "clean": "rm www/html/assets/*"
   },
   "devDependencies": {
     "alpinejs": "^3.12.1",
