@@ -168,6 +168,13 @@ class User extends ArrayWrapper implements Serializable, Storable {
         }
     }
 
+    /**
+     * Implementation of ArrayAccess
+     * 
+     * Ideally we should provide a mixed return type here, but for PHP7 compatibility,
+     * we add a ReturnTypeWillChange attribute instead.
+     */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         switch ($offset) {
             case 'uid':

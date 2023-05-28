@@ -169,11 +169,12 @@ class BigNum {
                 while ($this->_cmp($num, 0) > 0) {
                     $r = $this->_mod($num, $base);
                     if (BIGNUM_GMP) {
-                        $r = gmp_intval($r);
+                        $i = gmp_intval($r);
                     } else {
-                        $r = intval($r);
+                        /** @var string $r */
+                        $i = intval($r);
                     }
-                    $str = base_convert(strval($r), 10, $base) . $str;
+                    $str = base_convert(strval($i), 10, $base) . $str;
                     $num = $this->_div($num, $base);
                 }
      

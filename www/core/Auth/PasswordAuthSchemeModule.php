@@ -137,7 +137,7 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
                 $params = [];
                 list($param_string, $hash, $salt) = explode('$', $content, 3);
                 parse_str($param_string, $params);
-                if (!isset($params['f'])) $params['f'] = 'sha256';
+                if (!isset($params['f']) || is_array($params['f'])) $params['f'] = 'sha256';
                 if (!isset($params['dk'])) $params['dk'] = 0;
                 return $this->secureCompare(hash_pbkdf2(strval($params['f']), $credentials['password']['password'], base64_decode($salt), intval($params['c']), intval($params['dk']), true),
                     base64_decode($hash));

@@ -139,7 +139,11 @@ class ArrayWrapper implements ArrayAccess, Countable, IteratorAggregate {
 
     /**
      * Implementation of ArrayAccess
+     * 
+     * Ideally we should provide a mixed return type here, but for PHP7 compatibility,
+     * we add a ReturnTypeWillChange attribute instead.
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         return isset($this->container[$offset]) ? $this->container[$offset] : null;
     }
