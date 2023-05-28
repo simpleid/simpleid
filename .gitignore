@@ -2,7 +2,6 @@ composer.site.json
 composer.lock
 .phpunit.result.cache
 
-package-lock.json
 node_modules/
 
 log/
