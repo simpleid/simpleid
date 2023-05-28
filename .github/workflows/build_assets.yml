@@ -1,0 +1,31 @@
+name: Build assets
+on:
+  push:
+    branches-ignore:
+      - '*'   # Ignore all branches which do not have a slash
+    paths:
+      - 'assets/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Build assets
+        run: |
+          npm ci
+          npm run build
+
+      - name: Commit
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Auto build assets
+          file_pattern: 'www/html'
