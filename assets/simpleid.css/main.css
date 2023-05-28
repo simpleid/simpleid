@@ -1,6 +1,6 @@
 /*! SimpleID | GPL-2.0-or-later | simpleid.org */
 
-@import url(normalize.css);
+@import 'modern-normalize';
 
 /* General elements -------------------------------------------------------- */
 html {
