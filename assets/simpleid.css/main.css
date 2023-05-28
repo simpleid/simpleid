@@ -125,7 +125,7 @@ pre.code { white-space: pre; overflow: initial; }
 }
 .logged-in-as .identity {
     padding-left: 20px;
-    background: transparent url(user.png) no-repeat top left;
+    background: transparent url(../user.png) no-repeat top left;
     color: #FFFFFF;
 }
 .logged-in-as a {
@@ -166,15 +166,15 @@ pre.code { white-space: pre; overflow: initial; }
 /* Specific elements ------------------------------------------------------- */
 .realm, .site {
     padding-left: 20px;
-    background: transparent url(world.png) no-repeat top left;
+    background: transparent url(../world.png) no-repeat top left;
 }
 .app {
     padding-left: 20px;
-    background: transparent url(application.png) no-repeat top left;
+    background: transparent url(../application.png) no-repeat top left;
 }
 .device {
     padding-left: 20px;
-    background: transparent url(drive.png) no-repeat top left;
+    background: transparent url(../drive.png) no-repeat top left;
 }
 .url-elide { color: #999999; }
 
@@ -193,12 +193,12 @@ span.last-time { display: none; }
     border: 1px solid #AAAA11;
     background: #FFFFDD;
 }
-.unsecure p { padding-left: 20px; background: transparent url(lock-open.png) no-repeat top left; }
+.unsecure p { padding-left: 20px; background: transparent url(../lock-open.png) no-repeat top left; }
 .secure {
     border: 1px solid #44AA11;
     background: #EEFFDD;
 }
-.secure p { padding-left: 20px; background: transparent url(lock.png) no-repeat top left; }
+.secure p { padding-left: 20px; background: transparent url(../lock.png) no-repeat top left; }
 
 .block {
     background-color: #EEEEEE;
