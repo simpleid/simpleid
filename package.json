@@ -8,11 +8,11 @@
     "clean": "rm www/html/assets/*"
   },
   "devDependencies": {
-    "alpinejs": "^3.12.1",
     "arg": "^5.0.2",
     "esbuild": "^0.17.19"
   },
   "dependencies": {
+    "alpinejs": "^3.12.1",
     "normalize.css": "^8.0.1"
   }
 }
