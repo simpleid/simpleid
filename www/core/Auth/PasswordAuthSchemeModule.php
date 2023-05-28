@@ -131,8 +131,7 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
 
         switch ($prefix) {
             case '2y':
-                $bcrypt = Bcrypt::instance();
-                return $bcrypt->verify($credentials['password']['password'], $test_user['password']['password']);
+                return password_verify($credentials['password']['password'], $test_user['password']['password']);
             case 'pbkdf2':
                 $params = [];
                 list($param_string, $hash, $salt) = explode('$', $content, 3);
