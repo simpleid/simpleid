@@ -7,40 +7,33 @@
     </head>
     <body>
         <script src="{{ @base_path }}html/assets/default.js" type="text/javascript"></script>
-        <script src="{{ @base_path }}html/hmac-sha256.js" type="text/javascript"></script>
         <script type="text/javascript">
             function checkSessionApp(options) {
                 return {
                     cookieName: options.cookieName,
 
-                    secure_compare: function(str1, str2) {
-                        if (str1.length != str2.length) return false;
-
-                        let result = 0;
-                        for (var i = 0; i < str1.length - 1; i++) {
-                            result |= str1.charCodeAt(i) ^ str2.charCodeAt(i);
-                        }
-
-                        return (result == 0);
-                    },
-
                     checkSession($ev) {
                         const ev = $ev.originalEvent;
-
                         if (ev.origin != window.parent.location.origin) return;
 
-                        const client_id = ev.data.split(' ')[0];
-                        const session_state = ev.data.split(' ')[1];
-                        if (typeof session_state == 'undefined') {
-                            ev.source.postMessage('error', ev.origin);
-                            return;
-                        }
+                        const encoder = new TextEncoder();
 
-                        const salt = session_state.split('.')[1];
-                        if (typeof salt == 'undefined') {
+                        const data_parts = ev.data.split(' ', 2);
+                        if (data_parts.length != 2) {
                             ev.source.postMessage('error', ev.origin);
                             return;
                         }
+                        const client_id = data_parts[0];
+                        const session_state = data_parts[1];
+
+                        const session_state_parts = session_state.split('.', 2);
+                        if (session_state_parts.length != 2) {
+                            ev.source.postMessage('error', ev.origin);
+                            return;
+                        }
+                        const hashString = session_state_parts[0];
+                        const salt = session_state_parts[1];
+                        const hash = new Uint8Array(hashString.match(/[\da-f]{2}/gi).map((h) => parseInt(h, 16)));
 
                         const cookies = document.cookie.split(';').map(function(cookie) {
                             return cookie.trim().split(/(=)/);
@@ -50,18 +43,11 @@
                         }, {});
 
                         const uals = cookies[this.cookieName];
+                        const key = await window.crypto.subtle.importKey('raw', encoder.encode(uals), {name: 'HMAC', hash: 'SHA-256'}, false, ['sign', 'verify']);
 
-                        // This needs to match ConnectSessionModule::buildSessionState
-                        const expected_session_state = CryptoJS.HmacSHA256(client_id + ' ' + ev.origin + ' ' + salt, uals) + '.' + salt;
-
-                        let status;
-                        if (secure_compare(session_state, expected_session_state)) {
-                            status = 'unchanged';
-                        } else {
-                            status = 'changed';
-                        }
-
-                        ev.source.postMessage(status, ev.origin);
+                        window.crypto.subtle.verify('HMAC', key, hash, encoder.encode(client_id + ' ' + origin + ' ' + salt)).then((result) => {
+                            ev.source.postMessage((result) ? 'unchanged' : 'changed', ev.origin);
+                        });
                     }
                 }
             }
