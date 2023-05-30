@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "build": "node build/build_assets.js",
+    "watch": "node build/build_assets.js --watch",
     "clean": "git restore www/html/assets"
   },
   "devDependencies": {

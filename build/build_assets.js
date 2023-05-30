@@ -14,25 +14,24 @@ async function buildScript(package) {
         bundle: true,
         platform: 'browser',
         sourcemap: 'external',
-        minify: !args.watch,
+        minify: !args['--watch'],
         define: { 
-            'process.env.NODE_ENV': args.watch ? `'development'` : `'production'`
+            'process.env.NODE_ENV': args['--watch'] ? `'development'` : `'production'`
         },
     });
     
-    if (args.watch) {
-        console.log('Watching...');
+    if (args['--watch']) {
+        console.log(`Watching ${package}...`);
 
-        await ctx.watch().catch(() => {
+        ctx.watch().catch(() => {
             process.exit(1);
         });
     } else {
         await ctx.rebuild().catch(() => {
             process.exit(1);
         });
+        await ctx.dispose();
     }
-
-    await ctx.dispose();
 }
 
 async function buildStylesheet(package) {
@@ -43,25 +42,24 @@ async function buildStylesheet(package) {
         platform: 'browser',
         sourcemap: 'external',
         external: ['*.png'],
-        minify: !args.watch,
+        minify: !args['--watch'],
         define: { 
-            'process.env.NODE_ENV': args.watch ? `'development'` : `'production'`
+            'process.env.NODE_ENV': args['--watch'] ? `'development'` : `'production'`
         },
     });
     
-    if (args.watch) {
-        console.log('Watching...');
+    if (args['--watch']) {
+        console.log(`Watching ${package}...`);
 
-        await ctx.watch().catch(() => {
+        ctx.watch().catch(() => {
             process.exit(1);
         });
     } else {
         await ctx.rebuild().catch(() => {
             process.exit(1);
         });
+        await ctx.dispose();
     }
-
-    await ctx.dispose();
 }
 
 fs.readdirSync('assets').forEach(function(package) {
