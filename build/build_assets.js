@@ -4,7 +4,8 @@ const path = require('path');
 const esbuild = require('esbuild');
 
 const args = arg({
-    '--watch': Boolean
+    '--watch': Boolean,
+    '--serve': Boolean
 });
 
 async function buildScript(package) {
@@ -62,6 +63,9 @@ async function buildStylesheet(package) {
     }
 }
 
+/* ----------------------- Main ----------------------- */
+if (args['--serve']) args['--watch'] = true;
+
 fs.readdirSync('assets').forEach(function(package) {
     const type = path.extname(package);
     if (type == '.js') {
@@ -70,3 +74,19 @@ fs.readdirSync('assets').forEach(function(package) {
         buildStylesheet(package);
     }
 });
+
+if (args['--serve']) {
+    const server = require("@compodoc/live-server");
+    params = {
+        port: 4000,
+        host: "0.0.0.0",
+        root: "tests/frontend",
+        open: false, // When false, it won't load your browser by default.
+        mount: [
+            ["/html", "./www/html"]
+        ],
+        logLevel: 2, // 0 = errors only, 1 = some, 2 = lots
+    };
+    console.log(`Serving on http://${params.host}:${params.port}/`)
+    server.start(params);
+}

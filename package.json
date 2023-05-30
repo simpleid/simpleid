@@ -6,9 +6,11 @@
   "scripts": {
     "build": "node build/build_assets.js",
     "watch": "node build/build_assets.js --watch",
+    "serve": "node build/build_assets.js --watch --serve",
     "clean": "git restore www/html/assets"
   },
   "devDependencies": {
+    "@compodoc/live-server": "^1.2.3",
     "arg": "^5.0.2",
     "esbuild": "^0.17.19"
   },
