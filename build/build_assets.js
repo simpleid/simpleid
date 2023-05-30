@@ -8,43 +8,19 @@ const args = arg({
     '--serve': Boolean
 });
 
-async function buildScript(package) {
+async function build(entryPoints) {
     const ctx = await esbuild.context({
-        entryPoints: [`assets/${package}/main.js`],
-        outfile: `www/html/assets/${package}`,
-        bundle: true,
-        allowOverwrite: true,
-        platform: 'browser',
-        sourcemap: 'external',
-        minify: !args['--watch'],
-        define: { 
-            'process.env.NODE_ENV': args['--watch'] ? `'development'` : `'production'`
-        },
-    });
-    
-    if (args['--watch']) {
-        console.log(`Watching ${package}...`);
-
-        ctx.watch().catch(() => {
-            process.exit(1);
-        });
-    } else {
-        await ctx.rebuild().catch(() => {
-            process.exit(1);
-        });
-        await ctx.dispose();
-    }
-}
-
-async function buildStylesheet(package) {
-    const ctx = await esbuild.context({
-        entryPoints: [`assets/${package}/main.css`],
-        outfile: `www/html/assets/${package}`,
+        entryPoints: entryPoints,
+        outdir: 'www/html/assets',
         bundle: true,
         allowOverwrite: true,
         platform: 'browser',
         sourcemap: 'external',
         external: ['*.png'],
+        banner: {
+            css: '/* DO NOT EDIT - automatically generated */', 
+            js: '/* DO NOT EDIT - automatically generated */'
+        }, 
         minify: !args['--watch'],
         define: { 
             'process.env.NODE_ENV': args['--watch'] ? `'development'` : `'production'`
@@ -68,14 +44,18 @@ async function buildStylesheet(package) {
 /* ----------------------- Main ----------------------- */
 if (args['--serve']) args['--watch'] = true;
 
-fs.readdirSync('assets').forEach(function(package) {
+const entryPoints = fs.readdirSync('assets').filter((package) => {
     const type = path.extname(package);
-    if (type == '.js') {
-        buildScript(package);
-    } else if (type == '.css') {
-        buildStylesheet(package);
+    return ((type == '.js') || (type == '.css'))
+}).map((package) => {
+    const type = path.extname(package);
+    const base = path.basename(package, type);
+    return {
+        in: `assets/${package}/main${type}`,
+        out: base
     }
 });
+build(entryPoints);
 
 if (args['--serve']) {
     const server = require("@compodoc/live-server");
