@@ -21,7 +21,7 @@
         {{ @@javascript | raw }}
     </head>
     <body class="{{ @@page_class }}">
-        <script src="{{ @base_path }}html/assets/default.js" type="text/javascript"></script>
+        <script src="{{ @base_path }}html/assets/default.js" type="text/javascript" defer></script>
 
         <div x-data="{ nav_expand: false, user_expand: false }">
         <div id="header"><div id="header-inner">
