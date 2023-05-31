@@ -60,17 +60,12 @@ SimpleID uses the [Alpine.js library](http://alpinejs.dev),
 by Caleb Porzio and other contributors.
 Licensing information for this library can be found at <https://github.com/alpinejs/alpine/blob/main/LICENSE.md>.
 
-SimpleID uses the [QRCode.js library](https://github.com/davidshimjs/qrcodejs),
-by davidshimjs.
+SimpleID uses the [qrcode-svg library](https://github.com/papnkukn/qrcode-svg),
+by papnkukn.
 Licensing information for this library can be found at
-<https://github.com/davidshimjs/qrcodejs/blob/master/LICENSE>.
+<https://github.com/papnkukn/qrcode-svg/blob/master/LICENSE>.
 
-SimpleID uses the [crypto-js library](https://github.com/brix/crypto-js),
-by Jeff Mott and Evan Vosberg.
+SimpleID uses [modern-normalize style sheet](http://necolas.github.io/normalize.css/),
+by Nicolas Gallagher, Jonathan Neal and Sindre Sorhus.
 Licensing information for this library can be found at
-<https://raw.githubusercontent.com/brix/crypto-js/master/LICENSE>.
-
-SimpleID uses [normalize.css style sheet](http://necolas.github.io/normalize.css/),
-by Nicolas Gallagher and Jonathan Neal.
-Licensing information for this library can be found at
-<https://github.com/necolas/normalize.css/blob/master/LICENSE.md>.
+<https://github.com/sindresorhus/modern-normalize/blob/main/license>.
