@@ -28,7 +28,7 @@ async function build(entryPoints) {
     });
     
     if (args['--watch']) {
-        console.log(`Watching ${package}...`);
+        console.log(`Watching...`);
 
         ctx.watch().catch(() => {
             process.exit(1);
