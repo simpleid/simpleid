@@ -32,6 +32,8 @@ const SIMPLEID_ETERNAL_TOKEN_EXPIRES_IN = 315360000;
 
 
 // 2. Load configuration
+$f3 = \Base::instance();
+
 $default_config = [
     'allow_plaintext' => false,
     'allow_autocomplete' => false,
@@ -70,9 +72,6 @@ if (file_exists('conf/config.php')) {
 } else {
     die('No configuration file found.  See <http://simpleid.org/docs/2/installing/> for instructions on how to set up a configuration file.');
 }
-
-
-$f3 = \Base::instance();
 
 $config = array_replace_recursive($default_config, $config);
 if (!isset($config['canonical_base_path'])) {
