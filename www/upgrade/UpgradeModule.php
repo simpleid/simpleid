@@ -67,7 +67,7 @@ class UpgradeModule extends Module {
      * Displays the upgrade info page.
      */
     function info() {
-        $tpl = new \Template();
+        $tpl = \Template::instance();
         
         $this->f3->set('upgrade_url', 'http://simpleid.org/documentation/getting-started/upgrading');
 
@@ -96,7 +96,7 @@ class UpgradeModule extends Module {
             return;
         }
 
-        $tpl = new \Template();
+        $tpl = \Template::instance();
         $cache = \Cache::instance();
         
         $cache->reset('.upgrade');
@@ -253,7 +253,7 @@ class UpgradeModule extends Module {
      * run the upgrade script.
      */
     protected function accessDenied() {
-        $tpl = new \Template();
+        $tpl = \Template::instance();
 
         $this->f3->set('upgrade_url', 'https://simpleid.org/docs/2/upgrading/#upgrade');
         

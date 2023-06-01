@@ -52,7 +52,7 @@ class ConnectSessionModule extends Module {
      */
     public function check_session() {
         $auth = AuthManager::instance();
-        $tpl = new \Template();
+        $tpl = \Template::instance();
 
         $this->f3->set('cookie_name', $auth->getCookieName('uals'));
         
@@ -162,7 +162,7 @@ class ConnectSessionModule extends Module {
      */
     protected function logoutForm($form_state = null) {
         if ($form_state == null) $form_state = new FormState();
-        $tpl = new \Template();
+        $tpl = \Template::instance();
 
         $token = new SecurityToken();
         $this->f3->set('tk', $token->generate('connect_logout', SecurityToken::OPTION_BIND_SESSION));

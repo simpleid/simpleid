@@ -55,7 +55,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
         /** @var \SimpleID\Models\User $user */
         $user = $auth->getUser();
 
-        $tpl = new \Template();
+        $tpl = \Template::instance();
         $token = new SecurityToken();
 
         // Require HTTPS, redirect if necessary
@@ -196,7 +196,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             $uaid = $auth->assignUAID();
             if (in_array($uaid, $test_user['otp']['remember'])) return;
 
-            $tpl = new \Template();
+            $tpl = \Template::instance();
 
             // Note this is called from user_login(), so $_POST is always filled
             $this->f3->set('otp_recovery_url', 'http://simpleid.org/docs/2/common_problems/#otp');

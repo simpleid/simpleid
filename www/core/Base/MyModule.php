@@ -101,7 +101,7 @@ class MyModule extends Module {
 
         $token = new SecurityToken();
 
-        $tpl = new \Template();
+        $tpl = \Template::instance();
         $this->f3->set('tk', $token->generate('apps', SecurityToken::OPTION_BIND_SESSION));
         $this->f3->set('title', $this->f3->get('intl.core.my.apps_title'));
         $this->f3->set('layout', 'my_apps.html');
@@ -278,7 +278,7 @@ class MyModule extends Module {
     public function onDashboardBlocks(UIBuildEvent $event) {
         $auth = AuthManager::instance();
         $user = $auth->getUser();
-        $tpl = new \Template();
+        $tpl = \Template::instance();
 
         $event->addBlock('welcome', $this->f3->get('intl.core.my.logged_in_as', [ $user->getDisplayName(), $user['uid'] ]), -10, [
             'title' => $this->f3->get('intl.core.my.welcome_title')
@@ -323,12 +323,12 @@ class MyModule extends Module {
         $event = new UIBuildEvent($event_name);
         \Events::instance()->dispatch($event);
 
-        $tpl = new \Template();
+        $tpl = \Template::instance();
         // TODO $event->getAttachments();
         $this->f3->set('blocks', $event->getBlocks());
         $this->f3->set('title', $title);
         $this->f3->set('layout', 'my_blocks.html');
-        print $tpl->render('page.html');        
+        print $tpl->render('page.html');
     }
 }
 

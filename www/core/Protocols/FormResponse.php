@@ -47,7 +47,7 @@ class FormResponse extends ArrayWrapper {
      */
     public function render($url) {
         $f3 = Base::instance();
-        $tpl = new Template();
+        $tpl = Template::instance();
 
         $f3->set('url', $url);
         $f3->set('params', $this->container);

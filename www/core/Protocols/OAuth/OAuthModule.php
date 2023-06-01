@@ -622,7 +622,7 @@ class OAuthModule extends Module implements ProtocolResult {
      */
     protected function consentForm($request, $response) {
         $store = StoreManager::instance();
-        $tpl = new \Template();
+        $tpl = \Template::instance();
 
         $client = $store->loadClient($request['client_id'], 'SimpleID\Protocols\OAuth\OAuthClient');
 

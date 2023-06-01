@@ -105,7 +105,7 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
         $form_state = $event->getFormState();
 
         if ($form_state['mode'] == AuthManager::MODE_CREDENTIALS) {
-            $tpl = new \Template();
+            $tpl = \Template::instance();
             $event->addBlock('auth_rememberme', $tpl->render('auth_rememberme.html', false), 10);
         }
     }

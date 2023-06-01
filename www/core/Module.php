@@ -223,7 +223,7 @@ abstract class Module extends \Prefab {
     protected function fatalError($error) {
         $this->f3->set('title', $this->f3->get('intl.common.error'));
         $this->f3->set('message', $error);
-        $tpl = new \Template();
+        $tpl = \Template::instance();
         print $tpl->render('page.html');
         exit;
     }

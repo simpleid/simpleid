@@ -224,7 +224,7 @@ class AuthModule extends Module {
      * @return void
      */
     public function loginForm($params = [ 'destination' => null ], $form_state = null) {
-        $tpl = new \Template();
+        $tpl = \Template::instance();
         $config = $this->f3->get('config');
         if ($form_state == null) $form_state = new FormState([ 'mode' => AuthManager::MODE_CREDENTIALS ]);
 

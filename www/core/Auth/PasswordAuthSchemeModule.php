@@ -52,7 +52,7 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
         $form_state = $event->getFormState();
 
         if ($form_state['mode'] == AuthManager::MODE_CREDENTIALS || $form_state['mode'] == AuthManager::MODE_REENTER_CREDENTIALS) {
-            $tpl = new \Template();
+            $tpl = \Template::instance();
 
             $this->f3->set('login_form_module', 'password');
 
