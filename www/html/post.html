@@ -13,7 +13,7 @@
             <div id="content-inner">            
                 <img src="{{ @base_path }}html/loading.gif" id="loading-graphic" style="display: block; margin-left: auto; margin-right: auto">
             
-                <form action="{{ @url }}" method="post" id="post-form">
+                <form action="{{ @url }}" method="post" id="post-form" {{ @@test }}>
                     <repeat group="{{ @params }}" key="{{ @name }}" value="{{ @value }}">
                         <input type="hidden" name="{{ @name }}" value= "{{ @value }}">
                     </repeat>
@@ -27,7 +27,8 @@
 
         <script type="text/javascript">
             document.getElementById("fallback").style.display = "none";
-            document.getElementById("post-form").submit();
+            if (!document.getElementById("post-form").hasAttribute("data-test"))
+                document.getElementById("post-form").submit();
             window.setTimeout(function() {
                 document.getElementById("loading-graphic").style.display = "none";
                 document.getElementById("fallback").style.display = "block";

@@ -46,6 +46,8 @@ class RoboFile extends \Robo\Tasks {
                     if (isset($step['variables'])) $f3->mset($step['variables']);
 
                     $result = $tpl->render($template_file);
+                } elseif (isset($step['resolve'])) {
+                    $result = $tpl->resolve($step['resolve']);
                 } elseif (isset($step['array'])) {
                     $result = [];
 
