@@ -1,0 +1,31 @@
+# Configuration of make_frontend_tests
+
+globals:
+  # Framework variables (1st phase)
+  - UI: www/html/
+    PREFIX: intl.
+    DEBUG: 2
+
+  # Framework variables (2nd phase)
+  - FALLBACK: en
+    LOCALES: www/locale/
+
+  # Global template variables
+  - title: Test page
+    version: test
+    base_path: /
+
+tests:
+  auth_login.html:
+    - template: auth_password.html
+      variables:
+        login_form_module: auth_password
+      set: form_content
+
+    - array:
+        content: '{{ @form_content | raw }}'
+      push: forms
+
+    - template: page.html
+      variables:
+        layout: auth_login.html
