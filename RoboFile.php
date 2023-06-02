@@ -25,4 +25,49 @@ class RoboFile extends \Robo\Tasks {
                 ->run();
         }
     }
+    
+    public function make_frontend_tests() {
+        $tests_dir = 'tests/frontend';
+        $f3 = \Base::instance();
+        $tpl = \Template::instance();
+
+        $config = Spyc::YAMLLoad($tests_dir . '/config.yml');
+
+        foreach ($config['globals'] as $phase) {
+            $f3->mset($phase);
+        }
+
+        foreach ($config['tests'] as $output_file => $steps) {
+            $this->say($output_file);
+
+            foreach ($steps as $step) {
+                if (isset($step['template'])) {
+                    $template_file = $step['template'];
+                    if (isset($step['variables'])) $f3->mset($step['variables']);
+
+                    $result = $tpl->render($template_file);
+                } elseif (isset($step['resolve'])) {
+                    $result = $tpl->resolve($step['resolve']);
+                } elseif (isset($step['array'])) {
+                    $result = [];
+
+                    foreach ($step['array'] as $variable => $contents) {
+                        $result[$variable] = $tpl->resolve($contents);
+                    }
+                }
+
+                if (isset($step['set'])) {
+                    $f3->set($step['set'], $result);
+                } elseif (isset($step['push'])) {
+                    if (is_array($f3->get($step['push']))) {
+                        $f3->push($step['push'], $result);
+                    } else {
+                        $f3->set($step['push'], [ $result ]);
+                    }
+                } else {
+                    $this->taskWriteToFile($tests_dir . '/' . $output_file)->text($result)->run();
+                }
+            }
+        }
+    }
 }

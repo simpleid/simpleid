@@ -56,7 +56,8 @@
     "scripts": {
         "test": [ "@composer install", "phpunit" ],
         "phpstan": [ "@composer install", "phpstan analyse" ],
-        "update-copyright": [ "@composer install", "robo update_copyright" ]
+        "update-copyright": [ "@composer install", "robo update_copyright" ], 
+        "make-frontend-tests": [ "@composer install", "robo make_frontend_tests" ]
     },
     "extra": {
         "branch-alias": {

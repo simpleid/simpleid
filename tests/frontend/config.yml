@@ -1,0 +1,63 @@
+# Configuration of make_frontend_tests
+
+globals:
+  # Framework variables (1st phase)
+  - UI: www/html/
+    PREFIX: intl.
+    DEBUG: 2
+
+  # Framework variables (2nd phase)
+  - FALLBACK: en
+    LOCALES: www/locale/
+
+  # Global template variables
+  - title: Test page
+    version: test
+    base_path: /
+
+tests:
+  auth_login.html:
+    - template: auth_password.html
+      variables:
+        login_form_module: auth_password
+      set: form_content
+
+    - array:
+        content: '{{ @form_content | raw }}'
+      push: forms
+
+    - template: page.html
+      variables:
+        page_class: dialog-page
+        layout: auth_login.html
+
+  oauth_consent.html:
+    - template: page.html
+      variables:
+        page_class: dialog-page
+        layout: oauth_consent.html
+        application_name: Sample application
+        application_type: web
+        scope_list:
+          id: know who you are
+          profile: view your profile information (excluding e-mail and address information)
+          email: view your e-mail address
+
+  dashboard.html:
+    - array:
+        id: welcome
+        title: '{{ @intl.core.my.welcome_title | raw }}'
+        content: '{{ @intl.core.my.logged_in_as, \'test\', \'test\' | format, raw }}'
+      push: blocks
+
+    - template: page.html
+      variables:
+        layout: my_blocks.html
+
+  post.html:
+    - template: post.html
+      variables:
+        test: data-test
+        url: ''
+        params:
+          foo: bar

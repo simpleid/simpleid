@@ -5,6 +5,8 @@ composer.lock
 node_modules/
 
 log/
+tests/frontend/*.html
+tmp/
 www/.htaccess
 www/config.php
 www/vendor/
