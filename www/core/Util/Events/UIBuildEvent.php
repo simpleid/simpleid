@@ -22,7 +22,7 @@
 
 namespace SimpleID\Util\Events;
 
-use SimpleID\Util\UIBuilder;
+use SimpleID\Util\UI\UIBuilder;
 
 /**
  * A generic event used to build user interfaces, based

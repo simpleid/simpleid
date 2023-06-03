@@ -20,7 +20,7 @@
  * 
  */
 
-namespace SimpleID\Util;
+namespace SimpleID\Util\UI;
 
 /**
  * A builder to build user interfaces.
