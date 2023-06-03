@@ -1,6 +1,7 @@
 /*! SimpleID | GPL-2.0-or-later | simpleid.org */
 
 @import 'modern-normalize';
+@import 'upgrade.css';
 
 /* General elements -------------------------------------------------------- */
 html {
@@ -369,4 +370,3 @@ input[type="radio"]:focus, input[type="checkbox"]:focus {
         border-width: 0px;
     }
 }
-
