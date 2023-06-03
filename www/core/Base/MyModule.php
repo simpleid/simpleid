@@ -325,7 +325,7 @@ class MyModule extends Module {
         \Events::instance()->dispatch($event);
 
         $tpl = Template::instance();
-        // TODO $event->getAttachments();
+        $tpl->mergeAttachments($event);
         $this->f3->set('blocks', $event->getBlocks());
         $this->f3->set('title', $title);
         $this->f3->set('layout', 'my_blocks.html');

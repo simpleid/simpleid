@@ -695,6 +695,7 @@ class OAuthModule extends Module implements ProtocolResult {
 
         $event = new FormBuildEvent($form_state, 'oauth_consent_form_build');
         \Events::instance()->dispatch($event);
+        $tpl->mergeAttachments($event);
         $this->f3->set('forms', $event->getBlocks());
         
         header('X-Frame-Options: DENY');

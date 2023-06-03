@@ -94,7 +94,7 @@ trait AttachmentManagerTrait {
      * @param AttachmentManagerInterface $manager the attachment manager to merge
      * @return void
      */
-    protected function mergeAttachments(AttachmentManagerInterface $manager) {
+    public function mergeAttachments(AttachmentManagerInterface $manager) {
         $this->attachments = array_merge_recursive($this->attachments, $manager->getAttachments());
     }
 }

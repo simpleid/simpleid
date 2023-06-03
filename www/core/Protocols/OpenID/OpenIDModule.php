@@ -773,6 +773,7 @@ class OpenIDModule extends Module implements ProtocolResult {
 
             $event = new FormBuildEvent($form_state, 'openid_consent_form_build');
             \Events::instance()->dispatch($event);
+            $tpl->mergeAttachments($event);
             $this->f3->set('forms', $event->getBlocks());
             
             if ($reason == self::CHECKID_RETURN_TO_SUSPECT) {

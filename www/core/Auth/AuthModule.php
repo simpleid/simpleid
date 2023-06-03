@@ -178,6 +178,7 @@ class AuthModule extends Module {
 
             $dispatcher->dispatch($event);
             if (count($event->getBlocks()) > 0) {
+                $tpl->mergeAttachments($event);
                 $this->loginForm($params, $form_state);
                 return;
             }
@@ -240,6 +241,7 @@ class AuthModule extends Module {
             $event = new FormBuildEvent($form_state, 'login_form_build');
             \Events::instance()->dispatch($event);
             $forms = $event->getBlocks();
+            $tpl->mergeAttachments($event);
         }
         $this->f3->set('forms', $forms);
 
