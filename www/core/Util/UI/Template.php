@@ -39,6 +39,15 @@ class Template extends F3Template implements AttachmentManagerInterface {
         // $this->fw comes from the Fat-Free View class
         if (!$this->fw->exists('attachments')) $this->fw->set('attachments', []);
         $this->attachments = &$this->fw->ref('attachments');
+
+        // Register filters
+        $this->filter('attr', self::class . '::instance()->attr');
+    }
+
+    public function attr($val = null, $name = null) {
+        if (($val == null) || ($val === false)) return '';
+        if ($val === true) return $this->esc($name);
+        return $this->esc($name) . '="' . $this->esc($val) . '"';
     }
 }
 

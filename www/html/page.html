@@ -11,14 +11,18 @@
         <check if="{{ @@head }}"><include href="{{ @head }}"></check>
         
         <link rel="stylesheet" href="{{ @base_path }}html/assets/simpleid.css">
+        <check if="{{ @@attachments.css }}"><repeat group="{{ @attachments.css }}" value="{{ @attachment }}">
+            <check if="{{ @@attachment.src }}">
+                <true><link rel="stylesheet" href="{{ @base_path }}{{ @attachment.src }}"></true>
+                <false><style type="text/css">{{ @@attachment.inline | raw }}</style></false>
+            </check>
+        </repeat></check>
         
         <script type="text/javascript">
             const l = {{ json_encode(@@js_locale) | raw }};
         </script>
     </head>
     <body class="{{ @@page_class }}">
-        <script src="{{ @base_path }}html/assets/default.js" type="text/javascript" defer></script>
-
         <div x-data="{ nav_expand: false, user_expand: false }">
         <div id="header"><div id="header-inner">
             <check if="{{ @@nav }}">
@@ -74,5 +78,13 @@
                 <a href="http://github.com/simpleid/simpleid/">{{ @intl.core.footer_support }}</a>
             </address>
         </div>
+
+        <check if="{{ @@attachments.js }}"><repeat group="{{ @attachments.js }}" value="{{ @attachment }}">
+            <check if="{{ @@attachment.src }}">
+                <true><script type="text/javascript" src="{{ @base_path }}{{ @attachment.src }}" {{ @@attachment.defer, 'defer' | attr, raw }} {{ @@attachment.defer, 'async' | attr, raw }}></script></true>
+                <false><script type="text/javascript">{{ @@attachment.inline | raw }}</script></false>
+            </check>
+        </repeat></check>
+        <script src="{{ @base_path }}html/assets/default.js" type="text/javascript" defer></script>
     </body>
 </html>
