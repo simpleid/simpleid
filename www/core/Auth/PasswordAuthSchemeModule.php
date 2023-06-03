@@ -29,6 +29,7 @@ use SimpleID\Store\StoreManager;
 use SimpleID\Util\Events\BaseDataCollectionEvent;
 use SimpleID\Util\Forms\FormBuildEvent;
 use SimpleID\Util\Forms\FormSubmitEvent;
+use SimpleID\Util\UI\Template;
 
 /**
  * Password-based authentication scheme.
@@ -52,7 +53,7 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
         $form_state = $event->getFormState();
 
         if ($form_state['mode'] == AuthManager::MODE_CREDENTIALS || $form_state['mode'] == AuthManager::MODE_REENTER_CREDENTIALS) {
-            $tpl = \Template::instance();
+            $tpl = Template::instance();
 
             $this->f3->set('login_form_module', 'password');
 

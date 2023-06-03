@@ -1,6 +1,7 @@
 <?php
 
 use Symfony\Component\Finder\Finder;
+use SimpleID\Util\UI\Template;
 
 /**
  * This is project's console commands configuration for Robo task runner.
@@ -29,7 +30,7 @@ class RoboFile extends \Robo\Tasks {
     public function make_frontend_tests() {
         $tests_dir = 'tests/frontend';
         $f3 = \Base::instance();
-        $tpl = \Template::instance();
+        $tpl = Template::instance();
 
         $config = Spyc::YAMLLoad($tests_dir . '/config.yml');
 

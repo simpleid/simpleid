@@ -21,9 +21,9 @@
 
 namespace SimpleID\Protocols;
 
-use \Template;
 use \Base;
 use SimpleID\Util\ArrayWrapper;
+use SimpleID\Util\UI\Template;
 
 /**
  * A class representing a response to be rendered using an HTML

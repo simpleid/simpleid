@@ -32,6 +32,7 @@ use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
 use SimpleID\Util\Events\BaseDataCollectionEvent;
 use SimpleID\Util\Forms\FormState;
+use SimpleID\Util\UI\Template;
 use SimpleID\Module;
 use SimpleID\ModuleManager;
 use SimpleJWT\JWT;
@@ -52,7 +53,7 @@ class ConnectSessionModule extends Module {
      */
     public function check_session() {
         $auth = AuthManager::instance();
-        $tpl = \Template::instance();
+        $tpl = Template::instance();
 
         $this->f3->set('cookie_name', $auth->getCookieName('uals'));
         
@@ -162,7 +163,7 @@ class ConnectSessionModule extends Module {
      */
     protected function logoutForm($form_state = null) {
         if ($form_state == null) $form_state = new FormState();
-        $tpl = \Template::instance();
+        $tpl = Template::instance();
 
         $token = new SecurityToken();
         $this->f3->set('tk', $token->generate('connect_logout', SecurityToken::OPTION_BIND_SESSION));

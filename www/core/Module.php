@@ -23,6 +23,7 @@
 namespace SimpleID;
 
 use SimpleID\Auth\AuthManager;
+use SimpleID\Util\UI\Template;
 
 /**
  * A SimpleID module.
@@ -223,7 +224,7 @@ abstract class Module extends \Prefab {
     protected function fatalError($error) {
         $this->f3->set('title', $this->f3->get('intl.common.error'));
         $this->f3->set('message', $error);
-        $tpl = \Template::instance();
+        $tpl = Template::instance();
         print $tpl->render('page.html');
         exit;
     }

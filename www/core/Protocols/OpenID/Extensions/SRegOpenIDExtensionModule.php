@@ -29,6 +29,7 @@ use SimpleID\Protocols\OpenID\OpenIDResponseBuildEvent;
 use SimpleID\Util\Events\UIBuildEvent;
 use SimpleID\Util\Forms\FormBuildEvent;
 use SimpleID\Util\Forms\FormSubmitEvent;
+use SimpleID\Util\UI\Template;
 
 /**
  * Implements the Simple Registration extension.
@@ -106,7 +107,7 @@ class SRegOpenIDExtensionModule extends Module {
         // Check we have any response to consent to
         if (!count($response->getParamsForExtension(self::OPENID_NS_SREG))) return;
         
-        $tpl = new \Template();
+        $tpl = new Template();
         $hive = [
             'module' => 'sreg',
             'userinfo_label' => $this->f3->get('intl.common.consent.send_label'),
@@ -185,7 +186,7 @@ class SRegOpenIDExtensionModule extends Module {
 
         if (!isset($user['sreg'])) return;
 
-        $tpl = new \Template();
+        $tpl = new Template();
         $hive = [
             'userinfo_label' => $this->f3->get('intl.core.openid.sreg.profile_block'),
             'name_label' => $this->f3->get('intl.common.name'),

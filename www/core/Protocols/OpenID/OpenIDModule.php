@@ -37,6 +37,7 @@ use SimpleID\Util\Events\UIBuildEvent;
 use SimpleID\Util\Forms\FormBuildEvent;
 use SimpleID\Util\Forms\FormSubmitEvent;
 use SimpleID\Util\Forms\FormState;
+use SimpleID\Util\UI\Template;
 
 /**
  * The module for authentication under OpenID version 1.1 and 2.0
@@ -746,7 +747,7 @@ class OpenIDModule extends Module implements ProtocolResult {
      * @return void
      */
     protected function consentForm($request, $response, $reason = self::CHECKID_APPROVAL_REQUIRED) {
-        $tpl = \Template::instance();
+        $tpl = Template::instance();
         $token = new SecurityToken();
         $auth = AuthManager::instance();
         $user = $auth->getUser();
@@ -1002,7 +1003,7 @@ class OpenIDModule extends Module implements ProtocolResult {
     public function providerXRDS() {
         $this->logger->log(LogLevel::DEBUG, 'Providing XRDS.');
 
-        $tpl = \Template::instance();
+        $tpl = Template::instance();
 
         $event = new BaseDataCollectionEvent('xrds_types');
         \Events::instance()->dispatch($event);
@@ -1026,7 +1027,7 @@ class OpenIDModule extends Module implements ProtocolResult {
         $user = $store->loadUser($params['uid']);
         
         if ($user != NULL) {
-            $tpl = \Template::instance();
+            $tpl = Template::instance();
 
             if ($user->hasLocalOpenIDIdentity()) {
                 $this->f3->set('local_id', $user['openid']["identity"]);
@@ -1064,7 +1065,7 @@ class OpenIDModule extends Module implements ProtocolResult {
     public function onProfileBlocks(UIBuildEvent $event) {
         $auth = AuthManager::instance();
         $user = $auth->getUser();
-        $tpl = \Template::instance();
+        $tpl = Template::instance();
         
         $this->f3->set('js_locale', [ 'code' => addslashes($this->f3->get('intl.core.openid.profile_js')) ]);
 

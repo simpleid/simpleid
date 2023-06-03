@@ -32,6 +32,7 @@ use SimpleID\Util\Events\BaseDataCollectionEvent;
 use SimpleID\Util\Events\UIBuildEvent;
 use SimpleID\Util\Forms\FormBuildEvent;
 use SimpleID\Util\Forms\FormSubmitEvent;
+use SimpleID\Util\UI\Template;
 
 /**
  * An authentication scheme module that provides two-factor authentication
@@ -55,7 +56,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
         /** @var \SimpleID\Models\User $user */
         $user = $auth->getUser();
 
-        $tpl = \Template::instance();
+        $tpl = Template::instance();
         $token = new SecurityToken();
 
         // Require HTTPS, redirect if necessary
@@ -196,7 +197,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             $uaid = $auth->assignUAID();
             if (in_array($uaid, $test_user['otp']['remember'])) return;
 
-            $tpl = \Template::instance();
+            $tpl = Template::instance();
 
             // Note this is called from user_login(), so $_POST is always filled
             $this->f3->set('otp_recovery_url', 'http://simpleid.org/docs/2/common_problems/#otp');

@@ -30,6 +30,7 @@ use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
 use SimpleID\Util\Events\OrderedDataCollectionEvent;
 use SimpleID\Util\Events\UIBuildEvent;
+use SimpleID\Util\UI\Template;
 
 /**
  * Functions for displaying various pages in SimpleID.
@@ -101,7 +102,7 @@ class MyModule extends Module {
 
         $token = new SecurityToken();
 
-        $tpl = \Template::instance();
+        $tpl = Template::instance();
         $this->f3->set('tk', $token->generate('apps', SecurityToken::OPTION_BIND_SESSION));
         $this->f3->set('title', $this->f3->get('intl.core.my.apps_title'));
         $this->f3->set('layout', 'my_apps.html');
@@ -278,7 +279,7 @@ class MyModule extends Module {
     public function onDashboardBlocks(UIBuildEvent $event) {
         $auth = AuthManager::instance();
         $user = $auth->getUser();
-        $tpl = \Template::instance();
+        $tpl = Template::instance();
 
         $event->addBlock('welcome', $this->f3->get('intl.core.my.logged_in_as', [ $user->getDisplayName(), $user['uid'] ]), -10, [
             'title' => $this->f3->get('intl.core.my.welcome_title')
@@ -323,7 +324,7 @@ class MyModule extends Module {
         $event = new UIBuildEvent($event_name);
         \Events::instance()->dispatch($event);
 
-        $tpl = \Template::instance();
+        $tpl = Template::instance();
         // TODO $event->getAttachments();
         $this->f3->set('blocks', $event->getBlocks());
         $this->f3->set('title', $title);

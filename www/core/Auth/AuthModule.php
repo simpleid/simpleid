@@ -30,6 +30,7 @@ use SimpleID\Util\Events\BaseStoppableEvent;
 use SimpleID\Util\Forms\FormState;
 use SimpleID\Util\Forms\FormBuildEvent;
 use SimpleID\Util\Forms\FormSubmitEvent;
+use SimpleID\Util\UI\Template;
 
 /**
  * The module used to authenticate users.
@@ -224,7 +225,7 @@ class AuthModule extends Module {
      * @return void
      */
     public function loginForm($params = [ 'destination' => null ], $form_state = null) {
-        $tpl = \Template::instance();
+        $tpl = Template::instance();
         $config = $this->f3->get('config');
         if ($form_state == null) $form_state = new FormState([ 'mode' => AuthManager::MODE_CREDENTIALS ]);
 

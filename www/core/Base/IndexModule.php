@@ -27,6 +27,7 @@ use SimpleID\Auth\AuthManager;
 use SimpleID\Module;
 use SimpleID\ModuleManager;
 use SimpleID\Util\SecurityToken;
+use SimpleID\Util\UI\Template;
 
 /**
  * This module contains generic routes for SimpleID.
@@ -69,7 +70,7 @@ class IndexModule extends Module {
         } elseif ($mgr->isModuleLoaded('SimpleID\Base\MyModule')) {
             $this->f3->mock('GET /my/dashboard');
         } else {
-            $tpl = \Template::instance();
+            $tpl = Template::instance();
             $this->f3->set('user_header', true);
             $this->f3->set('title', 'SimpleID');
             print $tpl->render('page.html');

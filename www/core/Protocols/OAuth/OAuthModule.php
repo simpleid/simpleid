@@ -36,6 +36,7 @@ use SimpleID\Util\Events\BaseDataCollectionEvent;
 use SimpleID\Util\Forms\FormState;
 use SimpleID\Util\Forms\FormBuildEvent;
 use SimpleID\Util\Forms\FormSubmitEvent;
+use SimpleID\Util\UI\Template;
 
 /**
  * The module for authentication using OAuth.
@@ -622,7 +623,7 @@ class OAuthModule extends Module implements ProtocolResult {
      */
     protected function consentForm($request, $response) {
         $store = StoreManager::instance();
-        $tpl = \Template::instance();
+        $tpl = Template::instance();
 
         $client = $store->loadClient($request['client_id'], 'SimpleID\Protocols\OAuth\OAuthClient');
 

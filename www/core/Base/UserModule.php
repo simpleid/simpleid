@@ -29,6 +29,7 @@ use SimpleID\Auth\AuthManager;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
 use SimpleID\Util\Events\UIBuildEvent;
+use SimpleID\Util\UI\Template;
 
 
 class UserModule extends Module {
@@ -45,7 +46,7 @@ class UserModule extends Module {
      */
     function user($f3, $params) {
         $web = \Web::instance();
-        $tpl = \Template::instance();
+        $tpl = Template::instance();
         $store = StoreManager::instance();
         $mgr = ModuleManager::instance();
         

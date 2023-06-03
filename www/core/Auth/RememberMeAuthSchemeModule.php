@@ -28,6 +28,7 @@ use SimpleID\Crypt\Random;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
 use SimpleID\Util\Forms\FormBuildEvent;
+use SimpleID\Util\UI\Template;
 
 /**
  * An authentication scheme that provides automatic authentication
@@ -105,7 +106,7 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
         $form_state = $event->getFormState();
 
         if ($form_state['mode'] == AuthManager::MODE_CREDENTIALS) {
-            $tpl = \Template::instance();
+            $tpl = Template::instance();
             $event->addBlock('auth_rememberme', $tpl->render('auth_rememberme.html', false), 10);
         }
     }

@@ -30,6 +30,7 @@ use SimpleID\Util\Events\BaseDataCollectionEvent;
 use SimpleID\Util\Events\UIBuildEvent;
 use SimpleID\Util\Forms\FormBuildEvent;
 use SimpleID\Util\Forms\FormSubmitEvent;
+use SimpleID\Util\UI\Template;
 
 /**
  * Implements the Attribute Exchange extension.
@@ -139,7 +140,7 @@ class AXOpenIDExtensionModule extends Module {
         $mode = $ax_request['mode'];
         
         if ($mode == 'fetch_request') {
-            $tpl = new \Template();
+            $tpl = new Template();
             $hive = [
                 'module' => 'ax',
                 'userinfo_label' => $this->f3->get('intl.common.consent.send_label'),
@@ -241,7 +242,7 @@ class AXOpenIDExtensionModule extends Module {
 
         if (!isset($user['ax'])) return;
 
-        $tpl = new \Template();
+        $tpl = new Template();
         $hive = [
             'userinfo_label' => $this->f3->get('intl.core.openid.ax.profile_block'),
             'name_label' => $this->f3->get('intl.core.openid.ax.type_url_label'),
