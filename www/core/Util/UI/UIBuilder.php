@@ -34,15 +34,17 @@ namespace SimpleID\Util\UI;
  * Javascript code.  Each attachment is associated with a type.
  *
  */
-class UIBuilder {
-
+class UIBuilder implements AttachmentManagerInterface {
+    use AttachmentManagerTrait;
 
     /** @var array<array<mixed>> */
     protected $blocks = [];
 
-    /** @var array<string, array<mixed>> */
-    protected $attachments = [];
 
+    public function __construct() {
+        // $this->attachments comes from AttachmentManagerTrait
+        $this->attachments = [];
+    }
 
     /**
      * Adds a UI block to the builder.
@@ -66,25 +68,6 @@ class UIBuilder {
     }
 
     /**
-     * Adds an attachment to the builder
-     * 
-     * An *attachment* can be a CSS stylesheet or a Javascript file
-     * 
-     * @param string $attachment_type the type of attachment
-     * @param mixed $data the details of the attachment
-     * @return UIBuilder
-     */
-    public function addAttachment($attachment_type, $data) {
-        if (isset($this->attachments[$attachment_type])) {
-            $this->attachments[$attachment_type][] = $data;
-        } else {
-            $this->attachments[$attachment_type] = [ $data ];
-        }
-
-        return $this;
-    }
-
-    /**
      * Merges another UI builder into this builder.
      * 
      * Blocks from the other builder are appended to this builder.
@@ -96,7 +79,7 @@ class UIBuilder {
      */
     public function merge(UIBuilder $builder) {
         $this->blocks = array_merge($this->blocks, $builder->blocks);
-        $this->attachments = array_merge_recursive($this->attachments, $builder->attachments);
+        $this->mergeAttachments($builder);
         return $this;
     }
 
@@ -109,45 +92,6 @@ class UIBuilder {
     public function getBlocks() {
         uasort($this->blocks, function($a, $b) { if ($a['#weight'] == $b['#weight']) { return 0; } return ($a['#weight'] < $b['#weight']) ? -1 : 1; });
         return array_map(function($a) { return $a['#data']; }, $this->blocks);
-    }
-
-    /**
-     * Retrieves all the attachments.
-     * 
-     * This function returns an array of all attachments, with the
-     * key being the attachment type, and the value an array of the
-     * attachment details.
-     * 
-     * Note that the value array may contain duplicates.  To filter
-     * for unique values, use the {@link getAttachmentsByType()} method.
-     * 
-     * @return array<string, array<mixed>> the attachments
-     */
-    public function getAttachments() {
-        return $this->attachments;
-    }
-
-    /**
-     * Returns an array of attachment types currently attached to the
-     * builder.
-     * 
-     * @return array<string>
-     */
-    public function getAttachmentTypes() {
-        return array_keys($this->attachments);
-    }
-
-    /**
-     * Returns the attachments of a particular type.
-     * 
-     * Only unique elements are returned.
-     * 
-     * @param string $attachment_type the attachment type
-     * @return array<array<mixed>>
-     */
-    public function getAttachmentsByType($attachment_type) {
-        if (!isset($this->attachments[$attachment_type])) return [];
-        return array_unique($this->attachments[$attachment_type]);
     }
 }
 

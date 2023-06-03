@@ -39,6 +39,7 @@ class UIBuildEvent extends UIBuilder implements \GenericEventInterface {
      * @param string $eventName the name of the event, or the name
      */
     public function __construct($eventName = null) {
+        parent::__construct();
         $this->setEventName($eventName);
     }
 
