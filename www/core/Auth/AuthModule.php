@@ -178,7 +178,6 @@ class AuthModule extends Module {
 
             $dispatcher->dispatch($event);
             if (count($event->getBlocks()) > 0) {
-                $tpl->mergeAttachments($event);
                 $this->loginForm($params, $form_state);
                 return;
             }

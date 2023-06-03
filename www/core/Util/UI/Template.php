@@ -44,8 +44,8 @@ class Template extends F3Template implements AttachmentManagerInterface {
         $this->filter('attr', self::class . '::instance()->attr');
     }
 
-    public function attr($val = null, $name = null) {
-        if (($val == null) || ($val === false)) return '';
+    public function attr(mixed $val = null, string $name = null): string {
+        if (($val == null) || ($val == false)) return '';
         if ($val === true) return $this->esc($name);
         return $this->esc($name) . '="' . $this->esc($val) . '"';
     }
