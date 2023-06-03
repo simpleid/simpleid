@@ -2,23 +2,19 @@
 <html lang="en">
     <head>
         <title>{{ @title }} - <check if="{{ @@site_title }}"><true>{{ @site_title }}</true><false>SimpleID</false></check></title>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <meta name="SimpleID-Version" content="{{ @version }}" />
-        <meta name="robots" content="noindex,nofollow" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-        <link rel="shortcut icon" href="{{ @base_path }}html/simpleid.ico" type="image/x-icon" />
+        <meta charset="utf-8">
+        <meta name="SimpleID-Version" content="{{ @version }}">
+        <meta name="robots" content="noindex,nofollow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+        <link rel="shortcut icon" href="{{ @base_path }}html/simpleid.ico" type="image/x-icon">
 
         <check if="{{ @@head }}"><include href="{{ @head }}"></check>
         
-        <link rel="stylesheet" href="{{ @base_path }}html/assets/simpleid.css" />
-        <style type="text/css" media="screen">
-            {{ @@css | raw }}
-        </style>
+        <link rel="stylesheet" href="{{ @base_path }}html/assets/simpleid.css">
         
         <script type="text/javascript">
             const l = {{ json_encode(@@js_locale) | raw }};
         </script>
-        {{ @@javascript | raw }}
     </head>
     <body class="{{ @@page_class }}">
         <script src="{{ @base_path }}html/assets/default.js" type="text/javascript" defer></script>
