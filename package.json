@@ -12,7 +12,11 @@
   "devDependencies": {
     "@compodoc/live-server": "^1.2.3",
     "arg": "^5.0.2",
-    "esbuild": "^0.17.19"
+    "autoprefixer": "^10.4.14",
+    "esbuild": "^0.17.19",
+    "esbuild-sass-plugin": "^2.9.0",
+    "postcss": "^8.4.24",
+    "postcss-merge-rules": "^6.0.1"
   },
   "dependencies": {
     "alpinejs": "^3.12.1",
