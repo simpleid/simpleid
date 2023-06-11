@@ -22,6 +22,8 @@
 
 namespace SimpleID\Base;
 
+use SimpleID\Util\Events\BaseEvent;
+
 /**
  * An event to collect scope information.
  * 
@@ -40,7 +42,7 @@ namespace SimpleID\Base;
  * 
  * Listeners should use {@link addScopeInfo()} to add scope information.
  */
-class ScopeInfoCollectionEvent {
+class ScopeInfoCollectionEvent extends BaseEvent {
     /** @var array<string, array<string, mixed>> */
     protected $scope_info = [];
 

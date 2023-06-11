@@ -24,6 +24,7 @@ namespace SimpleID\Protocols\OAuth;
 
 use Psr\EventDispatcher\StoppableEventInterface;
 use SimpleID\Protocols\OAuth\OAuthClient;
+use SimpleID\Util\Events\BaseEvent;
 
 /**
  * An event to authenticate a client.
@@ -33,7 +34,7 @@ use SimpleID\Protocols\OAuth\OAuthClient;
  * necessary credentials to authenticate a client, it should call
  * the {@link setClient()} method.
  */
-class OAuthInitClientEvent implements StoppableEventInterface {
+class OAuthInitClientEvent extends BaseEvent implements StoppableEventInterface {
     /** @var Request */
     protected $request;
 

@@ -44,7 +44,7 @@ namespace SimpleID\Util\Events;
  * The emitter can retrieve the collected data by calling the
  * {@link getResults()} method.
  */
-class BaseDataCollectionEvent implements \GenericEventInterface {
+class BaseDataCollectionEvent extends BaseEvent implements \GenericEventInterface {
     use GenericEventTrait;
 
     public const MERGE_DEFAULT = 0;

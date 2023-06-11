@@ -23,9 +23,10 @@
 namespace SimpleID\Protocols\OpenID;
 
 use SimpleID\Protocols\ProtocolResult;
+use SimpleID\Util\Events\BaseEvent;
 
 /**
- * An event trigger before an assertion response is sent, to allow
+ * An event triggered before an assertion response is sent, to allow
  * for modification.
  *
  * For positive assertions, listeners can assume that all user approvals
@@ -44,7 +45,7 @@ use SimpleID\Protocols\ProtocolResult;
  * $response[$alias . '.field'] = 'value';
  * ```
  */
-class OpenIDResponseBuildEvent {
+class OpenIDResponseBuildEvent extends BaseEvent {
     /** @var bool */
     protected $assertion;
 

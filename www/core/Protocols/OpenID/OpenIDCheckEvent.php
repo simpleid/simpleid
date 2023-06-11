@@ -24,6 +24,7 @@ namespace SimpleID\Protocols\OpenID;
 
 use SimpleID\Protocols\ProtocolResult;
 use SimpleID\Protocols\ProtocolResultTrait;
+use SimpleID\Util\Events\BaseEvent;
 
 /**
  * An event to process an OpenID authentication request.
@@ -57,7 +58,7 @@ use SimpleID\Protocols\ProtocolResultTrait;
  * the assertion result may return CHECKID_PROTOCOL_ERROR.
  * 
  */
-class OpenIDCheckEvent implements ProtocolResult {
+class OpenIDCheckEvent extends BaseEvent implements ProtocolResult {
     use ProtocolResultTrait;
 
     /** @var Request */
