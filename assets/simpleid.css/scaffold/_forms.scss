@@ -1,0 +1,165 @@
+// https://github.com/tailwindlabs/tailwindcss-forms
+
+@use 'util';
+
+$background-color: #eee !default;
+$border-color: #ccc !default;
+$hover-color: #888 !default;
+$focus-color: var(--brand-color) !default;
+$disabled-color: #888 !default;
+$placeholder-color: #888 !default;
+$default-button-color: var(--brand-color) !default;
+$default-button-border-color: var(--brand-color) !default;
+$error-color: var(--red) !default;
+$valid-color: var(--green) !default;
+
+/* Box-like widgets */
+@include util.form-all-boxes {
+  background-color: $background-color;
+  border: 1px solid $border-color;
+  @include util.padding-x(util.size(2));
+  @include util.padding-y(util.size(1));
+
+  &.is-error { border-color: $error-color !important; }
+  &.is-valid { border-color: $valid-color; }
+
+  &:focus { border-color: $focus-color; }
+}
+
+@include util.form-placeholder {
+  color: $placeholder-color;
+}
+
+/* Webkit fixes */
+::-webkit-datetime-edit-fields-wrapper,
+.form-input::-webkit-datetime-edit-fields-wrapper {
+  padding: 0;
+}
+        
+// Unfortunate hack until https://bugs.webkit.org/show_bug.cgi?id=198959 is fixed.
+// This sucks because users can't change line-height with a utility on date inputs now.
+// Reference: https://github.com/twbs/bootstrap/pull/31993
+::-webkit-date-and-time-value,
+.form-input::-webkit-date-and-time-value {
+  min-height: 1.5em;
+}
+      
+// In Safari on macOS date time inputs are 4px taller than normal inputs
+// This is because there is extra padding on the datetime-edit and datetime-edit-{part}-field pseudo elements
+// See https://github.com/tailwindlabs/tailwindcss-forms/issues/95
+::-webkit-datetime-edit,
+::-webkit-datetime-edit-year-field,
+::-webkit-datetime-edit-month-field,
+::-webkit-datetime-edit-day-field,
+::-webkit-datetime-edit-hour-field,
+::-webkit-datetime-edit-minute-field,
+::-webkit-datetime-edit-second-field,
+::-webkit-datetime-edit-millisecond-field,
+::-webkit-datetime-edit-meridiem-field,
+.form-input::-webkit-datetime-edit,
+.form-input::-webkit-datetime-edit-year-field,
+.form-input::-webkit-datetime-edit-month-field,
+.form-input::-webkit-datetime-edit-day-field,
+.form-input::-webkit-datetime-edit-hour-field,
+.form-input::-webkit-datetime-edit-minute-field,
+.form-input::-webkit-datetime-edit-second-field,
+.form-input::-webkit-datetime-edit-millisecond-field,
+.form-input::-webkit-datetime-edit-meridiem-field {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* Select boxes */
+@include util.form-all-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-position: right util.size(2) center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: util.size(10);
+  print-color-adjust: exact;
+}
+
+@include util.form-multi-select {
+  background-image: initial;
+  background-position: initial;
+  background-repeat: unset;
+  background-size: initial;
+  padding-right: util.size(3);
+  print-color-adjust: unset;
+}
+
+/* Check boxes and radio buttons */
+@include util.form-check-radio {
+  @include util.margin-y(util.size(2));
+}
+
+/* Buttons */
+@include util.form-button {
+  @include util.padding-x(util.size(3));
+  @include util.padding-y(util.size(1));
+  background-color: $background-color;
+  border-color: $border-color;
+  cursor: pointer;
+
+  &:hover { border-color: $hover-color; }
+  &:focus { border-color: $focus-color; }
+  &:active { box-shadow: 0 0 0 1px rgba(0,0,0, 0.15) inset, 0 0 6px rgba(0,0,0, 0.20) inset; }
+
+  &[disabled] {
+    background-color: $background-color !important;
+    border-color: $border-color !important;
+    color: $disabled-color !important;
+  }
+
+  &.is-default {
+    color: white;
+    background-color: $default-button-color;
+    border-color: $default-button-border-color;
+    font-weight: 600;
+
+    &:hover, &:focus { background-color: $default-button-border-color; }
+  }
+}
+
+/* Textbox-button-label combinations */
+%-smart-borders {
+  &:not(:first-child) { border-left-width: 0; }
+  &:not(:last-child) { border-right-width: 0; }
+}
+
+.form-combo {
+  display: inline-flex;
+  align-items: flex-start;
+
+  button, input, select {
+    display: inline-block;
+  }
+
+  span {
+    @extend %-smart-borders;
+    flex: 0 0 auto;
+    @include util.padding-x(util.size(2));
+    @include util.padding-y(util.size(1));
+    border: 1px solid $border-color;
+    cursor: default;
+  }
+
+  // Side label
+  .is-subtle {
+    @extend %-smart-borders;
+    @include util.padding-x(util.size(2));
+    color: $placeholder-color;
+  }
+
+  // Special rules for button.is-subtle
+  button.is-subtle {
+    border-left-width: 1px !important;
+    border-right-width: 1px !important;
+    &:hover, &:focus { border-color: $hover-color; z-index: 2; }
+    &:active { box-shadow: none; }
+  }
+  input { z-index: 0; }
+  input + button.is-subtle { margin-left: -1px; }
+  button.is-subtle + input { margin-right: -1px; }
+}

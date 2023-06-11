@@ -1,0 +1,25 @@
+@use 'sass:map';
+@use 'common' as common;
+
+// Responsive design
+@mixin breakpoint($bp) {
+  @media (min-width: common.screen($bp)) { @content }
+}
+@mixin responsive($bp, $smaller, $larger) {
+  display: $smaller;
+  @include breakpoint($bp) { display: $larger; }
+}
+
+// Dark mode
+// $dark-mode-class refers to the name of the class that is applied to
+// the <html> element to activate dark mode.  If it is blank, then
+// the prefers-color-scheme media query is used
+$dark-mode-class: '' !default;
+
+@mixin dark-mode {
+  @if $dark-mode-class == '' {
+    @media (prefers-color-scheme: dark) { @content }
+  } @else {
+    html.#{$dark-mode-class} { @content }
+  }
+}

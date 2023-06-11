@@ -1,0 +1,46 @@
+@use 'sass:map';
+@use 'sass:meta';
+
+// Flex presets
+$-flex-presets: (
+    grow-shrink: 1 1 0%,
+    size-aware-grow-shrink: 1 1 auto,
+    size-aware-shrink: 0 1 auto,
+    none: none
+);
+
+@mixin flex-preset($type) {
+  flex: map.get($-flex-presets, $type);
+}
+
+// Grid template rows/columns
+@mixin grid-columns($columns) {
+  @if meta.type-of($columns) == number {
+    grid-template-columns: repeat($columns, minmax(0, 1fr));
+  } @else {
+    grid-template-columns: $columns;
+  }
+}
+@mixin grid-rows($rows) {
+  @if meta.type-of($rows) == number {
+    grid-template-rows: repeat($rows, minmax(0, 1fr));
+  } @else {
+    grid-template-rows: $rows;
+  }
+}
+
+@mixin grid-column-span($value) {
+  grid-column: span $value / span $value;
+}
+@mixin grid-row-span($value) {
+  grid-row: span $value / span $value;
+}
+
+// Gap
+// Aliases for row-gap and column-gap
+@mixin gap-x($size) {
+  column-gap: $size;
+}
+@mixin gap-y($size) {
+  row-gap: $size;
+}

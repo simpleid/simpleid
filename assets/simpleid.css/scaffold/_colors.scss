@@ -1,0 +1,66 @@
+@use 'sass:color';
+
+// Default colour scheme is from 'Flat UI'
+// https://materialui.co/flatuicolors/
+$color-scheme: (
+  'turquoise': #1ABC9C,
+  'emerland': #2ECC71,
+  'peter-river': #3498DB,
+  'amethyst': #9B59B6,
+  'wet-asphalt': #34495E,
+  'green-sea': #16A085,
+  'nephritis': #27AE60,
+  'belize-hole': #2980B9,
+  'wisteria': #8E44AD,
+  'midnight-blue': #2C3E50,
+  'sunflower': #F1C40F,
+  'carrot': #E67E22,
+  'alizarin': #E74C3C,
+  'clouds': #ECF0F1,
+  'concrete': #95A5A6,
+  'orange': #F39C12,
+  'pumpkin': #D35400,
+  'pomegranate': #C0392B,
+  'silver': #BDC3C7,
+  'asbestos': #7F8C8D
+) !default;
+
+$base-lightness: 600 !default;
+$darker-lightness: (
+  '700': 15%,
+  '800': 30%,
+  '900': 55%,
+  '950': 75%
+) !default;
+$lighter-lightness: (
+  '500': 15%,
+  '400': 30%,
+  '300': 45%,
+  '200': 65%,
+  '100': 85%,
+  '50': 95%
+) !default;
+
+$additional-colors: () !default;
+
+@mixin generate-shades($name, $base-color) {
+  @each $index, $value in $lighter-lightness {
+    --#{$name}-#{$index}: #{color.scale($base-color, $lightness: $value)};
+  }
+
+  --#{$name}: #{$base-color};
+  --#{$name}-#{$base-lightness}: #{$base-color};
+
+  @each $index, $value in $darker-lightness {
+    --#{$name}-#{$index}: #{color.scale($base-color, $lightness: -$value)};
+  }  
+}
+
+@mixin generate-color-scheme {
+  @each $name, $base-color in $color-scheme {
+    @include generate-shades($name, $base-color)
+  }
+  @each $name, $value in $additional-colors {
+    --#{$name}: #{$value};
+  }
+}

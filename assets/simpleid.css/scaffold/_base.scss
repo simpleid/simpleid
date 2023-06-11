@@ -1,0 +1,65 @@
+// Scaffold base module
+@use 'util';
+@import '~modern-normalize';
+
+// Whether to include additional styles
+$webapp: false !default;
+
+html { line-height: util.leading(normal); }
+
+// Additional styles for web applications.
+// Modified from suitcss (https://github.com/suitcss/base)
+/*! suitcss | MIT License | https://github.com/suitcss/base */
+
+@if $webapp {
+  /**
+   * Removes the default spacing and border for appropriate elements.
+   */
+  blockquote,
+  dl,
+  dd,
+  figure,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  pre {
+    margin: 0;
+  }
+
+  button {
+    background: transparent;
+    border: 0;
+    padding: 0;
+  }
+
+  /**
+   * Work around a Firefox/IE bug where the transparent `button` background
+   * results in a loss of the default `button` focus styles.
+   */
+
+  button:focus {
+    outline: 1px dotted;
+    outline: 5px auto -webkit-focus-ring-color;
+  }
+
+  fieldset {
+    border: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  iframe {
+    border: 0;
+  }
+
+  ol,
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }    
+}

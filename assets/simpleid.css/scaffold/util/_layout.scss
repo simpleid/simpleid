@@ -1,0 +1,39 @@
+@use 'sass:math';
+@use 'common' as common;
+
+// Fix width to breakpoint
+@mixin container($bp, $padding: 0, $center: false) {
+  max-width: common.screen($bp);
+  @if $padding != 0 { padding: $padding; }
+  @if $center { margin-left: auto; margin-right: auto }
+}
+
+// Columns
+$column-size-presets: (
+  '3xs': common.size(64),
+  '2xs': common.size(72),
+  'xs': common.size(80),
+  'sm': common.size(96),
+  'md': common.size(112),
+  'lg': common.size(128),
+  'xl': common.size(144),
+  '2xl': common.size(168),
+  '3xl': common.size(192),
+  '4xl': common.size(224),
+  '5xl': common.size(256),
+  '6xl': common.size(288),
+  '7xl': common.size(320)
+) !default;
+
+@function column-size($size) {
+  @return map.get($column-size-presets, $size);
+}
+
+// Positioning
+@mixin inset-x($size) {
+  left: $size; right: $size;
+}
+
+@mixin inset-y($size) {
+  top: $size; bottom: $size;
+}
