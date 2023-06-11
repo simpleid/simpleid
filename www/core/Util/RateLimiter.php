@@ -131,7 +131,8 @@ class RateLimiter {
             $src = $f3->get('IP');
         }
         $cache = \Cache::instance();
-        $cache->reset(rawurlencode($src) . '.ratelimit');
+        $cache_name = $this->getCacheName($src);
+        $cache->reset($cache_name);
     }
 
     /**
@@ -140,8 +141,7 @@ class RateLimiter {
      * @return void
      */
     public function resetAll() {
-        $cache = \Cache::instance();
-        $cache->reset('.ratelimit');
+        $this->reset('');
     }
 
     /**
@@ -179,7 +179,7 @@ class RateLimiter {
      * @return string the cache name
      */
     protected function getCacheName($src) {
-        return (($this->key == null) ? rawurlencode($this->key) . '.' : '') . rawurlencode($src) . '.ratelimit';
+        return rawurlencode($src) . (($this->key == null) ? '.' . rawurlencode($this->key) : '') . '.ratelimit';
     }
 }
 
