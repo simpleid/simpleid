@@ -34,15 +34,15 @@ namespace SimpleID\Util;
  */
 class RateLimiter {
     /** @var string the identifier of the rate limited */
-    private $key;
+    protected $key;
 
     /** @var int the maximum number of requests from a particular
      * source over the specified period
      */
-    private $limit;
+    protected $limit;
 
     /** @var int $interval the specified period in seconds */
-    private $interval;
+    protected $interval;
 
     /**
      * Creates a rate limiter.
@@ -78,10 +78,7 @@ class RateLimiter {
      * @return bool|int
      */
     public function throttle($src = null, $return_remainder = false) {
-        if ($src == null) {
-            $f3 = \Base::instance();
-            $src = $f3->get('IP');
-        }
+        if ($src == null) $src = $this->getDefaultSource();
 
         $cache = \Cache::instance();
         $cache_name = $this->getCacheName($src);
@@ -104,10 +101,7 @@ class RateLimiter {
      * @return void
      */
     public function penalize($src = null) {
-        if ($src == null) {
-            $f3 = \Base::instance();
-            $src = $f3->get('IP');
-        }
+        if ($src == null) $src = $this->getDefaultSource();
 
         $cache = \Cache::instance();
         $cache_name = $this->getCacheName($src);
@@ -126,10 +120,8 @@ class RateLimiter {
      * @return void
      */
     public function reset($src = null) {
-        if ($src == null) {
-            $f3 = \Base::instance();
-            $src = $f3->get('IP');
-        }
+        if ($src == null) $src = $this->getDefaultSource();
+        
         $cache = \Cache::instance();
         $cache_name = $this->getCacheName($src);
         $cache->reset($cache_name);
@@ -169,6 +161,16 @@ class RateLimiter {
      */
     public function getInterval() {
         return $this->interval;
+    }
+    
+    /**
+     * Returns the IP address as the default source for the rate limiter.
+     *
+     * @return string the IP address
+     */
+    protected function getDefaultSource() {
+        $f3 = \Base::instance();
+        return $f3->get('IP');
     }
 
     /**
