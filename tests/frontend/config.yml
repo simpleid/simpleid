@@ -20,6 +20,7 @@ tests:
     - template: auth_password.html
       variables:
         login_form_module: auth_password
+        submit_button: Log in
       set: form_content
 
     - array:
