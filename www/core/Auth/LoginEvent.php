@@ -22,6 +22,7 @@
 
 namespace SimpleID\Auth;
 
+use SimpleID\Util\Events\BaseEvent;
 use SimpleID\Util\Forms\FormEventInterface;
 
 /**
@@ -40,7 +41,7 @@ use SimpleID\Util\Forms\FormEventInterface;
  * methods {@link getUser()} and {@link getAuthLevel()} are also
  * included.
  */
-class LoginEvent implements FormEventInterface {
+class LoginEvent extends BaseEvent implements FormEventInterface {
     /** @var AuthResultInterface */
     protected $result;
 

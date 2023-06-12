@@ -22,7 +22,16 @@
 
 namespace SimpleID\Models;
 
-class ConsentEvent implements \GenericEventInterface {
+use SimpleID\Util\Events\BaseEvent;
+
+/**
+ * Event where a change has occurred to a user consent.
+ * 
+ * The `$eventName` can be one of the following:
+ * 
+ * - `consent_revoke`
+ */
+class ConsentEvent extends BaseEvent implements \GenericEventInterface {
     /** @var string */
     protected $eventName;
 

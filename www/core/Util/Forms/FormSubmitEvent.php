@@ -23,6 +23,7 @@
 namespace SimpleID\Util\Forms;
 
 use Psr\EventDispatcher\StoppableEventInterface;
+use SimpleID\Util\Events\BaseEvent;
 use SimpleID\Util\Events\GenericEventTrait;
 use SimpleID\Util\Events\StoppableEventTrait;
 
@@ -40,7 +41,7 @@ use SimpleID\Util\Events\StoppableEventTrait;
  * result is not sufficient reason for further processing to be stopped.
  *
  */
-class FormSubmitEvent implements \GenericEventInterface, StoppableEventInterface, FormEventInterface {
+class FormSubmitEvent extends BaseEvent implements \GenericEventInterface, StoppableEventInterface, FormEventInterface {
     use GenericEventTrait;
     use StoppableEventTrait;
 

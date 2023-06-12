@@ -24,6 +24,7 @@ namespace SimpleID\Protocols\OAuth;
 
 use Psr\EventDispatcher\StoppableEventInterface;
 use SimpleID\Protocols\OAuth\OAuthClient;
+use SimpleID\Util\Events\BaseEvent;
 
 /**
  * An event to authenticate an access token.
@@ -32,7 +33,7 @@ use SimpleID\Protocols\OAuth\OAuthClient;
  * the access token.  If successful, it should call
  * the {@link setToken()} method.
  */
-class OAuthInitTokenEvent implements StoppableEventInterface {
+class OAuthInitTokenEvent extends BaseEvent implements StoppableEventInterface {
     /** @var \SimpleID\Protocols\OAuth\AccessToken */
     protected $access_token = null;
 

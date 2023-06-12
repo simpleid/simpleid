@@ -2,7 +2,7 @@
 /*
  * SimpleID
  *
- * Copyright (C) Kelvin Mo 2021-2023
+ * Copyright (C) Kelvin Mo 2023
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -20,37 +20,15 @@
  * 
  */
 
-namespace SimpleID\Auth;
-
-use SimpleID\Models\User;
-use SimpleID\Util\Events\BaseEvent;
+namespace SimpleID\Util\Events;
 
 /**
- * Event to log out a user.
+ * Base class for all events in SimpleID.
  * 
- * Listeners can use this event to clean up any saved information when a user
- * logs out.
- * 
- * The user being logged out can be obtained from the {@link getUser()}
- * method.
- * 
+ * Currently this class does not do anything. However, having all
+ * events being subclasses of this class helps with organisation.
  */
-class LogoutEvent extends BaseEvent {
-    /** @var User */
-    protected $user;
-
-    public function __construct(User $user) {
-        $this->user = $user;
-    }
-
-    /**
-     * Returns the user being logged out.
-     * 
-     * @return User the user
-     */
-    public function getUser(): User {
-        return $this->user;
-    }
+class BaseEvent {
 }
 
 ?>

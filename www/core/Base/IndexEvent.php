@@ -23,6 +23,7 @@
 namespace SimpleID\Base;
 
 use Psr\EventDispatcher\StoppableEventInterface;
+use SimpleID\Util\Events\BaseEvent;
 use SimpleID\Util\Events\StoppableEventTrait;
 
 /**
@@ -33,7 +34,7 @@ use SimpleID\Util\Events\StoppableEventTrait;
  * the request, it should call the {@link stopPropagation()}
  * method to stop further processing.
  */
-class IndexEvent implements StoppableEventInterface {
+class IndexEvent extends BaseEvent implements StoppableEventInterface {
     use StoppableEventTrait;
 
     /** @var array<string, mixed> */
