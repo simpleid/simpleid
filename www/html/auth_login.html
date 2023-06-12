@@ -1,4 +1,4 @@
-<div class="login-security {{ @@security_class }}" x-data="{ isSubmitted: false }">
+<div class="login-security {{ @@security_class }}" x-data="{ isSubmitted: false }" x-init="$nextTick(() => formReady($el))">
     <form action="{{ @base_path }}auth/login/{{ @@destination }}" method="post" enctype="application/x-www-form-urlencoded" @submit="isSubmitted = true">
         <input type="hidden" name="fs" value="{{ @@fs }}">
         <input type="hidden" name="tk" value="{{ @@tk }}">
@@ -16,23 +16,15 @@
 </div>
 
 <script type="text/javascript">
-    const formReady = function() {        
+    const formReady = function($div) {
         const focus = new Array();
-        document.querySelectorAll('input[data-focus-weight]').forEach((el) => {
+        $div.querySelectorAll('input[data-focus-weight]').forEach((el) => {
             if ((el.value == '') && el.hasAttribute('data-focus-weight')) {
                 focus.push({ weight: el.getAttribute('data-focus-weight'), el: el });
             }
         });
         if (focus.length == 0) return;
-        focus.sort(function (a, b) {
-            return a.weight - b.weight;
-        });
+        focus.sort((a, b) => a.weight - b.weight);
         focus[0].el.focus();
     };
-
-    if (document.readyState != 'loading') {
-        formReady();
-    } else {
-        document.addEventListener('DOMContentLoaded', formReady);
-    }
 </script>
