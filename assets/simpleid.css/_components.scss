@@ -1,66 +1,3 @@
-/*! SimpleID | GPL-2.0-or-later | simpleid.org */
-
-@import 'modern-normalize';
-@import 'upgrade.css';
-
-/* General elements -------------------------------------------------------- */
-html {
-    font-size: 12px;
-    line-height: 19px;
-}
-
-h1 {
-    font-weight: normal;
-    color: #666666;
-}
-
-a {
-    border-bottom: 1px solid #CCCCCC;
-    color: #1144AA;
-    text-decoration: none !important;
-    font-weight: bold;
-}
-a:visited {
-    border-color: #CCCCCC;
-    color: #114499;
-}
-a:focus, a:hover {
-    border-color: #4488EE;
-    color: #4488EE;
-}
-
-table {
-    border-collapse: collapse;
-    margin: 0 0 1em 0;
-    width: 100%;
-}
-
-td, th {
-    border-bottom: 1px solid #CCCCCC;
-    text-align: left;
-    vertical-align: top;
-    padding: 5px 5px;
-}
-th {
-    border-bottom: 0px;
-    background-color: #666666;
-    color: #FFFFFF;
-    white-space: nowrap;
-    font-weight: bold;
-}
-
-pre {
-    border:1px solid #CCCCCC;
-    padding: 5px;
-    font-family:"Bitstream Vera Sans Mono","Courier New",monospace;
-    font-size: 0.9em;
-    white-space: nowrap;
-    overflow: scroll;
-}
-pre.code { white-space: pre; overflow: initial; }
-
-[x-cloak] { display: none !important; }
-
 /* Page layout ------------------------------------------------------------- */
 /*.sticky { position: fixed; }*/
 #header {
@@ -369,4 +306,32 @@ input[type="radio"]:focus, input[type="checkbox"]:focus {
         padding: 0px;
         border-width: 0px;
     }
+}
+
+
+/* Upgrade pages ----------------------------------------------------------- */
+
+.upgrade-version {
+    font-weight: bold;
+    font-size: 1.5em;
+}
+
+.original-version { color: #666666; }
+.this-version { color: #4A80ED; }
+
+.upgrade-error {
+    border: 1px solid #666666;
+    border-radius: 4px;
+    padding: 0 10px;
+    background: #DDDDDD;
+    margin-bottom: 10px;
+    display: none;
+}
+.upgrade-error p { line-height: 1; }
+
+.upgrade-results {
+    overflow: auto;
+    height: 200px;
+    border: 1px solid #666666;
+    background-color: #EEEEEE;
 }

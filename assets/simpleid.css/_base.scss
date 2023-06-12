@@ -1,0 +1,49 @@
+/* General elements -------------------------------------------------------- */
+h1 {
+    font-weight: normal;
+    color: #666666;
+}
+
+a {
+    border-bottom: 1px solid #CCCCCC;
+    color: var(--brand-color);
+    text-decoration: none !important;
+    font-weight: bold;
+}
+a:visited {
+    border-color: #CCCCCC;
+    color: #114499;
+}
+a:focus, a:hover {
+    border-color: #4488EE;
+    color: #4488EE;
+}
+
+table {
+    border-collapse: collapse;
+    margin: 0 0 1em 0;
+    width: 100%;
+}
+
+td, th {
+    border-bottom: 1px solid #CCCCCC;
+    text-align: left;
+    vertical-align: top;
+    padding: 5px 5px;
+}
+th {
+    border-bottom: 0px;
+    background-color: #666666;
+    color: #FFFFFF;
+    white-space: nowrap;
+    font-weight: bold;
+}
+
+pre {
+    border:1px solid #CCCCCC;
+    padding: 5px;
+    font-size: 0.9em;
+    white-space: nowrap;
+    overflow: scroll;
+}
+pre.code { white-space: pre; overflow: initial; }
