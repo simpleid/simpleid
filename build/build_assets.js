@@ -8,6 +8,11 @@ const postcss = require('postcss');
 const mergeRules = require('postcss-merge-rules');
 const autoprefixer = require('autoprefixer');
 
+const extensions = {
+    '.js': [ '.js' ],
+    '.css': [ '.css', '.scss' ]
+};
+
 const args = arg({
     '--watch': Boolean,
     '--serve': Boolean
@@ -63,8 +68,19 @@ const entryPoints = fs.readdirSync('assets').filter((package) => {
 }).map((package) => {
     const type = path.extname(package);
     const base = path.basename(package, type);
+    const input = extensions[type].reduce((prev, current) => {
+        if (prev != null) return prev;
+        try {
+            fs.accessSync(`assets/${package}/main${current}`);
+            return `assets/${package}/main${current}`;
+        } catch (err) {
+            // Not found, return previous value
+            return prev;
+        }
+    }, null);
+
     return {
-        in: `assets/${package}/main${type}`,
+        in: input,
         out: base
     }
 });
