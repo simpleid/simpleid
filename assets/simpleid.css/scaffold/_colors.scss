@@ -1,4 +1,6 @@
 @use 'sass:color';
+@use 'sass:map';
+@use 'sass:meta';
 
 // Default colour scheme is from 'Flat UI'
 // https://materialui.co/flatuicolors/
@@ -25,40 +27,44 @@ $color-scheme: (
   'asbestos': #7F8C8D
 ) !default;
 
-$base-lightness: 600 !default;
-$darker-lightness: (
+$default-shades: (
+  '50': -95%,
+  '100': -85%,
+  '200': -65%,
+  '300': -45%,
+  '400': -30%,
+  '500': -15%,
+  '600': 0,
   '700': 15%,
   '800': 30%,
   '900': 55%,
   '950': 75%
 ) !default;
-$lighter-lightness: (
-  '500': 15%,
-  '400': 30%,
-  '300': 45%,
-  '200': 65%,
-  '100': 85%,
-  '50': 95%
-) !default;
 
 $additional-colors: () !default;
 
-@mixin generate-shades($name, $base-color) {
-  @each $index, $value in $lighter-lightness {
-    --#{$name}-#{$index}: #{color.scale($base-color, $lightness: $value)};
+@mixin generate-shades($name, $base-color, $shades: $default-shades) {
+  @each $index, $value in $shades {
+    @if $value == 0 {
+      --#{$name}: #{$base-color};
+      --#{$name}-#{$index}: #{$base-color};
+    } @else if meta.type-of($value) == color {
+      --#{$name}-#{$index}: #{$value};
+    } @else {
+      --#{$name}-#{$index}: #{color.scale($base-color, $lightness: $value)};
+    }
   }
-
-  --#{$name}: #{$base-color};
-  --#{$name}-#{$base-lightness}: #{$base-color};
-
-  @each $index, $value in $darker-lightness {
-    --#{$name}-#{$index}: #{color.scale($base-color, $lightness: -$value)};
-  }  
 }
 
 @mixin generate-color-scheme {
-  @each $name, $base-color in $color-scheme {
-    @include generate-shades($name, $base-color)
+  @each $name, $value in $color-scheme {
+    @if meta.type-of($value) == map {
+      $base-color: map.get($value, 'base-color');
+      $shades: map.get($value, 'shades');
+      @include generate-shades($name, $base-color, $shades);
+    } @else if meta.type-of($value) == color {
+      @include generate-shades($name, $value);
+    }
   }
   @each $name, $value in $additional-colors {
     --#{$name}: #{$value};
