@@ -32,8 +32,8 @@
                         <input type="hidden" name="{{ @name }}" value= "{{ @value }}">
                     </repeat>
                     <div id="fallback" x-cloak x-show="timedOut">
-                        <p style="font: 12px/19px Helvetica, Arial, sans-serif;">Click the Continue button to continue.</p>
-                        <input type="submit" value="Continue" class="centre">
+                        <p style="font: 12px/19px Helvetica, Arial, sans-serif;">{{ @intl.common.click_continue | raw }}</p>
+                        <input type="submit" value="{{ @intl.common.continue }}" class="centre">
                     </div>
                 </form>
             </div>
