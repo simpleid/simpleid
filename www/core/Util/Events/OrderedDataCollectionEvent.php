@@ -26,7 +26,7 @@ namespace SimpleID\Util\Events;
  * A generic event used to collect data in an ordered way.
  *
  */
-class OrderedDataCollectionEvent implements \GenericEventInterface {
+class OrderedDataCollectionEvent extends BaseEvent implements \GenericEventInterface {
     use GenericEventTrait;
 
     /** @var array<array<mixed>> */

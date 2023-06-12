@@ -2,7 +2,7 @@
 /*
  * SimpleID
  *
- * Copyright (C) Kelvin Mo 2021-2023
+ * Copyright (C) Kelvin Mo 2023
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,7 +23,7 @@
 namespace SimpleID\Util\UI;
 
 /**
- * A builder to build user interfaces.
+ * Interface for building user interfaces.
  * 
  * User interfaces built by adding "blocks" using the {@link addBlock()}
  * method.  A block is essentially a piece of HTML code that can be
@@ -34,20 +34,9 @@ namespace SimpleID\Util\UI;
  * Javascript code.  Each attachment is associated with a type.
  *
  */
-class UIBuilder implements UIBuilderInterface {
-    use AttachmentManagerTrait;
-
-    /** @var array<array<mixed>> */
-    protected $blocks = [];
-
-
-    public function __construct() {
-        // $this->attachments comes from AttachmentManagerTrait
-        $this->attachments = [];
-    }
-
+interface UIBuilderInterface extends AttachmentManagerInterface {
     /**
-     * Adds a UI block to the builder.
+     * Adds a UI block.
      * 
      * @param string $id the block ID
      * @param string $content the contents
@@ -55,17 +44,7 @@ class UIBuilder implements UIBuilderInterface {
      * @param array<string, mixed> $additional additional data
      * @return UIBuilderInterface
      */
-    public function addBlock($id, $content, $weight = 0, $additional = []) {
-        $block = [ 'id' => $id, 'content' => $content, 'weight' => $weight ];
-        $block = array_merge($block, $additional);
-
-        $this->blocks[] = [
-            '#data' => $block,
-            '#weight' => $weight
-        ];
-
-        return $this;
-    }
+    public function addBlock($id, $content, $weight = 0, $additional = []);
 
     /**
      * Merges another UI builder into this builder.
@@ -77,11 +56,7 @@ class UIBuilder implements UIBuilderInterface {
      * @param UIBuilderInterface $builder the builder to merge
      * @return UIBuilderInterface
      */
-    public function merge(UIBuilderInterface $builder) {
-        $this->blocks = array_merge($this->blocks, $builder->getBlockData());
-        $this->mergeAttachments($builder);
-        return $this;
-    }
+    public function merge(UIBuilderInterface $builder);
 
     /**
      * Retrieves the blocks from the builder, ordered by the
@@ -89,20 +64,14 @@ class UIBuilder implements UIBuilderInterface {
      * 
      * @return array<array<mixed>>
      */
-    public function getBlocks() {
-        uasort($this->blocks, function($a, $b) { if ($a['#weight'] == $b['#weight']) { return 0; } return ($a['#weight'] < $b['#weight']) ? -1 : 1; });
-        return array_map(function($a) { return $a['#data']; }, $this->blocks);
-    }
+    public function getBlocks();
 
     /**
-     * Retrieves the blocks from the builder, ordered by the
-     * weight, from lowest to highest.
+     * Retrieves the raw block data stored in the builder.
      * 
      * @return array<array<mixed>>
      */
-    public function getBlockData() {
-        return $this->blocks;
-    }
+    public function getBlockData();
 }
 
 ?>

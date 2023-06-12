@@ -22,16 +22,23 @@
 
 namespace SimpleID\Util\Events;
 
+use SimpleID\Util\UI\AttachmentManagerInterface;
 use SimpleID\Util\UI\UIBuilder;
+use SimpleID\Util\UI\UIBuilderInterface;
 
 /**
- * A generic event used to build user interfaces, based
- * on UIBuilder.
+ * A generic event used to build user interfaces.
  * 
- * @see SimpleID\Util\UIBuilder
+ * This event is created along with a UIBuilder. The methods from the
+ * UIBuilderInterface are delegated to the attached UIBuilder.
+ * 
+ * @see SimpleID\Util\UI\UIBuilder
  */
-class UIBuildEvent extends UIBuilder implements \GenericEventInterface {
+class UIBuildEvent extends BaseEvent implements \GenericEventInterface, UIBuilderInterface {
     use GenericEventTrait;
+
+    /** @var \SimpleID\Util\UI\UIBuilder */
+    protected $builder;
 
     /**
      * Creates a UI build event
@@ -39,10 +46,74 @@ class UIBuildEvent extends UIBuilder implements \GenericEventInterface {
      * @param string $eventName the name of the event, or the name
      */
     public function __construct($eventName = null) {
-        parent::__construct();
         $this->setEventName($eventName);
+        $this->builder = new UIBuilder();
     }
 
+    /**
+     * Returns the UIBuilder for this event
+     * 
+     * @return \SimpleID\Util\UI\UIBuilder
+     */
+    public function getUIBuilder() {
+        return $this->builder;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addBlock($id, $content, $weight = 0, $additional = []) {
+        return $this->builder->addBlock($id, $content, $weight, $additional);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function merge(UIBuilderInterface $builder) {
+        return $this->builder->merge($builder);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlocks() {
+        return $this->builder->getBlocks();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockData() {
+        return $this->builder->getBlockData();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addAttachment(string $attachment_type, array $data): AttachmentManagerInterface {
+        return $this->builder->addAttachment($attachment_type, $data);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAttachments(): array {
+        return $this->builder->getAttachments();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAttachmentTypes(): array {
+        return $this->builder->getAttachmentTypes();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAttachmentsByType(string $attachment_type) {
+        return $this->builder->getAttachmentsByType($attachment_type);
+    }
 }
 
 ?>

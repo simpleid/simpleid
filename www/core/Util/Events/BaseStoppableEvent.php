@@ -27,7 +27,7 @@ use Psr\EventDispatcher\StoppableEventInterface;
 /**
  * A generic event that can be stopped.
  */
-class BaseStoppableEvent implements \GenericEventInterface, StoppableEventInterface {
+class BaseStoppableEvent extends BaseEvent implements \GenericEventInterface, StoppableEventInterface {
     use GenericEventTrait;
     use StoppableEventTrait;
 

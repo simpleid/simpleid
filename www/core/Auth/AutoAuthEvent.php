@@ -23,6 +23,7 @@
 namespace SimpleID\Auth;
 
 use SimpleID\Models\User;
+use SimpleID\Util\Events\BaseEvent;
 
 /**
  * Event to attempt to automatically login using credentials presented
@@ -35,7 +36,7 @@ use SimpleID\Models\User;
  * This event is stopped once a user has been set.
  * 
  */
-class AutoAuthEvent implements AuthResultInterface {
+class AutoAuthEvent extends BaseEvent implements AuthResultInterface {
     /** @var User|null */
     protected $user = null;
 
