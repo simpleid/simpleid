@@ -57,7 +57,7 @@ tests:
   post.html:
     - template: post.html
       variables:
-        test: data-test
+        test: true
         url: ''
         params:
           foo: bar

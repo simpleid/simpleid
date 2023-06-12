@@ -7,32 +7,49 @@
         <meta name="robots" content="noindex,nofollow" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
         <link rel="shortcut icon" href="{{ @base_path }}html/simpleid.ico" type="image/x-icon" />
+        <style type="text/css">
+            #content {
+                max-width: 400px;
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+            .centre {
+                margin-left: auto;
+                margin-right: auto;
+            }
+            [x-cloak] { display: none !important; }
+        </style>
     </head>
     <body>
-        <div id="content" style="max-width: 400px; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+        <div id="content" x-init="$nextTick(() => { if (!test) $refs.form.submit(); setTimeout(() => timedOut = true, 15000); })" x-data="{ timedOut: false, test: <check if="{{ @@test }}"><true>true</true><false>false</false></check> }">
             <div id="content-inner">            
-                <img src="{{ @base_path }}html/loading.gif" id="loading-graphic" style="display: block; margin-left: auto; margin-right: auto">
+                <img src="{{ @base_path }}html/loading.gif" id="loading-graphic" class="centre" x-show="!timedOut">
             
-                <form action="{{ @url }}" method="post" id="post-form" {{ @@test }}>
+                <form action="{{ @url }}" method="post" id="post-form" x-ref="form">
                     <repeat group="{{ @params }}" key="{{ @name }}" value="{{ @value }}">
                         <input type="hidden" name="{{ @name }}" value= "{{ @value }}">
                     </repeat>
-                    <div id="fallback">
+                    <div id="fallback" x-cloak x-show="timedOut">
                         <p style="font: 12px/19px Helvetica, Arial, sans-serif;">Click the Continue button to continue.</p>
-                        <input type="submit" value="Continue" style="display: block; margin-left: auto; margin-right: auto">
+                        <input type="submit" value="Continue" class="centre">
                     </div>
                 </form>
             </div>
         </div>
 
-        <script type="text/javascript">
-            document.getElementById("fallback").style.display = "none";
+
+        <script src="{{ @base_path }}html/assets/default.js" type="text/javascript" defer></script>
+                <script type="text/javascript">
+
+            /*document.getElementById("fallback").style.display = "none";
             if (!document.getElementById("post-form").hasAttribute("data-test"))
                 document.getElementById("post-form").submit();
             window.setTimeout(function() {
                 document.getElementById("loading-graphic").style.display = "none";
                 document.getElementById("fallback").style.display = "block";
-            }, 15000);
+            }, 15000);*/
         </script>
     </body>
 </html>
