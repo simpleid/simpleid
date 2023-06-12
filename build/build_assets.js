@@ -3,6 +3,11 @@ const fs = require('fs');
 const path = require('path');
 const esbuild = require('esbuild');
 
+const sassPlugin = require('esbuild-sass-plugin').sassPlugin;
+const postcss = require('postcss');
+const mergeRules = require('postcss-merge-rules');
+const autoprefixer = require('autoprefixer');
+
 const args = arg({
     '--watch': Boolean,
     '--serve': Boolean
@@ -25,6 +30,14 @@ async function build(entryPoints) {
         define: { 
             'process.env.NODE_ENV': args['--watch'] ? `'development'` : `'production'`
         },
+        plugins: [
+            sassPlugin({
+                async transform(src, resolveDir) {
+                    const {css} = await postcss([mergeRules, autoprefixer]).process(src, { from: undefined });
+                    return css;
+                }
+            })
+        ]
     });
     
     if (args['--watch']) {
