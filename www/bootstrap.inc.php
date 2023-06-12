@@ -36,7 +36,6 @@ $f3 = \Base::instance();
 
 $default_config = [
     'allow_plaintext' => false,
-    'allow_autocomplete' => false,
     'openid_verify_return_url' => true,
     'openid_strict_realm_check' => true,
     'webfinger_access_control_allow_origin' => '*',

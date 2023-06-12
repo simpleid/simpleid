@@ -21,7 +21,7 @@
     
     <div class="form-item">
         <label for="edit-otp">{{ @intl.core.auth_otp.otp_label }}</label>
-        <input type="number" maxlength="6" name="otp" id="edit-otp" size="10" value="" autocapitalize="off" autocorrect="off" class="form-text otp required" />
+        <input type="number" maxlength="6" name="otp" id="edit-otp" size="10" value="" autocomplete="one-time-code" autocorrect="off" class="form-text otp required" />
     </div>
     <input type="submit" name="op" id="edit-submit" value="{{ @intl.common.verify }}" class="form-default" />
 </form>

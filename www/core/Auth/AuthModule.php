@@ -250,9 +250,6 @@ class AuthModule extends Module {
                 // Follow through
                 $this->f3->set('uid', $form_state['uid']);
             case AuthManager::MODE_CREDENTIALS:
-                $security_class = ($config['allow_autocomplete']) ? 'allow-autocomplete ' : '';
-                $this->f3->set('security_class', $security_class);
-
                 $this->f3->set('submit_button', $this->f3->get('intl.common.login'));
                 $this->f3->set('title', $this->f3->get('intl.common.login'));
                 break;

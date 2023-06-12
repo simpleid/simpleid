@@ -16,10 +16,7 @@
 </div>
 
 <script type="text/javascript">
-    const formReady = function() {
-        if (!document.querySelector('.login-security').classList.contains('allow-autocomplete')) 
-            document.querySelectorAll('.credentials').forEach((el) => el.setAttribute('autocomplete', 'off'));
-        
+    const formReady = function() {        
         const focus = new Array();
         document.querySelectorAll('input[data-focus-weight]').forEach((el) => {
             if ((el.value == '') && el.hasAttribute('data-focus-weight')) {
