@@ -31,7 +31,8 @@
         "phpunit/phpunit": "^7.0 || ^9.3",
         "consolidation/robo": "^3.0 || ^4.0",
         "phpstan/phpstan": "^1.3.0",
-        "tracy/tracy": "2.9.7"
+        "tracy/tracy": "2.9.7",
+        "totten/lurkerlite": "^1.3"
     },
     "license": "GPL-2.0+",
     "authors": [
@@ -57,7 +58,8 @@
         "test": [ "@composer install", "phpunit" ],
         "phpstan": [ "@composer install", "phpstan analyse" ],
         "update-copyright": [ "@composer install", "robo update_copyright" ], 
-        "make-frontend-tests": [ "@composer install", "robo make_frontend_tests" ]
+        "make-frontend-tests": [ "@composer install", "robo make_frontend_tests" ],
+        "watch-frontend": [ "@composer install", "robo watch_frontend" ]
     },
     "extra": {
         "branch-alias": {
