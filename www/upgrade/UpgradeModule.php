@@ -75,7 +75,7 @@ class UpgradeModule extends Module {
         $this->f3->set('tk', $token->generate('upgrade_info', SecurityToken::OPTION_BIND_SESSION));
                
         $this->f3->set('title', $this->f3->get('intl.upgrade.upgrade_title'));
-        $this->f3->set('page_class', 'dialog-page');
+        $this->f3->set('page_class', 'is-dialog-page');
         $this->f3->set('layout', 'upgrade_info.html');
         
         print $tpl->render('page.html');
@@ -117,7 +117,7 @@ class UpgradeModule extends Module {
         $this->f3->set('this_version', SIMPLEID_VERSION);
         
         $this->f3->set('title', $this->f3->get('intl.upgrade.upgrade_title'));
-        $this->f3->set('page_class', 'dialog-page');
+        $this->f3->set('page_class', 'is-dialog-page');
         $this->f3->set('layout', 'upgrade_selection.html');
         
         print $tpl->render('page.html');
@@ -138,7 +138,7 @@ class UpgradeModule extends Module {
         $this->f3->set('step', $step);
 
         $this->f3->set('title', $this->f3->get('intl.upgrade.upgrade_title'));
-        $this->f3->set('page_class', 'dialog-page');
+        $this->f3->set('page_class', 'is-dialog-page');
         $this->f3->set('layout', 'upgrade_apply.html');
         
         print $tpl->render('page.html');
@@ -242,7 +242,7 @@ class UpgradeModule extends Module {
         $this->f3->set('results', $upgrade['results']);
                 
         $this->f3->set('title', $this->f3->get('intl.upgrade.upgrade_title'));
-        $this->f3->set('page_class', 'dialog-page');
+        $this->f3->set('page_class', 'is-dialog-page');
         $this->f3->set('layout', 'upgrade_results.html');
         
         print $tpl->render('page.html');
