@@ -27,6 +27,9 @@ class RoboFile extends \Robo\Tasks {
         }
     }
     
+    /**
+     * Create frontend tests
+     */
     public function make_frontend_tests() {
         $tests_dir = 'tests/frontend';
         $f3 = \Base::instance();
@@ -70,5 +73,17 @@ class RoboFile extends \Robo\Tasks {
                 }
             }
         }
+    }
+
+    /**
+     * Watch the www/html directory for changes and run the make_frontend_tests
+     * command
+     */
+    public function watch_frontend() {
+        $this->taskWatch()
+            ->monitor('www/html', function() {
+                $this->make_frontend_tests();
+            }
+        )->run();
     }
 }
