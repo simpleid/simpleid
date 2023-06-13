@@ -42,7 +42,7 @@ class Template extends F3Template implements AttachmentManagerInterface {
 
         // Register filters
         $this->filter('attr', static::class . '::instance()->attr');
-        $this->filter('json', static::class . '::instance()->json');
+        $this->filter('js', static::class . '::instance()->js');
     }
 
     /**
@@ -61,7 +61,7 @@ class Template extends F3Template implements AttachmentManagerInterface {
     }
 
     /**
-     * Filter to encode JSON.
+     * Filter to encode values to be included in Javascript.
      * 
      * This function uses `json_encode()` to encode the data as JSON. However,
      * it provides additional safety features so that they can be embedded
@@ -76,7 +76,7 @@ class Template extends F3Template implements AttachmentManagerInterface {
      * @param mixed $data the data to be converted
      * @return string
      */
-    public function json(mixed $data = null): string {
+    public function js(mixed $data = null): string {
         $json_flags = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_THROW_ON_ERROR;
         $json = json_encode($data, $json_flags);
 

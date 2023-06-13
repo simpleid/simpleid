@@ -19,7 +19,7 @@
         </repeat></check>
         
         <script type="text/javascript">
-            window.simpleid = {{ @@js_data | json, raw }};
+            window.simpleid = {{ @@js_data | js, raw }};
         </script>
     </head>
     <body class="{{ @@page_class }}">
