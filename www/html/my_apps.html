@@ -7,10 +7,10 @@
             tk: tk,
 
             loadApps() {
-                const params = new URLSearchParams({tk: this.tk});
-                fetch('apps?' + params, {
+                fetch('apps', {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
+                        'X-Request-Token': this.tk,
                         'Accept': 'application/json'
                     }
                 })
@@ -29,10 +29,10 @@
                 const currentApp = this.apps.find((app) => (app.cid == cid));
 
                 if (!currentApp.details) {
-                    const params = new URLSearchParams({tk: this.tk});
-                    fetch('apps/' + encodeURIComponent(cid) + '?' + params, {
+                    fetch('apps/' + encodeURIComponent(cid), {
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest',
+                            'X-Request-Token': this.tk,
                             'Accept': 'application/json'
                         }
                     })
@@ -44,11 +44,11 @@
             },
 
             deleteApp(cid) {
-                const params = new URLSearchParams({tk: this.tk});
-                fetch('apps/' + encodeURIComponent(cid) + '?' + params, {
+                fetch('apps/' + encodeURIComponent(cid), {
                     method: 'DELETE',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
+                        'X-Request-Token': this.tk,
                         'Accept': 'application/json'
                     }
                 })
