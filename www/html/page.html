@@ -19,7 +19,7 @@
         </repeat></check>
         
         <script type="text/javascript">
-            const l = {{ json_encode(@@js_locale) | raw }};
+            window.simpleid = {{ @@js_data | json, raw }};
         </script>
     </head>
     <body class="{{ @@page_class }}">

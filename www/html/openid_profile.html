@@ -23,7 +23,7 @@ function openIdDiscoveryApp() {
                 if (this.local_id) code += this.templates.openid2_local_id + '<br>';
             }
             
-            if (code == '') code = l.code;
+            if (code == '') code = simpleid.intl.code;
             
             return code;
         }
