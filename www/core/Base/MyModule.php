@@ -118,7 +118,7 @@ class MyModule extends Module {
         header('Content-Type: application/json');
 
         $token = new SecurityToken();
-        if (!$this->f3->exists('GET.tk') || !$token->verify($this->f3->get('GET.tk'), 'apps')) {
+        if (!$this->f3->exists('HEADERS.X-Request-Token') || !$token->verify($this->f3->get('HEADERS.X-Request-Token'), 'apps')) {
             $this->f3->status(401);
             print json_encode([
                 'error' => 'unauthorized',
@@ -153,7 +153,7 @@ class MyModule extends Module {
         header('Content-Type: application/json');
 
         $token = new SecurityToken();
-        if (!$this->f3->exists('GET.tk') || !$token->verify($this->f3->get('GET.tk'), 'apps')) {
+        if (!$this->f3->exists('HEADERS.X-Request-Token') || !$token->verify($this->f3->get('HEADERS.X-Request-Token'), 'apps')) {
             $this->f3->status(401);
             print json_encode([
                 'error' => 'unauthorized',
@@ -226,7 +226,7 @@ class MyModule extends Module {
         header('Content-Type: application/json');
 
         $token = new SecurityToken();
-        if (!isset($delete['tk']) || !is_string($delete['tk']) || !$token->verify($delete['tk'], 'apps')) {
+        if (!$this->f3->exists('HEADERS.X-Request-Token') || !$token->verify($this->f3->get('HEADERS.X-Request-Token'), 'apps')) {
             $this->f3->status(401);
             print json_encode([
                 'error' => 'unauthorized',
