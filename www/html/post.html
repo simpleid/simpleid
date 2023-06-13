@@ -23,7 +23,7 @@
         </style>
     </head>
     <body>
-        <div id="content" x-init="$nextTick(() => { if (!test) $refs.form.submit(); setTimeout(() => timedOut = true, 15000); })" x-data="{ timedOut: false, test: <check if="{{ @@test }}"><true>true</true><false>false</false></check> }">
+        <div id="content" x-init="$nextTick(() => { if (!test) $refs.form.submit(); setTimeout(() => timedOut = true, 15000); })" x-data="{ timedOut: false, test: <check if="{{ @@frontend_test }}"><true>true</true><false>false</false></check> }">
             <div id="content-inner">            
                 <img src="{{ @base_path }}html/loading.gif" id="loading-graphic" class="centre" x-show="!timedOut">
             
