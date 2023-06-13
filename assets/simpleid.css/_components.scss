@@ -245,20 +245,20 @@ input[type="radio"]:focus, input[type="checkbox"]:focus {
 }
 
 /* Dialogs and dialog pages */
-.dialog-page { background: #EEEEEE; }
-.dialog-page #content {
+.is-dialog-page { background: #EEEEEE; }
+.is-dialog-page #content {
     padding-top: 50px;
     max-width: 400px;
 }
-.dialog-page #content-inner {
+.is-dialog-page #content-inner {
     padding: 20px;
     border: 10px solid #DDDDDD;
     background: #FFFFFF;
 }
 
-.dialog-page form { padding-right: 2px; } /* Used to adjust the padding in text boxes */
-.dialog-page .form-item { padding-right: 1em; } /* Used to adjust the padding in text boxes */
-.dialog-page select, .dialog-page textarea, .dialog-page input[type="text"], .dialog-page input[type="password"], .dialog-page input[type="number"] {
+.is-dialog-page form { padding-right: 2px; } /* Used to adjust the padding in text boxes */
+.is-dialog-page .form-item { padding-right: 1em; } /* Used to adjust the padding in text boxes */
+.is-dialog-page select, .is-dialog-page textarea, .is-dialog-page input[type="text"], .is-dialog-page input[type="password"], .is-dialog-page input[type="number"] {
     width: 100%;
 }
 

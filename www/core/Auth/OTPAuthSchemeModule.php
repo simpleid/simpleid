@@ -137,7 +137,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
         $this->f3->set('tk', $token->generate('otp', SecurityToken::OPTION_BIND_SESSION));
 
 
-        $this->f3->set('page_class', 'dialog-page');
+        $this->f3->set('page_class', 'is-dialog-page');
         $this->f3->set('title', $this->f3->get('intl.core.auth_otp.otp_title'));
         $this->f3->set('layout', 'auth_otp_setup.html');
 

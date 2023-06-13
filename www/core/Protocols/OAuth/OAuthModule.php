@@ -690,7 +690,7 @@ class OAuthModule extends Module implements ProtocolResult {
         $this->f3->set('logout_destination', '/continue/' . rawurlencode($token->generate($request->toArray())));
         $this->f3->set('user_header', true);
         $this->f3->set('title', $this->f3->get('intl.core.oauth.oauth_title'));
-        $this->f3->set('page_class', 'dialog-page');
+        $this->f3->set('page_class', 'is-dialog-page');
         $this->f3->set('layout', 'oauth_consent.html');
 
         $event = new FormBuildEvent($form_state, 'oauth_consent_form_build');

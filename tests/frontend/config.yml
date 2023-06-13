@@ -30,13 +30,13 @@ tests:
 
     - template: page.html
       variables:
-        page_class: dialog-page
+        page_class: is-dialog-page
         layout: auth_login.html
 
   oauth_consent.html:
     - template: page.html
       variables:
-        page_class: dialog-page
+        page_class: is-dialog-page
         layout: oauth_consent.html
         application_name: Sample application
         application_type: web

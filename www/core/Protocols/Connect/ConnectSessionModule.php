@@ -173,7 +173,7 @@ class ConnectSessionModule extends Module {
 
         $this->f3->set('user_header', true);
         $this->f3->set('title', $this->f3->get('intl.common.logout'));
-        $this->f3->set('page_class', 'dialog-page');
+        $this->f3->set('page_class', 'is-dialog-page');
         $this->f3->set('layout', 'connect_logout.html');
         
         header('X-Frame-Options: DENY');
