@@ -28,6 +28,13 @@ tests:
         content: '{{ @form_content | raw }}'
       push: forms
 
+    - template: auth_rememberme.html
+      set: form_content
+
+    - array:
+        content: '{{ @form_content | raw }}'
+      push: forms
+
     - template: page.html
       variables:
         page_class: is-dialog-page
