@@ -5,23 +5,25 @@ html { font-size: 14px; }
 
 /* General elements -------------------------------------------------------- */
 h1 {
-    font-weight: normal;
-    color: var(--grey-400);
+  font-weight: normal;
+  font-size: util.font-size('2xl');
+  color: var(--grey-400);
 }
 
 a {
-    border-bottom: 1px solid var(--grey-900);
-    color: var(--brand-color);
-    text-decoration: none !important;
-    font-weight: util.font-weight(bold);
-}
-a:visited {
+  border-bottom: 1px solid var(--grey-900);
+  color: var(--brand-color);
+  text-decoration: none !important;
+  font-weight: util.font-weight(bold);
+
+  &:visited {
     border-color: var(--grey-900);
-    color: #114499;
-}
-a:focus, a:hover {
-    border-color: #4488EE;
-    color: #4488EE;
+    color: var(--brand-color-dark);
+  }
+  &:focus, &:hover {
+    border-color: var(--brand-color-light);
+    color: var(--brand-color-light);
+  }
 }
 
 table {

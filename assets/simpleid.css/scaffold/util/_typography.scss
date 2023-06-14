@@ -33,6 +33,14 @@ $font-size-presets: (
   }
 }
 
+@function line-height($value) {
+  @if map.has-key($font-size-presets, $value) {
+    @return nth(map.get($font-size-presets, $value), 2);
+  } @else {
+    @return $value;
+  }
+}
+
 @mixin text-size($preset) {
   $values: map.get($font-size-presets, $preset);
   font-size: nth($values, 1);

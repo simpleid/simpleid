@@ -7,7 +7,7 @@ $box-shadow-presets: (
     dimensions: (0 1px 2px 0) (),
     color: rgb(0 0 0 / 0.05)
   ),
-  'default': (
+  'base': (
     dimensions: (0 1px 3px 0) (0 1px 2px -1px),
     color: rgb(0 0 0 / 0.1)
   ),
@@ -37,13 +37,13 @@ $box-shadow-presets: (
   )
 ) !default;
 
-@mixin box-shadow-preset($value: default, $color: default) {
+@mixin box-shadow-preset($value: base, $color: base) {
   @if map.has-key($box-shadow-presets, $value) {
     $result: ();
     $dimensions: map.get(map.get($box-shadow-presets, $value), 'dimensions');
     $box-shadow-color: map.get(map.get($box-shadow-presets, $value), 'color');
 
-    @if $color != default {
+    @if $color != base {
       $box-shadow-color: $color;
     }
 
@@ -61,7 +61,7 @@ $box-shadow-presets: (
 // Drop shadows
 $drop-shadow-presets: (
   'sm': (0 1px 1px rgb(0 0 0 / 0.05)) (),
-  'default': (0 1px 2px rgb(0 0 0 / 0.1)) (0 1px 1px rgb(0 0 0 / 0.06)),
+  'base': (0 1px 2px rgb(0 0 0 / 0.1)) (0 1px 1px rgb(0 0 0 / 0.06)),
   'md': (0 4px 3px rgb(0 0 0 / 0.07)) (0 2px 2px rgb(0 0 0 / 0.06)),
   'lg': (0 10px 8px rgb(0 0 0 / 0.04)) (0 4px 3px rgb(0 0 0 / 0.1)),
   'xl': (0 20px 13px rgb(0 0 0 / 0.03)) (0 8px 5px rgb(0 0 0 / 0.08)),
@@ -69,7 +69,7 @@ $drop-shadow-presets: (
   'none': (0 0 #0000) (),
 ) !default;
 
-@mixin drop-shadow-preset($value: default) {
+@mixin drop-shadow-preset($value: base) {
   @if map.has-key($drop-shadow-presets, $value) {
     $preset: map.get($box-shadow-presets, $value);
 
@@ -88,7 +88,7 @@ $drop-shadow-presets: (
 $blur-size-presets: (
   'none': 0,
   'sm': 4px,
-  'default': 8px,
+  'base': 8px,
   'md': 12px,
   'lg': 16px,
   'xl': 24px,
@@ -96,7 +96,7 @@ $blur-size-presets: (
   '3xl': 64px,
 ) !default;
 
-@function blur-size($size: default) {
+@function blur-size($size: base) {
   @if map.has-key($blur-size-presets, $value) {
     @return map.get($blur-size-presets, $value);
   } @else {

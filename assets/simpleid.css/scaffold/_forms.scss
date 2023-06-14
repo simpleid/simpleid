@@ -8,6 +8,7 @@ $hover-color: #888 !default;
 $focus-color: var(--brand-color) !default;
 $disabled-color: #888 !default;
 $placeholder-color: #888 !default;
+$button-border-color: #ccc !default;
 $default-button-color: var(--brand-color) !default;
 $default-button-border-color: var(--brand-color) !default;
 $error-color: var(--red) !default;
@@ -16,19 +17,25 @@ $valid-color: var(--green) !default;
 /* Box-like widgets */
 @include util.form-all-boxes {
   appearance: none;
-  background-color: $background-color;
+  background-color: #ffffff;
   border: 1px solid $border-color;
   @include util.padding-x(util.size(2));
   @include util.padding-y(util.size(1));
+  font-size: util.font-size(base);
+  line-height: util.line-height(base);
 
   &.is-error { border-color: $error-color !important; }
   &.is-valid { border-color: $valid-color; }
 
-  &:focus { border-color: $focus-color; }
+  &:focus { 
+    outline-width: 0;
+    border-color: $focus-color; 
+  }
 }
 
 @include util.form-placeholder {
   color: $placeholder-color;
+  opacity: 1;
 }
 
 /* Webkit fixes */
@@ -95,13 +102,30 @@ $valid-color: var(--green) !default;
   @include util.margin-y(util.size(2));
 }
 
+/* File uploads */
+[type='file'] {
+  background: unset;
+  border-width: 0;
+  padding: 0;
+  font-size: unset;
+  line-height: inherit;
+
+  &:focus { outline: 1px solid ButtonText, 1px audo -webkit-focus-ring-color; }
+}
+
 /* Buttons */
 @include util.form-button {
   @include util.padding-x(util.size(3));
   @include util.padding-y(util.size(1));
+  margin-inline-end: util.size(2);
+  margin-block-end: util.size(2);
+
   background-color: $background-color;
   border-color: $border-color;
   cursor: pointer;
+  font-weight: util.font-size(medium);
+
+  &:last-child { margin-inline-end: 0; }
 
   &:hover { border-color: $hover-color; }
   &:focus { border-color: $focus-color; }
@@ -117,7 +141,6 @@ $valid-color: var(--green) !default;
     color: white;
     background-color: $default-button-color;
     border-color: $default-button-border-color;
-    font-weight: 600;
 
     &:hover, &:focus { background-color: $default-button-border-color; }
   }

@@ -31,8 +31,6 @@ label.option { font-weight: normal; }
 
 @include util.form-button {
   padding: util.size(2) util.size(4);
-  background-color: #EEEEEE;
-  border: 1px solid #999999;
   border-radius: 2px;
   vertical-align: middle;
   font-weight: util.font-weight(bold);
@@ -41,20 +39,13 @@ label.option { font-weight: normal; }
     box-shadow: 0 0 0 1px rgba(0,0,0, 0.15) inset, 0 0 6px rgba(0,0,0, 0.20) inset;
   }
 
-  &[disabled] {
-    color: #999999 !important;
-    background-color: #EEEEEE !important;
-    border-color: #999999 !important;
-  }
-
   &.is-default {
-    color: #FFFFFF;
-    background-color: #1144AA;
-    border-color: #114499;
+    font-weight: util.font-weight(bold);
   }
 }
 
 @include util.form-check-radio {
-  margin: 0.5em 0;
-  &:focus { outline: 1px auto #1144AA; }
+  @include util.margin-y(util.size(2));
+  margin-inline-end: util.size(2);
+  &:focus { outline: 1px auto var(--brand-color); }
 }

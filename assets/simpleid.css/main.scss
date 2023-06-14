@@ -36,11 +36,13 @@
   )
 );
 @use 'scaffold/forms' with (
-  $background-color: inherit,
+  $background-color: var(--grey-950),
   $border-color: var(--grey-800),
   $hover-color: var(--grey),
   $disabled-color: var(--grey),
   $placeholder-color: var(--grey),
+  $button-border-color: var(--grey-700),
+  $default-button-color: var(--brand-color),
   $default-button-border-color: var(--brand-color-dark)
 );
 

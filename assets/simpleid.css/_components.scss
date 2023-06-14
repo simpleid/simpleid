@@ -95,10 +95,16 @@
   margin-top: util.size(8);
   text-align: right;
   font-size: util.font-size('sm');
-  color: var(--grey-color);
+  color: var(--grey);
 
   address { font-style: normal }
-  a { color: #999999; }
+  a { 
+    color: var(--grey-700);
+    &:hover { 
+      color: var(--grey-400);
+      border-bottom-color: var(--grey-400); 
+    }
+  }
 }
 
 
