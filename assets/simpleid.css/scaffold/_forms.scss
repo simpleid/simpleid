@@ -15,6 +15,7 @@ $valid-color: var(--green) !default;
 
 /* Box-like widgets */
 @include util.form-all-boxes {
+  appearance: none;
   background-color: $background-color;
   border: 1px solid $border-color;
   @include util.padding-x(util.size(2));
