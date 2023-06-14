@@ -9,6 +9,7 @@ class RateLimiterTest extends TestCase {
 
     protected function getRateLimiter($method, $limit = 10, $interval = 10) {
         $f3 = \Base::instance();
+        if (getenv('PROCESS_TEMP')) $f3->set('TEMP', getenv('RUNNER_TEMP') . '/cache');
         $f3->set('CACHE', true);
         return new RateLimiter(uniqid($method), $limit, $interval);
     }
