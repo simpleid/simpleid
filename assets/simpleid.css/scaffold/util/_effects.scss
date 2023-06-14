@@ -1,0 +1,105 @@
+@use 'sass:list';
+@use 'sass:map';
+
+// Box shadow
+$box-shadow-presets: (
+  'sm': (
+    dimensions: (0 1px 2px 0) (),
+    color: rgb(0 0 0 / 0.05)
+  ),
+  'default': (
+    dimensions: (0 1px 3px 0) (0 1px 2px -1px),
+    color: rgb(0 0 0 / 0.1)
+  ),
+  'md': (
+    dimensions: (0 4px 6px -1px) (0 2px 4px -2px),
+    color: rgb(0 0 0 / 0.1)
+  ),
+  'lg': (
+    dimensions: (0 10px 15px -3px) (0 4px 6px -4px),
+    color: rgb(0 0 0 / 0.1)
+  ),
+  'xl': (
+    dimensions: (0 20px 25px -5px) (0 8px 10px -6px),
+    color: rgb(0 0 0 / 0.1)
+  ),
+  '2xl': (
+    dimensions: (0 25px 50px -12px) (),
+    color: rgb(0 0 0 / 0.25)
+  ),
+  'inner': (
+    dimensions: (inset 0 2px 4px 0) (),
+    color: rgb(0 0 0 / 0.05)
+  ),
+  'none': (
+    dimensions: (0 0),
+    color: #0000
+  )
+) !default;
+
+@mixin box-shadow-preset($value: default, $color: default) {
+  @if map.has-key($box-shadow-presets, $value) {
+    $result: ();
+    $dimensions: map.get(map.get($box-shadow-presets, $value), 'dimensions');
+    $box-shadow-color: map.get(map.get($box-shadow-presets, $value), 'color');
+
+    @if $color != default {
+      $box-shadow-color: $color;
+    }
+
+    @each $dimension in $dimensions {
+      @if list.length($dimension) > 0 {
+        $result: list.append($result, list.append($dimension, $box-shadow-color), $separator: comma);
+      }
+    }
+    box-shadow: $result;
+  } @else {
+    box-shadow: $value;
+  }
+}
+
+// Drop shadows
+$drop-shadow-presets: (
+  'sm': (0 1px 1px rgb(0 0 0 / 0.05)) (),
+  'default': (0 1px 2px rgb(0 0 0 / 0.1)) (0 1px 1px rgb(0 0 0 / 0.06)),
+  'md': (0 4px 3px rgb(0 0 0 / 0.07)) (0 2px 2px rgb(0 0 0 / 0.06)),
+  'lg': (0 10px 8px rgb(0 0 0 / 0.04)) (0 4px 3px rgb(0 0 0 / 0.1)),
+  'xl': (0 20px 13px rgb(0 0 0 / 0.03)) (0 8px 5px rgb(0 0 0 / 0.08)),
+  '2xl': (0 25px 25px rgb(0 0 0 / 0.15)) (),
+  'none': (0 0 #0000) (),
+) !default;
+
+@mixin drop-shadow-preset($value: default) {
+  @if map.has-key($drop-shadow-presets, $value) {
+    $preset: map.get($box-shadow-presets, $value);
+
+    @each $shadow in $preset {
+      @if list.length($shadow) > 0 {
+        $result: list.append($result, drop-shadow($shadow), $separator: space);
+      }
+    }
+    filter: $result;
+  } @else {
+    filter: drop-shadow($value);
+  }
+}
+
+// Blur
+$blur-size-presets: (
+  'none': 0,
+  'sm': 4px,
+  'default': 8px,
+  'md': 12px,
+  'lg': 16px,
+  'xl': 24px,
+  '2xl': 40px,
+  '3xl': 64px,
+) !default;
+
+@function blur-size($size: default) {
+  @if map.has-key($blur-size-presets, $value) {
+    @return map.get($blur-size-presets, $value);
+  } @else {
+    @return $size;
+  }
+}

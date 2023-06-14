@@ -30,95 +30,25 @@ $breakpoint-presets: (
   }
 }
 
-// Form element collections
-// Box-like widgets
-@mixin form-all-boxes {
-  [type='text'],
-  [type='email'],
-  [type='url'],
-  [type='password'],
-  [type='number'],
-  [type='date'],
-  [type='datetime-local'],
-  [type='month'],
-  [type='search'],
-  [type='tel'],
-  [type='time'],
-  [type='week'],
-  [multiple],
-  textarea,
-  select,
-  .form-input,
-  .form-textarea,
-  .form-select,
-  .form-multiselect {
-    @content;
-  }
+// Responsive design
+@mixin breakpoint($bp) {
+  @media (min-width: screen($bp)) { @content }
 }
-@mixin form-textbox {
-  [type='text'],
-  [type='email'],
-  [type='url'],
-  [type='password'],
-  [type='number'],
-  [type='date'],
-  [type='datetime-local'],
-  [type='month'],
-  [type='search'],
-  [type='tel'],
-  [type='time'],
-  [type='week'],
-  .form-input {
-    @content;
-  }
-}
-@mixin form-textarea {
-  textarea,
-  .form-textarea {
-    @content;
-  }
-}
-@mixin form-placeholder {
-  input::placeholder,
-  textarea::placeholder,
-  .form-input::placeholder,
-  .form-textarea::placeholder {
-    @content;
-  }
+@mixin responsive-display($bp, $smaller, $larger) {
+  display: $smaller;
+  @include breakpoint($bp) { display: $larger; }
 }
 
-// Select boxes
-@mixin form-all-select {
-  select,
-  .form-select {
-    @content;
-  }
-}
+// Dark mode
+// $dark-mode-class refers to the name of the class that is applied to
+// the <html> element to activate dark mode.  If it is blank, then
+// the prefers-color-scheme media query is used
+$dark-mode-class: '' !default;
 
-@mixin form-multi-select {
-  [multiple],
-  [size]:where(select:not([size="1"]))
-  .form-select:where([size]:not([size="1"])) {
-    @content;
-  }  
-}
-
-// Check boxes and radio buttons
-@mixin form-check-radio {
-  [type='checkbox'],
-  [type='radio'],
-  .form-checkbox, .form-radio {
-    @content
-  }
-}
-
-// Buttons
-@mixin form-button {
-  button,
-  input[type="submit"],
-  input[type="button"],
-  input[type="reset"],
-  .input-button {
-    @content;
+@mixin dark-mode {
+  @if $dark-mode-class == '' {
+    @media (prefers-color-scheme: dark) { @content }
+  } @else {
+    html.#{$dark-mode-class} { @content }
   }
 }

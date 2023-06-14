@@ -1,0 +1,92 @@
+// Form element collections
+// Box-like widgets
+@mixin form-all-boxes {
+  [type='text'],
+  [type='email'],
+  [type='url'],
+  [type='password'],
+  [type='number'],
+  [type='date'],
+  [type='datetime-local'],
+  [type='month'],
+  [type='search'],
+  [type='tel'],
+  [type='time'],
+  [type='week'],
+  [multiple],
+  textarea,
+  select,
+  .form-input,
+  .form-textarea,
+  .form-select,
+  .form-multiselect {
+    @content;
+  }
+}
+@mixin form-textbox {
+  [type='text'],
+  [type='email'],
+  [type='url'],
+  [type='password'],
+  [type='number'],
+  [type='date'],
+  [type='datetime-local'],
+  [type='month'],
+  [type='search'],
+  [type='tel'],
+  [type='time'],
+  [type='week'],
+  .form-input {
+    @content;
+  }
+}
+@mixin form-textarea {
+  textarea,
+  .form-textarea {
+    @content;
+  }
+}
+@mixin form-placeholder {
+  input::placeholder,
+  textarea::placeholder,
+  .form-input::placeholder,
+  .form-textarea::placeholder {
+    @content;
+  }
+}
+
+// Select boxes
+@mixin form-all-select {
+  select,
+  .form-select {
+    @content;
+  }
+}
+
+@mixin form-multi-select {
+  [multiple],
+  [size]:where(select:not([size="1"]))
+  .form-select:where([size]:not([size="1"])) {
+    @content;
+  }  
+}
+
+// Check boxes and radio buttons
+@mixin form-check-radio {
+  [type='checkbox'],
+  [type='radio'],
+  .form-checkbox, .form-radio {
+    @content
+  }
+}
+
+// Buttons
+@mixin form-button {
+  button,
+  input[type="submit"],
+  input[type="button"],
+  input[type="reset"],
+  .input-button {
+    @content;
+  }
+}
