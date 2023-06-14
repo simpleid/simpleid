@@ -1,3 +1,9 @@
+@use 'scaffold/util';
+
+@mixin dialog {
+  .is-dialog-page & { @content; }
+}
+
 /* Page layout ------------------------------------------------------------- */
 /*.sticky { position: fixed; }*/
 #header {
@@ -84,15 +90,17 @@
 }
 #user-toggle img { padding: 0.5em; }
 
-#footer {
-    margin: 2em 0;
-    padding: 0px 10px;
-    text-align: right;
-    font-size: 0.9em;
-    color: #999999;
+/* Footer ------------------------------------------------------- */
+.content--footer {
+  margin-top: util.size(8);
+  text-align: right;
+  font-size: util.font-size('sm');
+  color: var(--grey-color);
+
+  address { font-style: normal }
+  a { color: #999999; }
 }
-#footer address { font-style: normal }
-#footer a { color: #999999; }
+
 
 #content {
     margin: auto;
@@ -194,54 +202,6 @@ input.otp { -moz-appearance:textfield; }
 input.otp::-webkit-outer-spin-button,
 input.otp::-webkit-inner-spin-button {
     -webkit-appearance: none;
-}
-
-/* Forms */
-.form-item { margin: 1em 0; }
-
-label {
-    display: block;
-    font-weight: bold;
-    padding: 2px 0;
-}
-label.option { font-weight: normal; }
-
-select, textarea, input[type="text"], input[type="password"], input[type="number"] {
-    display: inline-block;
-    padding: 0.5em;    
-    border: 1px solid #AAAAAA;
-    border-radius: 2px;
-}
-select:focus, textarea:focus, input[type="text"]:focus, input[type="password"]:focus, input[type="number"]:focus {
-    border-color: #1144AA;
-}
-
-input[type="submit"], input[type="button"] {
-    padding: 0.5em 1em;
-    background-color: #EEEEEE;
-    border: 1px solid #999999;
-    border-radius: 2px;
-    zoom: 1;
-    vertical-align: middle;
-    font-weight: bold;
-}
-input[type="submit"]:active, input[type="button"]:active {
-    box-shadow: 0 0 0 1px rgba(0,0,0, 0.15) inset, 0 0 6px rgba(0,0,0, 0.20) inset;
-}
-input[type="submit"][disabled], input[type="button"][disabled] {
-    color: #999999 !important;
-    background-color: #EEEEEE !important;
-    border-color: #999999 !important;
-}
-input[type="submit"].form-default, input[type="button"].form-default {
-    color: #FFFFFF;
-    background-color: #1144AA;
-    border-color: #114499;
-}
-
-input[type="radio"], input[type="checkbox"] { margin: 0.5em 0; }
-input[type="radio"]:focus, input[type="checkbox"]:focus {
-    outline: 1px auto #1144AA;
 }
 
 /* Dialogs and dialog pages */

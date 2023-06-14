@@ -1,0 +1,61 @@
+@use 'scaffold/util';
+@use 'sass:map';
+
+/* ----- Wrappers --------------------------------------- */
+.wrapper {
+  width: 100%;
+  @include util.margin-x(auto);
+  @include util.padding-x(util.size(4));
+
+  @each $bp in map.keys(util.$breakpoint-presets) {
+    @include util.breakpoint($bp) { @include util.container($bp) }
+  }
+}
+
+/* ----- Forms ------------------------------------------ */
+.form-item { margin: 1em 0; }
+
+label {
+    display: block;
+    font-weight: util.font-weight(bold);
+    @include util.padding-y(util.size(1));
+}
+label.option { font-weight: normal; }
+
+@include util.form-all-boxes {
+  // to be reviewed
+  display: inline-block;
+  padding: util.size(2);
+  border-radius: 2px;
+}
+
+@include util.form-button {
+  padding: util.size(2) util.size(4);
+  background-color: #EEEEEE;
+  border: 1px solid #999999;
+  border-radius: 2px;
+  vertical-align: middle;
+  font-weight: util.font-weight(bold);
+
+  &:active {
+    box-shadow: 0 0 0 1px rgba(0,0,0, 0.15) inset, 0 0 6px rgba(0,0,0, 0.20) inset;
+  }
+
+  &[disabled] {
+    color: #999999 !important;
+    background-color: #EEEEEE !important;
+    border-color: #999999 !important;
+  }
+
+  &.form-default {
+    // TODO  rename to is-default
+    color: #FFFFFF;
+    background-color: #1144AA;
+    border-color: #114499;
+  }
+}
+
+@include util.form-check-radio {
+  margin: 0.5em 0;
+  &:focus { outline: 1px auto #1144AA; }
+}

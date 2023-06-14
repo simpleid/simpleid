@@ -1,17 +1,22 @@
+@use 'scaffold/util';
+
+/* Set global font size ---------------------------------------------------- */
+html { font-size: 14px; }
+
 /* General elements -------------------------------------------------------- */
 h1 {
     font-weight: normal;
-    color: #666666;
+    color: var(--grey-400);
 }
 
 a {
-    border-bottom: 1px solid #CCCCCC;
+    border-bottom: 1px solid var(--grey-900);
     color: var(--brand-color);
     text-decoration: none !important;
-    font-weight: bold;
+    font-weight: util.font-weight(bold);
 }
 a:visited {
-    border-color: #CCCCCC;
+    border-color: var(--grey-900);
     color: #114499;
 }
 a:focus, a:hover {
@@ -26,21 +31,21 @@ table {
 }
 
 td, th {
-    border-bottom: 1px solid #CCCCCC;
+    border-bottom: 1px solid var(--grey-900);
     text-align: left;
     vertical-align: top;
     padding: 5px 5px;
 }
 th {
     border-bottom: 0px;
-    background-color: #666666;
+    background-color: var(--grey-400);
     color: #FFFFFF;
     white-space: nowrap;
     font-weight: bold;
 }
 
 pre {
-    border:1px solid #CCCCCC;
+    border:1px solid var(--grey-900);
     padding: 5px;
     font-size: 0.9em;
     white-space: nowrap;
