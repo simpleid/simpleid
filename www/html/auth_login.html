@@ -8,7 +8,7 @@
         </repeat>
 
         {* @submit_button text may vary depending on auth module *}
-        <input type="submit" name="op" value="{{ @@submit_button }}" class="form-default" :disabled="isSubmitted">
+        <input type="submit" name="op" value="{{ @@submit_button }}" class="is-default" :disabled="isSubmitted">
         <check if="{{ @@cancellable }}">
             <input type="submit" name="op" value="{{ @intl.common.cancel }}">
         </check>

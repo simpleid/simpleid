@@ -34,7 +34,7 @@ function confirmConsent(ev) {
                 <check if="{{ @form.weight >= 0 }}">{{ @form.content | raw }}</check>
             </repeat>
             
-            <input type="submit" name="op" id="edit-submit" value="{{ @intl.common.ok }}" class="form-default" />
+            <input type="submit" name="op" id="edit-submit" value="{{ @intl.common.ok }}" class="is-default" />
             <input type="submit" name="op" id="edit-cancel" value="{{ @intl.common.cancel }}" />
         </true>
         <false>
@@ -44,7 +44,7 @@ function confirmConsent(ev) {
             
             <p>{{ @intl.core.openid.switch_user_label, @switch_url | format, raw }}</p>
             
-            <input type="submit" name="op" id="edit-cancel" value="{{ @intl.common.cancel }}" class="form-default">
+            <input type="submit" name="op" id="edit-cancel" value="{{ @intl.common.cancel }}" class="is-default">
         </false>
     </check>
 </form>

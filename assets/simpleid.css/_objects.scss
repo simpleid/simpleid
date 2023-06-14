@@ -47,8 +47,7 @@ label.option { font-weight: normal; }
     border-color: #999999 !important;
   }
 
-  &.form-default {
-    // TODO  rename to is-default
+  &.is-default {
     color: #FFFFFF;
     background-color: #1144AA;
     border-color: #114499;
