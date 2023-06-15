@@ -77,7 +77,11 @@ class Template extends F3Template implements AttachmentManagerInterface {
      * @return string
      */
     public function js(mixed $data = null): string {
-        $json_flags = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_THROW_ON_ERROR;
+        /* Note that all strings in $data have been escaped by F3. This
+           means we have to leave ampersands intact so that they can be
+           unescaped by the raw filter
+         */
+        $json_flags = JSON_HEX_TAG | JSON_HEX_APOS /*| JSON_HEX_AMP*/ | JSON_HEX_QUOT | JSON_THROW_ON_ERROR;
         $json = json_encode($data, $json_flags);
 
         if (is_null($data) || is_numeric($data) || is_bool($data)) {
