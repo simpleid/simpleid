@@ -32,17 +32,17 @@ class RoboFile extends \Robo\Tasks {
      */
     public function make_frontend_tests() {
         $tests_dir = 'tests/frontend';
-        $f3 = \Base::instance();
-        $tpl = Template::instance();
 
         $config = Spyc::YAMLLoad($tests_dir . '/config.yml');
 
-        foreach ($config['globals'] as $phase) {
-            $f3->mset($phase);
-        }
-
         foreach ($config['tests'] as $output_file => $steps) {
             $this->say($output_file);
+
+            $f3 = \Base::instance();
+            $tpl = Template::instance();
+            foreach ($config['globals'] as $phase) {
+                $f3->mset($phase);
+            }
 
             foreach ($steps as $step) {
                 if (isset($step['template'])) {
@@ -72,6 +72,9 @@ class RoboFile extends \Robo\Tasks {
                     $this->taskWriteToFile($tests_dir . '/' . $output_file)->text($result)->run();
                 }
             }
+
+            \Registry::clear(\Base::class);
+            \Registry::clear(Template::class);
         }
     }
 
