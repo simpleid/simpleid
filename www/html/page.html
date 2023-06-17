@@ -31,38 +31,61 @@
     </check>
 
     <check if="{{ @@nav || @@user_header || true }}">
-      <header class="header" x-data="{ nav_expand: false, showUserMenu: false }">
-        <div id="header"><div id="header-inner">
-            <check if="{{ @@nav }}">
-                <div id="nav-toggle" @click="nav_expand = !nav_expand" :class="{'expand': nav_expand }"><img src="{{ @base_path }}html/nav-toggle.png" /></div>
-            </check>
-            <div id="logo">
+      <header class="header" x-data="{ showNavMenu: false, showUserMenu: false }">
+        <div class="wrapper">
+          <nav class="header-nav">
+            <section class="header-nav--group">
+              <check if="{{ @@nav }}">
+                <div class="header-nav--sidebar-icon">
+                  <button aria-label="Open menu" x-on:click.prevent.stop="showNavMenu = !showNavMenu; showUserMenu = false">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu">
+                      <line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                  </button>
+                </div>
+              </check>
+
+              <div class="header-nav--title">
                 <h1><check if="{{ @@site_title }}">
                     <true>{{ @site_title }}</true>
                     <false><a href="http://simpleid.org/">SimpleID</a> <span class="version">{{ @version }}</span></false>
                 </check></h1>
-            </div>
+              </div>
+            </section>
+
             <check if="{{ @@user_header }}">
-                <div>
-                    <div id="user-toggle" @click="showUserMenu = !showUserMenu" :class="{'expand': showUserMenu }"><img src="{{ @base_path }}html/user-toggle.png" /></div>
-                    <div id="user" :class="{'expand': showUserMenu }">
-                        <div class="logged-in-as">
-                            <span><strong class="identity" title="{{ @user.uid }}">{{ @user.display_name }}</strong></span>
-                        <check if="{{ @@logout_link || @@logout_destination }}"><span id="logout"><a href="{{ @base_path }}auth/logout{{ @@logout_destination }}">{{ @intl.common.logout }}</a></span></check>
-                        </div>
-                    </div>
+              <section class="header-nav--group">
+                <div class="header-nav--username">
+                  <span title="{{ @user.uid }}">{{ @user.display_name }}</span>
                 </div>
+
+                <div class="header-nav--user-icon">
+                  <button aria-label="Open menu" x-on:click.prevent.stop="showUserMenu = !showUserMenu; showNavMenu = false">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                  </button>
+                </div>
+              </section>
             </check>
-            <div style="clear: both;"></div>
-        </div></div>
-        <check if="{{ @@nav }}">
-            <div id="nav" :class="{'expand': nav_expand }"><div id="nav-inner">
-                <ul id="nav-left">
-                    <repeat group="{{ @nav }}" value="{{ @item }}"><li><a href="{{ @base_path }}{{ @item.path }}">{{ @item.name }}</a></li></repeat>
+
+            <check if="{{ @@nav }}">
+              <aside class="header-nav--nav-menu" x-bind:class="{ 'is-open': showNavMenu }" x-on:click.away="showNavMenu = false">
+                <ul class="header-nav--links">
+                  <repeat group="{{ @nav }}" value="{{ @item }}"><li><a href="{{ @base_path }}{{ @item.path }}">{{ @item.name }}</a></li></repeat>
                 </ul>
-                <div style="clear: both"></div>
-            </div></div>
-        </check>
+              </aside>
+            </check>
+
+            <check if="{{ @@user_header }}">
+              <aside class="header-nav--user-menu" x-cloak x-bind:class="{ 'is-open': showUserMenu }" x-on:click.away="showUserMenu = false">
+                <ul class="header-nav--links">
+                  <check if="{{ @@logout_link || @@logout_destination }}"><li><a href="{{ @base_path }}auth/logout{{ @@logout_destination }}">{{ @intl.common.logout }}</a></li></check>
+                </ul>
+              </aside>
+            </check>
+          </nav>
+        </div>       
       </header>
     </check>
 

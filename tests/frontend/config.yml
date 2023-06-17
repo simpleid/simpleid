@@ -71,6 +71,10 @@ tests:
           - name: My profile
             path: ''
         user_header: true
+        user:
+          uid: test
+          display_name: Test user
+        logout_destination: /
 
   post.html:
     - template: post.html
