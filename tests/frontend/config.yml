@@ -65,6 +65,12 @@ tests:
     - template: page.html
       variables:
         layout: my_blocks.html
+        nav:
+          - name: Dashboard
+            path: ''
+          - name: My profile
+            path: ''
+        user_header: true
 
   post.html:
     - template: post.html

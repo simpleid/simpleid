@@ -90,6 +90,24 @@
 }
 #user-toggle img { padding: 0.5em; }
 
+/* Content ------------------------------------------------------ */
+.content--main .wrapper {
+  @include dialog {
+    background-color: white;
+
+    @include util.breakpoint('sm') {
+      @include util.margin-y(util.size(8));
+      @include util.padding-y(util.size(4));
+      @include util.container('sm');
+      border: 1px solid var(--grey-900);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    @include util.breakpoint('md') { @include util.margin-y(util.size(16)); }
+    @include util.breakpoint('lg') { @include util.margin-y(util.size(24)); }
+  }
+}
+
 /* Footer ------------------------------------------------------- */
 .content--footer {
   margin-top: util.size(8);
@@ -115,6 +133,13 @@
     clear: both;
 }
 
+/* Dialog pages ------------------------------------------------- */
+body.is-dialog-page { background: var(--grey-950); }
+.is-dialog-page {
+  @include util.form-all-boxes { width: 100%; }
+}
+.is-dialog-page form { padding-right: 2px; } /* Used to adjust the padding in text boxes */
+//.is-dialog-page .form-item { padding-right: 1em; } /* Used to adjust the padding in text boxes */
 
 /* Specific elements ------------------------------------------------------- */
 .realm, .site {
@@ -141,6 +166,13 @@ span.last-time { display: none; }
     margin-bottom: 10px;
 }
 .message p { line-height: 1; }
+
+.alert {
+  @include util.padding-y(util.size(2));
+  background-color: var(--red-400);
+  color: white;
+  text-align: center;
+}
 
 .unsecure {
     border: 1px solid #AAAA11;
@@ -211,7 +243,6 @@ input.otp::-webkit-inner-spin-button {
 }
 
 /* Dialogs and dialog pages */
-.is-dialog-page { background: #EEEEEE; }
 .is-dialog-page #content {
     padding-top: 50px;
     max-width: 400px;
@@ -222,16 +253,10 @@ input.otp::-webkit-inner-spin-button {
     background: #FFFFFF;
 }
 
-.is-dialog-page form { padding-right: 2px; } /* Used to adjust the padding in text boxes */
-.is-dialog-page .form-item { padding-right: 1em; } /* Used to adjust the padding in text boxes */
-.is-dialog-page select, .is-dialog-page textarea, .is-dialog-page input[type="text"], .is-dialog-page input[type="password"], .is-dialog-page input[type="number"] {
-    width: 100%;
-}
+
 
 /* Mobile devices ---------------------------------------------------------- */
 @media only screen and (max-width: 767px) {
-    html { font-size: 14px; }
-
     #logo .version { display: none; }
 
     #nav-toggle, #user-toggle { display: block; }

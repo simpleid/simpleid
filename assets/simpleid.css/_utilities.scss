@@ -1,2 +1,7 @@
+@use 'scaffold/util';
+
 /* AlpineJS */
 [x-cloak] { display: none !important; }
+
+/* Hidden */
+@include util.generate-responsive-classes('u-hidden') { display: none; }

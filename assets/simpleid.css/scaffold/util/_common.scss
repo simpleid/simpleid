@@ -1,5 +1,6 @@
 @use 'sass:map';
 @use 'sass:math';
+@use 'sass:list';
 
 // Sizing units
 $sizing-unit: 0.25rem !default;
@@ -31,12 +32,26 @@ $breakpoint-presets: (
 }
 
 // Responsive design
-@mixin breakpoint($bp) {
-  @media (min-width: screen($bp)) { @content }
+@mixin breakpoint($bp, $max-bp: none) {
+  @if $max-bp == none {
+    @media (min-width: screen($bp)) { @content }
+  } @else {
+    @media (min-width: screen($bp)) { 
+      @media not all and (min-width: screen($max-bp)) { @content; }
+    }
+  }
 }
 @mixin responsive-display($bp, $smaller, $larger) {
   display: $smaller;
   @include breakpoint($bp) { display: $larger; }
+}
+@mixin generate-responsive-classes($class-name) {
+  .#{$class-name} { @content; }
+  @each $bp, $value in $breakpoint-presets {
+    @include breakpoint($bp) {
+      .bp-#{$bp}\:#{$class-name} { @content; }
+    }
+  }
 }
 
 // Dark mode
