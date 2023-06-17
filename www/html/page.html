@@ -39,7 +39,7 @@
                     <div id="user-toggle" @click="user_expand = !user_expand" :class="{'expand': user_expand }"><img src="{{ @base_path }}html/user-toggle.png" /></div>
                     <div id="user" :class="{'expand': user_expand }">
                         <div class="logged-in-as">
-                            <span><strong class="identity" title="{{ @user.uid }}">{{ @user->getDisplayName() }}</strong></span>
+                            <span><strong class="identity" title="{{ @user.uid }}">{{ @user.display_name }}</strong></span>
                         <check if="{{ @@logout_link || @@logout_destination }}"><span id="logout"><a href="{{ @base_path }}auth/logout{{ @@logout_destination }}">{{ @intl.common.logout }}</a></span></check>
                         </div>
                     </div>
