@@ -52,7 +52,7 @@ class RateLimiter {
      * source over the specified period
      * @param int $interval the specified period in seconds
      */
-    public function __construct($key = null, $limit = 10, $interval = 10) {
+    public function __construct($key, $limit = 10, $interval = 10) {
         $this->limit = $limit;
         $this->interval = $interval;
         $this->key = $key;
@@ -64,30 +64,48 @@ class RateLimiter {
      *
      * The source is specified in the $src parameter.  If $src is not
      * specified, the IP address is used.
+     * 
+     * The rate limiter is incremented by the amount specified by the
+     * $weight parameter.
      *
-     * If $return_remainder is false, this function returns a boolean
-     * indicating whether the request should continue to be processed (true),
-     * or should be refused (false).
-     *
-     * If $return_remainder is true, this function returns the number
-     * of requests the sources could have before the limit is reached.
+     * This function returns a boolean indicating whether the request
+     * should continue to be processed (true), or should be refused (false).
      *
      * @param string $src the source
-     * @param bool $return_remainder whether to return the remaining number
-     * of allowed requests
-     * @return bool|int
+     * @param int $weight
+     * @return bool
      */
-    public function throttle($src = null, $return_remainder = false) {
+    public function throttle($src = null, $weight = 1) {
         if ($src == null) $src = $this->getDefaultSource();
 
         $cache = \Cache::instance();
         $cache_name = $this->getCacheName($src);
-        $i = $cache->get($cache_name);
-        if ($i === false) $i = 0;
-        $i++;
-        if ($i > $this->limit) { return false;}
-        $cache->set($cache_name, $i, $this->interval);
-        return ($return_remainder) ? intval($this->limit - $i) : true;
+        $entry = $cache->get($cache_name);
+        if (($entry === false) || (time() >= $entry['expires'])) $entry = ['count' => 0, 'expires' => time() + $this->interval ];
+        $entry['count'] += $weight;
+        if ($entry['count'] > $this->limit) { return false;}
+        $cache->set($cache_name, $entry, $this->interval);
+        return true;
+    }
+
+    /**
+     * Returns the number of requests remaining for the source before the
+     * limit is reached.
+     *
+     * The source is specified in the $src parameter.  If $src is not
+     * specified, the IP address is used.
+     *
+     * @param string $src the source
+     * @return int
+     */
+    public function remainder($src = null) {
+        if ($src == null) $src = $this->getDefaultSource();
+
+        $cache = \Cache::instance();
+        $cache_name = $this->getCacheName($src);
+        $entry = $cache->get($cache_name);
+        if ($entry === false) return $this->limit;
+        return intval($this->limit - $entry['count']);
     }
 
     /**
@@ -105,7 +123,13 @@ class RateLimiter {
 
         $cache = \Cache::instance();
         $cache_name = $this->getCacheName($src);
-        $cache->set($cache_name, $this->limit, $this->interval);
+        $entry = $cache->get($cache_name);
+        if ($entry === false) {
+            $entry = ['count' => $this->limit, 'expires' => time() + $this->interval ];
+        } else {
+            $entry['count'] = $this->limit;
+        };
+        $cache->set($cache_name, $entry, $this->interval);
     }
 
     /**
@@ -181,7 +205,7 @@ class RateLimiter {
      * @return string the cache name
      */
     protected function getCacheName($src) {
-        return rawurlencode($src) . (($this->key == null) ? '.' . rawurlencode($this->key) : '') . '.ratelimit';
+        return rawurlencode($src) . '.' . rawurlencode($this->key) . '.ratelimit';
     }
 }
 
