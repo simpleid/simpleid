@@ -149,6 +149,8 @@ class User extends ArrayWrapper implements Serializable, Storable {
             case 'uid':
                 $this->uid = $value;
                 break;
+            case 'display_name':
+                return;
             case 'identity':
                 $this->container['openid']['identity'] = $value;
                 break;
@@ -160,6 +162,7 @@ class User extends ArrayWrapper implements Serializable, Storable {
     public function offsetExists($offset): bool {
         switch ($offset) {
             case 'uid':
+            case 'display_name':
                 return true;
             case 'identity':
                 return $this->hasLocalOpenIDIdentity();
@@ -179,6 +182,8 @@ class User extends ArrayWrapper implements Serializable, Storable {
         switch ($offset) {
             case 'uid':
                 return $this->uid;
+            case 'display_name':
+                return $this->getDisplayName();
             case 'identity':
                 // Retained for compatibility purposes
                 $mod = UserModule::instance();
