@@ -239,7 +239,7 @@
                 
                 <div class="form-item">
                     <label for="edit-otp">{otp_label}</label>
-                    <input type="number" maxlength="6" name="otp" id="edit-otp" size="10" value="" autocapitalize="off" autocorrect="off" class="form-text required" />
+                    <input type="text" inputmode="numeric" maxlength="6" name="otp" id="edit-otp" size="10" value="" autocapitalize="off" autocorrect="off" class="form-text required" />
                 </div>
                 <input type="submit" name="op" id="edit-submit" value="{submit_button}" class="form-default" />
             </form>
