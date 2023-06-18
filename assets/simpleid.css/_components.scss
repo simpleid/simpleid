@@ -6,7 +6,7 @@
 
 /* Alert bar --------------------------------------------------------------- */
 .alert {
-  @include util.padding-y(util.size(2));
+  padding: util.size(6) util.size(2);
   background-color: var(--red-400);
   color: white;
   text-align: center;
@@ -28,8 +28,10 @@ $header-height: 16;
   @include dialog { height: auto; }
 
   .wrapper {
-    @include util.padding-x(util.size(4));
-    @include dialog { @extend .wrapper; }
+    @include util.margin-x(0);
+    @include util.padding-x(util.size(6));
+    max-width: 100%;
+    //@include dialog { @extend .wrapper; }
   }
 }
 
@@ -45,6 +47,7 @@ $header-nav-menu-width: 64;
   button {
     cursor: pointer;
     padding: 0;
+    margin-block-end: 0;
     background-color: transparent;
     border: 0;
     color: white;
@@ -108,8 +111,8 @@ $header-nav-menu-width: 64;
 }
 
 .header-nav--nav-menu {
-  position: fixed; // bp
-  top: util.size($header-height); // bp
+  position: fixed;
+  top: util.size($header-height);
   left: 0;
   width: 0;
   overflow: hidden;
@@ -119,7 +122,6 @@ $header-nav-menu-width: 64;
   transition-duration: 0.3s;
 
   @include util.breakpoint($header-nav-bp) {
-    // position etc
     width: util.size($header-nav-menu-width);
     overflow: auto;
     transition-property: none;
@@ -133,10 +135,24 @@ $header-nav-menu-width: 64;
   }
 }
 
+.sidebar-adjust {
+  @include util.breakpoint($header-nav-bp) {
+    position: relative;
+    left: util.size($header-nav-menu-width);
+    width: calc(100% - util.size($header-nav-menu-width));
+
+    @include dialog {
+      position: static;
+      left: inherit;
+      width: inherit;
+    }
+  }
+}
+
 .header-nav--user-menu {
   position: fixed;
   top: util.size($header-height);
-  right: 0; // TODO bp
+  right: 0;
   width: util.size($header-nav-menu-width);
   background-color: var(--grey-400);
 
@@ -157,7 +173,7 @@ $header-nav-menu-width: 64;
   margin: 0;
 
   a {
-    @include util.padding-x(util.size(4));
+    @include util.padding-x(util.size(6));
     @include util.padding-y(util.size(2));
     display: block;
     color: white;
@@ -177,10 +193,10 @@ $header-nav-menu-width: 64;
 
   @include dialog {
     background-color: white;
+    @include util.padding-x(util.size(8));
 
     @include util.breakpoint('sm') {
       @include util.margin-y(util.size(8));
-      @include util.padding-y(util.size(4));
       @include util.container('sm');
       border: 1px solid var(--grey-900);
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -193,7 +209,7 @@ $header-nav-menu-width: 64;
 
 /* Footer ------------------------------------------------------- */
 .content--footer {
-  margin-top: util.size(8);
+  margin-top: util.size(16);
   text-align: right;
   font-size: util.font-size('sm');
   color: var(--grey);
@@ -216,6 +232,16 @@ body.is-dialog-page { background: var(--grey-950); }
 .is-dialog-page form { padding-right: 2px; } /* Used to adjust the padding in text boxes */
 //.is-dialog-page .form-item { padding-right: 1em; } /* Used to adjust the padding in text boxes */
 
+/* Messages ----------------------------------------------------- */
+.message {
+    border: 1px solid #666666;
+    border-radius: 4px;
+    padding: 0 10px;
+    background: #DDDDDD;
+    margin-bottom: 10px;
+}
+.message p { line-height: 1; }
+
 /* Specific elements ------------------------------------------------------- */
 .realm, .site {
     padding-left: 20px;
@@ -232,26 +258,6 @@ body.is-dialog-page { background: var(--grey-950); }
 .url-elide { color: #999999; }
 
 span.last-time { display: none; }
-
-.message {
-    border: 1px solid #666666;
-    border-radius: 4px;
-    padding: 0 10px;
-    background: #DDDDDD;
-    margin-bottom: 10px;
-}
-.message p { line-height: 1; }
-
-.unsecure {
-    border: 1px solid #AAAA11;
-    background: #FFFFDD;
-}
-.unsecure p { padding-left: 20px; background: transparent url(../lock-open.png) no-repeat top left; }
-.secure {
-    border: 1px solid #44AA11;
-    background: #EEFFDD;
-}
-.secure p { padding-left: 20px; background: transparent url(../lock.png) no-repeat top left; }
 
 .block {
     background-color: #EEEEEE;
@@ -298,8 +304,8 @@ span.last-time { display: none; }
 #discovery label { display: inline; }
 
 .otp-key {
-    font-size: 18px;
-    font-family: "Bitstream Vera Sans Mono","Courier New",monospace;
+  @include util.text-size(xl);
+  font-family: util.$font-mono;
     margin: 5px;
 }
 .otp-letters { padding: 0 2px; }

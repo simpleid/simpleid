@@ -5,10 +5,10 @@
 .wrapper {
   width: 100%;
   @include util.margin-x(auto);
-  @include util.padding-x(util.size(4));
+  @include util.padding-x(util.size(6));
 
   @each $bp in map.keys(util.$breakpoint-presets) {
-    @include util.breakpoint($bp) { @include util.container($bp) }
+    @include util.breakpoint($bp) { @include util.container($bp); }
   }
 }
 
