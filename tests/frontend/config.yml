@@ -39,6 +39,7 @@ tests:
       variables:
         page_class: is-dialog-page
         layout: auth_login.html
+        message: The user name or password is not correct.
 
   oauth_consent.html:
     - template: page.html

@@ -1,15 +1,17 @@
-<repeat group="{{ @@blocks }}" value="{{ @block }}">
-    <div class="block" id="{{ @block.id }}">
-        <div class="block-header">
-            <check if="{{ @@block.links }}">
-                <div class="block-header-links">
-                    <repeat group="{{ @block.links }}" value="{{ @link }}"><a href="{{ @link.href }}">{{ @link.name }}</a></li></repeat>
-                </div>
-            </check>
-            <h2>{{ @block.title }}</h2>
-        </div>
-        <div class="block-content">
-            {{ @block.content | raw }}
-        </div>
-    </div>
-</repeat>
+<div class="blocks">
+  <repeat group="{{ @@blocks }}" value="{{ @block }}">
+    <section class="block {{ ' ', ((@@block.class) ? @@block.class : []) | implode }}" id="{{ @block.id }}">
+      <header class="block--header">
+        <check if="{{ @@block.links }}">
+          <div class="block--header-links">
+            <repeat group="{{ @block.links }}" value="{{ @link }}"><a href="{{ @link.href }}">{{ @link.name }}</a></li></repeat>
+          </div>
+        </check>
+        <h2>{{ @block.title }}</h2>
+      </header>
+      <div class="block--content">
+        {{ @block.content | raw }}
+      </div>
+    </section>
+  </repeat>
+</div>

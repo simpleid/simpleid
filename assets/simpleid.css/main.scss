@@ -16,6 +16,7 @@
         '700': #999999,
         '800': #aaaaaa,
         '900': #cccccc,
+        '925': #dddddd,
         '950': #eeeeee
       )
     ),
@@ -25,14 +26,8 @@
     'red': #f44226
   ),
   $additional-colors: (
-    'background-color': #fdfdfd,
     'brand-color-light': #4488ee,
-    'brand-color-dark': #114499,
-    'grey-color':       #888888,
-    'grey-color-light': #cccccc,
-    'grey-color-dark':  #666666,
-    'grey-color-super-light': #eeeeee,
-    'grey-color-super-dark': #444444,
+    'brand-color-dark': #114499
   )
 );
 @use 'scaffold/forms' with (

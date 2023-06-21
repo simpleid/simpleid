@@ -182,7 +182,7 @@ $header-nav-menu-width: 64;
     border-bottom: 0;
 
     &:hover {
-      background-color: var(--grey-color);
+      background-color: var(--grey);
     }
   }
 }
@@ -234,13 +234,66 @@ body.is-dialog-page { background: var(--grey-950); }
 
 /* Messages ----------------------------------------------------- */
 .message {
-    border: 1px solid #666666;
-    border-radius: 4px;
-    padding: 0 10px;
-    background: #DDDDDD;
-    margin-bottom: 10px;
+  padding: util.size(4) util.size(4);
+  @include util.margin-y(util.size(4));
+  background-color: var(--grey-925);
+  border: 1px solid var(--grey-400);
+  border-radius: 4px;
+
+  &.success {
+    background-color: var(--green-950);
+    border-color: var(--green-400);
+  }
+  &.warning {
+    background-color: var(--red-950);
+    border-color: var(--red-400);
+  }
 }
 .message p { line-height: 1; }
+
+/* Dashboard blocks --------------------------------------------- */
+.block {
+  background-color: var(--grey-950);
+  @include util.margin-y(util.size(8));
+}
+.block--header {
+  background-color: var(--grey-400);
+  padding: util.size(1) util.size(4);
+
+  h2 {
+    font-size: util.font-size(lg);
+    font-weight: util.font-weight(bold);
+    color: white;
+    margin: 0;
+    padding: 0;
+    border-top-width: 0;
+  }
+}
+.block--header-links {
+  float: right;
+  font-size: util.font-size(sm);
+  text-align: right;
+  white-space: nowrap;
+
+  a {
+    color: #FFFFFF;
+    border-bottom-color: #FFFFFF;
+    font-weight: util.font-weight(normal);
+  }
+}
+.block--content {
+  padding: util.size(2) util.size(4);
+  p {
+    margin-bottom: util.size(2);
+    padding: 0;
+  }
+  h3 {
+    font-size: util.font-size(base);
+    font-weight: util.font-weight(bold);
+    margin: 0;
+    padding-top: util.size(2);
+  }
+}
 
 /* Specific elements ------------------------------------------------------- */
 .realm, .site {
@@ -255,85 +308,39 @@ body.is-dialog-page { background: var(--grey-950); }
     padding-left: 20px;
     background: transparent url(../drive.png) no-repeat top left;
 }
-.url-elide { color: #999999; }
+.url-elide { color: var(--grey-700); }
 
 span.last-time { display: none; }
-
-.block {
-    background-color: #EEEEEE;
-    margin-bottom: 20px;
-}
-.block-header {
-    background-color: #666666;
-    margin:0 0 5px;
-    padding: 5px 10px;
-}
-.block-header h2 {
-    font-size: 1.2em;
-    font-weight: bold;
-    color: #FFFFFF;
-    margin: 0;
-    padding: 0;
-    border-top-width: 0;
-}
-.block-header-links {
-    float: right;
-    font-size: 0.9em;
-    text-align: right;
-    white-space: nowrap;
-}
-.block-header-links a {
-    color: #FFFFFF;
-    border-bottom-color: #FFFFFF;
-    font-weight: normal;
-}
-.block-content {
-    padding: 5px 10px;
-}
-.block-content p {
-    margin: 0 0 5px 0;
-    padding: 0;
-}
-.block-content h3 {
-    font-size: 1em;
-    font-weight: bold;
-    margin: 0;
-    padding: 5px 0 0 0;
-}
 
 #discovery label { display: inline; }
 
 .otp-key {
   @include util.text-size(xl);
   font-family: util.$font-mono;
-    margin: 5px;
+  margin: util.size(2);
 }
-.otp-letters { padding: 0 2px; }
-#otp-key-qr { padding: 16px 0; }
+.otp-letters { padding: 0 util.size(1); }
+#otp-key-qr { padding: util.size(4) 0; }
 
 /* Upgrade pages ----------------------------------------------------------- */
 
 .upgrade-version {
-    font-weight: bold;
-    font-size: 1.5em;
+  font-weight: util.font-weight(bold);
+  font-size: util.font-size(xl);
 }
 
-.original-version { color: #666666; }
-.this-version { color: #4A80ED; }
+.original-version { color: var(--grey-400); }
+.this-version { color: var(--brand-color-light); }
 
 .upgrade-error {
-    border: 1px solid #666666;
-    border-radius: 4px;
-    padding: 0 10px;
-    background: #DDDDDD;
-    margin-bottom: 10px;
-    display: none;
+  @extend .message;
+  display: none;
 }
 .upgrade-error p { line-height: 1; }
 
 .upgrade-results {
-    overflow: auto;
-    height: 200px;
-    border: 1px solid #666666;
-    background-color: #EEEEEE;
+  overflow: auto;
+  height: 200px;
+  border: 1px solid var(--grey-400);
+  background-color: var(--grey-950);
 }
