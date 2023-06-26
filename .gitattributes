@@ -10,6 +10,7 @@
 /phpstan.neon.dist      export-ignore
 /phpunit.xml.dist       export-ignore
 /RoboFile.php           export-ignore
+/www/html/assets/*.map  export-ignore
 
 # Add commit/tag name to version.inc.php
 /www/version.inc.php    export-subst
