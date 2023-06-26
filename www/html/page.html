@@ -92,7 +92,7 @@
     <section class="content sidebar-adjust">
       <main class="content--main">
         <div class="wrapper">
-          <h1 class="title">{{ @title }}</h1>
+          <header class="content--main-header"><h1 class="title">{{ @title }}</h1></header>
 
           <check if="{{ @@message }}">
             <div class="message">
@@ -103,7 +103,7 @@
             </div>
           </check>
 
-          <check if="{{ @@layout }}"><include href="{{ @layout }}"></check>
+          <check if="{{ @@layout }}"><div class="content--main-layout"><include href="{{ @layout }}" /></div></check>
         </div>
       </main>
 

@@ -31,6 +31,7 @@ label.option { font-weight: normal; }
 
 @include util.form-button {
   padding: util.size(2) util.size(4);
+  border-width: 1px;
   border-radius: 2px;
   vertical-align: middle;
   font-weight: util.font-weight(bold);
@@ -49,3 +50,8 @@ label.option { font-weight: normal; }
   margin-inline-end: util.size(2);
   &:focus { outline: 1px auto var(--brand-color); }
 }
+
+
+/* ----- Client URLs ------------------------------------ */
+// getDisplayHTML display_html
+.url-elide { color: var(--grey-700); }

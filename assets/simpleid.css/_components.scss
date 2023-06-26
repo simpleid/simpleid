@@ -206,6 +206,9 @@ $header-nav-menu-width: 64;
     @include util.breakpoint('lg') { @include util.margin-y(util.size(24)); }
   }
 }
+.content--main-header {
+  margin-bottom: util.size(4);
+}
 
 /* Footer ------------------------------------------------------- */
 .content--footer {
@@ -308,9 +311,6 @@ body.is-dialog-page { background: var(--grey-950); }
     padding-left: 20px;
     background: transparent url(../drive.png) no-repeat top left;
 }
-.url-elide { color: var(--grey-700); }
-
-span.last-time { display: none; }
 
 #discovery label { display: inline; }
 
@@ -324,21 +324,21 @@ span.last-time { display: none; }
 
 /* Upgrade pages ----------------------------------------------------------- */
 
-.upgrade-version {
+.upgrade--version {
   font-weight: util.font-weight(bold);
   font-size: util.font-size(xl);
+
+  &.is-original-version { color: var(--grey-400); }
+  &.is-this-version { color: var(--brand-color-light); }
 }
 
-.original-version { color: var(--grey-400); }
-.this-version { color: var(--brand-color-light); }
-
-.upgrade-error {
+.upgrade--error {
   @extend .message;
   display: none;
 }
-.upgrade-error p { line-height: 1; }
+.upgrade--error p { line-height: 1; }
 
-.upgrade-results {
+.upgrade--results {
   overflow: auto;
   height: 200px;
   border: 1px solid var(--grey-400);
