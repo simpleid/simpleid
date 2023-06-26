@@ -2,7 +2,7 @@
 
 globals:
   # Framework variables (1st phase)
-  - UI: www/html/
+  - UI: www/html/,www/upgrade/
     PREFIX: intl.
     DEBUG: 2
 
@@ -48,6 +48,9 @@ tests:
         layout: oauth_consent.html
         application_name: Sample application
         application_type: web
+        client_info:
+          - foo
+          - bar
         scope_list:
           id: know who you are
           profile: view your profile information (excluding e-mail and address information)
@@ -83,3 +86,21 @@ tests:
         url: ''
         params:
           foo: bar
+
+  upgrade_access_denied.html:
+    - template: page.html
+      variables:
+        layout: upgrade_access_denied.html
+        upgrade_url: 'https://simpleid.org/docs/2/upgrading/#upgrade'
+
+  upgrade_selection.html:
+    - template: page.html
+      variables:
+        page_class: is-dialog-page
+        layout: upgrade_selection.html
+        original_version: 0.1.0
+        this_version: 0.2.0
+        upgrade_access_check: false
+        upgid: foo
+        tk: foo
+        results: Success
