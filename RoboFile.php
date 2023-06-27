@@ -47,16 +47,18 @@ class RoboFile extends \Robo\Tasks {
             foreach ($steps as $step) {
                 if (isset($step['template'])) {
                     $template_file = $step['template'];
+                    $mime = (isset($step['mime'])) ? $step['mime'] : 'text/html';
+                    $hive = (isset($step['local_variables'])) ? $step['local_variables'] : null;
                     if (isset($step['variables'])) $f3->mset($step['variables']);
 
-                    $result = $tpl->render($template_file);
+                    $result = $tpl->render($template_file, $mime, $hive);
                 } elseif (isset($step['resolve'])) {
-                    $result = $tpl->resolve($step['resolve']);
+                    $result = (is_string($step['resolve']) ? $tpl->resolve($step['resolve']) : $step['resolve'];
                 } elseif (isset($step['array'])) {
                     $result = [];
 
                     foreach ($step['array'] as $variable => $contents) {
-                        $result[$variable] = $tpl->resolve($contents);
+                        $result[$variable] = (is_string($contents)) ? $tpl->resolve($contents) : $contents;
                     }
                 }
 

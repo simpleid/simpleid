@@ -59,6 +59,40 @@ tests:
           This web site has not confirmed its identity and might be fraudulent.
           Are you sure you wish to automatically send your information to this site for any future requests?
 
+  openid_consent.html:
+    - template: openid_userinfo_consent.html
+      local_variables:
+        module: sreg
+        userinfo_label: SimpleID will also be sending the following information to the site.
+        name_label: Name
+        value_label: Value
+        fields:
+          - id: email
+            html_id: email
+            name: Email
+            value: hello@example.com
+            required: true
+
+          - id: nickname
+            html_id: nickname
+            name: Nickname
+            value: Foo
+            required: false
+            checked: false
+      set: form_content
+
+    - array:
+        content: '{{ @form_content | raw }}'
+        weight: 0
+      push: forms
+
+    - template: page.html
+      variables:
+        page_class: is-dialog-page
+        layout: openid_consent.html
+        cancel: false
+        realm: https://example.com/
+
   dashboard.html:
     - array:
         id: welcome
