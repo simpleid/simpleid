@@ -95,4 +95,7 @@ pre.code { white-space: pre; overflow: initial; }
   ul ul, ul ol, ol ul, ol ol {
     @include util.margin-y($list-item-block-margin);
   }
+
+  > :first-child { margin-top: 0; }
+  > :last-child { margin-bottom: 0; }
 }

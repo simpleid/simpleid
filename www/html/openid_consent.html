@@ -15,10 +15,12 @@ function confirmConsent(ev) {
     
     <check if="{{ !@cancel }}">
         <true>
-            <p>{{ @intl.core.openid.realm_label, @realm | format, raw }}</p>
+            <div class="narrative">
+                <p>{{ @intl.core.openid.realm_label, @realm | format, raw }}</p>
+            </div>
             
             <check if="{{ @@return_to_suspect }}">
-            <div class="message unsecure">
+            <div class="message warning">
                 <p>{{ @intl.core.openid.suspect_label, @suspect_url | format, raw }}</p>
             </div>
             </check>
@@ -38,11 +40,13 @@ function confirmConsent(ev) {
             <input type="submit" name="op" id="edit-cancel" value="{{ @intl.common.cancel }}" />
         </true>
         <false>
-            <p>{{ @intl.core.openid.unable_label, @realm | format, raw }}</p>
-            
-            <p>{{ @intl.core.openid.identity_not_matching_label, @requested_identity | format }}</p>
-            
-            <p>{{ @intl.core.openid.switch_user_label, @switch_url | format, raw }}</p>
+            <div class="narrative">
+                <p>{{ @intl.core.openid.unable_label, @realm | format, raw }}</p>
+                
+                <p>{{ @intl.core.openid.identity_not_matching_label, @requested_identity | format }}</p>
+                
+                <p>{{ @intl.core.openid.switch_user_label, @switch_url | format, raw }}</p>
+            </div>
             
             <input type="submit" name="op" id="edit-cancel" value="{{ @intl.common.cancel }}" class="is-default">
         </false>

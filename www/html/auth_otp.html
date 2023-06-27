@@ -1,6 +1,8 @@
-<p>{{ @intl.core.auth_otp.otp_instructions_label }}</p>
+<div class="narrative">
+    <p>{{ @intl.core.auth_otp.otp_instructions_label }}</p>
 
-<p>{{ @intl.core.auth_otp.otp_recovery_label, @otp_recovery_url | format, raw }}</p>
+    <p>{{ @intl.core.auth_otp.otp_recovery_label, @otp_recovery_url | format, raw }}</p>
+</div>
 
 <div class="form-item">
     <label for="edit-otp">{{ @intl.core.auth_otp.otp_label }}</label>

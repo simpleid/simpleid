@@ -52,6 +52,23 @@ label.option { font-weight: normal; }
 }
 
 
+/* ----- Info panes ------------------------------------- */
+.info-pane {
+  @include util.margin-y(util.size(4));
+  button {
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+    margin-inline-end: 0;
+    margin-block-end: 0;
+    background: transparent;
+    font-weight: util.font-weight(medium);
+    font-size: util.font-size('lg');
+    color: var(--grey-400);
+    svg, span { vertical-align: middle; }
+  }
+}
+
 /* ----- Client URLs ------------------------------------ */
 // getDisplayHTML display_html
 .url-elide { color: var(--grey-700); }
