@@ -16,9 +16,11 @@
 .form-item { margin: 1em 0; }
 
 label {
-    display: block;
-    font-weight: util.font-weight(bold);
-    @include util.padding-y(util.size(1));
+  display: block;
+  font-weight: util.font-weight(bold);
+  @include util.padding-y(util.size(1));
+
+  table & { padding: 0; }
 }
 label.option { font-weight: normal; }
 
@@ -49,6 +51,8 @@ label.option { font-weight: normal; }
   @include util.margin-y(util.size(2));
   margin-inline-end: util.size(2);
   &:focus { outline: 1px auto var(--brand-color); }
+
+  table & { margin: 0; }
 }
 
 

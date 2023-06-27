@@ -27,23 +27,24 @@ a {
 }
 
 table {
-    border-collapse: collapse;
-    margin: 0 0 1em 0;
-    width: 100%;
+  border-collapse: collapse;
+  @include util.margin-y(util.size(4));
+  width: 100%;
+  line-height: util.leading(tight);
 }
 
 td, th {
-    border-bottom: 1px solid var(--grey-900);
-    text-align: left;
-    vertical-align: top;
-    padding: 5px 5px;
+  border-bottom: 1px solid var(--grey-900);
+  text-align: left;
+  vertical-align: top;
+  padding: util.size(1.5) util.size(2);
 }
 th {
-    border-bottom: 0px;
-    background-color: var(--grey-400);
-    color: #FFFFFF;
-    white-space: nowrap;
-    font-weight: bold;
+  border-bottom: 0px;
+  background-color: var(--grey-400);
+  color: #FFFFFF;
+  white-space: nowrap;
+  font-weight: bold;
 }
 
 pre {
