@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <link rel="shortcut icon" href="{{ @base_path }}html/simpleid.ico" type="image/x-icon">
 
-    <check if="{{ @@head }}"><include href="{{ @head }}"></check>
+    <include href="{{ @head }}" if="{{ @@head }}" />
         
     <link rel="stylesheet" href="{{ @base_path }}html/assets/simpleid.css">
     <check if="{{ @@attachments.css }}"><repeat group="{{ @attachments.css }}" value="{{ @attachment }}">

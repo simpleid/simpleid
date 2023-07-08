@@ -63,10 +63,22 @@
   }
 }
 
+@mixin form-single-select {
+  select:not([multiple]),
+  select:not([size]),
+  select[size="1"],
+  .form-select:not([multiple]),
+  .form-select:not([size]),
+  .form-select[size="1"] {
+    @content
+  }
+}
+
 @mixin form-multi-select {
   [multiple],
   [size]:where(select:not([size="1"]))
-  .form-select:where([size]:not([size="1"])) {
+  .form-select:where([size]:not([size="1"])),
+  .form-multiselect {
     @content;
   }  
 }
@@ -86,7 +98,7 @@
   input[type="submit"],
   input[type="button"],
   input[type="reset"],
-  .input-button {
+  .form-button {
     @content;
   }
 }
