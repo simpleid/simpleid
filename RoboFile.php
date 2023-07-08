@@ -53,7 +53,7 @@ class RoboFile extends \Robo\Tasks {
 
                     $result = $tpl->render($template_file, $mime, $hive);
                 } elseif (isset($step['resolve'])) {
-                    $result = (is_string($step['resolve']) ? $tpl->resolve($step['resolve']) : $step['resolve'];
+                    $result = (is_string($step['resolve'])) ? $tpl->resolve($step['resolve']) : $step['resolve'];
                 } elseif (isset($step['array'])) {
                     $result = [];
 
