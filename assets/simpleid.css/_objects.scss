@@ -27,13 +27,15 @@ label.option { font-weight: normal; }
 @include util.form-all-boxes {
   // to be reviewed
   display: inline-block;
-  padding: util.size(2);
+  @include util.padding-y(util.size(2));
   border-radius: 2px;
 }
+@include util.form-textbox { @include util.padding-x(util.size(2)); }
+@include util.form-textarea { @include util.padding-x(util.size(2)); }
+@include util.form-all-select { padding-left: util.size(2); }
 
 @include util.form-button {
   padding: util.size(2) util.size(4);
-  border-width: 1px;
   border-radius: 2px;
   vertical-align: middle;
   font-weight: util.font-weight(bold);
@@ -55,6 +57,16 @@ label.option { font-weight: normal; }
   table & { margin: 0; }
 }
 
+.form-combo {
+  @include util.form-combo-controls {
+    border-radius: 0; 
+    &:first-child { border-radius: 2px 0 0 2px; }
+    &:last-child { border-radius: 0 2px 2px 0; }
+  }
+
+  span { @include util.padding-y(util.size(2)); }
+  @include util.form-button { @include util.padding-y(util.size(2)); }
+}
 
 /* ----- Info panes ------------------------------------- */
 .info-pane {

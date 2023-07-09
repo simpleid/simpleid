@@ -102,3 +102,20 @@
     @content;
   }
 }
+
+// Form combo controls
+@mixin form-combo-controls {
+  @include form-textbox { @content; }
+  @include form-single-select { @content; }
+  @include form-button { @content; }
+  span { @content; }
+}
+
+@mixin form-combo-main-controls {
+  @include form-textbox { 
+    &:not(.form-combo--side) { @content; }
+  }
+  @include form-single-select {
+    &:not(.form-combo--side) { @content; } 
+  }
+}

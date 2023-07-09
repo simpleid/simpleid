@@ -121,7 +121,7 @@ $valid-color: var(--green) !default;
   margin-block-end: util.size(2);
 
   background-color: $background-color;
-  border-color: $border-color;
+  border: 1px solid $border-color;
   cursor: pointer;
   font-weight: util.font-size(medium);
 
@@ -147,43 +147,61 @@ $valid-color: var(--green) !default;
 }
 
 /* Textbox-button-label combinations */
-%-smart-borders {
-  &:not(:first-child) { border-left-width: 0; }
-  &:not(:last-child) { border-right-width: 0; }
+// These are combinations of a main control (which can be anything selected
+// by util.form-textbox) and one or two side controls (which can be a span,
+// a button, or a select box with the class form-combo--side)
+//
+// .is-subtle can be used on a side control to make it less prominent
+%-form-combo-side-controls {
+  flex: 0 0 auto;
+  &:not(:first-child) { margin-left: -1px; }
+  &:not(:last-child) { margin-right: -1px; }
+  &:hover, &:focus { z-index: 10; }
 }
+
+%-form-combo-display { display: inline-block; }
 
 .form-combo {
   display: inline-flex;
-  align-items: flex-start;
+  align-items: stretch;
 
-  button, input, select {
-    display: inline-block;
+  @include util.form-combo-controls { @extend %-form-combo-display; }
+
+  // Main control
+  @include util.form-combo-main-controls {
+    z-index: 0;
+  }
+
+  // Side controls
+  .form-combo--side {
+    @extend %-form-combo-side-controls;
+  }
+  @include util.form-button {
+    @extend %-form-combo-side-controls;
+    margin-inline-end: 0;
+    margin-block-end: 0;
+
+    &.is-subtle {
+      color: initial;
+      font-size: util.font-size(sm);
+      @include util.padding-x(util.size(2));
+    }
   }
 
   span {
-    @extend %-smart-borders;
     flex: 0 0 auto;
     @include util.padding-x(util.size(2));
     @include util.padding-y(util.size(1));
     border: 1px solid $border-color;
     cursor: default;
+    &:not(:first-child) { border-left-width: 0; }
+    &:not(:last-child) { border-right-width: 0; }
   }
 
-  // Side label
+  // .is-subtle
   .is-subtle {
-    @extend %-smart-borders;
-    @include util.padding-x(util.size(2));
     color: $placeholder-color;
+    background-color: $background-color;
+    font-weight: util.font-weight(normal);
   }
-
-  // Special rules for button.is-subtle
-  button.is-subtle {
-    border-left-width: 1px !important;
-    border-right-width: 1px !important;
-    &:hover, &:focus { border-color: $hover-color; z-index: 2; }
-    &:active { box-shadow: none; }
-  }
-  input { z-index: 0; }
-  input + button.is-subtle { margin-left: -1px; }
-  button.is-subtle + input { margin-right: -1px; }
 }
