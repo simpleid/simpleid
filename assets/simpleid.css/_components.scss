@@ -305,19 +305,6 @@ body.is-dialog-page { background: var(--grey-950); }
 }
 
 /* Specific elements ------------------------------------------------------- */
-.realm, .site {
-    padding-left: 20px;
-    background: transparent url(../world.png) no-repeat top left;
-}
-.app {
-    padding-left: 20px;
-    background: transparent url(../application.png) no-repeat top left;
-}
-.device {
-    padding-left: 20px;
-    background: transparent url(../drive.png) no-repeat top left;
-}
-
 #discovery label { display: inline; }
 
 .otp-key {

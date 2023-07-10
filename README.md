@@ -51,10 +51,10 @@ by Vladimir Andersen.
 Licensing information for this library can be found at
 <https://github.com/mustangostang/spyc/blob/master/COPYING>.
 
-SimpleID uses the [famfamfam Silk icon set](http://www.famfamfam.com/lab/icons/silk/),
-designed by Mark James.
-The icon set is licensed under a
-[Creative Commons Attribution 2.5 License](http://creativecommons.org/licenses/by/2.5/).
+SimpleID uses the [Feather icon library](https://feathericons.com/),
+designed by Cole Bemis.
+Licensing information for this library can be found at
+<https://github.com/feathericons/feather/blob/master/LICENSE>.
 
 SimpleID uses the [Alpine.js library](http://alpinejs.dev),
 by Caleb Porzio and other contributors.

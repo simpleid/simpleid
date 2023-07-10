@@ -9,7 +9,7 @@
     </check>
     
     <div class="narrative">
-        <p>{{ @intl.common.consent.request_label, @application_name, @application_type | format, raw }}</p>
+        <p>{{ @intl.common.consent.request_label, @application_name | format, raw }}</p>
         
         <ul>
             <repeat group="{{ @scope_list }}" key="{{ @scope }}" value="{{ @description }}">
