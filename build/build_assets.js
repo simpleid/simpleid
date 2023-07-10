@@ -25,7 +25,7 @@ async function build(entryPoints) {
         bundle: true,
         allowOverwrite: true,
         platform: 'browser',
-        sourcemap: 'external',
+        sourcemap: (args['--watch'] || args['--serve']) ? 'external' : false,
         external: ['*.png'],
         banner: {
             css: '/* DO NOT EDIT - automatically generated */', 

@@ -11,3 +11,4 @@ www/.htaccess
 www/config.php
 www/vendor/
 www/html/.sass-cache/
+www/html/assets/*.map
