@@ -304,16 +304,15 @@ body.is-dialog-page { background: var(--grey-950); }
   }
 }
 
-/* Specific elements ------------------------------------------------------- */
-#discovery label { display: inline; }
-
+/* OTP key ------------------------------------------------------------------ */
 .otp-key {
-  @include util.text-size(xl);
+  @include util.text-size('2xl');
+  @include util.margin-y(util.size(4));
   font-family: util.$font-mono;
-  margin: util.size(2);
+  text-align: center;
+
+  span { padding: 0 util.size(1); }  
 }
-.otp-letters { padding: 0 util.size(1); }
-#otp-key-qr { padding: util.size(4) 0; }
 
 /* Upgrade pages ----------------------------------------------------------- */
 

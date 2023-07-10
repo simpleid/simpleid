@@ -41,6 +41,20 @@ tests:
         layout: auth_login.html
         message: The user name or password is not correct.
 
+  auth_otp_setup.html:
+    - template: page.html
+      variables:
+        page_class: is-dialog-page
+        layout: auth_otp_setup.html
+        secret1: AAAA
+        secret5: BBBB
+        secret9: CCCC
+        secret13: DDDD
+        qr: otpauth://totp/SimpleID?secret=AAAABBBBCCCCDDDD&digits=6&period=30
+        tk: foo
+        otp_params: foo
+        otp_recovery_url: http://simpleid.org/docs/2/common-problems/#otp
+
   oauth_consent.html:
     - template: page.html
       variables:

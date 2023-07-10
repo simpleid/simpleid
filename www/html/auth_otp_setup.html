@@ -8,8 +8,8 @@
     <ol>
         <li>{{ @intl.core.auth_otp.download_app }}</li>
         <li>{{ @intl.core.auth_otp.add_account, @qr | format, raw }}
-            <div class="otp-key"><span class="otp-letters">{{ @secret1 }}</span><span class="otp-letters">{{ @secret5 }}</span><span class="otp-letters">{{ @secret9 }}</span><span class="otp-letters">{{ @secret13 }}</span></div>
-            <div id="otp-key-qr" x-data="{ url: '{{ @qr | raw }}' }" x-qrcode="url"></div>
+            <div class="otp-key"><span>{{ @secret1 }}</span><span>{{ @secret5 }}</span><span>{{ @secret9 }}</span><span>{{ @secret13 }}</span></div>
+            <div class="otp-key" x-data="{ url: {{ @qr | js, raw }} }" x-qrcode="url"></div>
         </li>
         <li>{{ @intl.core.auth_otp.verify_code }}</li>
     </ol>
