@@ -32,31 +32,33 @@ class RoboFile extends \Robo\Tasks {
      */
     public function make_frontend_tests() {
         $tests_dir = 'tests/frontend';
-        $f3 = \Base::instance();
-        $tpl = Template::instance();
 
         $config = Spyc::YAMLLoad($tests_dir . '/config.yml');
-
-        foreach ($config['globals'] as $phase) {
-            $f3->mset($phase);
-        }
 
         foreach ($config['tests'] as $output_file => $steps) {
             $this->say($output_file);
 
+            $f3 = \Base::instance();
+            $tpl = Template::instance();
+            foreach ($config['globals'] as $phase) {
+                $f3->mset($phase);
+            }
+
             foreach ($steps as $step) {
                 if (isset($step['template'])) {
                     $template_file = $step['template'];
+                    $mime = (isset($step['mime'])) ? $step['mime'] : 'text/html';
+                    $hive = (isset($step['local_variables'])) ? $step['local_variables'] : null;
                     if (isset($step['variables'])) $f3->mset($step['variables']);
 
-                    $result = $tpl->render($template_file);
+                    $result = $tpl->render($template_file, $mime, $hive);
                 } elseif (isset($step['resolve'])) {
-                    $result = $tpl->resolve($step['resolve']);
+                    $result = (is_string($step['resolve'])) ? $tpl->resolve($step['resolve']) : $step['resolve'];
                 } elseif (isset($step['array'])) {
                     $result = [];
 
                     foreach ($step['array'] as $variable => $contents) {
-                        $result[$variable] = $tpl->resolve($contents);
+                        $result[$variable] = (is_string($contents)) ? $tpl->resolve($contents) : $contents;
                     }
                 }
 
@@ -72,6 +74,9 @@ class RoboFile extends \Robo\Tasks {
                     $this->taskWriteToFile($tests_dir . '/' . $output_file)->text($result)->run();
                 }
             }
+
+            \Registry::clear(\Base::class);
+            \Registry::clear(Template::class);
         }
     }
 

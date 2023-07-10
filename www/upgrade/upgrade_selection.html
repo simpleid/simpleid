@@ -1,8 +1,9 @@
+<div class="narrative">
 <p>{{ @intl.upgrade.version_detected }}</p>
 
-<p>{{ @intl.upgrade.original_version_label }}: <strong class="upgrade-version original-version">{{ @original_version }}</strong></p>
+<p>{{ @intl.upgrade.original_version_label }}: <strong class="upgrade--version is-original-version">{{ @original_version }}</strong></p>
 
-<p>{{ @intl.upgrade.this_version_label }}: <strong class="upgrade-version this-version">{{ @this_version }}</strong></p>
+<p>{{ @intl.upgrade.this_version_label }}: <strong class="upgrade--version is-this-version">{{ @this_version }}</strong></p>
 
 <check if="{{ @@upgid }}">
     <true>
@@ -24,4 +25,4 @@
         </check>
     </false>
 </check>
-    
+</div>    

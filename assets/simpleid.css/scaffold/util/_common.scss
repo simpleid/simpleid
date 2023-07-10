@@ -1,0 +1,69 @@
+@use 'sass:map';
+@use 'sass:math';
+@use 'sass:list';
+
+// Sizing units
+$sizing-unit: 0.25rem !default;
+
+@function size($value, $unit: $sizing-unit) {
+  @return $value * $unit;
+}
+
+// Fractions
+@function frac($numerator, $denominator) {
+  @return math.percentage(math.div($numerator, $denominator));
+}
+
+// Breakpoints
+$breakpoint-presets: (
+  'sm': 640px,
+  'md': 768px,
+  'lg': 1024px,
+  'xl': 1280px,
+  '2xl': 1536px
+) !default;
+
+@function screen($bp) {
+  @if map.has-key($breakpoint-presets, $bp) {
+    @return map.get($breakpoint-presets, $bp);
+  } @else {
+    @return $bp;
+  }
+}
+
+// Responsive design
+@mixin breakpoint($bp, $max-bp: none) {
+  @if $max-bp == none {
+    @media (min-width: screen($bp)) { @content }
+  } @else {
+    @media (min-width: screen($bp)) { 
+      @media not all and (min-width: screen($max-bp)) { @content; }
+    }
+  }
+}
+@mixin responsive-display($bp, $smaller, $larger) {
+  display: $smaller;
+  @include breakpoint($bp) { display: $larger; }
+}
+@mixin generate-responsive-classes($class-name) {
+  .#{$class-name} { @content; }
+  @each $bp, $value in $breakpoint-presets {
+    @include breakpoint($bp) {
+      .bp-#{$bp}\:#{$class-name} { @content; }
+    }
+  }
+}
+
+// Dark mode
+// $dark-mode-class refers to the name of the class that is applied to
+// the <html> element to activate dark mode.  If it is blank, then
+// the prefers-color-scheme media query is used
+$dark-mode-class: '' !default;
+
+@mixin dark-mode {
+  @if $dark-mode-class == '' {
+    @media (prefers-color-scheme: dark) { @content }
+  } @else {
+    html.#{$dark-mode-class} { @content }
+  }
+}

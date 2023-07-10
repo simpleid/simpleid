@@ -37,10 +37,10 @@
     }
 </script>
 
-<div x-data="upgradeApp('{{ @step }}')" x-init="upgradeApply">
+<div x-data="upgradeApp('{{ @step }}')" x-init="upgradeApply" class="narrative">
     <p>{{ @intl.upgrade.applying_upgrade }} <span x-html="progress"></span></p>
 
-    <div x-cloak x-show="error">
+    <div class="upgrade--error" x-cloak x-show="error">
         <p x-html="error"></p>
     </div>
 </div>

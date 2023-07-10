@@ -1,0 +1,111 @@
+@use 'scaffold/util';
+@use 'sass:map';
+
+/* ----- Wrappers --------------------------------------- */
+.wrapper {
+  width: 100%;
+  @include util.margin-x(auto);
+  @include util.padding-x(util.size(6));
+
+  @each $bp in map.keys(util.$breakpoint-presets) {
+    @include util.breakpoint($bp) { @include util.container($bp); }
+  }
+}
+
+/* ----- Forms ------------------------------------------ */
+.form-item { @include util.margin-y(util.size(4)); }
+
+label {
+  display: block;
+  font-weight: util.font-weight(bold);
+  @include util.padding-y(util.size(1));
+
+  table & { padding: 0; }
+}
+label.option { font-weight: normal; }
+
+@include util.form-all-boxes {
+  // to be reviewed
+  display: inline-block;
+  @include util.padding-y(util.size(2));
+  border-radius: 2px;
+}
+@include util.form-textbox { @include util.padding-x(util.size(2)); }
+@include util.form-textarea { @include util.padding-x(util.size(2)); }
+@include util.form-all-select { padding-left: util.size(2); }
+
+@include util.form-button {
+  padding: util.size(2) util.size(4);
+  border-radius: 2px;
+  vertical-align: middle;
+  font-weight: util.font-weight(bold);
+
+  &:active {
+    box-shadow: 0 0 0 1px rgba(0,0,0, 0.15) inset, 0 0 6px rgba(0,0,0, 0.20) inset;
+  }
+
+  &.is-default {
+    font-weight: util.font-weight(bold);
+  }
+}
+
+@include util.form-check-radio {
+  @include util.margin-y(util.size(2));
+  margin-inline-end: util.size(2);
+  &:focus { outline: 1px auto var(--brand-color); }
+
+  table & { margin: 0; }
+}
+
+.form-combo {
+  @include util.form-combo-controls {
+    border-radius: 0; 
+    &:first-child { border-radius: 2px 0 0 2px; }
+    &:last-child { border-radius: 0 2px 2px 0; }
+  }
+
+  span { @include util.padding-y(util.size(2)); }
+  @include util.form-button { @include util.padding-y(util.size(2)); }
+}
+
+/* ----- Info panes ------------------------------------- */
+.info-pane {
+  @include util.margin-y(util.size(4));
+  button {
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+    margin-inline-end: 0;
+    margin-block-end: 0;
+    background: transparent;
+    font-weight: util.font-weight(medium);
+    font-size: util.font-size('lg');
+    color: var(--grey-400);
+    svg, span { vertical-align: middle; }
+  }
+}
+
+/* ----- Client URLs ------------------------------------ */
+// getDisplayHTML display_html
+.url-elide { color: var(--grey-700); }
+
+/* ----- Loading spinners ------------------------------- */
+.loading-spinner {
+  margin: util.size(8) auto;
+  border: util.size(2) solid var(--grey-950);
+  border-top-color: var(--grey-700);
+  border-radius: 50%;
+  width: util.size(14);
+  height: util.size(14);
+  animation: spin 2s linear infinite;
+}
+.loading-spinner.is-large {
+  border-width: util.size(4);
+  width: util.size(30);
+  height: util.size(30);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

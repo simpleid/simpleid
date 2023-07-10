@@ -8,27 +8,32 @@
     </div>
     </check>
     
-    <p>{{ @intl.common.consent.request_label, @application_name, @application_type | format, raw }}</p>
-    
-    <ul>
-        <repeat group="{{ @scope_list }}" key="{{ @scope }}" value="{{ @description }}">
-        <input name="prefs[consents][oauth][]" value="{{ @scope }}" type="hidden">
-        <check if="{{ @@description }}"><li>{{ @description }}</li></check>
-        </repeat>
-    </ul>
+    <div class="narrative">
+        <p>{{ @intl.common.consent.request_label, @application_name | format, raw }}</p>
+        
+        <ul>
+            <repeat group="{{ @scope_list }}" key="{{ @scope }}" value="{{ @description }}">
+            <input name="prefs[consents][oauth][]" value="{{ @scope }}" type="hidden">
+            <check if="{{ @@description }}"><li>{{ @description }}</li></check>
+            </repeat>
+        </ul>
+
+        <p>{{ @intl.common.consent.dashboard_label | raw }}</p>
+    </div>
     
     <check if="{{ @@client_dynamic }}">
-    <div class="message unsecure">
+    <div class="message warning">
         <p>{{ @intl.core.oauth.dynamic_label, @application_name | format, raw }}</p>
     </div>
     </check>
     
-    <p>{{ @intl.common.consent.dashboard_label | raw }}</p>
-
     <check if="{{ @@client_info }}">
-    <div class="client-info">
-        <h2 class="client-info-heading collapsed">{{ @intl.common.more_info }}</h2>
-        <div class="client-info-details">
+    <div class="client-info info-pane" x-data="{ expanded: false }">
+        <button class="client-info--heading info-pane--heading" @click.prevent="expanded = !expanded">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            <span>{{ @intl.common.more_info }}</span>
+        </button>
+        <div class="client-info--details info-pane--details narrative" x-show="expanded" x-collapse>
             <ul>
                 <repeat group="{{ @client_info }}" value="{{ @item }}"><li>{{ @item | raw }}</li></repeat>
             </ul>
@@ -43,6 +48,6 @@
         </label>
     </div>
     
-    <input name="op" id="edit-allow" value="{{ @intl.common.allow }}" class="form-default" type="submit">
+    <input name="op" id="edit-allow" value="{{ @intl.common.allow }}" class="is-default" type="submit">
     <input name="op" id="edit-deny" value="{{ @intl.common.deny }}" type="submit">
 </form>

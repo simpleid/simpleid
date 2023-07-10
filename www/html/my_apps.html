@@ -71,7 +71,7 @@
 
     <table id="apps">
         <tr class="loading" x-show="isLoading">
-            <td colspan="2" style="text-align: center"><img src="{{ @base_path }}html/loading.gif"></td>
+            <td colspan="2" style="text-align: center"><div class="loading-spinner"></div></td>
         </tr>
         <tr x-cloak x-show="!isLoading && (apps.length == 0)">
             <td colspan="2" style="text-align: center">{{ @intl.core.my.app_none }}</td>

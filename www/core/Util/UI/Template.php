@@ -41,13 +41,63 @@ class Template extends F3Template implements AttachmentManagerInterface {
         $this->attachments = &$this->fw->ref('attachments');
 
         // Register filters
-        $this->filter('attr', self::class . '::instance()->attr');
+        $this->filter('attr', static::class . '::instance()->attr');
+        $this->filter('js', static::class . '::instance()->js');
     }
 
+    /**
+     * Filter to create an HTML attribute.
+     * 
+     * The output should be fed through a `raw` filter to prevent double-escaping.
+     * 
+     * @param mixed $val the attribute value
+     * @param string $name the name of the attribute
+     * @return string
+     */
     public function attr(mixed $val = null, string $name = null): string {
         if (($val == null) || ($val == false)) return '';
         if ($val === true) return $this->esc($name);
         return $this->esc($name) . '="' . $this->esc($val) . '"';
+    }
+
+    /**
+     * Filter to encode values to be included in Javascript.
+     * 
+     * This function uses `json_encode()` to encode the data as JSON. However,
+     * it provides additional safety features so that they can be embedded
+     * directly within `<script>` tags, including:
+     * 
+     * - if the input data is a single string, convert the double quotes to
+     *   single quotes
+     * - wrapping arrays and objects with `JSON.parse()`
+     * 
+     * The output should be fed through a `raw` filter to prevent double-escaping.
+     * 
+     * @param mixed $data the data to be converted
+     * @return string
+     */
+    public function js(mixed $data = null): string {
+        /* Note that all strings in $data have been escaped by F3. This
+           means we have to leave ampersands intact so that they can be
+           unescaped by the raw filter
+         */
+        $json_flags = JSON_HEX_TAG | JSON_HEX_APOS /*| JSON_HEX_AMP*/ | JSON_HEX_QUOT | JSON_THROW_ON_ERROR;
+        $json = json_encode($data, $json_flags);
+
+        if (is_null($data) || is_numeric($data) || is_bool($data)) {
+            // Simple types - return directly
+            return $json;
+        } elseif (is_string($data)) {
+            // String - change quotation marks
+            return "'" . substr($json, 1, -1) . "'";
+        } elseif (($json == '[]') || ($json == '{}')) {
+            // Empty object or array, return directly
+            return $json;
+        } else {
+            // Complex type, wrap JSON parse
+            $json = json_encode($json, $json_flags);
+            return 'JSON.parse(\'' . substr($json, 1, -1) . '\')';
+        }
     }
 }
 

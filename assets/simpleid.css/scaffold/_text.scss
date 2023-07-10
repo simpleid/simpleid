@@ -1,0 +1,496 @@
+@use 'sass:math';
+@use 'sass:map';
+@use 'util';
+
+@function _round($x, $y) {
+  @return math.div(math.round(10000000 * math.div($x, $y)), 10000000);
+}
+@function _rem($px) {
+  @return _round($px, 16) * 1rem;
+}
+@function _em($px, $base-px) {
+  @return _round($px, $base-px) * 1em;
+}
+
+$color-scheme: (
+  'text-color': #000000,
+  'lead-color': #000000,
+  'heading-color': #000000,
+  'link-color': #000000,
+  'bold-color': #000000,
+  'quote-color': #000000,
+  'quote-border-color': #000000,
+  'caption-color': #000000,
+  'code-color': #000000,
+  'pre-color': #000000,
+  'pre-background-color': #FFFFFF,
+  'list-marker-color': #000000,
+  'rule-color': #000000,
+  'table-heading-border-color': #000000,
+  'table-cell-border-color': #000000,
+) !default;
+
+@mixin generate-common {
+  max-width: 65ch;
+  color: map.get($color-scheme, 'text-color');
+
+  [class~='lead'] { color: map.get($color-scheme, 'lead-color'); }
+  a {
+    color: map.get($color-scheme, 'link-color');
+    font-weight: 500;
+  }
+  strong {
+    color: map.get($color-scheme, 'bold-color');
+    font-weight: 600;
+  }
+  a strong, blockquote strong, thead th strong { color: inherit; }
+  ol {
+    list-style-type: decimal;
+    &[type='A'] { list-style-type: upper-alpha; }
+    &[type='a'] { list-style-type: lower-alpha; }
+    &[type='I'] { list-style-type: upper-roman; }
+    &[type='i'] { list-style-type: lower-roman; }
+    &[type='1'] { list-style-type: decimal; }
+
+    > li::marker { font-weight: 400;}
+  }
+  ul { list-style-type: disc; }
+  ul >li::marker, ol >li::marker { color: map.get($color-scheme, 'list-marker-color'); }
+  hr {
+    color: map.get($color-scheme, 'rule-color');
+    border-top-width: 1px;
+  }
+  blockquote {
+    font-weight: 500;
+    font-style: italic;
+    color: map.get($color-scheme, 'quote-color');
+    border-left: 0.25rem solid map.get($color-scheme, 'quote-border-color');
+    quotes: "\\201C" "\\201D" "\\2018" "\\2019";
+    p:first-of-type::before { content: open-quote; }
+    p:last-of-type::after { content: close-quote; }
+  }
+  h1 {
+    color: map.get($color-scheme, 'heading-color');
+    font-weight: 800;
+    strong { font-weight: 900; color: inherit; }
+  }
+  h2 {
+    color: map.get($color-scheme, 'heading-color');
+    font-weight: 700;
+    strong { font-weight: 800; color: inherit; }
+  }
+  h3, h4 {
+    color: map.get($color-scheme, 'heading-color');
+    font-weight: 600;
+    strong { font-weight: 700; color: inherit; }
+  }
+  figcaption { color: map.get($color-scheme, 'caption-color'); }
+  code {
+    color: map.get($color-scheme, 'code-color');
+    font-weight: 600;
+    &::before, &::after { content: "`"; }
+  }
+  a code, h1 code, h2 code, h3 code, h4 code, blockquote code, thead th code { color: inherit; }
+  pre {
+    color: map.get($color-scheme, 'pre-color');
+    background-color: map.get($color-scheme, 'pre-background-color');
+    overflow-x: auto;
+    font-weight: 400;
+    code {
+      background-color: transparent;
+      border-width: 0;
+      border-radius: 0;
+      padding: 0;
+      font-weight: inherit;
+      font-family: inherit;
+      line-height: inherit;
+      &::before, &::after { content: none; }
+    }
+  }
+  table {
+    width: 100%;
+    table-layout: auto;
+    text-align: left;
+    @include util.margin-y(_em(32, 16));
+  }
+  thead {
+    border-bottom: 1px solid map.get($color-scheme, 'table-heading-border-color');
+    th {
+      color: map.get($color-scheme, 'heading-color');
+      font-weight: 600;
+      vertical-align: bottom;
+    }
+  }
+  tbody tr {
+    border-bottom: 1px solid map.get($color-scheme, 'table-cell-border-color');
+    &:last-child { border-bottom: 0px; }
+  }
+  tbody td { vertical-align: baseline; }
+  tfoot {
+    border-top: 1px solid map.get($color-scheme, 'table-heading-border-color');
+    td { vertical-align: top; }
+  }
+}
+
+
+
+$sizing-presets: (
+  'base': (
+    base-size: 16,
+    base-leading: 28,
+    base-block-margin: 20,
+    lead-size: 20,
+    lead-leading: 32,
+    lead-margin: 24,
+    h1-size: 36,
+    h1-leading: 40,
+    h1-margin-bottom: 32,
+    h2-size: 24,
+    h2-leading: 32,
+    h2-margin-top: 48,
+    h2-margin-bottom: 24,
+    h3-blockquote-size: 20,
+    h3-leading: 32,
+    h3-margin-top: 32,
+    h3-margin-bottom: 12,
+    blockquote-margin: 32,
+    blockquote-padding: 20,
+    h4-size: 16,
+    h4-leading: 24,
+    h4-margin-top: 24,
+    h4-margin-bottom: 8,
+    figure-margin: 32,
+    figcaption-size: 14,
+    figcaption-leading: 20,
+    figcaption-margin: 12,
+    code-size: 14,
+    h2-code-size: 21,
+    h3-code-size: 18,
+    pre-size: 14,
+    pre-leading: 24,
+    pre-margin: 24,
+    pre-border-radius: 6,
+    pre-padding-x: 16,
+    pre-padding-y: 12,
+    list-padding: 26,
+    list-item-padding: 6,
+    list-item-margin: 8,
+    list-item-block-margin: 12,
+    hr-margin: 48,
+    table-size: 14,
+    table-leading: 24,
+    table-padding-x: 8,
+    table-padding-y: 8
+  ),
+  'sm': (
+    base-size: 14,
+    base-leading: 24,
+    base-block-margin: 16,
+    lead-size: 18,
+    lead-leading: 28,
+    lead-margin: 16,
+    h1-size: 30,
+    h1-leading: 36,
+    h1-margin-bottom: 24,
+    h2-size: 20,
+    h2-leading: 28,
+    h2-margin-top: 32,
+    h2-margin-bottom: 16,
+    h3-blockquote-size: 18,
+    h3-leading: 28,
+    h3-margin-top: 28,
+    h3-margin-bottom: 8,
+    blockquote-margin: 24,
+    blockquote-padding: 20,
+    h4-size: 14,
+    h4-leading: 20,
+    h4-margin-top: 20,
+    h4-margin-bottom: 8,
+    figure-margin: 24,
+    figcaption-size: 12,
+    figcaption-leading: 16,
+    figcaption-margin: 8,
+    code-size: 12,
+    h2-code-size: 18,
+    h3-code-size: 16,
+    pre-size: 12,
+    pre-leading: 20,
+    pre-margin: 20,
+    pre-border-radius: 4,
+    pre-padding-x: 12,
+    pre-padding-y: 8,
+    list-padding: 22,
+    list-item-padding: 6,
+    list-item-margin: 4,
+    list-item-block-margin: 8,
+    hr-margin: 40,
+    table-size: 12,
+    table-leading: 18,
+    table-padding-x: 12,
+    table-padding-y: 8
+  ),
+  'lg': (
+    base-size: 18,
+    base-leading: 32,
+    base-block-margin: 24,
+    lead-size: 22,
+    lead-leading: 32,
+    lead-margin: 24,
+    h1-size: 48,
+    h1-leading: 48,
+    h1-margin-bottom: 40,
+    h2-size: 30,
+    h2-leading: 40,
+    h2-margin-top: 56,
+    h2-margin-bottom: 32,
+    h3-blockquote-size: 24,
+    h3-leading: 36,
+    h3-margin-top: 40,
+    h3-margin-bottom: 16,
+    blockquote-margin: 40,
+    blockquote-padding: 24,
+    h4-size: 18,
+    h4-leading: 28,
+    h4-margin-top: 32,
+    h4-margin-bottom: 8,
+    figure-margin: 32,
+    figcaption-size: 16,
+    figcaption-leading: 24,
+    figcaption-margin: 16,
+    code-size: 16,
+    h2-code-size: 26,
+    h3-code-size: 21,
+    pre-size: 16,
+    pre-leading: 28,
+    pre-margin: 32,
+    pre-border-radius: 6,
+    pre-padding-x: 24,
+    pre-padding-y: 16,
+    list-padding: 28,
+    list-item-padding: 8,
+    list-item-margin: 12,
+    list-item-block-margin: 16,
+    hr-margin: 56,
+    table-size: 16,
+    table-leading: 24,
+    table-padding-x: 12,
+    table-padding-y: 12
+  ),
+  'xl': (
+    base-size: 20,
+    base-leading: 36,
+    base-block-margin: 24,
+    lead-size: 24,
+    lead-leading: 36,
+    lead-margin: 24,
+    h1-size: 56,
+    h1-leading: 56,
+    h1-margin-bottom: 48,
+    h2-size: 36,
+    h2-leading: 40,
+    h2-margin-top: 56,
+    h2-margin-bottom: 32,
+    h3-blockquote-size: 30,
+    h3-leading: 40,
+    h3-margin-top: 48,
+    h3-margin-bottom: 20,
+    blockquote-margin: 40,
+    blockquote-padding: 32,
+    h4-size: 20,
+    h4-leading: 32,
+    h4-margin-top: 36,
+    h4-margin-bottom: 12,
+    figure-margin: 40,
+    figcaption-size: 18,
+    figcaption-leading: 28,
+    figcaption-margin: 18,
+    code-size: 18,
+    h2-code-size: 31,
+    h3-code-size: 27,
+    pre-size: 18,
+    pre-leading: 32,
+    pre-margin: 36,
+    pre-border-radius: 8,
+    pre-padding-x: 24,
+    pre-padding-y: 20,
+    list-padding: 32,
+    list-item-padding: 8,
+    list-item-margin: 12,
+    list-item-block-margin: 16,
+    hr-margin: 56,
+    table-size: 18,
+    table-leading: 28,
+    table-padding-x: 12,
+    table-padding-y: 16
+  ),
+  '2xl': (
+    base-size: 24,
+    base-leading: 40,
+    base-block-margin: 32,
+    lead-size: 30,
+    lead-leading: 44,
+    lead-margin: 32,
+    h1-size: 64,
+    h1-leading: 64,
+    h1-margin-bottom: 56,
+    h2-size: 48,
+    h2-leading: 52,
+    h2-margin-top: 72,
+    h2-margin-bottom: 40,
+    h3-blockquote-size: 36,
+    h3-leading: 44,
+    h3-margin-top: 56,
+    h3-margin-bottom: 24,
+    blockquote-margin: 64,
+    blockquote-padding: 40,
+    h4-size: 24,
+    h4-leading: 36,
+    h4-margin-top: 40,
+    h4-margin-bottom: 16,
+    figure-margin: 48,
+    figcaption-size: 20,
+    figcaption-leading: 32,
+    figcaption-margin: 20,
+    code-size: 20,
+    h2-code-size: 42,
+    h3-code-size: 32,
+    pre-size: 20,
+    pre-leading: 36,
+    pre-margin: 40,
+    pre-border-radius: 8,
+    pre-padding-x: 32,
+    pre-padding-y: 24,
+    list-padding: 38,
+    list-item-padding: 10,
+    list-item-margin: 12,
+    list-item-block-margin: 20,
+    hr-margin: 72,
+    table-size: 20,
+    table-leading: 28,
+    table-padding-x: 12,
+    table-padding-y: 16
+  )
+) !default;
+
+@mixin generate-sizing($preset: 'base') {
+  $table: map.get($sizing-presets, $preset);
+  $base-size: map.get($table, 'base-size');
+  $lead-size: map.get($table, 'lead-size');
+  $h1-size: map.get($table, 'h1-size');
+  $h2-size: map.get($table, 'h2-size');
+  $h3-size: map.get($table, 'h3-blockquote-size');
+  $h4-size: map.get($table, 'h4-size');
+  $figcaption-size: map.get($table, 'figcaption-size');
+  $pre-size: map.get($table, 'pre-size');
+  $table-size: map.get($table, 'table-size');
+
+  font-size: _rem($base-size);
+  line-height: _round(map.get($table, 'base-leading'), $base-size);
+
+  p { @include util.margin-y(_em(map.get($table, 'base-block-margin'), $base-size)); }
+  [class~='lead'] {
+    font-size: _em($lead-size, $base-size);
+    line-height: _round(map.get($table, 'lead-leading'), $lead-size);
+    @include util.margin-y(_em(map.get($table, 'lead-margin'), $lead-size));
+  }
+  blockquote {
+    // Blockquote is based on h3
+    @include util.margin-y(_em(map.get($table, 'blockquote-margin'), $h3-size));
+    padding-left: _em(map.get($table, 'blockquote-padding'), $h3-size);
+  }
+  h1 {
+    font-size: _em($h1-size, $base-size);
+    line-height: _round(map.get($table, 'h1-leading'), $h1-size);
+    margin-top: 0;
+    margin-bottom: _em(map.get($table, 'h1-margin-bottom'), $h1-size);
+  }
+  h2 {
+    font-size: _em($h2-size, $base-size);
+    line-height: _round(map.get($table, 'h2-leading'), $h2-size);
+    margin-top: _em(map.get($table, 'h2-margin-top'), $h2-size);
+    margin-bottom: _em(map.get($table, 'h2-margin-bottom'), $h2-size);
+    & + * { margin-top: 0; }
+  }
+  h3 {
+    font-size: _em($h3-size, $base-size);
+    line-height: _round(map.get($table, 'h3-leading'), $h3-size);
+    margin-top: _em(map.get($table, 'h3-margin-top'), $h3-size);
+    margin-bottom: _em(map.get($table, 'h3-margin-bottom'), $h3-size);
+    & + * { margin-top: 0; }
+  }
+  h4 {
+    font-size: _em($h4-size, $base-size);
+    line-height: _round(map.get($table, 'h4-leading'), $h4-size);
+    margin-top: _em(map.get($table, 'h4-margin-top'), $h4-size);
+    margin-bottom: _em(map.get($table, 'h4-margin-bottom'), $h4-size);
+    & + * { margin-top: 0; }
+  }
+  img, video, figure {
+    @include util.margin-y(_em(map.get($table, 'figure-margin'), $base-size));
+  }
+  figure > * { @include util.margin-y(0); }
+  figcaption {
+    font-size: _em($figcaption-size, $base-size);
+    line-height: _round(map.get($table, 'figcaption-leading'), $figcaption-size);
+    margin-top: _em(map.get($table, 'figcaption-margin'), $figcaption-size);
+  }
+  code { font-size: _em(map.get($table, 'code-size'), $base-size); }
+  h2 code { font-size: _em(map.get($table, 'h2-code-size'), $h2-size); }
+  h3 code { font-size: _em(map.get($table, 'h3-code-size'), $h3-size); }
+  pre {
+    font-size: _em($pre-size, $base-size);
+    line-height: _round(map.get($table, 'pre-leading'), $pre-size);
+    @include util.margin-y(_em(map.get($table, 'pre-margin'), $pre-size));
+    border-radius: _rem(map.get($table, 'pre-border-radius'));
+    padding: _em(map.get($table, 'pre-padding-y'), $pre-size) _em(map.get($table, 'pre-padding-x'), $pre-size);
+  }
+  ol, ul {
+    @include util.margin-y(_em(map.get($table, 'base-block-margin'), $base-size));
+    padding-left: _em(map.get($table, 'list-padding'), $base-size);
+    > li { padding-left: _em(map.get($table, 'list-item-padding'), $base-size); }
+  }
+  li {
+    @include util.margin-y(_em(map.get($table, 'list-item-margin'), $base-size));
+  }
+  > ul > li p {
+    @include util.margin-y(_em(map.get($table, 'list-item-block-margin'), $base-size));
+  }
+  > ul > li > *:first-child, > ol > li > *:first-child {
+    margin-top: _em(map.get($table, 'base-block-margin'), $base-size);
+  }
+  > ul > li > *:last-child, > ol > li > *:last-child {
+    margin-bottom: _em(map.get($table, 'base-block-margin'), $base-size);
+  }
+  ul ul, ul ol, ol ul, ol ol {
+    @include util.margin-y(_em(map.get($table, 'list-item-block-margin'), $base-size));
+  }
+  hr {
+    @include util.margin-y(_em(map.get($table, 'hr-margin'), $base-size));
+    & + * { margin-top: 0; }
+  }
+  table {
+    font-size: _em($table-size, $base-size);
+    line-height: _round(map.get($table, 'table-leading'), $table-size);
+  }
+  thead th {
+    @include util.margin-x(_em(map.get($table, 'table-padding-x'), $table-size));
+    padding-bottom: _em(map.get($table, 'table-padding-y'), $table-size);
+    &:first-child { padding-left: 0; }
+    &:last-child { padding-right: 0; }
+  }
+  tbody td, tfoot td {
+    padding: _em(map.get($table, 'table-padding-y'), $table-size) _em(map.get($table, 'table-padding-x'), $table-size);
+    &:first-child { padding-left: 0; }
+    &:last-child { padding-right: 0; } 
+  }
+  > :first-child { margin-top: 0; }
+  > :last-child { margin-bottom: 0; }
+}
+
+
+@mixin generate-text-styles($sizing-preset: 'base') {
+  @include generate-common;
+  @if $sizing-preset != none {
+    @include generate-sizing($sizing-preset);
+  }
+}

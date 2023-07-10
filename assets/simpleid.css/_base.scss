@@ -1,0 +1,102 @@
+@use 'scaffold/util';
+
+/* Set global font size ---------------------------------------------------- */
+html { font-size: 14px; }
+
+/* General elements -------------------------------------------------------- */
+h1 {
+  font-weight: normal;
+  font-size: util.font-size('2xl');
+  color: var(--grey-400);
+}
+
+a {
+  border-bottom: 1px solid var(--grey-900);
+  color: var(--brand-color);
+  text-decoration: none !important;
+  font-weight: util.font-weight(bold);
+
+  &:visited {
+    border-color: var(--grey-900);
+    color: var(--brand-color-dark);
+  }
+  &:focus, &:hover {
+    border-color: var(--brand-color-light);
+    color: var(--brand-color-light);
+  }
+}
+
+table {
+  border-collapse: collapse;
+  @include util.margin-y(util.size(4));
+  width: 100%;
+  line-height: util.leading(tight);
+}
+
+td, th {
+  border-bottom: 1px solid var(--grey-900);
+  text-align: left;
+  vertical-align: top;
+  padding: util.size(1.5) util.size(2);
+}
+th {
+  border-bottom: 0px;
+  background-color: var(--grey-400);
+  color: #FFFFFF;
+  white-space: nowrap;
+  font-weight: bold;
+}
+
+pre {
+    border:1px solid var(--grey-900);
+    padding: 5px;
+    font-size: 0.9em;
+    white-space: nowrap;
+    overflow: scroll;
+}
+pre.code { white-space: pre; overflow: initial; }
+
+.narrative {
+  $base-block-margin: 1.14em;
+  $list-padding: 1.57em;
+  $list-item-padding: 0.43em;
+  $list-item-margin: 0.57em;
+  $list-item-block-margin: 0.86em;
+
+  p { @include util.margin-y($base-block-margin); }
+  ol, ul {
+    @include util.margin-y($base-block-margin);
+    padding-left: $list-padding;
+    > li { padding-left: $list-item-padding; }
+  }
+  ol {
+    list-style-type: decimal;
+    &[type='A'] { list-style-type: upper-alpha; }
+    &[type='a'] { list-style-type: lower-alpha; }
+    &[type='I'] { list-style-type: upper-roman; }
+    &[type='i'] { list-style-type: lower-roman; }
+    &[type='1'] { list-style-type: decimal; }
+
+    > li::marker { font-weight: 400;}
+  }
+  ul { list-style-type: disc; }
+  
+  li {
+    @include util.margin-y($list-item-margin);
+  }
+  > ul > li p {
+    @include util.margin-y($list-item-block-margin);
+  }
+  > ul > li > *:first-child, > ol > li > *:first-child {
+    margin-top: $base-block-margin;
+  }
+  > ul > li > *:last-child, > ol > li > *:last-child {
+    margin-bottom: $base-block-margin;
+  }
+  ul ul, ul ol, ol ul, ol ol {
+    @include util.margin-y($list-item-block-margin);
+  }
+
+  > :first-child { margin-top: 0; }
+  > :last-child { margin-bottom: 0; }
+}

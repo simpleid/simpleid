@@ -1,0 +1,341 @@
+@use 'scaffold/util';
+
+@mixin dialog {
+  .is-dialog-page & { @content; }
+}
+
+/* Alert bar --------------------------------------------------------------- */
+.alert {
+  padding: util.size(6) util.size(2);
+  background-color: var(--red-400);
+  color: white;
+  text-align: center;
+}
+
+/* Header ------------------------------------------------------------------ */
+$header-height: 16;
+
+.header {
+  position: sticky;
+  z-index: 10;
+  width: 100%;
+  height: util.size($header-height);
+  top: 0;
+  @include util.padding-y(util.size(4));
+  background-color: var(--grey-400);
+  color: var(--grey-900);
+
+  @include dialog { height: auto; }
+
+  .wrapper {
+    @include util.margin-x(0);
+    @include util.padding-x(util.size(6));
+    max-width: 100%;
+    //@include dialog { @extend .wrapper; }
+  }
+}
+
+/* Navigation menu --------------------------------------------------------- */
+$header-nav-bp: lg;
+$header-nav-menu-width: 64;
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  button {
+    cursor: pointer;
+    padding: 0;
+    margin-block-end: 0;
+    background-color: transparent;
+    border: 0;
+    color: white;
+
+    &:active { box-shadow: none; }
+  }
+
+  svg {
+    width: util.size(8);
+    height: util.size(8);
+  }
+}
+
+.header-nav--group {
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+}
+
+.header-nav--sidebar-icon {
+  margin-right: util.size(4);
+
+  @include util.breakpoint($header-nav-bp) { display: none; }
+}
+
+.header-nav--title { margin-bottom: util.size(2); }
+
+.header-nav--title h1 {
+  margin: 0;
+  padding: 0;
+  font-weight: bold;
+  font-size: util.font-size('lg');
+  color: var(--grey-900);
+  letter-spacing: 0;
+
+  a {
+    color: white;
+    text-decoration: none;
+    border-bottom: none;
+  }
+}
+
+.header-nav--title .version { 
+  display: none;
+  @include util.breakpoint($header-nav-bp) { display: initial; }
+}
+
+.header-nav--username {
+  display: none;
+  @include util.breakpoint($header-nav-bp) { display: block; }
+}
+
+.header-nav--user-icon {
+  margin-left: util.size(4);
+
+  svg, img {
+    border: 2px solid white;
+    border-radius: 50%;
+  }
+}
+
+.header-nav--nav-menu {
+  position: fixed;
+  top: util.size($header-height);
+  left: 0;
+  width: 0;
+  overflow: hidden;
+  height: 100%;
+  background-color: var(--grey-300);
+  transition-property: all;
+  transition-duration: 0.3s;
+
+  @include util.breakpoint($header-nav-bp) {
+    width: util.size($header-nav-menu-width);
+    overflow: auto;
+    transition-property: none;
+  }
+
+  &.is-open {
+    width: util.size($header-nav-menu-width);
+    overflow: auto;
+    transition-property: all;
+    transition-duration: 0.3s;
+  }
+}
+
+.sidebar-adjust {
+  @include util.breakpoint($header-nav-bp) {
+    position: relative;
+    left: util.size($header-nav-menu-width);
+    width: calc(100% - util.size($header-nav-menu-width));
+
+    @include dialog {
+      position: static;
+      left: inherit;
+      width: inherit;
+    }
+  }
+}
+
+.header-nav--user-menu {
+  position: fixed;
+  top: util.size($header-height);
+  right: 0;
+  width: util.size($header-nav-menu-width);
+  background-color: var(--grey-400);
+
+  overflow: hidden;
+  height: 0;
+  transition-property: all;
+  transition-duration: 0.3s;
+
+  &.is-open {
+    height: auto;
+    overflow: auto;
+    transition-property: all;
+    transition-duration: 0.3s;
+  }
+}
+
+.header-nav--links {
+  margin: 0;
+
+  a {
+    @include util.padding-x(util.size(6));
+    @include util.padding-y(util.size(2));
+    display: block;
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+    border-bottom: 0;
+
+    &:hover {
+      background-color: var(--grey);
+    }
+  }
+}
+
+/* Content ------------------------------------------------------ */
+.content--main .wrapper {
+  @include util.padding-y(util.size(8));
+
+  @include dialog {
+    background-color: white;
+    @include util.padding-x(util.size(8));
+
+    @include util.breakpoint('sm') {
+      @include util.margin-y(util.size(8));
+      @include util.container('sm');
+      border: 1px solid var(--grey-900);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    @include util.breakpoint('md') { @include util.margin-y(util.size(16)); }
+    @include util.breakpoint('lg') { @include util.margin-y(util.size(24)); }
+  }
+}
+.content--main-header {
+  margin-bottom: util.size(4);
+}
+
+/* Footer ------------------------------------------------------- */
+.content--footer {
+  margin-top: util.size(16);
+  text-align: right;
+  font-size: util.font-size('sm');
+  color: var(--grey);
+
+  address { font-style: normal }
+  a { 
+    color: var(--grey-700);
+    &:hover { 
+      color: var(--grey-400);
+      border-bottom-color: var(--grey-400); 
+    }
+  }
+}
+
+/* Dialog pages ------------------------------------------------- */
+body.is-dialog-page { background: var(--grey-950); }
+.is-dialog-page {
+  @include util.form-all-boxes { width: 100%; }
+
+  .form-combo { 
+    width: 100%;
+    @include util.form-combo-controls { width: initial; }
+    @include util.form-combo-main-controls { @include util.flex-preset(size-aware-grow-shrink); }
+  }
+}
+.is-dialog-page form { padding-right: 2px; } /* Used to adjust the padding in text boxes */
+//.is-dialog-page .form-item { padding-right: 1em; } /* Used to adjust the padding in text boxes */
+
+/* Messages ----------------------------------------------------- */
+.message {
+  padding: util.size(4) util.size(4);
+  @include util.margin-y(util.size(4));
+  background-color: var(--grey-925);
+  border: 1px solid var(--grey-400);
+  border-radius: 4px;
+
+  &.success {
+    background-color: var(--green-950);
+    border-color: var(--green-400);
+  }
+  &.warning {
+    background-color: var(--red-950);
+    border-color: var(--red-400);
+  }
+}
+.message p { line-height: 1; }
+
+/* Dashboard blocks --------------------------------------------- */
+.block {
+  background-color: var(--grey-950);
+  @include util.margin-y(util.size(8));
+}
+.block--header {
+  background-color: var(--grey-400);
+  padding: util.size(1) util.size(4);
+
+  h2 {
+    font-size: util.font-size(lg);
+    font-weight: util.font-weight(bold);
+    color: white;
+    margin: 0;
+    padding: 0;
+    border-top-width: 0;
+  }
+}
+.block--header-links {
+  float: right;
+  font-size: util.font-size(sm);
+  text-align: right;
+  white-space: nowrap;
+
+  a {
+    color: #FFFFFF;
+    border-bottom-color: #FFFFFF;
+    font-weight: util.font-weight(normal);
+  }
+}
+.block--content {
+  padding: util.size(2) util.size(4);
+  p {
+    margin-bottom: util.size(2);
+    padding: 0;
+  }
+  h3 {
+    font-size: util.font-size(base);
+    font-weight: util.font-weight(bold);
+    margin: 0;
+    padding-top: util.size(2);
+  }
+}
+
+/* OTP key ------------------------------------------------------------------ */
+.otp-key {
+  @include util.text-size('2xl');
+  @include util.margin-y(util.size(4));
+  font-family: util.$font-mono;
+  text-align: center;
+
+  span { padding: 0 util.size(1); }  
+}
+
+/* Loading pages ----------------------------------------------------------- */
+.is-dialog-page.is-loading .content--main .wrapper { text-align: center; }
+
+/* Upgrade pages ----------------------------------------------------------- */
+
+.upgrade--version {
+  font-weight: util.font-weight(bold);
+  font-size: util.font-size(xl);
+
+  &.is-original-version { color: var(--grey-400); }
+  &.is-this-version { color: var(--brand-color-light); }
+}
+
+.upgrade--error {
+  @extend .message;
+  display: none;
+}
+.upgrade--error p { line-height: 1; }
+
+.upgrade--results {
+  overflow: auto;
+  height: 200px;
+  border: 1px solid var(--grey-400);
+  background-color: var(--grey-950);
+}

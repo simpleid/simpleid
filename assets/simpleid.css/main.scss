@@ -1,0 +1,51 @@
+/*! SimpleID | GPL-2.0-or-later | simpleid.org */
+
+@use 'scaffold/base' as scaffold-base with ($webapp: true);
+@use 'scaffold/colors' with (
+  $color-scheme: (
+    'grey': (
+      'base-color': #888888,
+      'shades': (
+        '50': -95%,
+        '100': -85%,
+        '200': -65%,
+        '300': #444444,
+        '400': #666666,
+        '500': -15%,
+        '600': 0,
+        '700': #999999,
+        '800': #aaaaaa,
+        '900': #cccccc,
+        '925': #dddddd,
+        '950': #eeeeee
+      )
+    ),
+    'brand-color': #1144aa,
+    'green': #44aa11,
+    'yellow': #dba507,
+    'red': #f44226
+  ),
+  $additional-colors: (
+    'brand-color-light': #4488ee,
+    'brand-color-dark': #114499
+  )
+);
+@use 'scaffold/forms' with (
+  $background-color: var(--grey-950),
+  $border-color: var(--grey-800),
+  $hover-color: var(--grey),
+  $disabled-color: var(--grey),
+  $placeholder-color: var(--grey),
+  $button-border-color: var(--grey-700),
+  $default-button-color: var(--brand-color),
+  $default-button-border-color: var(--brand-color-dark)
+);
+
+@use 'base';
+@use 'objects';
+@use 'components';
+@use 'utilities';
+
+:root {
+  @include colors.generate-color-scheme;
+}

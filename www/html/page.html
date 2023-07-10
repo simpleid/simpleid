@@ -1,90 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title>{{ @title }} - <check if="{{ @@site_title }}"><true>{{ @site_title }}</true><false>SimpleID</false></check></title>
-        <meta charset="utf-8">
-        <meta name="SimpleID-Version" content="{{ @version }}">
-        <meta name="robots" content="noindex,nofollow">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-        <link rel="shortcut icon" href="{{ @base_path }}html/simpleid.ico" type="image/x-icon">
+  <head>
+    <title>{{ @title }} - {{ (@@site_title) ? @site_title : 'SimpleID' }}</title>
+    <meta charset="utf-8">
+    <meta name="robots" content="noindex,nofollow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <link rel="shortcut icon" href="{{ @base_path }}html/simpleid.ico" type="image/x-icon">
 
-        <check if="{{ @@head }}"><include href="{{ @head }}"></check>
+    <include href="{{ @head }}" if="{{ @@head }}" />
         
-        <link rel="stylesheet" href="{{ @base_path }}html/assets/simpleid.css">
-        <check if="{{ @@attachments.css }}"><repeat group="{{ @attachments.css }}" value="{{ @attachment }}">
-            <check if="{{ @@attachment.src }}">
-                <true><link rel="stylesheet" href="{{ @base_path }}{{ @attachment.src }}"></true>
-                <false><style type="text/css">{{ @@attachment.inline | raw }}</style></false>
-            </check>
-        </repeat></check>
+    <link rel="stylesheet" href="{{ @base_path }}html/assets/simpleid.css">
+    <check if="{{ @@attachments.css }}"><repeat group="{{ @attachments.css }}" value="{{ @attachment }}">
+      <check if="{{ @@attachment.src }}">
+        <true><link rel="stylesheet" href="{{ @base_path }}{{ @attachment.src }}"></true>
+        <false><style type="text/css">{{ @@attachment.inline | raw }}</style></false>
+      </check>
+    </repeat></check>
         
-        <script type="text/javascript">
-            const l = {{ json_encode(@@js_locale) | raw }};
-        </script>
-    </head>
-    <body class="{{ @@page_class }}">
-        <div x-data="{ nav_expand: false, user_expand: false }">
-        <div id="header"><div id="header-inner">
-            <check if="{{ @@nav }}">
-                <div id="nav-toggle" @click="nav_expand = !nav_expand" :class="{'expand': nav_expand }"><img src="{{ @base_path }}html/nav-toggle.png" /></div>
-            </check>
-            <div id="logo">
+    <script type="text/javascript">
+      window.simpleid = {{ @@js_data | js, raw }};
+    </script>
+  </head>
+  <body class="{{ @@page_class }}">
+    <check if="{{ @@alert }}">
+      <div class="alert">
+        <div class="wrapper">
+          {{ @alert }}
+        </div>
+      </div>
+    </check>
+
+    <check if="{{ @@nav || @@user_header || true }}">
+      <header class="header" x-data="{ showNavMenu: false, showUserMenu: false }">
+        <div class="wrapper">
+          <nav class="header-nav">
+            <section class="header-nav--group">
+              <check if="{{ @@nav }}">
+                <div class="header-nav--sidebar-icon">
+                  <button aria-label="Open menu" x-on:click.prevent.stop="showNavMenu = !showNavMenu; showUserMenu = false">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu">
+                      <line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                  </button>
+                </div>
+              </check>
+
+              <div class="header-nav--title">
                 <h1><check if="{{ @@site_title }}">
                     <true>{{ @site_title }}</true>
-                    <false><a href="http://simpleid.org/">SimpleID</a> <span class="version">{{ @version }}</span>
+                    <false><a href="http://simpleid.org/">SimpleID</a> <span class="version">{{ @version }}</span></false>
                 </check></h1>
-            </div>
+              </div>
+            </section>
+
             <check if="{{ @@user_header }}">
-                <div>
-                    <div id="user-toggle" @click="user_expand = !user_expand" :class="{'expand': user_expand }"><img src="{{ @base_path }}html/user-toggle.png" /></div>
-                    <div id="user" :class="{'expand': user_expand }">
-                        <div class="logged-in-as">
-                            <span><strong class="identity" title="{{ @user.uid }}">{{ @user.display_name }}</strong></span>
-                        <check if="{{ @@logout_link || @@logout_destination }}"><span id="logout"><a href="{{ @base_path }}auth/logout{{ @@logout_destination }}">{{ @intl.common.logout }}</a></span></check>
-                        </div>
-                    </div>
+              <section class="header-nav--group">
+                <div class="header-nav--username">
+                  <span title="{{ @user.uid }}">{{ @user.display_name }}</span>
                 </div>
+
+                <div class="header-nav--user-icon">
+                  <button aria-label="Open menu" x-on:click.prevent.stop="showUserMenu = !showUserMenu; showNavMenu = false">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                  </button>
+                </div>
+              </section>
             </check>
-            <div style="clear: both;"></div>
-        </div></div>
-        <check if="{{ @@nav }}">
-            <div id="nav" :class="{'expand': nav_expand }"><div id="nav-inner">
-                <ul id="nav-left">
-                    <repeat group="{{ @nav }}" value="{{ @item }}"><li><a href="{{ @base_path }}{{ @item.path }}">{{ @item.name }}</a></li></repeat>
+
+            <check if="{{ @@nav }}">
+              <aside class="header-nav--nav-menu" x-bind:class="{ 'is-open': showNavMenu }" x-on:click.away="showNavMenu = false">
+                <ul class="header-nav--links">
+                  <repeat group="{{ @nav }}" value="{{ @item }}"><li><a href="{{ @base_path }}{{ @item.path }}">{{ @item.name }}</a></li></repeat>
                 </ul>
-                <div style="clear: both"></div>
-            </div></div>
+              </aside>
+            </check>
+
+            <check if="{{ @@user_header }}">
+              <aside class="header-nav--user-menu" x-cloak x-bind:class="{ 'is-open': showUserMenu }" x-on:click.away="showUserMenu = false">
+                <ul class="header-nav--links">
+                  <check if="{{ @@logout_link || @@logout_destination }}"><li><a href="{{ @base_path }}auth/logout{{ @@logout_destination }}">{{ @intl.common.logout }}</a></li></check>
+                </ul>
+              </aside>
+            </check>
+          </nav>
+        </div>
+      </header>
+    </check>
+
+    <section class="content sidebar-adjust">
+      <main class="content--main">
+        <div class="wrapper">
+          <header class="content--main-header"><h1 class="title">{{ @title }}</h1></header>
+
+          <check if="{{ @@message }}">
+            <div class="message">
+              <check if="{{ is_array(@message) }}">
+                <true><ul><repeat group="{{ @message }}" value="{{ @item }}"><li>{{ @item | raw }}</li></repeat></ul></true>
+                <false><p>{{ @message | raw }}</p></false>
+              </check>
+            </div>
+          </check>
+
+          <check if="{{ @@layout }}"><div class="content--main-layout"><include href="{{ @layout }}" /></div></check>
+        </div>
+      </main>
+
+      <footer class="content--footer">
+        <div class="wrapper">
+          <address>
+              SimpleID {{ @version }} &copy; Kelvin Mo &middot;
+              <a href="http://simpleid.org/docs/2/">{{ @intl.core.footer_doc }}</a> &middot;
+              <a href="http://github.com/simpleid/simpleid/">{{ @intl.core.footer_support }}</a>
+          </address>
+        </div>
+      </footer>
+    </section>
+
+    <check if="{{ @@attachments.js }}">
+      <repeat group="{{ @attachments.js }}" value="{{ @attachment }}">
+        <check if="{{ @@attachment.src }}">
+          <true><script type="text/javascript" src="{{ @base_path }}{{ @attachment.src }}" {{ @@attachment.defer, 'defer' | attr, raw }} {{ @@attachment.async, 'async' | attr, raw }}></script></true>
+          <false><script type="text/javascript">{{ @@attachment.inline | raw }}</script></false>
         </check>
-        </div>
-        <div id="content"><div id="content-inner">
-            <h1>{{ @title }}</h1>
-
-            <check if="{{ @@message }}">
-                <div class="message">
-                    <check if="{{ is_array(@message) }}">
-                        <true><ul><repeat group="{{ @message }}" value="{{ @item }}"><li>{{ @item | raw }}</li></repeat></ul></true>
-                        <false><p>{{ @message | raw }}</p></false>
-                    </check>
-                </div>
-            </check>
-
-            <check if="{{ @@layout }}"><include href="{{ @layout }}"></check>
-        </div></div>
-
-        <div id="footer">
-            <address>
-                SimpleID {{ @version }} &copy; Kelvin Mo &middot;
-                <a href="http://simpleid.org/docs/2/">{{ @intl.core.footer_doc }}</a> &middot;
-                <a href="http://github.com/simpleid/simpleid/">{{ @intl.core.footer_support }}</a>
-            </address>
-        </div>
-
-        <check if="{{ @@attachments.js }}"><repeat group="{{ @attachments.js }}" value="{{ @attachment }}">
-            <check if="{{ @@attachment.src }}">
-                <true><script type="text/javascript" src="{{ @base_path }}{{ @attachment.src }}" {{ @@attachment.defer, 'defer' | attr, raw }} {{ @@attachment.defer, 'async' | attr, raw }}></script></true>
-                <false><script type="text/javascript">{{ @@attachment.inline | raw }}</script></false>
-            </check>
-        </repeat></check>
-        <script src="{{ @base_path }}html/assets/default.js" type="text/javascript" defer></script>
-    </body>
+      </repeat>
+    </check>
+    <script src="{{ @base_path }}html/assets/default.js" type="text/javascript" defer></script>
+  </body>
 </html>

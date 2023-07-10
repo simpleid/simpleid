@@ -105,20 +105,6 @@ return [
     'allow_plaintext' => false,
 
     /*
-     * Allows web browsers to save passwords.
-     *
-     * SimpleID prevents web browsers from saving user passwords entered in a user
-     * logs into SimpleID.  Setting this value to true will allow browsers to
-     * ask the user whether the password should be saved in the browser's password
-     * store.
-     *
-     * The default is set to false for security reasons.  You should not change
-     * this value unless you are certain regarding the security of your browser's
-     * password store.
-     */
-    'allow_autocomplete' => false,
-
-    /*
      * Performs additional verification of relying party return URLs.
      *
      * When authenticating using OpenID version 2, SimpleID can perform additional

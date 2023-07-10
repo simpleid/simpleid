@@ -1,7 +1,7 @@
 <script>
 function confirmConsent(ev) {
     if (ev.target.checked) return; // It's currently checked and we're unchecking it
-    if (!confirm(l.openid_suspect)) ev.stopPropagation();
+    if (!confirm(simpleid.intl.openid_suspect)) ev.stopPropagation();
 }
 </script>
 
@@ -15,10 +15,12 @@ function confirmConsent(ev) {
     
     <check if="{{ !@cancel }}">
         <true>
-            <p>{{ @intl.core.openid.realm_label, @realm | format, raw }}</p>
+            <div class="narrative">
+                <p>{{ @intl.core.openid.realm_label, @realm | format, raw }}</p>
+            </div>
             
             <check if="{{ @@return_to_suspect }}">
-            <div class="message unsecure">
+            <div class="message warning">
                 <p>{{ @intl.core.openid.suspect_label, @suspect_url | format, raw }}</p>
             </div>
             </check>
@@ -34,17 +36,19 @@ function confirmConsent(ev) {
                 <check if="{{ @form.weight >= 0 }}">{{ @form.content | raw }}</check>
             </repeat>
             
-            <input type="submit" name="op" id="edit-submit" value="{{ @intl.common.ok }}" class="form-default" />
+            <input type="submit" name="op" id="edit-submit" value="{{ @intl.common.ok }}" class="is-default" />
             <input type="submit" name="op" id="edit-cancel" value="{{ @intl.common.cancel }}" />
         </true>
         <false>
-            <p>{{ @intl.core.openid.unable_label, @realm | format, raw }}</p>
+            <div class="narrative">
+                <p>{{ @intl.core.openid.unable_label, @realm | format, raw }}</p>
+                
+                <p>{{ @intl.core.openid.identity_not_matching_label, @requested_identity | format }}</p>
+                
+                <p>{{ @intl.core.openid.switch_user_label, @switch_url | format, raw }}</p>
+            </div>
             
-            <p>{{ @intl.core.openid.identity_not_matching_label, @requested_identity | format }}</p>
-            
-            <p>{{ @intl.core.openid.switch_user_label, @switch_url | format, raw }}</p>
-            
-            <input type="submit" name="op" id="edit-cancel" value="{{ @intl.common.cancel }}" class="form-default">
+            <input type="submit" name="op" id="edit-cancel" value="{{ @intl.common.cancel }}" class="is-default">
         </false>
     </check>
 </form>
