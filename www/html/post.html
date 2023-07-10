@@ -1,43 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <title>{{ (@@site_title) ? @site_title : 'SimpleID' }}</title>
-        <meta charset="utf-8">
-        <meta name="robots" content="noindex,nofollow" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-        <link rel="shortcut icon" href="{{ @base_path }}html/simpleid.ico" type="image/x-icon" />
-        <style type="text/css">
-            #content {
-                max-width: 400px;
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-            }
-            .centre {
-                margin-left: auto;
-                margin-right: auto;
-            }
-            [x-cloak] { display: none !important; }
-        </style>
-    </head>
-    <body>
-        <div id="content" x-init="$nextTick(() => { if (!test) $refs.form.submit(); setTimeout(() => timedOut = true, 15000); })" x-data="{ timedOut: false, test: {{ @@frontend_test ? 'true' : 'false' }} }">
-            <div id="content-inner">            
-                <img src="{{ @base_path }}html/loading.gif" id="loading-graphic" class="centre" x-show="!timedOut">
-            
-                <form action="{{ @url }}" method="post" x-ref="form">
-                    <repeat group="{{ @params }}" key="{{ @name }}" value="{{ @value }}">
-                        <input type="hidden" name="{{ @name }}" value= "{{ @value }}">
-                    </repeat>
-                    <div id="fallback" x-cloak x-show="timedOut">
-                        <p style="font: 12px/19px Helvetica, Arial, sans-serif;">{{ @intl.common.click_continue | raw }}</p>
-                        <input type="submit" value="{{ @intl.common.continue }}" class="centre">
-                    </div>
-                </form>
-            </div>
-        </div>
+<div x-init="$nextTick(() => { if (!test) $refs.form.submit(); setTimeout(() => timedOut = true, 15000); })" x-data="{ timedOut: false, test: {{ @@frontend_test ? 'true' : 'false' }} }">
 
-        <script src="{{ @base_path }}html/assets/default.js" type="text/javascript" defer></script>
-    </body>
-</html>
+    <div class="loading-spinner is-large" x-show="!timedOut"></div>
+    
+    <form action="{{ @url }}" method="post" x-ref="form">
+        <repeat group="{{ @params }}" key="{{ @name }}" value="{{ @value }}">
+            <input type="hidden" name="{{ @name }}" value= "{{ @value }}">
+        </repeat>
+        <div x-cloak x-show="timedOut">
+            <div class="form-item">
+                <p>{{ @intl.common.click_continue | raw }}</p>
+            </div>
+            
+            <input type="submit" value="{{ @intl.common.continue }}" class="is-default">
+        </div>
+    </form>
+</div>

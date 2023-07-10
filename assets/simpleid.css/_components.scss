@@ -314,6 +314,9 @@ body.is-dialog-page { background: var(--grey-950); }
   span { padding: 0 util.size(1); }  
 }
 
+/* Loading pages ----------------------------------------------------------- */
+.is-dialog-page.is-loading .content--main .wrapper { text-align: center; }
+
 /* Upgrade pages ----------------------------------------------------------- */
 
 .upgrade--version {

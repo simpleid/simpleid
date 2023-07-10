@@ -13,7 +13,7 @@
 }
 
 /* ----- Forms ------------------------------------------ */
-.form-item { margin: 1em 0; }
+.form-item { @include util.margin-y(util.size(4)); }
 
 label {
   display: block;
@@ -88,3 +88,24 @@ label.option { font-weight: normal; }
 /* ----- Client URLs ------------------------------------ */
 // getDisplayHTML display_html
 .url-elide { color: var(--grey-700); }
+
+/* ----- Loading spinners ------------------------------- */
+.loading-spinner {
+  margin: util.size(8) auto;
+  border: util.size(2) solid var(--grey-950);
+  border-top-color: var(--grey-700);
+  border-radius: 50%;
+  width: util.size(14);
+  height: util.size(14);
+  animation: spin 2s linear infinite;
+}
+.loading-spinner.is-large {
+  border-width: util.size(4);
+  width: util.size(30);
+  height: util.size(30);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

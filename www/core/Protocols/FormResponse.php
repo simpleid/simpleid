@@ -49,9 +49,14 @@ class FormResponse extends ArrayWrapper {
         $f3 = Base::instance();
         $tpl = Template::instance();
 
+        $f3->set('page_class', 'is-dialog-page');
+        $f3->set('title', $f3->get('intl.common.please_wait'));
+        $f3->set('layout', 'post.html');
         $f3->set('url', $url);
         $f3->set('params', $this->container);
-        print $tpl->render('post.html');
+
+        header('X-Frame-Options: DENY');
+        print $tpl->render('page.html');
     }
 }
 

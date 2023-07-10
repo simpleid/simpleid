@@ -129,8 +129,11 @@ tests:
         logout_destination: /
 
   post.html:
-    - template: post.html
+    - template: page.html
       variables:
+        page_class: is-dialog-page is-loading
+        layout: post.html
+        title: Please wait
         url: ''
         params:
           foo: bar
