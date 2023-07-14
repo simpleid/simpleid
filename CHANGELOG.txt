@@ -1,3 +1,11 @@
+SimpleID 1.0.6
+--------------
+
+- Enhancements:
+    * Update autocomplete setting for one time password fields
+- Bug fixes:
+    * #86 Further fix to compatibility with PHP 8.2
+
 SimpleID 1.0.5
 --------------
 
