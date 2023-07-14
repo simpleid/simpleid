@@ -441,7 +441,7 @@ class XRDSParser {
      *
      * This constructor also initialises the underlying XML parser.
      */
-    function XRDSParser() {
+    function __construct() {
         $this->parser = xml_parser_create_ns();
         xml_parser_set_option($this->parser, XML_OPTION_CASE_FOLDING,0);
         xml_set_object($this->parser, $this);
