@@ -24,16 +24,21 @@ namespace SimpleID\Util\Events;
 
 /**
  * A utility trait for implementing {@link \GenericEventInterface}.
+ * 
+ * @see https://github.com/kelvinmo/f3-event-dispatcher
  */
 trait GenericEventTrait {
     /** @var string */
     protected $eventName;
 
     /**
-     * Creates a data collection event
+     * Sets the name of the event to be returned by `GenericEventInterface::getEventName()`.
      * 
-     * @param string $eventName the name of the event, or the name of the
-     * class if null
+     * The name of the event is specified by the `$eventName` parameter.  If
+     * `$eventName` is null, then the name of the class which inserted the trait
+     * is used instead.
+     * 
+     * @param string $eventName the name of the event, or null
      * @return void
      */
     protected function setEventName($eventName = null) {
@@ -48,7 +53,9 @@ trait GenericEventTrait {
     }
 
     /**
-     * {@inheritdoc}
+     * @see \GenericEventInterface::getEventName()
+     * 
+     * @return string
      */
     public function getEventName() {
         return $this->eventName;
