@@ -19,8 +19,15 @@ Security patches will be provided for the following versions:
 If you discover a vulnerability in SimpleID, keep it confidential. 
 *Do not disclose the vulnerability to anyone before the advisory is issued.*
 
-Provide details of the vulnerability direct to kmo-at-users.sourceforge.net.
-**Do not use the GitHub issue system.**
+You can provide details of the vulnerability in the following ways:
+
+   1. [Create a vulnerability report] on GitHub. If you are reading this
+      page on GitHub you can click the green button on the top right-hand
+      side of this page to create a vulnerability report.
+   2. Provide details of the vulnerability direct to
+      kmo-at-users.sourceforge.net.
+
+**Do not use the regular GitHub issue system.**
 
 At a minimum, your report should include:
 
@@ -51,6 +58,4 @@ the module.
 If you have suggestions on how this process could be improved please submit a
 pull request.
 
-
-
-[Semantic Versioning Specification]: https://semver.org/
+[Create a vulnerability report]: https://github.com/simpleid/simpleid/security/advisories/new
