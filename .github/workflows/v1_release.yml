@@ -10,21 +10,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '7.4'
+          php-version: '8.0'
           extensions: gmp, zlib
           tools: composer
 
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
       - name: Cache dependencies
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
-          path: "~/.composer/cache"
-          key: "composer-${{ hashFiles('**/composer.json') }}"
-          restore-keys: "composer-"
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: "sf-composer-${{ hashFiles('**/composer.json') }}"
+          restore-keys: "sf-composer-"
 
       - name: Install dependencies
         run: composer install
