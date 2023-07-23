@@ -226,7 +226,7 @@ class User extends ArrayWrapper implements Serializable, Storable {
      * PHP `__serialize` magic method.
      * 
      * @see https://www.php.net/manual/en/language.oop5.magic.php#object.serialize
-     * @return array
+     * @return array<string, mixed>
      */
     public function __serialize() {
         $result = [];
