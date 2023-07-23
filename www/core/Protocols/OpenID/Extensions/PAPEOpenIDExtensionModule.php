@@ -128,7 +128,7 @@ class PAPEOpenIDExtensionModule extends Module implements ProtocolResult {
         $response['ns.' . $alias] = self::OPENID_NS_PAPE;
         
         // We return the last time the user logged in using the login form
-        $response[$alias . '.auth_time'] = gmstrftime('%Y-%m-%dT%H:%M:%SZ', $auth->getAuthTime());
+        $response[$alias . '.auth_time'] = gmdate('Y-m-d\TH:i:s\Z', $auth->getAuthTime());
         
         // We don't comply with NIST_SP800-63
         $response[$alias . '.auth_level.ns.nist'] = self::PAPE_LEVEL_NIST800_63;
