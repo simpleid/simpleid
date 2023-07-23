@@ -214,9 +214,21 @@ class User extends ArrayWrapper implements Serializable, Storable {
         return $copy->toArray();        
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function serialize() {
         $f3 = Base::instance();
+        return $f3->serialize($this->__serialize());
+    }
 
+    /**
+     * PHP `__serialize` magic method.
+     * 
+     * @see https://www.php.net/manual/en/language.oop5.magic.php#object.serialize
+     * @return array
+     */
+    public function __serialize() {
         $result = [];
         foreach (get_object_vars($this) as $var => $value) {
             if ($var == 'container') {
@@ -225,20 +237,32 @@ class User extends ArrayWrapper implements Serializable, Storable {
                 $result[$var] = $value;
             }
         }
-
-        return $f3->serialize($result);
+        return $result;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function unserialize($data) {
         $f3 = Base::instance();
 
         /** @var array<string, mixed> $array */
         $array = $f3->unserialize($data);
+        $this->__unserialize($array);
+    }
+
+    /**
+     * PHP `__unserialize` magic method.
+     * 
+     * @see https://www.php.net/manual/en/language.oop5.magic.php#object.unserialize
+     * @param array<string, mixed> $array
+     * @return void
+     */
+    public function __unserialize($array) {
         foreach ($array as $var => $value) {
             $this->$var = $value;
         }
     }
-
 
     public function getStoreType() {
         return 'user';
