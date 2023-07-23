@@ -150,12 +150,12 @@ return [
     /*
      * Date and time format.
      *
-     * The date and time format specified using the strftime() syntax.
+     * The date and time format specified using the date_format() syntax.
      *
-     * See http://www.php.net/strftime for details.
+     * See https://www.php.net/manual/en/datetime.format.php for details.
      * 
      */
-    'date_time_format' => '%Y-%m-%d %H:%M:%S %Z',
+    'date_time_format' => 'Y-m-d H:i:s T',
 
     /*
      * Authentication context class reference.
