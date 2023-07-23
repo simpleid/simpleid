@@ -551,7 +551,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
 
         $scope_info_event = new ScopeInfoCollectionEvent();
         $dispatcher->dispatch($scope_info_event);
-        $scopes = $scope_info_event->getScopeInfoForType('oauth');
+        $scopes = array_keys($scope_info_event->getScopeInfoForType('oauth'));
 
         $jwt_signing_algs = AlgorithmFactory::getSupportedAlgs(Algorithm::SIGNATURE_ALGORITHM);
         $jwt_encryption_algs = AlgorithmFactory::getSupportedAlgs(Algorithm::KEY_ALGORITHM);
