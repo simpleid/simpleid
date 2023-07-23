@@ -56,7 +56,7 @@ Options -Indexes
     # Rewrite URLs
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(.*)$ index.php?q=$1 [L,QSA]
+    RewriteRule ^ index.php [L]
 </IfModule>
 
 # Switch register_globals to off
