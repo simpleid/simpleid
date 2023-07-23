@@ -551,7 +551,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
 
         $scope_info_event = new ScopeInfoCollectionEvent();
         $dispatcher->dispatch($scope_info_event);
-        $scopes = array_keys($scope_info_event->getScopeInfoForType('oauth'));
+        $scopes = $scope_info_event->getScopeInfoForType('oauth');
 
         $jwt_signing_algs = AlgorithmFactory::getSupportedAlgs(Algorithm::SIGNATURE_ALGORITHM);
         $jwt_encryption_algs = AlgorithmFactory::getSupportedAlgs(Algorithm::KEY_ALGORITHM);
@@ -572,7 +572,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
             'token_endpoint' => $this->getCanonicalURL('@oauth_token', '', 'https'),
             'userinfo_endpoint' => $this->getCanonicalURL('@connect_userinfo', '', 'https'),
             'jwks_uri' => $this->getCanonicalURL('@connect_jwks', '', 'https'),
-            'scopes_supported' => $scopes,
+            'scopes_supported' => array_keys($scopes),
             'response_types_supported' => [ 'code', 'token', 'id_token', 'id_token token', 'code token', 'code id_token', 'code id_token token' ],
             'response_modes_supported' => Response::getResponseModesSupported(),
             'grant_types_supported' => [ 'authorization_code', 'refresh_token' ],
