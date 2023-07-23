@@ -90,12 +90,13 @@ class DefaultLogger extends Log implements LoggerInterface {
     function log($level, $message, array $context = []) {
         $fw = \Base::instance();
         $config = $fw->get('config');
+        $time = new \DateTimeImmutable();
 
         if (self::$log_levels[$level] > self::$log_levels[$config['log_level']]) return;
 
         if (count($context) > 0) $message .= ': ' . self::formatArray($context);
 
-        $line = sprintf('%1$s %2$s [%3$s] %4$s', strftime($config['date_time_format']), session_id(), $level, $message) . "\n";
+        $line = sprintf('%1$s %2$s [%3$s] %4$s', $time->format($config['date_time_format']), session_id(), $level, $message) . "\n";
 
         $fw->write($this->file, $line, true);
     }

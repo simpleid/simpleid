@@ -492,7 +492,7 @@ class OpenIDModule extends Module implements ProtocolResult {
      */
     protected function createOKResponse($request) {
         $rand = new Random();
-        $nonce = gmstrftime('%Y-%m-%dT%H:%M:%SZ') . bin2hex($rand->bytes(4));
+        $nonce = gmdate('Y-m-d\TH:i:s\Z') . bin2hex($rand->bytes(4));
 
         $response = new Response($request);
         $response->setArray([
