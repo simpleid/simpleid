@@ -1,6 +1,7 @@
 {
     "name": "simpleid/simpleid",
     "description": "A simple, personal OpenID provider written in PHP",
+    "homepage": "https://simpleid.org/",
     "type": "project",
     "require": {
         "php": "^7.2 || ^8.0",
