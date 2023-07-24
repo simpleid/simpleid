@@ -99,7 +99,7 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
             $uid = ($form_state['mode'] == AuthManager::MODE_CREDENTIALS) ? $this->f3->get('POST.uid') : $form_state['uid'];
             
             if ($this->verifyCredentials($uid, $this->f3->get('POST')) === false) {
-                $this->f3->set('message', $this->f3->get('intl.core.auth_password.invalid_password'));
+                $event->addMessage($this->f3->get('intl.core.auth_password.invalid_password'));
                 $event->setInvalid();
                 return;
             }
