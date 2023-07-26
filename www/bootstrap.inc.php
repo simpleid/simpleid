@@ -86,6 +86,7 @@ $f3->mset([
     'CORS.origin' => '*',
     'JAR.domain' => '',
     'JAR.secure' => false,
+    'JAR.samesite' => 'Strict',
     'PACKAGE' => 'SimpleID/' . SIMPLEID_VERSION,
     'TEMP' => $config['temp_dir'] . '/',
     'UI' => 'html/',
