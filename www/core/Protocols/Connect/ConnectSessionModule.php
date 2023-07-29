@@ -108,7 +108,7 @@ class ConnectSessionModule extends Module {
             }
         } else {
             $form_state = new FormState([ 'connect_logout' => [] ]);
-            if ($this->f3->exists('REQUEST.state')) $form_state->pathSet('connect_logout.state', $this->f3->get('REQUEST.state'));
+            if ($this->f3->exists('REQUEST.state')) $form_state->set('connect_logout.state', $this->f3->get('REQUEST.state'));
 
             // Check for id_token_hint.  If it is a valid ID token AND it is the
             // current logged in user, then we can proceed with log out.  Otherwise
@@ -130,7 +130,7 @@ class ConnectSessionModule extends Module {
                         $post_logout_redirect_uri = $this->f3->get('REQUEST.post_logout_redirect_uri');
 
                         if (in_array($post_logout_redirect_uri, $client['connect']['post_logout_redirect_uris']))
-                            $form_state->pathSet('connect_logout.post_logout_redirect_uri', $post_logout_redirect_uri);
+                            $form_state->set('connect_logout.post_logout_redirect_uri', $post_logout_redirect_uri);
                     }
                 } catch (InvalidTokenException $e) {
                     $user_match = false;

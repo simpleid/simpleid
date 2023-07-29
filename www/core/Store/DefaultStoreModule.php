@@ -137,7 +137,7 @@ class DefaultStoreModule extends StoreModule {
             $uid = $matches[1];
             $test_user = $this->readUser($uid);
 
-            $test_value = $test_user->pathGet($criteria);
+            $test_value = $test_user->get($criteria);
         
             if ($test_value !== null) {
                 if (is_array($test_value)) {

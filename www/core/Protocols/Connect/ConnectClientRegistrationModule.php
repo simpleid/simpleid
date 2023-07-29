@@ -181,7 +181,7 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
             $parts = explode('#', $name, 2);
             $client_path = (isset(self::$metadata_map[$parts[0]])) ? self::$metadata_map[$parts[0]] : 'connect.' . $parts[0];
             if (isset($parts[1])) $client_path .= '#' . $parts[1];
-            $client->pathSet($client_path, $value);
+            $client->set($client_path, $value);
         }
 
         $client->fetchJWKs();
@@ -194,7 +194,7 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
         ]);
 
         if ($client['oauth']['token_endpoint_auth_method'] != 'none') {
-            $client->pathSet('oauth.client_secret', $rand->secret());
+            $client->set('oauth.client_secret', $rand->secret());
             $response['client_secret'] = $client['oauth']['client_secret'];
             $response['client_secret_expires_at'] = 0;
         }

@@ -153,7 +153,7 @@ class SRegOpenIDExtensionModule extends Module {
         $form_state = $event->getFormState();
         /** @var \SimpleID\Protocols\OpenID\Response */
         $response = $form_state->getResponse();
-        $prefs =& $form_state->pathRef('prefs');
+        $prefs =& $form_state->ref('prefs');
 
         // We only respond if the extension is requested
         if (!$response->hasExtension(self::OPENID_NS_SREG)) return;

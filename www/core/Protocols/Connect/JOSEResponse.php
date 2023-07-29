@@ -77,7 +77,7 @@ class JOSEResponse extends ArrayWrapper {
      * @param \SimpleID\Protocols\OAuth\OAuthClient $client the OAuth client to which the response
      * will be sent
      * @param string $path_prefix the prefix from which paths will be formed and passed
-     * to {@link ArrayWrapper::pathGet()} to get the client configuration
+     * to {@link ArrayWrapper::get()} to get the client configuration
      * @param array<string, mixed> $data the initial claims
      * @param string $default_signed_response_alg the default `_signed_response_alg` value
      * if the client configuration is not found
@@ -87,16 +87,16 @@ class JOSEResponse extends ArrayWrapper {
         $this->issuer = $issuer;
         $this->client = $client;
         
-        if ($this->client->pathExists($path_prefix . '_signed_response_alg')) {
-            $this->signed_response_alg = $this->client->pathGet($path_prefix . '_signed_response_alg');
+        if ($this->client->exists($path_prefix . '_signed_response_alg')) {
+            $this->signed_response_alg = $this->client->get($path_prefix . '_signed_response_alg');
         } elseif ($default_signed_response_alg != null) {
             $this->signed_response_alg = $default_signed_response_alg;
         }
 
-        if ($this->client->pathExists($path_prefix . '_encrypted_response_alg')) {
-            $this->encrypted_response_alg = $this->client->pathGet($path_prefix . '_encrypted_response_alg');
-            if ($this->client->pathExists($path_prefix . '_encrypted_response_enc')) {
-                $this->encrypted_response_enc = $this->client->pathGet($path_prefix . '_encrypted_response_enc');
+        if ($this->client->exists($path_prefix . '_encrypted_response_alg')) {
+            $this->encrypted_response_alg = $this->client->get($path_prefix . '_encrypted_response_alg');
+            if ($this->client->exists($path_prefix . '_encrypted_response_enc')) {
+                $this->encrypted_response_enc = $this->client->get($path_prefix . '_encrypted_response_enc');
             } else {
                 $this->encrypted_response_enc = 'A128CBC-HS256';
             }

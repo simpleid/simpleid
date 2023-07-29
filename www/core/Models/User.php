@@ -206,9 +206,9 @@ class User extends ArrayWrapper implements Serializable, Storable {
         $secret_paths[] = 'uid';
         foreach ($secret_paths as $path) {
             if ($hidden_value) {
-                $copy->pathSet($path, $hidden_value);
+                $copy->set($path, $hidden_value);
             } else {
-                $copy->pathUnset($path);
+                $copy->unset($path);
             }
         }
         return $copy->toArray();        

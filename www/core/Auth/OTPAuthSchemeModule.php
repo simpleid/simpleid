@@ -271,7 +271,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             $uaid = $auth->assignUAID();
             $remember = $user['otp']['remember'];
             $remember[] = $uaid;
-            $user->pathSet('otp.remember', array_unique($remember));
+            $user->set('otp.remember', array_unique($remember));
 
             $store->saveUser($user);
         }

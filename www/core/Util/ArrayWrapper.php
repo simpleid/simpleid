@@ -22,6 +22,7 @@
 
 namespace SimpleID\Util;
 
+use \InvalidArgumentException;
 use \ArrayAccess;
 use \Countable;
 use \IteratorAggregate;
@@ -61,14 +62,14 @@ use \ArrayIterator;
  * through object properties.  The entire expression in dot-notation is called
  * a *path*.
  *
- * Dot-notation can be used in {@link pathGet()}, {@link pathExists()}, {@link pathSet()},
- * and {@link pathRef()}.  Thus in the example above:
+ * Dot-notation can be used in {@link get()}, {@link exists()}, {@link set()},
+ * and {@link ref()}.  Thus in the example above:
  *
  * <code>
  * $array_wrapper = new ArrayWrapper(['dim1' => ['foo' => 1, 'bar' => 2]]);
- * print $array_wrapper->pathGet('dim1.foo');  # Prints 1
- * $array_wrapper->pathSet('dim.foo', 3);      # Works!
- * print $array_wrapper->pathGet('dim1.foo');  # Now prints 3
+ * print $array_wrapper->get('dim1.foo');  # Prints 1
+ * $array_wrapper->set('dim.foo', 3);      # Works!
+ * print $array_wrapper->get('dim1.foo');  # Now prints 3
  * </code>
  *
  * @implements ArrayAccess<string, mixed>
@@ -168,9 +169,10 @@ class ArrayWrapper implements ArrayAccess, Countable, IteratorAggregate {
      *
      * @param string $path the path
      * @return mixed the contents of the container matching the path
+     * @throws \InvalidArgumentException if $path is empty
      */
-    public function pathGet($path) {
-        $value = $this->pathRef($path);
+    public function get(string $path) {
+        $value = $this->ref($path);
         return $value;
     }
 
@@ -180,23 +182,52 @@ class ArrayWrapper implements ArrayAccess, Countable, IteratorAggregate {
      *
      * @param string $path the path
      * @return bool true if the path can be resolved
+     * @throws \InvalidArgumentException if $path is empty
      */
-    public function pathExists($path) {
-        $value = $this->pathRef($path, false);
+    public function exists(string $path) {
+        $value = $this->ref($path, false);
         return isset($value);
     }
 
     /**
      * Sets the value of the element specified by a FatFree-like path
-     * expression
+     * expression.
+     * 
+     * Note that this function will overwrite intermediate parts
+     * of the path with array declarations.  For example, the following
+     * code:
+     * 
+     * <code>
+     * $wrapper->set('a', 'foo');
+     * $wrapper->set('a.b', 'bar');
+     * </code>
+     * 
+     * Will result in `foo` being overwritten.
      *
      * @param string $path the path
      * @param mixed $value the value to set
      * @return void
+     * @throws \InvalidArgumentException if $path is empty
      */
-    public function pathSet($path, $value) {
-        $ref = &$this->pathRef($path);
+    public function set(string $path, $value) {
+        $ref = &$this->ref($path);
         $ref = $value;
+    }
+
+    /**
+     * Appends a value to an array element specified by a FatFree-like path
+     * expression.
+     *
+     * @param string $path the path to the array
+     * @param mixed $value the value to append
+     * @return void
+     * @throws \InvalidArgumentException if $path is empty or does not point
+     * to an array
+     */
+    public function append(string $path, $value) {
+        $ref = &$this->ref($path);
+        if (!is_array($ref)) throw new \InvalidArgumentException('Not an array: ' . $path);
+        $ref[] = $value;
     }
 
     /**
@@ -205,11 +236,12 @@ class ArrayWrapper implements ArrayAccess, Countable, IteratorAggregate {
      *
      * @param string $path the path
      * @return void
+     * @throws \InvalidArgumentException if $path is empty
      */
-    public function pathUnset($path) {
-        if (!$this->pathExists($path)) return;
+    public function unset(string $path) {
+        if (!$this->exists($path)) return;
 
-        $parts = $this->pathSplit($path);
+        $parts = $this->splitPath($path);
 
         if (count($parts) == 1) {
             unset($this->container[$path]);
@@ -218,10 +250,10 @@ class ArrayWrapper implements ArrayAccess, Countable, IteratorAggregate {
 
         $key = array_pop($parts);
         if (array_pop($parts) == '->') {
-            $ref = &$this->pathRefLimit($path, true, 2);
+            $ref = &$this->refLimit($path, true, 2);
             unset($ref->$key);
         } else {
-            $ref = &$this->pathRefLimit($path, true, 1);
+            $ref = &$this->refLimit($path, true, 1);
             unset($ref[$key]);
         }
     }
@@ -232,13 +264,17 @@ class ArrayWrapper implements ArrayAccess, Countable, IteratorAggregate {
      *
      * If $add is set to true, adds non-existent keys,
      * array elements, and object properties
+     * 
+     * If the path cannot be traversed (for example `a.b.c` but `a.b` is not
+     * an array), this function returns null.
      *
      * @param string $path the path
      * @param bool $add adds non-existent keys, array elements, and object properties
      * @return mixed the contents of the container matching the path
+     * @throws \InvalidArgumentException if $path is empty
      */
-    public function &pathRef($path, $add = TRUE) {
-        return $this->pathRefLimit($path, $add);
+    public function &ref(string $path, bool $add = TRUE) {
+        return $this->refLimit($path, $add);
     }
 
     /**
@@ -246,21 +282,25 @@ class ArrayWrapper implements ArrayAccess, Countable, IteratorAggregate {
      * expression, as a reference.
      *
      * If $add is set to true, adds non-existent keys,
-     * array elements, and object properties
+     * array elements, and object properties.
+     * 
+     * If the path cannot be traversed (for example `a.b.c` but `a.b` is not
+     * an array), this function returns null.
      *
      * @param string $path the path
      * @param bool $add adds non-existent keys, array elements, and object properties
      * @param int|null $limit the number of path elements to traverse, or null for
      * unlimited
      * @return mixed the contents of the container matching the path
+     * @throws \InvalidArgumentException if $path is empty
      */
-    protected function &pathRefLimit($path, $add = TRUE, $limit = NULL) {
+    protected function &refLimit(string $path, bool $add = TRUE, $limit = NULL) {
         $null = NULL;
 
-        $parts = $this->pathSplit($path);
+        $parts = $this->splitPath($path);
         if ($limit != null) $parts = array_slice($parts, 0, -$limit);
 
-        if (!preg_match('/^\w+$/', $parts[0])) return null;
+        if (!$parts || !preg_match('/^\w+$/', $parts[0])) throw new InvalidArgumentException('$path is empty or invalid');
 
         if ($add) {
             $var = &$this->container;
@@ -296,10 +336,12 @@ class ArrayWrapper implements ArrayAccess, Countable, IteratorAggregate {
     }
 
     /**
+     * 
+     * 
      * @param string $path
      * @return array<string>
      */
-    private function pathSplit($path) {
+    protected function splitPath(string $path) {
         $split = preg_split('/\[\h*[\'"]?(.+?)[\'"]?\h*\]|(->)|\./', $path, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
         if ($split === false) {
             return [ $path ];
