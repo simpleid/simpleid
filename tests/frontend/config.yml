@@ -69,9 +69,6 @@ tests:
           id: know who you are
           profile: view your profile information (excluding e-mail and address information)
           email: view your e-mail address
-        js_data.intl.openid_suspect: |
-          This web site has not confirmed its identity and might be fraudulent.
-          Are you sure you wish to automatically send your information to this site for any future requests?
 
   openid_consent.html:
     - template: openid_userinfo_consent.html
@@ -106,6 +103,10 @@ tests:
         layout: openid_consent.html
         cancel: false
         realm: https://example.com/
+        return_to_suspect: true
+        js_data.intl.openid_suspect: |
+          This web site has not confirmed its identity and might be fraudulent.
+          Are you sure you wish to automatically send your information to this site for any future requests?
 
   dashboard.html:
     - array:
