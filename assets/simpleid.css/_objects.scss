@@ -24,6 +24,12 @@ label {
 }
 label.option { font-weight: normal; }
 
+.form-help {
+  @include util.margin-y(util.size(1));
+  @include util.text-size(sm);
+  a { border-bottom-width: 0; }
+}
+
 @include util.form-all-boxes {
   // to be reviewed
   display: inline-block;
