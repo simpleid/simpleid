@@ -258,7 +258,7 @@ body.is-dialog-page { background: var(--grey-950); }
     border-color: var(--red-400);
   }
 }
-.message p { line-height: 1; }
+.message p { line-height: util.leading(tight); }
 
 /* Dashboard blocks --------------------------------------------- */
 .block {
