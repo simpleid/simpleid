@@ -104,6 +104,7 @@ tests:
         cancel: false
         realm: https://example.com/
         return_to_suspect: true
+        suspect_url: http://simpleid.org/documentation/troubleshooting/returnto-discovery-failure
         js_data.intl.openid_suspect: |
           This web site has not confirmed its identity and might be fraudulent.
           Are you sure you wish to automatically send your information to this site for any future requests?
