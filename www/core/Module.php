@@ -137,6 +137,8 @@ abstract class Module extends \Prefab {
      * @return void  
      */
     protected function checkHttps($action = 'redirect', $allow_override = false, $redirect_url = null, $strict = true) {
+        if ($this->f3->get('CLI')) return;
+
         if ($this->isHttps()) {
             if ($strict) header('Strict-Transport-Security: max-age=3600');
             return;
@@ -221,8 +223,20 @@ abstract class Module extends \Prefab {
      * @return void
      */
     protected function fatalError(string $error, int $code = 500) {
-        // This also sends the HTTP status code
-        $title = $this->f3->status($code);
+        // These status codes aren't currently included in Fat-Free Framework
+        static $extra_status_codes = [
+            426 => 'Upgrade Required'
+        ];
+
+        if (isset($extra_status_codes[$code])) {
+            $title = $extra_status_codes[$code];
+            if (!$this->f3->get('CLI') && !headers_sent())
+                header($_SERVER['SERVER_PROTOCOL'] . ' ' . $code . ' ' . $title);
+        } else {
+            // This also sends the HTTP status code
+            $title = $this->f3->status($code);
+        }
+        
         $this->f3->expire(-1);
         $trace = $this->f3->trace();
 
