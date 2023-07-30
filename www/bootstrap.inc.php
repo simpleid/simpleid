@@ -124,7 +124,7 @@ $logger = new $config['logger']($config);
 $f3->set('logger', $logger);
 
 if ($config['debug']) {
-    Tracy\Debugger::enable();
+    Tracy\Debugger::enable('127.0.0.1');
     if (is_int($config['debug'])) $f3->set('DEBUG', $config['debug']);
 }
 
