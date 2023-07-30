@@ -55,6 +55,10 @@ class ArrayWrapperTest extends TestCase {
 
         $wrapper->append('b.bb', 'BB2');
         $this->assertEquals([ 'BB0', 'BB1', 'BB2' ], $wrapper->get('b.bb'));
+
+        $wrapper->append('new_array', 'C1');
+        $wrapper->append('new_array', 'C2');
+        $this->assertEquals([ 'C1', 'C2' ], $wrapper->get('new_array'));
     }
 
     function testInvalidAppend() {

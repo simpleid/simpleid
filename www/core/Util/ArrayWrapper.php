@@ -226,6 +226,7 @@ class ArrayWrapper implements ArrayAccess, Countable, IteratorAggregate {
      */
     public function append(string $path, $value) {
         $ref = &$this->ref($path);
+        if (is_null($ref)) $ref = [];
         if (!is_array($ref)) throw new \InvalidArgumentException('Not an array: ' . $path);
         $ref[] = $value;
     }
