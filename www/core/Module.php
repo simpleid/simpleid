@@ -240,16 +240,24 @@ abstract class Module extends \Prefab {
         $this->f3->expire(-1);
         $trace = $this->f3->trace();
 
-        $this->f3->set('error', $error);
-        if ($this->f3->get('DEBUG') > 0) $this->f3->set('trace', $trace);
-
-        $this->f3->set('page_class', 'is-dialog-page');
-        $this->f3->set('title', $title);
-        $this->f3->set('layout', 'fatal_error.html');
-
-        $tpl = Template::instance();
-        print $tpl->render('page.html');
-        exit;
+        if ($this->f3->get('CLI')) {
+            $exit_code = 1;
+            echo PHP_EOL.'==================================='
+                .PHP_EOL.'ERROR ' . $code . ' - '. $title
+                .PHP_EOL.$error;
+        } else {
+            $exit_code = 0;
+            $this->f3->set('error', $error);
+            if ($this->f3->get('DEBUG') > 0) $this->f3->set('trace', $trace);
+    
+            $this->f3->set('page_class', 'is-dialog-page');
+            $this->f3->set('title', $title);
+            $this->f3->set('layout', 'fatal_error.html');
+    
+            $tpl = Template::instance();
+            print $tpl->render('page.html');
+        }
+        exit($exit_code);
     }
 
     /**
