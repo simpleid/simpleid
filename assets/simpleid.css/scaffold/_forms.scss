@@ -123,7 +123,7 @@ $valid-color: var(--green) !default;
   background-color: $background-color;
   border: 1px solid $border-color;
   cursor: pointer;
-  font-weight: util.font-size(medium);
+  font-weight: util.font-weight(medium);
 
   &:last-child { margin-inline-end: 0; }
 

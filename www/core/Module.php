@@ -219,11 +219,22 @@ abstract class Module extends \Prefab {
      * Displays a fatal error message and exits.
      *
      * @param string $error the message to set
+     * @param int $code the HTTP status code to send
      * @return void
      */
-    protected function fatalError($error) {
-        $this->f3->set('title', $this->f3->get('intl.common.error'));
-        $this->f3->set('message', $error);
+    protected function fatalError(string $error, int $code = 500) {
+        // This also sends the HTTP status code
+        $title = $this->f3->status($code);
+        $this->f3->expire(-1);
+        $trace = $this->f3->trace();
+
+        $this->f3->set('error', $error);
+        if ($this->f3->get('DEBUG') > 0) $this->f3->set('trace', $trace);
+
+        $this->f3->set('page_class', 'is-dialog-page');
+        $this->f3->set('title', $title);
+        $this->f3->set('layout', 'fatal_error.html');
+
         $tpl = Template::instance();
         print $tpl->render('page.html');
         exit;
