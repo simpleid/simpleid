@@ -217,15 +217,13 @@ class UpgradeModule extends Module {
 
         $token = new SecurityToken();
         if (!$this->f3->exists('GET.tk')) {
-            $this->f3->status(401);
-            $this->fatalError($this->f3->get('intl.common.invalid_tk'));
+            $this->fatalError($this->f3->get('intl.common.invalid_tk'), 401);
             return;
         }
 
         $payload = $token->getPayload($this->f3->get('POST.step'));
         if ($payload == null) {
-            $this->f3->status(401);
-            $this->fatalError($this->f3->get('intl.common.invalid_tk'));
+            $this->fatalError($this->f3->get('intl.common.invalid_tk'), 401);
             return;
         }
 
@@ -235,7 +233,6 @@ class UpgradeModule extends Module {
         $cache->reset('.upgrade');
 
         if ($upgrade === false) {
-            $this->f3->status(500);
             $this->fatalError($this->f3->get('intl.upgrade.upgrade_not_found'));
         }
 

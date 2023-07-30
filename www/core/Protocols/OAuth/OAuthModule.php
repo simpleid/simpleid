@@ -112,7 +112,7 @@ class OAuthModule extends Module implements ProtocolResult {
             if (isset($request['redirect_uri'])) {
                 $response->renderRedirect();
             } else {
-                $this->fatalError($this->f3->get('intl.common.protocol_error', $response['error']));
+                $this->fatalError($this->f3->get('intl.common.protocol_error', $response['error']), 400);
             }
             return;
         }
@@ -125,7 +125,7 @@ class OAuthModule extends Module implements ProtocolResult {
             if (isset($request['redirect_uri'])) {
                 $response->renderRedirect();
             } else {
-                $this->fatalError($this->f3->get('intl.common.protocol_error', $response['error']));
+                $this->fatalError($this->f3->get('intl.common.protocol_error', $response['error']), 400);
             }
             return;
         }
@@ -147,14 +147,14 @@ class OAuthModule extends Module implements ProtocolResult {
         // 1. response_type (pass 1 - check that it exists)
         if (!isset($request['response_type'])) {
             $this->logger->log(LogLevel::ERROR, 'Protocol Error: response_type not set.');
-            $this->fatalError($this->f3->get('intl.core.oauth.missing_response_type'));
+            $this->fatalError($this->f3->get('intl.core.oauth.missing_response_type'), 400);
             return;
         }
         
         $response_types = preg_split('/\s+/', $request['response_type']);
         if ($response_types == false) {
             $this->logger->log(LogLevel::ERROR, 'Protocol Error: Incorrect response_type.');
-            $this->fatalError($this->f3->get('intl.core.oauth.invalid_response_type'));
+            $this->fatalError($this->f3->get('intl.core.oauth.invalid_response_type'), 400);
             return;
         }
         if (in_array('token', $response_types)) $response->setResponseMode(Response::FRAGMENT_RESPONSE_MODE);
@@ -165,7 +165,7 @@ class OAuthModule extends Module implements ProtocolResult {
             if (isset($request['redirect_uri'])) {
                 $response->setError('invalid_request', 'client_id not set')->renderRedirect();
             } else {
-                $this->fatalError($this->f3->get('intl.core.oauth.missing_client_id'));
+                $this->fatalError($this->f3->get('intl.core.oauth.missing_client_id'), 400);
             }
             return;
         }
@@ -176,7 +176,7 @@ class OAuthModule extends Module implements ProtocolResult {
             if (isset($request['redirect_uri'])) {
                 $response->setError('invalid_request', 'client not found')->renderRedirect();
             } else {
-                $this->fatalError($this->f3->get('intl.core.oauth.client_not_found'));
+                $this->fatalError($this->f3->get('intl.core.oauth.client_not_found'), 400);
             }
             return;
         }
@@ -200,7 +200,7 @@ class OAuthModule extends Module implements ProtocolResult {
             
             if (!$redirect_uri_found) {
                 $this->logger->log(LogLevel::ERROR, 'Incorrect redirect URI: ' . $request['redirect_uri']);
-                $this->fatalError($this->f3->get('intl.core.oauth.invalid_redirect_uri'));
+                $this->fatalError($this->f3->get('intl.core.oauth.invalid_redirect_uri'), 400);
                 return;
             }
         } elseif (isset($client['oauth']['redirect_uris'])) {
@@ -210,12 +210,12 @@ class OAuthModule extends Module implements ProtocolResult {
                 $response->setRedirectURI($client['oauth']['redirect_uris'][0]);
             } else {
                 $this->logger->log(LogLevel::ERROR, 'Protocol Error: redirect_uri not specified in request when multiple redirect_uris are registered');
-                $this->fatalError($this->f3->get('intl.core.oauth.ambiguous_redirect_uri'));
+                $this->fatalError($this->f3->get('intl.core.oauth.ambiguous_redirect_uri'), 400);
                 return;
             }
         } else {
             $this->logger->log(LogLevel::ERROR, 'Protocol Error: redirect_uri not specified in request or client registration');
-            $this->fatalError($this->f3->get('intl.core.oauth.missing_redirect_uri'));
+            $this->fatalError($this->f3->get('intl.core.oauth.missing_redirect_uri'), 400);
             return;
         }
         

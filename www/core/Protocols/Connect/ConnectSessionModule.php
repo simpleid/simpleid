@@ -141,7 +141,7 @@ class ConnectSessionModule extends Module {
                 } else {
                     // The user that the id_token_hint points to is not the same user as the one
                     // currently logged in.
-                    $this->fatalError($this->f3->get('intl.common.already_logged_out'));
+                    $this->fatalError($this->f3->get('intl.common.already_logged_out'), 400);
                 }
             } elseif ($auth->isLoggedIn()) {
                 // Prompt for log out
@@ -191,7 +191,7 @@ class ConnectSessionModule extends Module {
         $payload = $token->getPayload($params['token']);
 
         if ($payload === null) {
-            $this->fatalError($this->f3->get('intl.common.invalid_request'));
+            $this->fatalError($this->f3->get('intl.common.invalid_request'), 400);
             return;
         }
 

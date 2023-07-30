@@ -122,7 +122,7 @@ class OpenIDModule extends Module implements ProtocolResult {
             default:
                 if (isset($request['openid.return_to'])) {
                     // Indirect communication - send error via indirect communication.
-                    $this->fatalError($this->f3->get('intl.core.openid.invalid_message'));
+                    $this->fatalError($this->f3->get('intl.core.openid.invalid_message'), 400);
                 } else {
                     // Direct communication
                     $this->directError('Invalid OpenID message.', [], $request);
@@ -240,12 +240,12 @@ class OpenIDModule extends Module implements ProtocolResult {
         if ($version == Message::OPENID_VERSION_1_1) {
             if (!isset($request['openid.return_to'])) {
                 $this->logger->log(LogLevel::ERROR, 'Protocol Error: openid.return_to not set.');
-                $this->fatalError($this->f3->get('intl.core.openid.missing_return_to'));
+                $this->fatalError($this->f3->get('intl.core.openid.missing_return_to'), 400);
                 return;
             }
             if (!isset($request['openid.identity'])) {
                 $this->logger->log(LogLevel::ERROR, 'Protocol Error: openid.identity not set.');
-                $this->fatalError($this->f3->get('intl.core.openid.missing_identity'));
+                $this->fatalError($this->f3->get('intl.core.openid.missing_identity'), 400);
                 return;
             }
         }
@@ -253,13 +253,13 @@ class OpenIDModule extends Module implements ProtocolResult {
         if ($version == Message::OPENID_VERSION_2) {
             if (isset($request['openid.identity']) && !isset($request['openid.claimed_id'])) {
                 $this->logger->log(LogLevel::ERROR, 'Protocol Error: openid.identity set, but not openid.claimed_id.');
-                $this->fatalError($this->f3->get('intl.core.openid.missing_claimed_id'));
+                $this->fatalError($this->f3->get('intl.core.openid.missing_claimed_id'), 400);
                 return;
             }
             
             if (!isset($request['openid.realm']) && !isset($request['openid.return_to'])) {
                 $this->logger->log(LogLevel::ERROR, 'Protocol Error: openid.return_to not set when openid.realm is not set.');
-                $this->fatalError($this->f3->get('intl.core.openid.realm_but_no_return_to'));
+                $this->fatalError($this->f3->get('intl.core.openid.realm_but_no_return_to'), 400);
                 return;
             }
         }
@@ -361,7 +361,7 @@ class OpenIDModule extends Module implements ProtocolResult {
                     $response = $this->createErrorResponse($request, $immediate);
                     $response->render($request['openid.return_to']);
                 } else {
-                    $this->fatalError('Unrecognised request.');
+                    $this->fatalError('Unrecognised request.', 400);
                 }
                 break;
         }
@@ -1036,9 +1036,7 @@ class OpenIDModule extends Module implements ProtocolResult {
             header('Content-Disposition: inline; filename=yadis.xml');
             print $tpl->render('openid_user_xrds.xml', 'application/xrds+xml');
         } else {
-            $this->f3->status(404);
-            
-            $this->fatalError($this->f3->get('intl.common.user_not_found', $params['uid']));
+            $this->fatalError($this->f3->get('intl.common.user_not_found', $params['uid']), 404);
         }
     }
 

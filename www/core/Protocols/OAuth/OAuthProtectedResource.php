@@ -162,7 +162,7 @@ class OAuthProtectedResource extends Module {
                 break;
             case 'html':
             default:
-                $this->fatalError($error_description);
+                $this->fatalError($error_description, 400);
                 break;
         }
         exit;

@@ -129,7 +129,7 @@ class AuthModule extends Module {
 
             // Listeners should call stopPropagation if it has processed successfully
             if (!$cancel_event->isPropagationStopped()) {
-                $this->fatalError($this->f3->get('intl.core.auth.cancelled'));
+                $this->fatalError($this->f3->get('intl.core.auth.cancelled'), 400);
             }
             return;
         }

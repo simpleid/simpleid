@@ -97,7 +97,7 @@ class IndexModule extends Module {
         $payload = $token->getPayload($params['token']);
 
         if ($payload === null) {
-            $this->fatalError($this->f3->get('intl.common.invalid_request'));
+            $this->fatalError($this->f3->get('intl.common.invalid_request'), 400);
             return;
         }
         

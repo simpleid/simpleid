@@ -49,16 +49,14 @@ class WebFingerModule extends Module {
         if (!$limiter->throttle()) {
             header('Retry-After: ' . $limiter->getInterval());
             // We never display a log for rate limit errors
-            $this->f3->status(429);
-            $this->fatalError($this->f3->get('intl.common.ratelimit_error'));
+            $this->fatalError($this->f3->get('intl.common.ratelimit_error'), 429);
         }
 
         $this->logger->log(LogLevel::INFO, 'SimpleID\Protocols\WebFinger->start');
     
         if (!$this->f3->exists('GET.resource') || ($this->f3->get('GET.resource') == '')) {
             $this->logger->log(LogLevel::NOTICE, 'resource parameter missing or empty');
-            $this->f3->status(400);
-            $this->fatalError($this->f3->get('intl.core.webfinger.missing_resource'));
+            $this->fatalError($this->f3->get('intl.core.webfinger.missing_resource'), 400);
             return;
         }
 
@@ -69,8 +67,7 @@ class WebFingerModule extends Module {
     
         if ($jrd == NULL) {
             $limiter->penalize();  // Stop $remote_addr from querying again
-            $this->f3->status(404);
-            $this->fatalError($this->f3->get('intl.common.not_found'));
+            $this->fatalError($this->f3->get('intl.common.not_found'), 404);
             return;
         }
     

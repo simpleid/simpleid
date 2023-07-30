@@ -147,11 +147,9 @@ abstract class Module extends \Prefab {
         if ($allow_override && $config['allow_plaintext']) return;
         
         if ($action == 'error') {
-            $this->f3->status(426);
-
             header('Upgrade: TLS/1.2, HTTP/1.1');
             header('Connection: Upgrade');
-            $this->fatalError($this->f3->get('intl.common.require_https'));
+            $this->fatalError($this->f3->get('intl.common.require_https'), 426);
             exit;
         }
         

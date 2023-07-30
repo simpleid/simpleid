@@ -613,8 +613,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
         $config = $this->f3->get('config');
 
         if (!isset($config['public_jwks_file'])) {
-            $this->f3->status(404);
-            $this->fatalError($this->f3->get('intl.core.connect.missing_jwks'));
+            $this->fatalError($this->f3->get('intl.core.connect.missing_jwks'), 404);
         }
         
         $set = new KeySet();
@@ -622,8 +621,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
         if ($file) $set->load($file);
 
         if (!$set->isPublic()) {
-            $this->f3->status(401);
-            $this->fatalError($this->f3->get('intl.core.connect.jwks_not_public'));
+            $this->fatalError($this->f3->get('intl.core.connect.jwks_not_public'), 401);
         }
 
         header('Content-Type: application/jwk-set+json');
