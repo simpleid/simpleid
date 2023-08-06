@@ -221,12 +221,18 @@ class AuthManager extends Prefab {
 
     /**
      * Sets the user specified by the parameter as the active user.
+     * 
+     * This is done by:
+     * 
+     * 1. Associating the user and authentication result with the current
+     *    browser session maintained by PHP
+     * 2. Storing the session ID against the user in the `login` cache type
      *
      * @param AuthResultInterface $result the authentication result
-     * @param \SimpleID\Util\Forms\FormState $form_state
+     * @param FormState $form_state the state of the login form
      * @return void
      */
-    public function login(AuthResultInterface $result, $form_state = null) {
+    public function login(AuthResultInterface $result, FormState $form_state = null) {
         if ($form_state == null) $form_state = new FormState();
 
         $store = StoreManager::instance();
