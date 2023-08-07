@@ -25,7 +25,7 @@ namespace SimpleID\Base;
 use SimpleID\Auth\AuthManager;
 use SimpleID\Module;
 use SimpleID\ModuleManager;
-use SimpleID\Models\ConsentEvent;
+use SimpleID\Base\ConsentEvent;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
 use SimpleID\Util\Events\OrderedDataCollectionEvent;

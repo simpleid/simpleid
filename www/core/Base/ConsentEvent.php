@@ -20,7 +20,7 @@
  * 
  */
 
-namespace SimpleID\Models;
+namespace SimpleID\Base;
 
 use SimpleID\Util\Events\BaseEvent;
 
