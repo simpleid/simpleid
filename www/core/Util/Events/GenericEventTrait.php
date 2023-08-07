@@ -58,7 +58,7 @@ trait GenericEventTrait {
      * @return string
      */
     public function getEventName() {
-        if ($eventName == null) {
+        if ($this->eventName == null) {
             return static::class;
         } else {
             return $this->eventName;
