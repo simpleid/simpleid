@@ -247,7 +247,7 @@ class MyModule extends Module {
             return;
         }
 
-        $event = new ConsentEvent('consent_revoke', $params['cid'], $prefs[$params['cid']]);
+        $event = new ConsentEvent('consent_revoke', $user, $params['cid'], $prefs[$params['cid']]);
         \Events::instance()->dispatch($event);
 
         unset($prefs[$params['cid']]);
