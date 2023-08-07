@@ -121,6 +121,7 @@ class AuthManager extends Prefab {
             // session_name() has to be called before session_set_cookie_params()
             session_name($this->getCookieName('sess'));
             session_start();
+            $this->f3->sync('SESSION');
         }
     }
 
@@ -138,8 +139,8 @@ class AuthManager extends Prefab {
     public function initUser($auto_auth = true) {
         $this->logger->log(LogLevel::DEBUG, 'SimpleID\Auth\AuthManager->initUser');
 
-        if (isset($_SESSION['auth']) && ($this->cache->get(rawurlencode($_SESSION['auth']['uid']) . '.login') == session_id())) {
-            $this->auth_info = $_SESSION['auth'];
+        if ($this->f3->exists('SESSION.auth') && ($this->cache->get(rawurlencode($this->f3->get('SESSION.auth.uid')) . '.login') == session_id())) {
+            $this->auth_info = $this->f3->get('SESSION.auth.uid');
 
             $store = StoreManager::instance();
             $user = $store->loadUser($this->auth_info['uid']);
@@ -252,7 +253,7 @@ class AuthManager extends Prefab {
         $this->auth_info['time'] = time();
 
         if ($level >= self::AUTH_LEVEL_AUTO) {
-            $_SESSION['auth'] = $this->auth_info;
+            $this->f3->set('SESSION.auth', $this->auth_info);
             $this->cache->set(rawurlencode($user['uid']) . '.login', session_id());
 
             $this->assignUALoginState(true);
@@ -264,7 +265,7 @@ class AuthManager extends Prefab {
                     'type' => 'browser',
                     'level' => $level,
                     'modules' => $modules,
-                    'time' => $_SESSION['auth']['time'],
+                    'time' => $this->f3->get('SESSION.auth.time'),
                 ];
                 if ($this->f3->exists('IP')) $activity['remote'] = $this->f3->get('IP');
                 if ($this->f3->exists('HEADERS.User-Agent')) $activity['ua'] = $this->f3->get('HEADERS.User-Agent');
