@@ -25,7 +25,6 @@ namespace SimpleID\Auth;
 use \Base;
 use \Cache;
 use \Prefab;
-use \Web\Geo;
 use Psr\Log\LogLevel;
 use SimpleID\ModuleManager;
 use SimpleID\Store\StoreManager;

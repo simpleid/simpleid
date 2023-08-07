@@ -26,6 +26,7 @@
     },
     "suggest": {
         "ext-gmp": "Better performance",
+        "ext-geoip": "Parse GeoIP database for geolocation",
         "simpleid/simpleid-tool": "Utilities for SimpleID"
     },
     "require-dev": {
