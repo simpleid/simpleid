@@ -94,31 +94,11 @@ class DefaultLogger extends Log implements LoggerInterface {
 
         if (self::$log_levels[$level] > self::$log_levels[$config['log_level']]) return;
 
-        if (count($context) > 0) $message .= ': ' . self::formatArray($context);
+        if (count($context) > 0) $message .= ' ' . json_encode($context);
 
         $line = sprintf('%1$s %2$s [%3$s] %4$s', $time->format($config['date_time_format']), session_id(), $level, $message) . "\n";
 
         $fw->write($this->file, $line, true);
-    }
-
-    /**
-     * Converts an array into a string for logging purposes.
-     *
-     * @param array<string, mixed> $array the array the convert
-     * @param array<string>|false $keys an array of keys to include in the converted string.  Set
-     * to false if all the keys in the array should be included
-     * @return string the converted string.
-     */
-    static function formatArray($array, $keys = false) {
-        $output = [];
-        
-        if ($keys == false) $keys = array_keys($array);
-        
-        foreach ($keys as $key) {
-            $output[] = $key . ": " . $array[$key];
-        }
-        
-        return implode('; ', $output);
     }
 }
 
