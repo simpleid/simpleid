@@ -16,7 +16,7 @@
 $header-height: 16;
 
 .header {
-  position: sticky;
+  position: fixed;
   z-index: 10;
   width: 100%;
   height: util.size($header-height);
@@ -31,7 +31,6 @@ $header-height: 16;
     @include util.margin-x(0);
     @include util.padding-x(util.size(6));
     max-width: 100%;
-    //@include dialog { @extend .wrapper; }
   }
 }
 
@@ -188,6 +187,8 @@ $header-nav-menu-width: 64;
 }
 
 /* Content ------------------------------------------------------ */
+.content { top: util.size($header-height); }
+
 .content--main .wrapper {
   @include util.padding-y(util.size(8));
 
@@ -213,6 +214,7 @@ $header-nav-menu-width: 64;
 /* Footer ------------------------------------------------------- */
 .content--footer {
   margin-top: util.size(16);
+  margin-bottom: util.size(4);
   text-align: right;
   font-size: util.font-size('sm');
   color: var(--grey);
@@ -239,7 +241,6 @@ body.is-dialog-page { background: var(--grey-950); }
   }
 }
 .is-dialog-page form { padding-right: 2px; } /* Used to adjust the padding in text boxes */
-//.is-dialog-page .form-item { padding-right: 1em; } /* Used to adjust the padding in text boxes */
 
 /* Messages ----------------------------------------------------- */
 .message {
