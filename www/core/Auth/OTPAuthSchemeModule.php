@@ -129,7 +129,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             $this->f3->set('secret' . ($i + 1), substr($code, $i, 4));
         }
 
-        $url = 'otpauth://totp/SimpleID?secret=' . $code . '&digits=' . $params['digits'] . '&period=' . $params['period'];
+        $url = 'otpauth://totp/SimpleID:' . rawurlencode($user['uid']) . '?issuer=SimpleID&secret=' . $code . '&digits=' . $params['digits'] . '&period=' . $params['period'];
         $this->f3->set('qr', addslashes($url));
 
         $this->f3->set('otp_recovery_url', 'http://simpleid.org/docs/2/common-problems/#otp');
