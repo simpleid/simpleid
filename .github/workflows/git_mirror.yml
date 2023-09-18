@@ -6,8 +6,6 @@ on:
       - 'dependabot/**'
       - 'issues/**'
       - 'features/**'
-  delete:
-  create:
   workflow_dispatch:
 
 jobs:
