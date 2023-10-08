@@ -41,8 +41,8 @@ use SimpleID\Util\Events\BaseDataCollectionEvent;
 use SimpleJWT\Util\Helper;
 use SimpleJWT\JWT;
 use SimpleJWT\InvalidTokenException;
-use SimpleJWT\Crypt\Algorithm;
 use SimpleJWT\Crypt\AlgorithmFactory;
+use SimpleJWT\Crypt\AlgorithmInterface;
 use SimpleJWT\Keys\KeySet;
 use \Web;
 
