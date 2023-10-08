@@ -32,22 +32,21 @@ use SimpleID\Util\Events\BaseEvent;
 use SimpleID\Util\Events\GenericEventTrait;
 
 /**
- * An event to collect scope information.
+ * Base class to represent an audit event.
  * 
- * Different identity protocols use the concept of *scope* to limit
- * the extent to which authorisation is provided by the user.  This
- * event is used to collect all the possible scopes that this
- * SimpleID installation can provide, as well as human-friendly
- * information on these scopes.
+ * An audit event represents an action that are typically logged for
+ * audit purposes.  An audit event is usually an action performed by
+ * a remote user agent affecting a subject (typically a user) or a client.
  * 
- * Scope information is categorised into *types*.  Generally each
- * identity protocol would have a separate type assigned.  Currently
- * the available types are:
+ * This base class automatically collects the following additional
+ * information:
  * 
- * - `openid` for the OpenID 1 and 2 protocols
- * - `oauth` for OAuth based protocols (including OpenID Connect)
- * 
- * Listeners should use {@link addScopeInfo()} to add scope information.
+ * - the time the event occurred
+ * - the IP address of the remote machine
+ * - the name of the user agent provided by the remote machine
+ * - if the `log_location` configuration variable is set to true,
+ *   uses a GeoIP resolver service to resolve the location of the IP
+ *   address
  */
 class AuditEvent extends BaseEvent {
 
@@ -69,6 +68,13 @@ class AuditEvent extends BaseEvent {
     /** @var Storable|null */
     protected $client;
 
+    /**
+     * Creates an audit event
+     * 
+     * @param Storable $subject the subject affected by the
+     * event
+     * @param Storable $client the client affected by the event
+     */
     public function __construct(Storable $subject = null, Storable $client = null) {
         $f3 = Base::instance();
         $geo = Geo::instance();
