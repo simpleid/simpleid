@@ -23,7 +23,7 @@
 namespace SimpleID\Auth;
 
 use SimpleID\Models\User;
-use SimpleID\Util\Events\BaseEvent;
+use SimpleID\Base\AuditEvent;
 
 /**
  * Event to log out a user.
@@ -35,12 +35,9 @@ use SimpleID\Util\Events\BaseEvent;
  * method.
  * 
  */
-class LogoutEvent extends BaseEvent {
-    /** @var User */
-    protected $user;
-
+class LogoutEvent extends AuditEvent {
     public function __construct(User $user) {
-        $this->user = $user;
+        parent::__construct($user);
     }
 
     /**
@@ -49,7 +46,9 @@ class LogoutEvent extends BaseEvent {
      * @return User the user
      */
     public function getUser(): User {
-        return $this->user;
+        /** @var User */
+        $user = $this->subject;
+        return $user;
     }
 }
 

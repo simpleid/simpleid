@@ -25,7 +25,8 @@ namespace SimpleID\Base;
 use SimpleID\Auth\AuthManager;
 use SimpleID\Module;
 use SimpleID\ModuleManager;
-use SimpleID\Models\ConsentEvent;
+use SimpleID\Base\ConsentEvent;
+use SimpleID\Protocols\ProtocolResultEvent;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
 use SimpleID\Util\Events\OrderedDataCollectionEvent;
@@ -247,7 +248,7 @@ class MyModule extends Module {
             return;
         }
 
-        $event = new ConsentEvent('consent_revoke', $params['cid'], $prefs[$params['cid']]);
+        $event = new ConsentEvent('consent_revoke', $user, $params['cid'], $prefs[$params['cid']]);
         \Events::instance()->dispatch($event);
 
         unset($prefs[$params['cid']]);
@@ -297,6 +298,28 @@ class MyModule extends Module {
             $event->addBlock('user', '<pre class="code">' . $this->f3->encode($user->toString()) . '</pre>', 10, [
                 'title' => $this->f3->get('intl.core.my.debug_user_title')
             ]);
+        }
+    }
+
+    /**
+     * Saves a positive assertion result to the user's activity log.
+     * 
+     * @param ProtocolResultEvent $event the assertion result event
+     * @return void
+     */
+    public function onProtocolResultEvent(ProtocolResultEvent $event) {
+        if ($event->isPositiveAssertion()) {
+            /** @var \SimpleID\Models\User $user */
+            $user = $event->getSubject();
+            $client_id = $event->getClient()->getStoreID();
+
+            $activity = [
+                'type' => 'app',
+                'id' => $client_id,
+                'time' => $event->getTime()->getTimestamp()
+            ];
+            if ($event->getIP()) $activity['remote'] = $event->getIP();
+            $user->addActivity($client_id, $activity);
         }
     }
 

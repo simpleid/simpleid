@@ -22,7 +22,7 @@
 
 namespace SimpleID\Auth;
 
-use SimpleID\Util\Events\BaseEvent;
+use SimpleID\Base\AuditEvent;
 use SimpleID\Util\Forms\FormEventInterface;
 
 /**
@@ -41,7 +41,7 @@ use SimpleID\Util\Forms\FormEventInterface;
  * methods {@link getUser()} and {@link getAuthLevel()} are also
  * included.
  */
-class LoginEvent extends BaseEvent implements FormEventInterface {
+class LoginEvent extends AuditEvent implements FormEventInterface {
     /** @var AuthResultInterface */
     protected $result;
 
@@ -53,6 +53,7 @@ class LoginEvent extends BaseEvent implements FormEventInterface {
      * @param \SimpleID\Util\Forms\FormState|null $form_state
      */
     public function __construct(AuthResultInterface $result, $form_state = null) {
+        parent::__construct($result->getUser());
         $this->result = $result;
         $this->form_state = $form_state;
     }

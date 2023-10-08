@@ -30,6 +30,7 @@ use SimpleID\Base\ScopeInfoCollectionEvent;
 use SimpleID\Auth\AuthManager;
 use SimpleID\Crypt\Random;
 use SimpleID\Protocols\ProtocolResult;
+use SimpleID\Protocols\ProtocolResultEvent;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
 use SimpleID\Util\Events\BaseDataCollectionEvent;
@@ -221,8 +222,9 @@ class OpenIDModule extends Module implements ProtocolResult {
      * {@link simpleid_checkid_identity()} to see whether the user logged on into SimpleID
      * matches the identity supplied in the OpenID request.
      *
-     * If the authentication request is not about an identity, this function calls
-     * the {@link hook_checkid() checkid hook} of the loaded extensions.
+     * If the authentication request is not about an identity, this function dispatches
+     * a {@link OpenIDCheckEvent}, which can be listened to by other extension
+     * modules.
      *
      * Depending on the OpenID version, this function will supply an appropriate
      * assertion.
@@ -899,13 +901,8 @@ class OpenIDModule extends Module implements ProtocolResult {
 
         $now = time();
 
-        $activity = [
-            'type' => 'app',
-            'id' => $realm,
-            'time' => $now
-        ];
-        if ($this->f3->exists('IP')) $activity['remote'] = $this->f3->get('IP');
-        $user->addActivity($cid, $activity);
+        $event = new ProtocolResultEvent(self::CHECKID_OK, $user, $this->loadRelyingParty($realm, true));
+        \Events::instance()->dispatch($event);
 
         if (isset($user->clients[$cid])) {
             $prefs = $user->clients[$cid];

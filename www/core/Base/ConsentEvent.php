@@ -20,9 +20,10 @@
  * 
  */
 
-namespace SimpleID\Models;
+namespace SimpleID\Base;
 
-use SimpleID\Util\Events\BaseEvent;
+use SimpleID\Models\User;
+use SimpleID\Util\Events\GenericEventTrait;
 
 /**
  * Event where a change has occurred to a user consent.
@@ -31,9 +32,8 @@ use SimpleID\Util\Events\BaseEvent;
  * 
  * - `consent_revoke`
  */
-class ConsentEvent extends BaseEvent implements \GenericEventInterface {
-    /** @var string */
-    protected $eventName;
+class ConsentEvent extends AuditEvent implements \GenericEventInterface {
+    use GenericEventTrait;
 
     /** @var string */
     protected $cid;
@@ -43,30 +43,17 @@ class ConsentEvent extends BaseEvent implements \GenericEventInterface {
 
     /**
      * @param string $eventName
+     * @param User $user
      * @param string $cid
      * @param array<string, mixed> $prefs
      */
-    public function __construct($eventName, $cid, $prefs) {
-        if ($eventName == null) {
-            // We use static::class instead of self::class or __CLASS__
-            // to pick up the name of the subclass instead of
-            // BaseDataCollectionEvent (if applicable)
-            $this->eventName = static::class;
-        } else {
-            $this->eventName = $eventName;
-        }
+    public function __construct($eventName, $user, $cid, $prefs) {
+        parent::__construct($user);
 
+        $this->setEventName($eventName);
         $this->cid = $cid;
         $this->prefs = $prefs;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getEventName() {
-        return $this->eventName;
-    }
-
 
     /**
      * @return string

@@ -27,8 +27,9 @@ use SimpleID\Auth\AuthManager;
 use SimpleID\Module;
 use SimpleID\ModuleManager;
 use SimpleID\Base\ScopeInfoCollectionEvent;
-use SimpleID\Models\ConsentEvent;
+use SimpleID\Base\ConsentEvent;
 use SimpleID\Protocols\ProtocolResult;
+use SimpleID\Protocols\ProtocolResultEvent;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
 use SimpleID\Util\Events\BaseStoppableEvent;
@@ -385,13 +386,8 @@ class OAuthModule extends Module implements ProtocolResult {
             $authorization->setScope($scopes);
         }
 
-        $activity = [
-            'type' => 'app',
-            'id' => $client->getStoreID(),
-            'time' => time()
-        ];
-        if ($this->f3->exists('IP')) $activity['remote'] = $this->f3->get('IP');
-        $user->addActivity($client->getStoreID(), $activity);
+        $result_event = new ProtocolResultEvent(self::CHECKID_OK, $user, $client);
+        $dispatcher->dispatch($result_event);
 
         if ($request->paramContains('response_type', 'code')) {
             $additional = [];

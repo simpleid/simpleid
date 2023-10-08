@@ -215,6 +215,20 @@ return [
     'log_level' => 'warning',
 
     /*
+     * Whether to use a geolocation service to log the location of auditable
+     * events.
+     *
+     * If enabled, this uses the `geoip` PECL extension to query an installed
+     * GeoIP database.  If the PECL extension is not installed, this uses a web
+     * service to query the location information, which may negatively affect
+     * performance.
+     *
+     * @see http://fatfreeframework.com/3.8/geo#location
+     * @see https://www.php.net/manual/en/ref.geoip.php
+     */
+    'log_location' => false,
+
+    /*
      * Debugging mode.
      *
      * Setting this to a number greater than `0` enables debugging mode. In debugging

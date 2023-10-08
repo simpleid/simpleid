@@ -44,6 +44,7 @@ $default_config = [
     'logger' => 'SimpleID\Util\DefaultLogger',
     'log_file' => '',
     'log_level' => 'info',
+    'log_location' => false,
     'date_time_format' => 'Y-m-d H:i:s T',
     'acr' => 1,
     'required_modules' => [

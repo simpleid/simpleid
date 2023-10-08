@@ -25,7 +25,6 @@ namespace SimpleID\Auth;
 use \Base;
 use \Cache;
 use \Prefab;
-use \Web\Geo;
 use Psr\Log\LogLevel;
 use SimpleID\ModuleManager;
 use SimpleID\Store\StoreManager;
@@ -258,6 +257,25 @@ class AuthManager extends Prefab {
 
             $this->assignUALoginState(true);
         }
+        if ($level > self::AUTH_LEVEL_AUTO)
+            $this->logger->log(LogLevel::INFO, 'Login successful: ' . $user['uid']);
+
+        $event = new LoginEvent($result, $form_state);
+        \Events::instance()->dispatch($event);
+    }
+
+    /**
+     * Saves the login event in the user's activity log.
+     *
+     * @see LoginEvent
+     * @return void
+     */
+    public function onLoginEvent(LoginEvent $event) {
+        $store = StoreManager::instance();
+        $user = $event->getUser();
+        $level = $event->getAuthLevel();
+        $form_state = $event->getFormState();
+        $modules = $event->getAuthResult()->getAuthModuleNames();
 
         if ($level > self::AUTH_LEVEL_AUTO) {
             if (!isset($form_state['auth_skip_activity'])) {
@@ -265,20 +283,15 @@ class AuthManager extends Prefab {
                     'type' => 'browser',
                     'level' => $level,
                     'modules' => $modules,
-                    'time' => $this->f3->get('SESSION.auth.time'),
+                    'time' => $event->getTime()->getTimestamp(),
                 ];
-                if ($this->f3->exists('IP')) $activity['remote'] = $this->f3->get('IP');
-                if ($this->f3->exists('HEADERS.User-Agent')) $activity['ua'] = $this->f3->get('HEADERS.User-Agent');
+                if ($event->getIP()) $activity['remote'] = $event->getIP();
+                if ($event->getUserAgent()) $activity['ua'] = $event->getUserAgent();
 
                 $user->addActivity($this->assignUAID(), $activity);
                 $store->saveUser($user);
             }
-        
-            $this->logger->log(LogLevel::INFO, 'Login successful: ' . $user['uid']);
         }
-
-        $event = new LoginEvent($result, $form_state);
-        \Events::instance()->dispatch($event);
     }
 
     /**
