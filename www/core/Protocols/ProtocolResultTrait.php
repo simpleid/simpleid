@@ -24,8 +24,15 @@ namespace SimpleID\Protocols;
 
 
 /**
- * A utility trait events dealing with assertion results
- * from identity protocols
+ * A utility trait dealing with collecting assertion results
+ * from identity protocols.
+ * 
+ * This trait provides the {@link setResult()} method, which
+ * updates the assertion result only if it is worse than
+ * the existing stored assertion result (if any).
+ * 
+ * The final assertion result can be obtained from the 
+ * {@link getResult()} method.
  */
 trait ProtocolResultTrait {
     /** @var int */

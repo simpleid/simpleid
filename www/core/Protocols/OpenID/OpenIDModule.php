@@ -221,8 +221,9 @@ class OpenIDModule extends Module implements ProtocolResult {
      * {@link simpleid_checkid_identity()} to see whether the user logged on into SimpleID
      * matches the identity supplied in the OpenID request.
      *
-     * If the authentication request is not about an identity, this function calls
-     * the {@link hook_checkid() checkid hook} of the loaded extensions.
+     * If the authentication request is not about an identity, this function dispatches
+     * a {@link OpenIDCheckEvent}, which can be listened to by other extension
+     * modules.
      *
      * Depending on the OpenID version, this function will supply an appropriate
      * assertion.
