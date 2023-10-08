@@ -41,8 +41,8 @@ use SimpleID\Util\Events\BaseDataCollectionEvent;
 use SimpleJWT\Util\Helper;
 use SimpleJWT\JWT;
 use SimpleJWT\InvalidTokenException;
-use SimpleJWT\Crypt\Algorithm;
 use SimpleJWT\Crypt\AlgorithmFactory;
+use SimpleJWT\Crypt\AlgorithmInterface;
 use SimpleJWT\Keys\KeySet;
 use \Web;
 
@@ -140,7 +140,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
             try {
                 AlgorithmFactory::addNoneAlg();
                 $helper = new Helper($request['request']);
-                $jwt = $helper->getJWTObject($set, $jwe_alg, $jwt_alg);
+                $jwt = $helper->decodeFully($set, $jwe_alg, $jwt_alg);
                 $request->loadData($jwt->getClaims());
             } catch (\UnexpectedValueException $e) {
                 $this->logger->log(LogLevel::ERROR, 'Invalid OpenID request object: ' . $e->getMessage());
@@ -553,9 +553,9 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
         $dispatcher->dispatch($scope_info_event);
         $scopes = $scope_info_event->getScopeInfoForType('oauth');
 
-        $jwt_signing_algs = AlgorithmFactory::getSupportedAlgs(Algorithm::SIGNATURE_ALGORITHM);
-        $jwt_encryption_algs = AlgorithmFactory::getSupportedAlgs(Algorithm::KEY_ALGORITHM);
-        $jwt_encryption_enc_algs = AlgorithmFactory::getSupportedAlgs(Algorithm::ENCRYPTION_ALGORITHM);
+        $jwt_signing_algs = AlgorithmFactory::getSupportedAlgs(AlgorithmInterface::SIGNATURE_ALGORITHM);
+        $jwt_encryption_algs = AlgorithmFactory::getSupportedAlgs(AlgorithmInterface::KEY_ALGORITHM);
+        $jwt_encryption_enc_algs = AlgorithmFactory::getSupportedAlgs(AlgorithmInterface::ENCRYPTION_ALGORITHM);
 
         $claims_supported = [ 'sub', 'iss', 'auth_time', 'acr' ];
         foreach ($scopes as $scope => $settings) {
