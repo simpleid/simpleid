@@ -139,7 +139,7 @@ class AuthManager extends Prefab {
         $this->logger->log(LogLevel::DEBUG, 'SimpleID\Auth\AuthManager->initUser');
 
         if ($this->f3->exists('SESSION.auth') && ($this->cache->get(rawurlencode($this->f3->get('SESSION.auth.uid')) . '.login') == session_id())) {
-            $this->auth_info = $this->f3->get('SESSION.auth.uid');
+            $this->auth_info = $this->f3->get('SESSION.auth');
 
             $store = StoreManager::instance();
             $user = $store->loadUser($this->auth_info['uid']);
