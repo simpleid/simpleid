@@ -2,7 +2,7 @@
 /*
  * SimpleID
  *
- * Copyright (C) Kelvin Mo 2009-2023
+ * Copyright (C) Kelvin Mo 2009-2024
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
