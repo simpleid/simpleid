@@ -25,7 +25,7 @@ namespace SimpleID\Protocols\OpenID;
 use Psr\Log\LogLevel;
 use SimpleID\Module;
 use SimpleID\ModuleManager;
-use SimpleID\Base\IndexEvent;
+use SimpleID\Base\RouteContentNegotiationEvent;
 use SimpleID\Base\ScopeInfoCollectionEvent;
 use SimpleID\Auth\AuthManager;
 use SimpleID\Crypt\Random;
@@ -71,11 +71,11 @@ class OpenIDModule extends Module implements ProtocolResult {
     /**
      * @return void
      */
-    public function onIndexEvent(IndexEvent $event) {
-        $_request = $event->getRequest();
+    public function onRouteContentNegotiationEvent(RouteContentNegotiationEvent $event) {
+        if ($event->getRoute() != 'index') return;
 
-        $web = \Web::instance();
-        $content_type = $web->acceptable([ 'text/html', 'application/xml', 'application/xhtml+xml', 'application/xrds+xml' ]);
+        $_request = $event->getRequest();
+        $content_type = $event->negotiate([ 'text/html', 'application/xml', 'application/xhtml+xml', 'application/xrds+xml' ]);
 
         if (isset($_request['openid.mode'])) {
             $this->start(new Request($_request));
