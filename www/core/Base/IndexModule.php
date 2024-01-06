@@ -34,7 +34,7 @@ use SimpleID\Util\UI\Template;
  */
 class IndexModule extends Module {
     static function init($f3) {
-        $f3->route('GET|POST /', 'SimpleID\Base\IndexModule->index');
+        $f3->route('GET|POST @index: /', 'SimpleID\Base\IndexModule->index');
         $f3->route('GET|POST /continue/@token', 'SimpleID\Base\IndexModule->continueRequest');
     }
 
@@ -56,7 +56,7 @@ class IndexModule extends Module {
         $this->logger->log(LogLevel::DEBUG, 'SimpleID\Base\IndexModule->index');
         header('Vary: Accept');
 
-        $event = new IndexEvent($_REQUEST);
+        $event = new RouteContentNegotiationEvent($this->f3->get('ALIAS'), $this->f3->get('REQUEST'), $this->f3->get('SERVER.HTTP_ACCEPT'));
         $dispatcher = \Events::instance();
         $dispatcher->dispatch($event);
         if ($event->isPropagationStopped()) return;
