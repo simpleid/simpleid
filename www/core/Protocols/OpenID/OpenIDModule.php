@@ -72,21 +72,32 @@ class OpenIDModule extends Module implements ProtocolResult {
      * @return void
      */
     public function onRouteContentNegotiationEvent(RouteContentNegotiationEvent $event) {
-        if ($event->getRoute() != 'index') return;
-
-        $_request = $event->getRequest();
+        $route = $event->getRoute();
         $content_type = $event->negotiate([ 'text/html', 'application/xml', 'application/xhtml+xml', 'application/xrds+xml' ]);
 
-        if (isset($_request['openid.mode'])) {
-            $this->start(new Request($_request));
-            $event->stopPropagation();
-        } elseif ($content_type == 'application/xrds+xml') {
-            $this->providerXRDS();
-            $event->stopPropagation();
-        } else {
-            // Point to SimpleID's XRDS document
-            header('X-XRDS-Location: ' . $this->getCanonicalURL('@openid_provider_xrds'));
-            return;
+        switch ($route) {
+            case 'index':
+                $_request = $event->getRequest();
+
+                if (isset($_request['openid.mode'])) {
+                    $this->start(new Request($_request));
+                    $event->stopPropagation();
+                } elseif ($content_type == 'application/xrds+xml') {
+                    $this->providerXRDS();
+                    $event->stopPropagation();
+                } else {
+                    // Point to SimpleID's XRDS document
+                    header('X-XRDS-Location: ' . $this->getCanonicalURL('@openid_provider_xrds'));
+                    return;
+                }
+                break;
+
+            case 'user':
+                if ($content_type == 'application/xrds+xml') {
+                    $this->userXRDS();
+                    $event->stopPropagation();
+                }
+                break;
         }
     }
 
@@ -1016,13 +1027,11 @@ class OpenIDModule extends Module implements ProtocolResult {
     /**
      * Returns the user's public XRDS page.
      * 
-     * @param \Base $f3
-     * @param array<string, mixed> $params
      * @return void
      */
-    public function userXRDS($f3, $params) {
+    public function userXRDS() {
         $store = StoreManager::instance();
-        $user = $store->loadUser($params['uid']);
+        $user = $store->loadUser($this->f3->get('PARAMS.uid'));
         
         if ($user != NULL) {
             $tpl = Template::instance();
@@ -1033,7 +1042,7 @@ class OpenIDModule extends Module implements ProtocolResult {
             header('Content-Disposition: inline; filename=yadis.xml');
             print $tpl->render('openid_user_xrds.xml', 'application/xrds+xml');
         } else {
-            $this->fatalError($this->f3->get('intl.common.user_not_found', $params['uid']), 404);
+            $this->fatalError($this->f3->get('intl.common.user_not_found', $this->f3->get('PARAMS.uid')), 404);
         }
     }
 

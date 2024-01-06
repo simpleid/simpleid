@@ -34,7 +34,7 @@ use SimpleID\Util\UI\Template;
 
 class UserModule extends Module {
     static function init($f3) {
-        $f3->route('GET /user/@uid', 'SimpleID\Base\UserModule->user');
+        $f3->route('GET @user: /user/@uid', 'SimpleID\Base\UserModule->user');
     }
 
     /**
@@ -62,32 +62,24 @@ class UserModule extends Module {
                 $this->f3->set('message', $this->f3->get('intl.common.user_not_found', $params['uid']));
             } else {
                 header('Vary: Accept');
-                
-                $content_type = $web->acceptable([ 'text/html', 'application/xml', 'application/xhtml+xml', 'application/xrds+xml', 'application/json' ]);
-                
-                if (($content_type == 'application/xrds+xml') && ($mgr->isModuleLoaded('SimpleID\Protocols\OpenID\OpenIDModule'))) {
-                    /** @var \SimpleID\Protocols\OpenID\OpenIDModule $openid_module */
-                    $openid_module = $mgr->getModule('SimpleID\Protocols\OpenID\OpenIDModule');
-                    $openid_module->userXRDS($f3, $params);
-                    return;
-                } elseif (($content_type == 'application/json') && ($mgr->isModuleLoaded('SimpleID\Protocols\Connect\OpenID2MigrationModule'))) {
-                    /** @var \SimpleID\Protocols\Connect\OpenID2MigrationModule $migration_module */
-                    $migration_module = $mgr->getModule('SimpleID\Protocols\Connect\OpenID2MigrationModule');
-                    $migration_module->userJSON($f3, $params);
-                } else {
-                    $xrds_location = $this->getCanonicalURL('@openid_user_xrds');
-                    header('X-XRDS-Location: ' . $xrds_location);
-                    
-                    $this->f3->set('message', $this->f3->get('intl.core.user.user_page', $params['uid']));
-                    
-                    $this->f3->set('title', $user['uid']);
-                    $this->f3->set('xrds', $xrds_location);
-                    if ($user->hasLocalOpenIDIdentity()) {
-                        $this->f3->set('local_id', $user["identity"]);
-                    }
 
-                    $this->f3->set('head', 'openid_head.html');
+                $event = new RouteContentNegotiationEvent($this->f3->get('ALIAS'), $this->f3->get('REQUEST'), $this->f3->get('SERVER.HTTP_ACCEPT'));
+                $dispatcher = \Events::instance();
+                $dispatcher->dispatch($event);
+                if ($event->isPropagationStopped()) return;
+
+                $xrds_location = $this->getCanonicalURL('@openid_user_xrds');
+                header('X-XRDS-Location: ' . $xrds_location);
+                
+                $this->f3->set('message', $this->f3->get('intl.core.user.user_page', $params['uid']));
+                
+                $this->f3->set('title', $user['uid']);
+                $this->f3->set('xrds', $xrds_location);
+                if ($user->hasLocalOpenIDIdentity()) {
+                    $this->f3->set('local_id', $user["identity"]);
                 }
+
+                $this->f3->set('head', 'openid_head.html');
             }
         }
         

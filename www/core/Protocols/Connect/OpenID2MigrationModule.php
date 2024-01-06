@@ -26,6 +26,7 @@ use Psr\Log\LogLevel;
 use SimpleID\Module;
 use SimpleID\ModuleManager;
 use SimpleID\Auth\AuthManager;
+use SimpleID\Base\RouteContentNegotiationEvent;
 use SimpleID\Base\ScopeInfoCollectionEvent;
 use SimpleID\Store\StoreManager;
 
@@ -45,27 +46,39 @@ class OpenID2MigrationModule extends Module {
     }
 
     /**
+     * @return void
+     */
+    public function onRouteContentNegotiationEvent(RouteContentNegotiationEvent $event) {
+        if ($event->getRoute() != 'user') return;
+
+        $content_type = $event->negotiate([ 'text/html', 'application/xml', 'application/xhtml+xml', 'application/json' ]);
+
+        if ($content_type == 'application/json') {
+            $this->userJSON();
+            $event->stopPropagation();
+        }
+    }
+
+    /**
      * Returns the user's OpenID 2.0 verification page.
      *
-     * @param \Base $f3
-     * @param array<string, mixed> $params
      * @return void
      * @see SimpleID\Base\UserModule::user()
      */
-    public function userJSON($f3, $params) {
+    public function userJSON() {
         $mgr = ModuleManager::instance();
 
         /** @var \SimpleID\Protocols\Connect\ConnectModule $connect_module */
         $connect_module = $mgr->getModule('SimpleID\Protocols\Connect\ConnectModule');
         $iss = $connect_module->getCanonicalHost();
         $store = StoreManager::instance();
-        $user = $store->loadUser($params['uid']);
+        $user = $store->loadUser($this->f3->get('PARAMS.uid'));
         
         if ($user != NULL) {
             header('Content-Type: application/json');
             print json_encode([ 'iss' => $iss ]);
         } else {
-            $this->fatalError($this->f3->get('intl.common.user_not_found', $params['uid']), 404);
+            $this->fatalError($this->f3->get('intl.common.user_not_found', $this->f3->get('PARAMS.uid')), 404);
         }
     }
 
