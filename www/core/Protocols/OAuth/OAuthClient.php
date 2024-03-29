@@ -70,7 +70,7 @@ class OAuthClient extends Client {
      * with the client.
      * 
      * @param string $redirect_uri the redirect_uri to test
-     * @return true if the redirect_uri has been registered
+     * @return bool true if the redirect_uri has been registered
      */
     public function hasRedirectUri($redirect_uri) {
         $redirect_uri_found = false;
@@ -78,11 +78,13 @@ class OAuthClient extends Client {
         $is_native = (isset($this->container['oauth']['application_type'])) ? ($this->container['oauth']['application_type'] == 'native') : false;
 
         $redirect_uri_components = parse_url($redirect_uri);
-        if ($redirect_uri_components === false) return false;
+        if ($redirect_uri_components == false) return false;
 
         foreach ($this->container['oauth']['redirect_uris'] as $client_redirect_uri) {
             $client_redirect_uri_components = parse_url($client_redirect_uri);
-            if ($redirect_uri_components === false) continue;
+            if (($client_redirect_uri_components == false)
+                || !isset($client_redirect_uri_components['scheme'])
+                || !isset($client_redirect_uri_components['host'])) continue;
 
             // Quick check - if redirect_uri has a query component and the registered
             // one does not

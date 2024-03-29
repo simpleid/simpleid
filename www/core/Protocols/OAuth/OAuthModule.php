@@ -171,6 +171,7 @@ class OAuthModule extends Module implements ProtocolResult {
             return;
         }
         
+        /** @var \SimpleID\Protocols\OAuth\OAuthClient $client */
         $client = $store->loadClient($request['client_id'], 'SimpleID\Protocols\OAuth\OAuthClient');
         if ($client == NULL) {
             $this->logger->log(LogLevel::ERROR, 'Client with client_id not found: ' . $request['client_id']);
