@@ -219,6 +219,12 @@ class OAuthModule extends Module implements ProtocolResult {
                 return;
             }
         }
+
+        // 5. PKCE required for native clients - RFC 8252 section 8.1
+        if ($client->isNative() && $request->paramContains('response_type', 'code') && !isset($request['code_challenge'])) {
+            $this->logger->log(LogLevel::ERROR, 'Protocol Error: code_challenge required for native apps');
+            $response->setError('invalid_request', 'code_challenge required for native apps')->renderRedirect();
+        }
     }
 
     /**
