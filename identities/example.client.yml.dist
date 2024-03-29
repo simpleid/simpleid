@@ -50,7 +50,7 @@ oauth:
     # host part of the redirect URI must not be "localhost".
     #
     # If application_type is "native", each redirect URI must either be using a
-    # custom URI scheme OR "http" scheme with "localhost" as host
+    # custom URI scheme OR "http" scheme with "127.0.0.1" or "[::1]" as host
     #
     #
     redirect_uris: 
