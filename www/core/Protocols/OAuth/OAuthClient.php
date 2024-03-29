@@ -64,6 +64,47 @@ class OAuthClient extends Client {
 
         return (isset($this->container['oauth']['client_secret']));
     }
+
+    /**
+     * Returns whether a specified redirect_uri has been registered
+     * with the client.
+     * 
+     * @param string $redirect_uri the redirect_uri to test
+     * @return true if the redirect_uri has been registered
+     */
+    public function hasRedirectUri($redirect_uri) {
+        $redirect_uri_found = false;
+        
+        $is_native = (isset($this->container['oauth']['application_type'])) ? ($this->container['oauth']['application_type'] == 'native') : false;
+
+        $redirect_uri_components = parse_url($redirect_uri);
+        if ($redirect_uri_components === false) return false;
+
+        foreach ($this->container['oauth']['redirect_uris'] as $client_redirect_uri) {
+            $client_redirect_uri_components = parse_url($client_redirect_uri);
+            if ($redirect_uri_components === false) continue;
+
+            // Quick check - if redirect_uri has a query component and the registered
+            // one does not
+            if (!isset($client_redirect_uri_components['query']) && isset($redirect_uri_components['query'])) continue;
+
+            if ($is_native && ($client_redirect_uri_components['scheme'] == 'http')
+                && (($client_redirect_uri_components['host'] == '127.0.0.1') || ($client_redirect_uri_components['host'] == '[::1]'))) {
+                // For native applications with http loopback, we remove the port number
+                // before making the comparison
+                $request_redirect_uri = preg_replace('!(http://(127\.0\.0\.1|\[::1\]))(:\d+)?!', '$1', $redirect_uri);
+            } else {
+                $request_redirect_uri = $redirect_uri;
+            }
+
+            if (strcasecmp(substr($request_redirect_uri, 0, strlen($client_redirect_uri)), $client_redirect_uri) === 0) {
+                $redirect_uri_found = true;
+                break;
+            }
+        }
+
+        return $redirect_uri_found;
+    }
 }
 
 ?>
