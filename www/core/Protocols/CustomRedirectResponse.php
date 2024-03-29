@@ -2,7 +2,7 @@
 /*
  * SimpleID
  *
- * Copyright (C) Kelvin Mo 2014-2024
+ * Copyright (C) Kelvin Mo 2024
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,38 +22,41 @@
 namespace SimpleID\Protocols;
 
 use \Base;
-use SimpleID\Util\ArrayWrapper;
 use SimpleID\Util\UI\Template;
 
 /**
- * A class representing a response to be rendered using an HTML
- * form.
+ * A class representing a response redirecting to a custom URL scheme,
+ * typically used by native apps.
+ * 
+ * This response is rendered with an HTML page to provide instructions
+ * in relation to a browser prompt.
  */
-class FormResponse extends ArrayWrapper {
+class CustomRedirectResponse {
+    /** @var string $url */
+    protected $url;
+
     /**
-     * Creates a form response.
+     * Creates a custom redirect response.
      *
-     * @param array<string, string> $data the initial response parameters
+     * @param string $url the redirect rul
      */
-    public function __construct($data = []) {
-        parent::__construct($data);
+    public function __construct($url) {
+        $this->url = $url;
     }
 
     /**
-     * Renders the response as a POST request.
+     * Renders the response.
      *
-     * @param string $url the URL to which the response is sent
      * @return void
      */
-    public function render($url) {
+    public function render() {
         $f3 = Base::instance();
         $tpl = Template::instance();
 
         $f3->set('page_class', 'is-dialog-page is-loading');
-        $f3->set('title', $f3->get('intl.common.please_wait'));
-        $f3->set('layout', 'post.html');
-        $f3->set('url', $url);
-        $f3->set('params', $this->container);
+        $f3->set('title', $f3->get('intl.common.launching_native_app'));
+        $f3->set('layout', 'redirect_native.html');
+        $f3->set('url', $this->url);
 
         header('X-Frame-Options: DENY');
         print $tpl->render('page.html');

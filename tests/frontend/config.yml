@@ -140,6 +140,14 @@ tests:
         params:
           foo: bar
 
+  native_app.html:
+    - template: page.html
+      variables:
+        page_class: is-dialog-page is-loading
+        layout: redirect_native.html
+        title: Launching...
+        url: ms-excel:ofv|u|http://localhost/poc.xls
+
   upgrade_access_denied.html:
     - template: page.html
       variables:

@@ -171,6 +171,7 @@ class OAuthModule extends Module implements ProtocolResult {
             return;
         }
         
+        /** @var \SimpleID\Protocols\OAuth\OAuthClient $client */
         $client = $store->loadClient($request['client_id'], 'SimpleID\Protocols\OAuth\OAuthClient');
         if ($client == NULL) {
             $this->logger->log(LogLevel::ERROR, 'Client with client_id not found: ' . $request['client_id']);
@@ -185,21 +186,7 @@ class OAuthModule extends Module implements ProtocolResult {
         // 3. redirect_uri
         if (isset($request['redirect_uri'])) {
             // Validate against client registration for public clients and implicit grant types
-            $redirect_uri_found = false;
-
-            $request_redirect_uri_has_query = (parse_url($request['redirect_uri'], PHP_URL_QUERY) != null);
-            
-            foreach ($client['oauth']['redirect_uris'] as $test_redirect_uri) {
-                $test_redirect_uri_has_query = (parse_url($test_redirect_uri, PHP_URL_QUERY) != null);
-                if (!$test_redirect_uri_has_query && $request_redirect_uri_has_query) continue;
-
-                if (strcasecmp(substr($request['redirect_uri'], 0, strlen($test_redirect_uri)), $test_redirect_uri) === 0) {
-                    $redirect_uri_found = true;
-                    break;
-                }
-            }
-            
-            if (!$redirect_uri_found) {
+            if (!$client->hasRedirectUri($request['redirect_uri'])) {
                 $this->logger->log(LogLevel::ERROR, 'Incorrect redirect URI: ' . $request['redirect_uri']);
                 $this->fatalError($this->f3->get('intl.core.oauth.invalid_redirect_uri'), 400);
                 return;
@@ -231,6 +218,12 @@ class OAuthModule extends Module implements ProtocolResult {
                 $response->setError('unsupported_response_type', 'unsupported response_type: ' . $response_type)->renderRedirect();
                 return;
             }
+        }
+
+        // 5. PKCE required for native clients - RFC 8252 section 8.1
+        if ($client->isNative() && $request->paramContains('response_type', 'code') && !isset($request['code_challenge'])) {
+            $this->logger->log(LogLevel::ERROR, 'Protocol Error: code_challenge required for native apps');
+            $response->setError('invalid_request', 'code_challenge required for native apps')->renderRedirect();
         }
     }
 

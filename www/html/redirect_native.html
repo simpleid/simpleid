@@ -1,0 +1,17 @@
+<div x-init="$nextTick(() => { if (!test) window.location.replace(url); })" x-data="{ url: {{ @url | js, raw }}, test: {{ @@frontend_test ? 'true' : 'false' }} }">
+
+    <div class="loading-spinner is-large"></div>
+    
+    <div>
+        <div class="form-item">
+            <p>{{ @intl.common.native_link_prompt | raw }}</p>
+        </div>
+
+        <div class="form-item">
+            <p>{{ @intl.common.click_native_link | raw }}</p>
+        </div>
+        
+        <button class="is-default" x-on:click="window.location.replace(url);">{{ @intl.common.launch_native_link }}</button>
+    </div>
+
+</div>
