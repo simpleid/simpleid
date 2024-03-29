@@ -104,7 +104,7 @@ class OAuthClient extends Client {
             // one does not
             if (!isset($client_redirect_uri_components['query']) && isset($redirect_uri_components['query'])) continue;
 
-            if ($is_native && ($client_redirect_uri_components['scheme'] == 'http')
+            if ($is_native && (strtolower($client_redirect_uri_components['scheme']) == 'http')
                 && (($client_redirect_uri_components['host'] == '127.0.0.1') || ($client_redirect_uri_components['host'] == '[::1]'))) {
                 // For native applications with http loopback, we remove the port number
                 // before making the comparison

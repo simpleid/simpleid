@@ -22,6 +22,7 @@
 namespace SimpleID\Protocols\OAuth;
 
 use \Base;
+use SimpleID\Protocols\CustomRedirectResponse;
 use SimpleID\Protocols\FormResponse;
 use SimpleID\Util\ArrayWrapper;
 
@@ -176,6 +177,8 @@ class Response extends ArrayWrapper {
 
         if ($this->response_mode == self::FORM_POST_RESPONSE_MODE) $this->renderFormPost($redirect_uri);
 
+        $parts = parse_url($redirect_uri);
+
         // 1. Firstly, get the query string
         $query = str_replace([ '+', '%7E' ], [ '%20', '~' ], http_build_query($this->container));
         
@@ -186,7 +189,6 @@ class Response extends ArrayWrapper {
             // 3. The URL may already have a query and a fragment.  If this is so, we
             //    need to slot in the new query string properly.  We disassemble and
             //    reconstruct the URL.
-            $parts = parse_url($redirect_uri);
             if ($parts == false) {
                 $url = $redirect_uri;
             } else {
@@ -216,9 +218,14 @@ class Response extends ArrayWrapper {
                 }
             }
         }
-
-        $f3->status(303);
-        header('Location: ' . $url);
+        
+        if (isset($parts['scheme']) && ((strtolower($parts['scheme']) == 'https') || (strtolower($parts['scheme']) == 'http'))) {
+            $f3->status(303);
+            header('Location: ' . $url);
+        } else {
+            $redirect = new CustomRedirectResponse($url);
+            $redirect->render();
+        }
     }
 
     /**
