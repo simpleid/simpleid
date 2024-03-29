@@ -147,7 +147,7 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
             }
 
             if (($application_type == 'web') && in_array('implicit', $grant_types)) {
-                if ((strtolower($parts['scheme']) != 'https') || (strtolower($parts['host']) == 'localhost') && ($parts['host'] == '127.0.0.1')) {
+                if ((strtolower($parts['scheme']) != 'https') || ($parts['host'] == '127.0.0.1') || ($parts['host'] == '[::1]')) {
                     $response->setError('invalid_redirect_uri', 'implicit grant type must use https URIs')->renderJSON();
                     return;
                 }
@@ -156,9 +156,9 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
                 // Authorization Servers MAY place additional constraints on Native Clients.
                 // Authorization Servers MAY reject Redirection URI values using the http scheme, other than the localhost case for Native Clients.
                 // The Authorization Server MUST verify that all the registered redirect_uris conform to these constraints. This prevents sharing a Client ID across different types of Clients.
-                if (((strtolower($parts['scheme']) == 'http') && ((strtolower($parts['host']) != 'localhost') || ($parts['host'] != '127.0.0.1')))
+                if (((strtolower($parts['scheme']) == 'http') && ((strtolower($parts['host']) != '127.0.0.1') || ($parts['host'] != '[::1]')))
                     || (strtolower($parts['scheme']) == 'https')) {
-                    $response->setError('invalid_redirect_uri', 'native clients cannot use https URIs')->renderJSON();
+                    $response->setError('invalid_redirect_uri', 'native clients cannot use https URIs or http URIs with non-loopback addresses')->renderJSON();
                     return;
                 }
             }
