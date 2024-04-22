@@ -32,6 +32,30 @@ namespace SimpleID\Util\UI;
  */
 interface AttachmentManagerInterface {
     /**
+     * Constant specifying the attachment type for CSS stylesheets.
+     * 
+     * The attachment should be specified as an array with one of the following keys:
+     * 
+     * - inline: the css code to be emdedded
+     * - src: the path to the stylesheet
+     */
+    const CSS_ATTACHMENT = 'css';
+
+    /**
+     * Constant specifying the attachment type for Javascript.
+     * 
+     * The attachment should be specified as an array with one of inline or src,
+     * plus zero or more of the following keys:
+     * 
+     * - inline: the Javascript code to be emdedded
+     * - src: the path to the script to load
+     * - defer: value of the defer attribute
+     * - async: value of the async attribute
+     * - type: value of the type attribute
+     */
+    const JS_ATTACHMENT = 'js';
+
+    /**
      * Adds an attachment.
      * 
      * @param string $attachment_type the type of attachment

@@ -120,9 +120,10 @@
 
     <check if="{{ @@attachments.js }}">
       <repeat group="{{ @attachments.js }}" value="{{ @attachment }}">
+        <set script_type="{{ @@attachment.type ? @attachment.type : 'text/javascript' }}">
         <check if="{{ @@attachment.src }}">
-          <true><script type="text/javascript" src="{{ @base_path }}{{ @attachment.src }}" {{ @@attachment.defer, 'defer' | attr, raw }} {{ @@attachment.async, 'async' | attr, raw }}></script></true>
-          <false><script type="text/javascript">{{ @@attachment.inline | raw }}</script></false>
+          <true><script type="{{ @script_type }}" src="{{ @base_path }}{{ @attachment.src }}" {{ @@attachment.defer, 'defer' | attr, raw }} {{ @@attachment.async, 'async' | attr, raw }}></script></true>
+          <false><script type="{{ @script_type }}" {{ @@attachment.defer, 'defer' | attr, raw }}>{{ @@attachment.inline | raw }}</script></false>
         </check>
       </repeat>
     </check>
