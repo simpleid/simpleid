@@ -54,7 +54,15 @@ interface AuthResultInterface extends StoppableEventInterface {
      * 
      * @return int the authentication level
      */
-    public function getAuthLevel();
+    public function getAuthLevel(): int;
+
+    /**
+     * Returns the authentication context class references in relation
+     * to the current authentication session.
+     *
+     * @return array<string|int> an array of ACR values
+     */
+    public function getACR(): array;
 
     /**
      * Returns the name of the modules that used to
@@ -63,7 +71,7 @@ interface AuthResultInterface extends StoppableEventInterface {
      * @return array<string> an array of fully qualified class names of the modules
      * involved in the authentication process
      */
-    public function getAuthModuleNames();
+    public function getAuthModuleNames(): array;
 }
 
 ?>

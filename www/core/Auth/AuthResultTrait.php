@@ -39,6 +39,9 @@ trait AuthResultTrait {
     /** @var array<string> */
     protected $auth_module_names = [];
 
+    /** @var array<string|int> */
+    protected $acr = [];
+
     /**
      * Returns the authenticated user
      * 
@@ -49,10 +52,23 @@ trait AuthResultTrait {
     }
 
     /**
-     * {@inheritdoc}
+     * Returns the level of authentication achieved in this
+     * session
+     * 
+     * @see AuthResultInterface::getAuthLevel()
      */
-    public function getAuthLevel() {
+    public function getAuthLevel(): int {
         return $this->auth_level;
+    }
+
+    /**
+     * Returns the authentication context class references in relation
+     * to the current authentication session.
+     *
+     * @see AuthResultInterface::getACR()
+     */
+    public function getACR(): array {
+        return $this->acr;
     }
 
     /**
@@ -60,7 +76,7 @@ trait AuthResultTrait {
      * 
      * @return array<string> the name of the modules
      */
-    public function getAuthModuleNames() {
+    public function getAuthModuleNames(): array {
         return array_unique($this->auth_module_names);
     }
 }

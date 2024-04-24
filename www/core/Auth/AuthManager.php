@@ -125,7 +125,7 @@ class AuthManager extends Prefab {
 
     /** 
      * Authentication information for the current session, usually loaded
-     * from a cookie.
+     * from a session variable.
      * 
      * @var array<string, mixed> 
      */
@@ -230,26 +230,14 @@ class AuthManager extends Prefab {
      * Returns the authentication context class references in relation
      * to the current authentication session.
      *
-     * @todo Move to part of the login event
      * @return string the ACR
      */
     public function getACR() {
-        $default_acr = $this->f3->get('config.acr');
-
-        if (isset($this->auth_info['modules'])) {
-            $event = new BaseDataCollectionEvent('acr');
-
-            foreach ($this->auth_info['modules'] as $module_name) {
-                /** @var string $module_name */
-                if (method_exists($module_name, 'onAcr')) {
-                    $module = $this->mgr->getModule($module_name);
-                    $module->onAcr($event);  // @phpstan-ignore-line
-                }
-            }
-            $module_acr = implode(' ', $event->getResults());
+        if (isset($this->auth_info['acr'])) {
+            return implode(' ', $this->auth_info['acr']);
+        } else {
+            return $this->f3->get('config.acr');
         }
-
-        return (isset($module_acr)) ? $module_acr : $default_acr;
     }
 
     /**
@@ -272,6 +260,7 @@ class AuthManager extends Prefab {
         $user = $result->getUser();
         $level = $result->getAuthLevel();
         $modules = $result->getAuthModuleNames();
+        $acr = $result->getACR();
 
         if (($user == null) && isset($form_state['uid'])) {
             $user = $store->loadUser($form_state['uid']);
@@ -283,6 +272,7 @@ class AuthManager extends Prefab {
         $this->auth_info['level'] = $level;
         $this->auth_info['modules'] = $modules;
         $this->auth_info['time'] = time();
+        if (count($acr) > 0) $this->auth_info['acr'] = $acr;
 
         if ($level >= self::AUTH_LEVEL_NON_INTERACTIVE) {
             $this->f3->set('SESSION.auth', $this->auth_info);
