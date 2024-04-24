@@ -20,7 +20,7 @@ tests:
   auth_login.html:
     - template: auth_password.html
       variables:
-        login_form_module: auth_password
+        login_form_module: password
         submit_button: Log in
       set: form_content
 
