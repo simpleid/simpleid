@@ -26,7 +26,7 @@ use SimpleID\Models\User;
 use SimpleID\Util\Events\BaseEvent;
 
 /**
- * Event to attempt to automatically login using credentials presented
+ * Event to attempt to login non-interactively using credentials presented
  * by the user agent.
  *
  * This event is created by the {@link SimpleID\Auth\AuthManager::initUser()}
@@ -36,12 +36,15 @@ use SimpleID\Util\Events\BaseEvent;
  * This event is stopped once a user has been set.
  * 
  */
-class AutoAuthEvent extends BaseEvent implements AuthResultInterface {
+class NonInteractiveAuthEvent extends BaseEvent implements AuthResultInterface {
     /** @var User|null */
     protected $user = null;
 
     /** @var string|null */
     protected $auth_module_name = null;
+
+    /** @var int */
+    protected $auth_level = AuthManager::AUTH_LEVEL_TOKEN;
 
     /**
      * {@inheritdoc}
@@ -74,10 +77,22 @@ class AutoAuthEvent extends BaseEvent implements AuthResultInterface {
     }
 
     /**
+     * Sets the authentication level
+     * 
+     * @param int $auth_level the authentication level
+     * @return void
+     */
+    public function setAuthLevel(int $auth_level) {
+        if ($auth_level > AuthManager::AUTH_LEVEL_NON_INTERACTIVE)
+            throw new \InvalidArgumentException('Cannot set authentication level higher than AUTH_LEVEL_NON_INTERACTIVE');
+        $this->auth_level = $auth_level;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getAuthLevel() {
-        return AuthManager::AUTH_LEVEL_AUTO;
+        return $this->auth_level;
     }
 
     /**

@@ -23,7 +23,7 @@
 namespace SimpleID\Auth;
 
 use Psr\Log\LogLevel;
-use SimpleID\Auth\AutoAuthEvent;
+use SimpleID\Auth\NonInteractiveAuthEvent;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\Events\BaseDataCollectionEvent;
 
@@ -35,10 +35,10 @@ class CertAuthSchemeModule extends AuthSchemeModule {
     /**
      * Attempts to automatically login using the client certificate
      * 
-     * @param AutoAuthEvent $event the event
+     * @param NonInteractiveAuthEvent $event the event
      * @return void
      */
-    public function onAutoAuthEvent(AutoAuthEvent $event) {
+    public function onNonInteractiveAuthEvent(NonInteractiveAuthEvent $event) {
         if (!$this->hasClientCert()) return;
 
         $cert = trim($_SERVER['SSL_CLIENT_M_SERIAL']) . ';' . trim($_SERVER['SSL_CLIENT_I_DN']);
@@ -50,6 +50,7 @@ class CertAuthSchemeModule extends AuthSchemeModule {
         if ($test_user != NULL) {
             $this->logger->log(LogLevel::DEBUG, 'Client SSL certificate accepted for ' . $test_user['uid']);
             $event->setUser($test_user, static::class);
+            $event->setAuthLevel(AuthManager::AUTH_LEVEL_NON_INTERACTIVE);
         } else {
             $this->logger->log(LogLevel::DEBUG, 'Client SSL certificate presented, but no user with that certificate exists.');
         }

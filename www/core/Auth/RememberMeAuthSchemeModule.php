@@ -23,7 +23,7 @@
 namespace SimpleID\Auth;
 
 use Psr\Log\LogLevel;
-use SimpleID\Auth\AutoAuthEvent;
+use SimpleID\Auth\NonInteractiveAuthEvent;
 use SimpleID\Crypt\Random;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
@@ -50,10 +50,10 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
     /**
      * Attempts to automatically login using the auto login cookie
      * 
-     * @see AutoAuthEvent
+     * @see NonInteractiveAuthEvent
      * @return void
      */
-    public function onAutoAuthEvent(AutoAuthEvent $event) {
+    public function onNonInteractiveAuthEvent(NonInteractiveAuthEvent $event) {
         if (!$this->f3->exists('COOKIE.' . $this->cookie_name)) return;
        
         $cookie = $this->f3->get('COOKIE.' . $this->cookie_name);
@@ -91,6 +91,7 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
         if ($test_user != NULL) {
             $this->logger->log(LogLevel::INFO, 'Automatic login token accepted for ' . $data['uid']);
             $event->setUser($test_user, static::class);
+            $event->setAuthLevel(AuthManager::AUTH_LEVEL_NON_INTERACTIVE);
         } else {
             $this->logger->log(LogLevel::WARNING, 'Automatic login token accepted for ' . $data['uid'] . ', but no such user exists');
         }
