@@ -26,7 +26,7 @@ use SimpleID\Models\User;
 use SimpleID\Util\Events\BaseEvent;
 
 /**
- * Event to attempt to automatically login using credentials presented
+ * Event to attempt to login non-interactively using credentials presented
  * by the user agent.
  *
  * This event is created by the {@link SimpleID\Auth\AuthManager::initUser()}
@@ -36,12 +36,15 @@ use SimpleID\Util\Events\BaseEvent;
  * This event is stopped once a user has been set.
  * 
  */
-class AutoAuthEvent extends BaseEvent implements AuthResultInterface {
-    /** @var User|null */
-    protected $user = null;
+class NonInteractiveAuthEvent extends BaseEvent implements AuthResultInterface {
+    use AuthResultTrait;
 
-    /** @var string|null */
-    protected $auth_module_name = null;
+    /**
+     * Creates a non-interactive authentication event
+     */
+    public function __construct() {
+        $this->auth_level = AuthManager::AUTH_LEVEL_TOKEN;
+    }
 
     /**
      * {@inheritdoc}
@@ -61,33 +64,19 @@ class AutoAuthEvent extends BaseEvent implements AuthResultInterface {
      */
     public function setUser(User $user, string $auth_module_name) {
         $this->user = $user;
-        $this->auth_module_name = $auth_module_name;
+        $this->auth_module_names[] = $auth_module_name;
     }
 
     /**
-     * Returns the authenticated user
+     * Sets the authentication level
      * 
-     * @return User the user
+     * @param int $auth_level the authentication level
+     * @return void
      */
-    public function getUser(): User {
-        return $this->user;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAuthLevel() {
-        return AuthManager::AUTH_LEVEL_AUTO;
-    }
-
-    /**
-     * Returns the name of the module that authenticated the user.
-     * 
-     * @return array<string> the name of the module
-     */
-    public function getAuthModuleNames() {
-        if ($this->auth_module_name == null) return [];
-        return [ $this->auth_module_name ];
+    public function setAuthLevel(int $auth_level) {
+        if ($auth_level > AuthManager::AUTH_LEVEL_NON_INTERACTIVE)
+            throw new \InvalidArgumentException('Cannot set authentication level higher than AUTH_LEVEL_NON_INTERACTIVE');
+        $this->auth_level = max($auth_level, $this->auth_level);
     }
 
     /**

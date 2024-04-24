@@ -2,7 +2,7 @@
 /*
  * SimpleID
  *
- * Copyright (C) Kelvin Mo 2021-2024
+ * Copyright (C) Kelvin Mo 2024
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,56 +22,61 @@
 
 namespace SimpleID\Auth;
 
-use Psr\EventDispatcher\StoppableEventInterface;
 use SimpleID\Models\User;
 
 /**
- * An interface for classes that can return an authentication result.
+ * A utility trait providing base functionality to implement
+ * {@link AuthResultInterface}
  * 
  */
-interface AuthResultInterface extends StoppableEventInterface {
-    /**
-     * Returns whether the authentication result was successful.
-     * 
-     * If the result was successful, the authentication parameters can
-     * be obtained through other methods in this interface
-     * 
-     * @return bool true if authentication was successful
-     */
-    public function isAuthSuccessful();
+trait AuthResultTrait {
+    /** @var User|null */
+    protected $user = null;
+
+    /** @var int */
+    protected $auth_level = AuthManager::AUTH_LEVEL_SESSION;
+
+    /** @var array<string> */
+    protected $auth_module_names = [];
+
+    /** @var array<string|int> */
+    protected $acr = [];
 
     /**
      * Returns the authenticated user
      * 
-     * @return User the user, or null if no users can
-     * be authenticated
+     * @return User the user
      */
-    public function getUser(): ?User;
+    public function getUser(): ?User {
+        return $this->user;
+    }
 
     /**
      * Returns the level of authentication achieved in this
      * session
      * 
-     * @return int the authentication level
+     * @see AuthResultInterface::getAuthLevel()
      */
-    public function getAuthLevel(): int;
+    public function getAuthLevel(): int {
+        return $this->auth_level;
+    }
 
     /**
      * Returns the authentication context class references in relation
      * to the current authentication session.
      *
-     * @return array<string|int> an array of ACR values
+     * @see AuthResultInterface::getACR()
      */
-    public function getACR(): array;
+    public function getACR(): array {
+        return $this->acr;
+    }
 
     /**
-     * Returns the name of the modules that used to
-     * authenticate the user in this session.
+     * Returns the name of the modules that authenticated user.
      * 
-     * @return array<string> an array of fully qualified class names of the modules
-     * involved in the authentication process
+     * @return array<string> the name of the modules
      */
-    public function getAuthModuleNames(): array;
+    public function getAuthModuleNames(): array {
+        return array_unique($this->auth_module_names);
+    }
 }
-
-?>

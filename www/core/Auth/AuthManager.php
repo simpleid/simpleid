@@ -70,12 +70,40 @@ use SimpleID\Util\Forms\FormState;
  */
 class AuthManager extends Prefab {
     const AUTH_LEVEL_SESSION = 0;
+    /**
+     * Constant denoting a non-interactive authentication level providing
+     * limited access to selected scopes.  Examples include OAuth tokens
+     * and app passwords.
+     */
     const AUTH_LEVEL_TOKEN = 1;
-    const AUTH_LEVEL_AUTO = 2;
+    /**
+     * Constant denoting a non-interactive authentication level providing
+     * full access.  Examples include certificate-based authentication
+     * schemes and "remember me" cookies set after a successful authentication
+     * at a higher level
+     */
+    const AUTH_LEVEL_NON_INTERACTIVE = 2;
+    /**
+     * Constant denoting an interactive authentication level with one
+     * credential successfully provided by the user or an external service.
+     * Examples include password authentication and federated authentication.
+     */
     const AUTH_LEVEL_CREDENTIALS = 3;
+    /**
+     * Constant denoting an interactive authentication level with one
+     * credential successfully provided by the user in the same browser
+     * session.  This is typically required for sensitive ("sudo") operations.
+     */
     const AUTH_LEVEL_REENTER_CREDENTIALS = 4;
+    /**
+     * Constant denoting an interactive authentication level with at least
+     * one physical factor provided and verified.  Examples include
+     * two factor authentication (where one factor is a physical factor)
+     * or passkey-based authentication
+     */
     const AUTH_LEVEL_VERIFIED = 5;
 
+    // constants for stages of the interactive authentication process
     const MODE_CREDENTIALS = self::AUTH_LEVEL_CREDENTIALS;
     const MODE_REENTER_CREDENTIALS = self::AUTH_LEVEL_REENTER_CREDENTIALS;
     const MODE_VERIFY = self::AUTH_LEVEL_VERIFIED;
@@ -95,7 +123,12 @@ class AuthManager extends Prefab {
     /** @var ModuleManager */
     protected $mgr;
 
-    /** @var array<string, mixed> */
+    /** 
+     * Authentication information for the current session, usually loaded
+     * from a session variable.
+     * 
+     * @var array<string, mixed> 
+     */
     private $auth_info = [];
 
     /** @var string|null */
@@ -128,14 +161,14 @@ class AuthManager extends Prefab {
      * Initialises the user system.  Loads data for the currently logged-in user,
      * if any.
      *
-     * If there is no logged in user and $auto_auth is set to true, the system
+     * If there is no logged in user and $allow_non_interactive is set to true, the system
      * queries the authentication scheme modules to determine whether a user can
-     * be logged in automatically
+     * be logged in with non-interactive authentication
      *
-     * @param bool $auto_auth performs automatic authentication
+     * @param bool $allow_non_interactive allows non-interactive authentication
      * @return void
      */
-    public function initUser($auto_auth = true) {
+    public function initUser($allow_non_interactive = true) {
         $this->logger->log(LogLevel::DEBUG, 'SimpleID\Auth\AuthManager->initUser');
 
         if ($this->f3->exists('SESSION.auth') && ($this->cache->get(rawurlencode($this->f3->get('SESSION.auth.uid')) . '.login') == session_id())) {
@@ -144,8 +177,8 @@ class AuthManager extends Prefab {
             $store = StoreManager::instance();
             $user = $store->loadUser($this->auth_info['uid']);
             $this->f3->set('user', $user);
-        } elseif ($auto_auth) {
-            $event = new AutoAuthEvent();
+        } elseif ($allow_non_interactive) {
+            $event = new NonInteractiveAuthEvent();
             \Events::instance()->dispatch($event);
 
             if ($event->isAuthSuccessful()) {
@@ -197,26 +230,14 @@ class AuthManager extends Prefab {
      * Returns the authentication context class references in relation
      * to the current authentication session.
      *
-     * @todo Move to part of the login event
      * @return string the ACR
      */
     public function getACR() {
-        $default_acr = $this->f3->get('config.acr');
-
-        if (isset($this->auth_info['modules'])) {
-            $event = new BaseDataCollectionEvent('acr');
-
-            foreach ($this->auth_info['modules'] as $module_name) {
-                /** @var string $module_name */
-                if (method_exists($module_name, 'onAcr')) {
-                    $module = $this->mgr->getModule($module_name);
-                    $module->onAcr($event);  // @phpstan-ignore-line
-                }
-            }
-            $module_acr = implode(' ', $event->getResults());
+        if (isset($this->auth_info['acr'])) {
+            return implode(' ', $this->auth_info['acr']);
+        } else {
+            return $this->f3->get('config.acr');
         }
-
-        return (isset($module_acr)) ? $module_acr : $default_acr;
     }
 
     /**
@@ -239,6 +260,7 @@ class AuthManager extends Prefab {
         $user = $result->getUser();
         $level = $result->getAuthLevel();
         $modules = $result->getAuthModuleNames();
+        $acr = $result->getACR();
 
         if (($user == null) && isset($form_state['uid'])) {
             $user = $store->loadUser($form_state['uid']);
@@ -250,14 +272,15 @@ class AuthManager extends Prefab {
         $this->auth_info['level'] = $level;
         $this->auth_info['modules'] = $modules;
         $this->auth_info['time'] = time();
+        if (count($acr) > 0) $this->auth_info['acr'] = $acr;
 
-        if ($level >= self::AUTH_LEVEL_AUTO) {
+        if ($level >= self::AUTH_LEVEL_NON_INTERACTIVE) {
             $this->f3->set('SESSION.auth', $this->auth_info);
             $this->cache->set(rawurlencode($user['uid']) . '.login', session_id());
 
             $this->assignUALoginState(true);
         }
-        if ($level > self::AUTH_LEVEL_AUTO)
+        if ($level > self::AUTH_LEVEL_NON_INTERACTIVE)
             $this->logger->log(LogLevel::INFO, 'Login successful: ' . $user['uid']);
 
         $event = new LoginEvent($result, $form_state);
@@ -277,7 +300,7 @@ class AuthManager extends Prefab {
         $form_state = $event->getFormState();
         $modules = $event->getAuthResult()->getAuthModuleNames();
 
-        if ($level > self::AUTH_LEVEL_AUTO) {
+        if ($level > self::AUTH_LEVEL_NON_INTERACTIVE) {
             if (!isset($form_state['auth_skip_activity'])) {
                 $activity = [
                     'type' => 'browser',
