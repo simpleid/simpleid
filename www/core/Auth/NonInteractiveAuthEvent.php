@@ -37,14 +37,14 @@ use SimpleID\Util\Events\BaseEvent;
  * 
  */
 class NonInteractiveAuthEvent extends BaseEvent implements AuthResultInterface {
-    /** @var User|null */
-    protected $user = null;
+    use AuthResultTrait;
 
-    /** @var string|null */
-    protected $auth_module_name = null;
-
-    /** @var int */
-    protected $auth_level = AuthManager::AUTH_LEVEL_TOKEN;
+    /**
+     * Creates a non-interactive authentication event
+     */
+    public function __construct() {
+        $this->auth_level = AuthManager::AUTH_LEVEL_TOKEN;
+    }
 
     /**
      * {@inheritdoc}
@@ -64,16 +64,7 @@ class NonInteractiveAuthEvent extends BaseEvent implements AuthResultInterface {
      */
     public function setUser(User $user, string $auth_module_name) {
         $this->user = $user;
-        $this->auth_module_name = $auth_module_name;
-    }
-
-    /**
-     * Returns the authenticated user
-     * 
-     * @return User the user
-     */
-    public function getUser(): User {
-        return $this->user;
+        $this->auth_module_names[] = $auth_module_name;
     }
 
     /**
@@ -85,24 +76,7 @@ class NonInteractiveAuthEvent extends BaseEvent implements AuthResultInterface {
     public function setAuthLevel(int $auth_level) {
         if ($auth_level > AuthManager::AUTH_LEVEL_NON_INTERACTIVE)
             throw new \InvalidArgumentException('Cannot set authentication level higher than AUTH_LEVEL_NON_INTERACTIVE');
-        $this->auth_level = $auth_level;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAuthLevel() {
-        return $this->auth_level;
-    }
-
-    /**
-     * Returns the name of the module that authenticated the user.
-     * 
-     * @return array<string> the name of the module
-     */
-    public function getAuthModuleNames() {
-        if ($this->auth_module_name == null) return [];
-        return [ $this->auth_module_name ];
+        $this->auth_level = max($auth_level, $this->auth_level);
     }
 
     /**

@@ -103,6 +103,7 @@ class AuthManager extends Prefab {
      */
     const AUTH_LEVEL_VERIFIED = 5;
 
+    // constants for stages of the interactive authentication process
     const MODE_CREDENTIALS = self::AUTH_LEVEL_CREDENTIALS;
     const MODE_REENTER_CREDENTIALS = self::AUTH_LEVEL_REENTER_CREDENTIALS;
     const MODE_VERIFY = self::AUTH_LEVEL_VERIFIED;
@@ -122,7 +123,12 @@ class AuthManager extends Prefab {
     /** @var ModuleManager */
     protected $mgr;
 
-    /** @var array<string, mixed> */
+    /** 
+     * Authentication information for the current session, usually loaded
+     * from a cookie.
+     * 
+     * @var array<string, mixed> 
+     */
     private $auth_info = [];
 
     /** @var string|null */
