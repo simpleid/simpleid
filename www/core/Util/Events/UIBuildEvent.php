@@ -62,8 +62,9 @@ class UIBuildEvent extends BaseEvent implements \GenericEventInterface, UIBuilde
     /**
      * {@inheritdoc}
      */
-    public function addBlock($id, $content, $weight = 0, $additional = []) {
-        return $this->builder->addBlock($id, $content, $weight, $additional);
+    public function addBlock(string $id, string $content, int $weight = 0, array $additional = []): UIBuildEvent {
+        $this->builder->addBlock($id, $content, $weight, $additional);
+        return $this;
     }
 
     /**
@@ -76,14 +77,14 @@ class UIBuildEvent extends BaseEvent implements \GenericEventInterface, UIBuilde
     /**
      * {@inheritdoc}
      */
-    public function getBlocks() {
+    public function getBlocks(): array {
         return $this->builder->getBlocks();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getBlockData() {
+    public function getBlockData(): array {
         return $this->builder->getBlockData();
     }
 
@@ -113,6 +114,13 @@ class UIBuildEvent extends BaseEvent implements \GenericEventInterface, UIBuilde
      */
     public function getAttachmentsByType(string $attachment_type) {
         return $this->builder->getAttachmentsByType($attachment_type);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset() {
+        $this->builder->reset();
     }
 }
 

@@ -30,7 +30,7 @@ namespace SimpleID\Util\UI;
  */
 trait AttachmentManagerTrait {
     /** @var array<string, array<mixed>> */
-    protected $attachments;
+    protected $attachments = [];
 
     /**
      * Adds an attachment.
@@ -96,6 +96,15 @@ trait AttachmentManagerTrait {
      */
     public function mergeAttachments(AttachmentManagerInterface $manager) {
         $this->attachments = array_merge_recursive($this->attachments, $manager->getAttachments());
+    }
+
+    /**
+     * Remove all attachments.
+     * 
+     * @return void
+     */
+    protected function resetAttachments() {
+        $this->attachments = [];
     }
 }
 
