@@ -108,7 +108,7 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
 
             $event->addAuthModuleName(self::class);
             $event->setUser($test_user);
-            $event->setAuthLevel($form_state['mode']);
+            $event->setAuthLevel(($form_state['mode'] == AuthManager::MODE_CREDENTIALS) ? AuthManager::AUTH_LEVEL_CREDENTIALS : AuthManager::AUTH_LEVEL_REENTER_CREDENTIALS);
         }
     }
 

@@ -251,7 +251,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
 
             $event->addAuthModuleName(self::class);
             $event->setUser($test_user);
-            $event->setAuthLevel($form_state['mode']);
+            $event->setAuthLevel(AuthManager::AUTH_LEVEL_VERIFIED);
         }
     }
 
