@@ -44,7 +44,7 @@ interface UIBuilderInterface extends AttachmentManagerInterface {
      * @param array<string, mixed> $additional additional data
      * @return UIBuilderInterface
      */
-    public function addBlock(string $id, string $content, int $weight = 0, array $additional = []): UIBuilderInterface;
+    public function addBlock(string $id, string $content, int $weight = 0, array $additional = []);
 
     /**
      * Merges another UI builder into this builder.
