@@ -103,9 +103,28 @@ class AuthManager extends Prefab {
      */
     const AUTH_LEVEL_VERIFIED = 5;
 
-    // constants for stages of the interactive authentication process
+    /**
+     * Constant denoting an interactive prompt to enter a user identification.
+     * Example of this include:
+     * 
+     * - entering a user name or email
+     * - selecting the network for federated login
+     * - selecting an account from a list of previously saved account
+     */
+    const MODE_IDENTIFY_USER = 0;
+    /**
+     * Constant denoting an interactive prompt to enter a credential.
+     */
     const MODE_CREDENTIALS = self::AUTH_LEVEL_CREDENTIALS;
+    /**
+     * Constant denoting an interactive prompt to reenter a credential.
+     * This is typically required for sensitive ("sudo") operations.
+     */
     const MODE_REENTER_CREDENTIALS = self::AUTH_LEVEL_REENTER_CREDENTIALS;
+    /**
+     * Constant denoting an interactive prompt for an additional physical
+     * factor
+     */
     const MODE_VERIFY = self::AUTH_LEVEL_VERIFIED;
 
     /** @var string|null */
