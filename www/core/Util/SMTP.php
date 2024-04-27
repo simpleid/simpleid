@@ -21,6 +21,7 @@
 
 namespace SimpleID\Util;
 
+use \Base;
 use \SMTP as F3SMTP;
 
 /**
@@ -39,7 +40,8 @@ use \SMTP as F3SMTP;
  */
 class SMTP extends F3SMTP {
     /**
-     * oauth access token
+     * OAuth access token
+     * @var string
      */
     protected $oauthToken;
 
@@ -48,14 +50,14 @@ class SMTP extends F3SMTP {
      * 
      * @param string $host server name
      * @param int $port port
-     * @param string $scheme security, one of ssl (SSL) or tls (STARTTLS)
-     * @param string $user user name
-     * @param string $pw password
-     * @param string $oauthToken OAuth token
-     * @param array $ctx resource options
+     * @param string|null $scheme security, one of ssl (SSL) or tls (STARTTLS)
+     * @param string|null $user user name
+     * @param string|null $pw password
+     * @param string|null $oauthToken OAuth token
+     * @param array|null $ctx resource options
      */
     function __construct($host = 'localhost', $port = 25, $scheme = NULL, $user = NULL, $pw = NULL, $oauthToken = NULL, $ctx = NULL) {
-        parent::__construct($host, $post, $scheme, $user, $pw, $ctx);
+        parent::__construct($host, $port, $scheme, $user, $pw, $ctx);
         $this->oauthToken = $oauthToken;
     }
 
@@ -81,18 +83,18 @@ class SMTP extends F3SMTP {
      * If the 'text' key is not specified, the plain text version is automatically generated
      * from the HTML.
      * 
-     * @param string|array $body the body to encode
-     * @param array &$headers MIME headers.
+     * @param string|array<string, string> $body the body to encode
+     * @param array<string, mixed> &$headers MIME headers.
      * @return string the encoded body
      */
     protected function encodeBody($body, &$headers): string {
         if (is_string($body)) {
             if ($headers['Content-Transfer-Encoding'] == 'quoted-printable')
-                $body = preg_replace('/^\.(.+)/m', '..$1', quoted_printable_encode($message));
+                $body = preg_replace('/^\.(.+)/m', '..$1', quoted_printable_encode($body));
             return $body;
         } elseif (isset($body['html'])) {
             if (!isset($body['text'])) {
-                $body['text'] = strip_tags(preg_replace('{<(head|style)\b.*?</\1>}is', '', $html));
+                $body['text'] = strip_tags(preg_replace('{<(head|style)\b.*?</\1>}is', '', $body['html']));
             }
 
             $fw = Base::instance();
@@ -127,6 +129,7 @@ class SMTP extends F3SMTP {
             $out .= "--" . $hash . "--" . $eol;
 
             unset($headers['Content-Transfer-Encoding']);
+            return $out;
         }
     }
 
