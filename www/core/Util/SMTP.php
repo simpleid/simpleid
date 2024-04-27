@@ -54,7 +54,7 @@ class SMTP extends F3SMTP {
      * @param string|null $user user name
      * @param string|null $pw password
      * @param string|null $oauthToken OAuth token
-     * @param array|null $ctx resource options
+     * @param array<mixed>|null $ctx resource options
      */
     function __construct($host = 'localhost', $port = 25, $scheme = NULL, $user = NULL, $pw = NULL, $oauthToken = NULL, $ctx = NULL) {
         parent::__construct($host, $port, $scheme, $user, $pw, $ctx);
@@ -103,7 +103,7 @@ class SMTP extends F3SMTP {
             $headers['Content-Type'] = 'multipart/alternative; boundary="'. $hash .'"';
 
             $out = '--' . $hash . $eol;
-            $out .= "Content-Type: text/plain; charset=\"" . $fw->ENCODING . "\"" . $eol;
+            $out .= "Content-Type: text/plain; charset=\"" . $fw->get('ENCODING') . "\"" . $eol;
             $out .= "Content-Transfer-Encoding: " . $headers['Content-Transfer-Encoding'] . $eol;
             $out .= $eol;
 
@@ -115,7 +115,7 @@ class SMTP extends F3SMTP {
 
             $out .= $eol;
             $out .= "--" . $hash . $eol;
-            $out .= "Content-Type: text/html; charset=\"" . $fw->ENCODING ."\"" . $eol;
+            $out .= "Content-Type: text/html; charset=\"" . $fw->get('ENCODING') ."\"" . $eol;
             $out .= "Content-Transfer-Encoding: " . $headers['Content-Transfer-Encoding'] . $eol;
             $out .= $eol;
 
@@ -131,6 +131,7 @@ class SMTP extends F3SMTP {
             unset($headers['Content-Transfer-Encoding']);
             return $out;
         }
+        user_error(self::E_Blank, E_USER_ERROR);
     }
 
     /**
@@ -140,7 +141,7 @@ class SMTP extends F3SMTP {
      * @param string $type the MIME content type
      * @param string $alias the name of the file as presented in the email
      * @param string $cid the Content-Id
-     * @return void
+     * @return null
      */
     function attach($file, $type = 'application/octet-stream', $alias = NULL, $cid = NULL) {
         if (!is_file($file))
@@ -172,7 +173,7 @@ class SMTP extends F3SMTP {
         // Connect to the server
         if (!$mock) {
             $socket = &$this->socket;
-            $socket = @stream_socket_client($this->host.':'.$this->port, $errno, $errstr, ini_get('default_socket_timeout'), STREAM_CLIENT_CONNECT, $this->context);
+            $socket = @stream_socket_client($this->host.':'.$this->port, $errno, $errstr, intval(ini_get('default_socket_timeout')), STREAM_CLIENT_CONNECT, $this->context);
             if (!$socket) {
                 $fw->error(500,$errstr);
                 return FALSE;
@@ -184,7 +185,7 @@ class SMTP extends F3SMTP {
         $this->dialog(NULL, $log, $mock);
 
         // Announce presence
-        $reply = $this->dialog('EHLO ' . $fw->HOST, $log, $mock);
+        $reply = $this->dialog('EHLO ' . $fw->get('HOST'), $log, $mock);
         if (strtolower($this->scheme) == 'tls') {
             $this->dialog('STARTTLS', $log, $mock);
             if (!$mock) {
@@ -195,7 +196,7 @@ class SMTP extends F3SMTP {
                 }
                 stream_socket_enable_crypto($socket, TRUE, $method);
             }
-            $reply = $this->dialog('EHLO ' . $fw->HOST, $log, $mock);
+            $reply = $this->dialog('EHLO ' . $fw->get('HOST'), $log, $mock);
         }
 
         if (preg_match('/8BITMIME/', $reply)) {
@@ -214,7 +215,7 @@ class SMTP extends F3SMTP {
                 $reply = $this->dialog(base64_encode($this->pw), $log, $mock);
             } elseif ($this->oauthToken) {
                 $auth = base64_encode(sprintf("n,a=%s,%shost=%s%sport=%s%sauth=Bearer %s%s%s",
-                    $user, chr(1), $this->host, chr(1), $this->port, chr(1), $this->oauthToken, chr(1), chr(1)));
+                    $this->user, chr(1), $this->host, chr(1), $this->port, chr(1), $this->oauthToken, chr(1), chr(1)));
                 $reply = $this->dialog('AUTH OAUTHBEARER ' . $auth, $log, $mock);
             }
 
