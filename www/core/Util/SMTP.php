@@ -132,6 +132,7 @@ class SMTP extends F3SMTP {
             return $out;
         }
         user_error(self::E_Blank, E_USER_ERROR);
+        return '';
     }
 
     /**
@@ -149,12 +150,13 @@ class SMTP extends F3SMTP {
         if ($alias)
             $file = [$alias, $file];
         $this->attachments[] = ['filename' => $file, 'cid' => $cid, 'type' => $type];
+        return null;
     }
 
     /**
      * Transmit message
      * 
-     * @param string|array $message the body of the message
+     * @param string|array<string, string> $message the body of the message
      * @param bool|string $log whether the response should be saved in `$this->log`
      * @param bool $mock dry run if true
      * @return bool true if the message was successfully sent
@@ -221,7 +223,7 @@ class SMTP extends F3SMTP {
 
             if (!preg_match('/^235\s.*/', $reply)) {
                 $this->dialog('QUIT', $log, $mock);
-                if (!$mock && $socket) fclose($socket);
+                if (!$mock && ($socket !== false)) fclose($socket);
                 return FALSE;
             }
         }
@@ -300,15 +302,14 @@ class SMTP extends F3SMTP {
                 $out.='Content-Disposition: attachment; '.
                     'filename="'.$alias.'"'.$eol;
                 $out.=$eol;
-                $out.=chunk_split(base64_encode(
-                    file_get_contents($file))).$eol;
+                $contents = file_get_contents($file);
+                if ($contents !== false) $out.=chunk_split(base64_encode($contents)).$eol;
             }
             $out.=$eol;
             $out.='--'.$hash.'--'.$eol;
             $out.='.';
-            $this->dialog($out,preg_match('/verbose/i',$log),$mock);
-        }
-        else {
+            $this->dialog($out,preg_match('/verbose/i',strval($log)),$mock);
+        } else {
             // Send mail headers
             $out='';
             foreach ($headers as $key=>$val)
@@ -317,11 +318,11 @@ class SMTP extends F3SMTP {
             $out.=$message.$eol;
             $out.='.';
             // Send message
-            $this->dialog($out,preg_match('/verbose/i',$log),$mock);
+            $this->dialog($out,preg_match('/verbose/i',strval($log)),$mock);
         }
 
         $this->dialog('QUIT',$log,$mock);
-        if (!$mock && $socket) fclose($socket);
+        if (!$mock && ($socket !== false)) fclose($socket);
         return TRUE;
     }
 }
