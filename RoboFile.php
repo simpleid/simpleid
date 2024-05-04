@@ -1,6 +1,7 @@
 <?php
 
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Yaml\Yaml;
 use SimpleID\Util\UI\Template;
 
 /**
@@ -33,7 +34,7 @@ class RoboFile extends \Robo\Tasks {
     public function make_frontend_tests() {
         $tests_dir = 'tests/frontend';
 
-        $config = Spyc::YAMLLoad($tests_dir . '/config.yml');
+        $config = Yaml::parseFile($tests_dir . '/config.yml');
 
         foreach ($config['tests'] as $output_file => $steps) {
             $this->say($output_file);

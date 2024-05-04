@@ -46,10 +46,9 @@ by Bong Cosca and the F3::Community.
 Licensing information for this framework can be found at
 <https://github.com/bcosca/fatfree#support-and-licensing>.
 
-SimpleID uses the [Spyc YAML parser library](https://github.com/mustangostang/spyc/),
-by Vladimir Andersen.
-Licensing information for this library can be found at
-<https://github.com/mustangostang/spyc/blob/master/COPYING>.
+SimpleID uses the [Symfony PHP components](https://symfony.com/).
+Licensing information can be found at
+<https://symfony.com/doc/current/contributing/code/license.html>.
 
 SimpleID uses the [Feather icon library](https://feathericons.com/),
 designed by Cole Bemis.
