@@ -22,7 +22,7 @@
 
 namespace SimpleID\Store;
 
-use \Spyc;
+use Symfony\Component\Yaml\Yaml;
 use SimpleID\Models\User;
 use SimpleID\Models\Client;
 
@@ -191,7 +191,7 @@ class DefaultStoreModule extends StoreModule {
         $identity_file = $this->config['identities_dir'] . "/$uid.user.yml";
 
         try {
-            $data = Spyc::YAMLLoad($identity_file);
+            $data = Yaml::parseFile($identity_file);
         } catch (\Exception $e) {
             $this->logger->log(\Psr\Log\LogLevel::ERROR, 'Cannot read user file ' . $identity_file . ': ' . $e->getMessage());
             trigger_error('Cannot read user file ' . $identity_file . ': ' . $e->getMessage(), E_USER_ERROR);
@@ -244,7 +244,7 @@ class DefaultStoreModule extends StoreModule {
         $client_file = $this->config['identities_dir'] . "/$cid.client.yml";
         if (file_exists($client_file)) {
             try {
-                $data = Spyc::YAMLLoad($client_file);
+                $data = Yaml::parseFile($client_file);
             } catch (\Exception $e) {
                 $this->logger->log(\Psr\Log\LogLevel::ERROR, 'Cannot read client file ' . $client_file . ' :' . $e->getMessage());
                 trigger_error('Cannot read client file ' . $client_file . ' :' . $e->getMessage(), E_USER_ERROR);

@@ -22,7 +22,7 @@
 
 namespace SimpleID\Upgrade;
 
-use \Spyc;
+use Symfony\Component\Yaml\Yaml;
 use Composer\Semver\Comparator;
 use Composer\Semver\Semver;
 use SimpleID\Module;
@@ -334,7 +334,7 @@ class UpgradeModule extends Module {
     }
 
     public function onUpgradeList(BaseDataCollectionEvent $event) {
-        $event->addResults(Spyc::YAMLLoad(__DIR__ . '/upgrade.yml'));
+        $event->addResults(Yaml::parseFile(__DIR__ . '/upgrade.yml'));
     }
 }
 
