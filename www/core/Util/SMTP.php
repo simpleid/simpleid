@@ -94,7 +94,7 @@ class SMTP extends F3SMTP {
             return $body;
         } elseif (isset($body['html'])) {
             if (!isset($body['text'])) {
-                $body['text'] = strip_tags(preg_replace('{<(head|style)\b.*?</\1>}is', '', $body['html']));
+                $body['text'] = strip_tags(preg_replace('{<(head|style|script)\b.*?</\1>}is', '', $body['html']));
             }
 
             $fw = Base::instance();
