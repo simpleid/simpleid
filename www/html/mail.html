@@ -9,7 +9,7 @@
     <meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no">
     <meta name="color-scheme" content="light dark">
     <meta name="supported-color-schemes" content="light dark">
-    <title>{{ @title }}</title>
+    <check if="{{ @@title }}"><title>{{ @title }}</title></check>
 
     {* Makes background images in 72ppi Outlook render at correct size. *}
     <!--[if gte mso 9]>
