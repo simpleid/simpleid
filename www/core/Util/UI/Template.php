@@ -63,7 +63,7 @@ class Template extends F3Template implements AttachmentManagerInterface {
      * <capture to="varname"><include href="foo"></capture>
      * ```
      * 
-     * @param array $node the template node
+     * @param array<string, mixed> $node the template node
      * @return string the compiled PHP code
      */
     public function _capture(array $node) {
@@ -86,7 +86,7 @@ class Template extends F3Template implements AttachmentManagerInterface {
      * <return name="value">
      * ```
      * 
-     * @param array $node the template node
+     * @param array<string, mixed> $node the template node
      * @return string the compiled PHP code
      */
     public function _return(array $node) {
@@ -100,6 +100,12 @@ class Template extends F3Template implements AttachmentManagerInterface {
         return '<?php '.$out.'?>';
     }
 
+    /**
+     * Format a callout for use in emails
+     * 
+     * @param array<string, mixed> $node the template node
+     * @return string the compiled PHP code
+     */
     public function _mail_callout(array $node) {
         $callout_bg = '<?= (' . $this->token('@@lightmode.callout_bg') . ') ?>';
         $callout_text = '<?= (' . $this->token('@@lightmode.callout_text') . ') ?>';
@@ -118,6 +124,16 @@ class Template extends F3Template implements AttachmentManagerInterface {
         return $out;        
     }
 
+    /**
+     * Format a button for use in emails
+     * 
+     * ```
+     * <mail_button href="value">
+     * ```
+     * 
+     * @param array<string, mixed> $node the template node
+     * @return string the compiled PHP code
+     */
     public function _mail_button(array $node) {
         $attrib = $node['@attrib'];
         unset($node['@attrib']);
@@ -152,13 +168,13 @@ class Template extends F3Template implements AttachmentManagerInterface {
      * @return void
      */
     protected function setReturnValue(string $path, $val) {
-        return $this->returnValues->set($path, $val);
+        $this->returnValues->set($path, $val);
     }
 
     /**
      * Returns all return values
      * 
-     * @return array an array of return values
+     * @return array<string, mixed> an array of return values
      */
     public function getReturnValues(): array {
         return $this->returnValues->toArray();
@@ -230,13 +246,29 @@ class Template extends F3Template implements AttachmentManagerInterface {
         }
     }
 
-    public function markdown(string $md) {
+    /**
+     * Converts Markdown to HTML.
+     * 
+     * @param string $md Markdown string to convert
+     * @return string the HTML converted from Markdown
+     */
+    public function markdown(string $md): string {
         $parsedown = new \Parsedown();
         return $parsedown->text($md);
     }
 
+    /**
+     * Transforms HTML to text by stripping HTML tags and word wrapping.
+     * 
+     * The contents within the `<head>`, `<style>` and `<script>` tags are removed
+     * altogether
+     * 
+     * @param string $html the HTML text
+     * @param int $wordwrap number of characters for word wrapping
+     * @return string the plain text
+     */
     public function html_to_text(string $html, int $wordwrap = 70): string {
-        return wordwrap(strip_tags(preg_replace('{<(head|style)\b.*?</\1>}is', '', $html)), $wordwrap);
+        return wordwrap(strip_tags(preg_replace('{<(head|style|script)\b.*?</\1>}is', '', $html)), $wordwrap);
     }
 }
 
