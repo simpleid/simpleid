@@ -6,6 +6,9 @@ node_modules/
 
 log/
 tests/frontend/*.html
+tests/frontend/*.txt
+tests/frontend/*-return.yml
+tests/temp
 tmp/
 www/.htaccess
 www/config.php

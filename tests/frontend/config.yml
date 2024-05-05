@@ -113,7 +113,7 @@ tests:
     - array:
         id: welcome
         title: '{{ @intl.core.my.welcome_title | raw }}'
-        content: '{{ @intl.core.my.logged_in_as, \'test\', \'test\' | format, raw }}'
+        content: "{{ @intl.core.my.logged_in_as, 'test', 'test' | format, raw }}"
       push: blocks
 
     - template: page.html
@@ -165,3 +165,19 @@ tests:
         upgid: foo
         tk: foo
         results: Success
+
+  mail.html:
+    - resolve: "{{ @intl.common.mail.footer, 'mail@example.com', 'SimpleID' | format }}"
+      set: mail_footer
+
+    - template: mail.html
+      variables:
+        layout: mail/test.md
+
+  mail.txt:
+    - resolve: "{{ @intl.common.mail.footer, 'mail@example.com', 'SimpleID' | format }}"
+      set: mail_footer
+
+    - template: mail.txt
+      variables:
+        layout: mail/test.md

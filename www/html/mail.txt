@@ -1,0 +1,7 @@
+{{ @@title }}
+{{ str_repeat('=', strlen(@@title)) }}
+
+<capture to="contents"><include href="{{ @layout }}" /></capture>{{ @contents | html_to_text }}
+
+---
+{{ @@mail_footer }}

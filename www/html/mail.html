@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+  {* https://raw.githubusercontent.com/TedGoas/Cerberus/main/cerberus-hybrid.html *}
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="x-apple-disable-message-reformatting">
+    <meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no">
+    <meta name="color-scheme" content="light dark">
+    <meta name="supported-color-schemes" content="light dark">
+    <title>{{ @title }}</title>
+
+    {* Makes background images in 72ppi Outlook render at correct size. *}
+    <!--[if gte mso 9]>
+      <xml>
+        <o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings>
+      </xml>
+    <![endif]-->
+    <set max_width="680"/>
+    <set lightmode="{{ [ 'email_bg' => '#eeeeee', 'content_bg' => '#ffffff', 'content_text' => '#444444', 'content_heading' => '#303030', 'callout_bg' => '#eeeeee', 'callout_text' => '#303030', 'button_bg' => '#1144aa', 'button_border' => '#114499', 'button_hover' => '#114499', 'button_text' => '#ffffff', 'footer_text' => '#888888' ] }}" />
+    <set darkmode="{{ [ 'email_bg' => '#111111', 'content_bg' => '#222222', 'content_text' => '#eeeeee', 'content_heading' => '#eeeeee', 'callout_bg' => '#eeeeee', 'callout_text' => '#222222', 'button_bg' => '#1144aa', 'button_border' => '#1e55bb', 'button_hover' => '#1e55bb', 'button_text' => '#ffffff', 'footer_text' => '#aaaaaa' ] }}" />
+    <style type="text/css">
+      <include href="assets/mail.css" />
+    </style>
+  </head>
+  <body width="100%" style="margin: 0; padding: 0 !important; mso-line-height-rule: exactly; background-color: {{ @lightmode.email_bg }};" class="email-bg">
+    <capture to="contents"><include href="{{ @layout }}" with="lightmode={{ @lightmode }},darkmode={{ @darkmode }}" /></capture>
+    <center role="article" aria-roledescription="email" lang="en" style="width: 100%; background-color: {{ @lightmode.email_bg }};" class="email-bg">
+      <!--[if mso | IE]>
+      <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: {{ @lightmode.email_bg }};" class="email-bg">
+      <tr>
+      <td>
+      <![endif]-->
+
+      {* Set the email width. *}
+      <div style="max-width: {{ @max_width }}px; margin: 0 auto;" class="email-container">
+        <!--[if mso]>
+        <table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="{{ @max_width }}">
+        <tr>
+        <td>
+        <![endif]-->
+
+        {* Email Body : BEGIN *}
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: auto;">
+          <tr>
+            <td style="background-color: {{ @lightmode.content_bg }};" class="darkmode-bg">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                <tr>
+                  <td style="padding: 20px; font-family: sans-serif; font-size: 15px; line-height: 20px; color: {{ @lightmode.content_text }};">
+                    {{ @contents | markdown, raw }}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+        {* Email Body : END *}
+
+        {* Email Footer : BEGIN *}
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="max-width: {{ @max_width }}px;" class="footer">
+          <tr>
+            <td style="padding: 20px; font-family: sans-serif; font-size: 12px; line-height: 15px; text-align: center; color: {{ @lightmode.footer_text }};">
+              {{ @@mail_footer }}
+            </td>
+          </tr>
+        </table>
+        {* Email Footer : END *}
+
+        <!--[if mso]>
+        </td>
+        </tr>
+        </table>
+        <![endif]-->
+      </div>
+
+      <!--[if mso | IE]>
+      </td>
+      </tr>
+      </table>
+      <![endif]-->
+    </center>
+  </body>
+</html>
