@@ -50,6 +50,10 @@ SimpleID uses the [Symfony PHP components](https://symfony.com/).
 Licensing information can be found at
 <https://symfony.com/doc/current/contributing/code/license.html>.
 
+SimpleID uses [Parsedown markdown library](https://parsedown.org/).
+Licensing information can be found at
+<https://github.com/erusev/parsedown/blob/master/LICENSE.txt>.
+
 SimpleID uses the [Feather icon library](https://feathericons.com/),
 designed by Cole Bemis.
 Licensing information for this library can be found at
@@ -68,3 +72,7 @@ SimpleID uses [modern-normalize style sheet](http://necolas.github.io/normalize.
 by Nicolas Gallagher, Jonathan Neal and Sindre Sorhus.
 Licensing information for this library can be found at
 <https://github.com/sindresorhus/modern-normalize/blob/main/license>.
+
+SimpleID uses [Cerberus email templates](https://github.com/TedGoas/Cerberus).
+Licensing information can be found at
+<https://github.com/TedGoas/Cerberus/blob/main/LICENSE>.

@@ -1,0 +1,7 @@
+<check if="{{ @@title }}">{{ @@title }}
+{{ str_repeat('=', strlen(@@title)) }}
+
+</check><capture to="contents"><include href="{{ @layout }}" /></capture>{{ @contents | html_to_text }}
+
+---
+{{ @@mail_footer }}

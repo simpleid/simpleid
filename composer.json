@@ -22,7 +22,8 @@
         "kelvinmo/f3-event-dispatcher": "^0.1",
         "robinvdvleuten/ulid": "^5.0",
         "tuupola/branca": "^2.3",
-        "symfony/yaml": "^5.4 || ^6.0"
+        "symfony/yaml": "^5.4 || ^6.0",
+        "erusev/parsedown": "^1.0"
     },
     "suggest": {
         "ext-gmp": "Better performance",

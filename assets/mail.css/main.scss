@@ -1,0 +1,32 @@
+@use 'sass:string';
+@use 'cerberus' with (
+    $button-hover: string.unquote('{{ @lightmode.button_hover }}'),
+    $email-bg-dark: string.unquote('{{ @@darkmode.email_bg }}'),
+    $content-bg-dark: string.unquote('{{ @@darkmode.content_bg }}'),
+    $content-text-dark: string.unquote('{{ @@darkmode.content_text }}'),
+    $button-bg-dark: string.unquote('{{ @@darkmode.button_bg }}'),
+    $button-border-dark: string.unquote('{{ @@darkmode.button_border }}'),
+    $button-hover-dark: string.unquote('{{ @@darkmode.button_hover }}'),
+    $button-text-dark: string.unquote('{{ @@darkmode.button_text }}'),
+    $footer-text-dark: string.unquote('{{ @@darkmode.footer_text }}')
+);
+
+h1 {
+    font-size: 25px;
+    line-height: 30px;
+    font-weight: normal;
+}
+h2 {
+    font-size: 18px;
+    line-height: 22px;
+    font-weight: bold;
+}
+
+h1, h2, h3 { color: string.unquote('{{ @lightmode.content_heading }}'); }
+
+@media (prefers-color-scheme: dark) {
+    .callout-td, .callout-div {
+        background: string.unquote('{{ @@darkmode.callout_bg }}') !important;
+        color: string.unquote('{{ @@darkmode.callout_text }}') !important;
+    }
+}

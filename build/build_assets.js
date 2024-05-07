@@ -38,6 +38,8 @@ async function build(entryPoints) {
         plugins: [
             sassPlugin({
                 async transform(src, resolveDir) {
+                    // Skip postcss processing for mail.css
+                    if (path.basename(resolveDir) == 'mail.css') return src;
                     const {css} = await postcss([mergeRules, autoprefixer]).process(src, { from: undefined });
                     return css;
                 }

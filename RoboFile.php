@@ -33,6 +33,10 @@ class RoboFile extends \Robo\Tasks {
      */
     public function make_frontend_tests() {
         $tests_dir = 'tests/frontend';
+        $temp_dir = 'tests/temp';
+
+        if (file_exists($temp_dir))
+            $this->taskCleanDir($temp_dir)->run();
 
         $config = Yaml::parseFile($tests_dir . '/config.yml');
 
@@ -41,6 +45,8 @@ class RoboFile extends \Robo\Tasks {
 
             $f3 = \Base::instance();
             $tpl = Template::instance();
+
+            $f3->set('TEMP', $temp_dir . '/');
             foreach ($config['globals'] as $phase) {
                 $f3->mset($phase);
             }
@@ -72,7 +78,12 @@ class RoboFile extends \Robo\Tasks {
                         $f3->set($step['push'], [ $result ]);
                     }
                 } else {
+                    $return_values = $tpl->getReturnValues();
+
                     $this->taskWriteToFile($tests_dir . '/' . $output_file)->text($result)->run();
+                    if ($return_values) {
+                        $this->taskWriteToFile($tests_dir . '/' . $output_file . '-return.yml')->text(Yaml::dump($return_values))->run();
+                    }
                 }
             }
 
