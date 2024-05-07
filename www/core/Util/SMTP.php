@@ -229,7 +229,8 @@ class SMTP extends F3SMTP {
         }
 
         if (empty($headers['Message-Id']))
-            $headers['Message-Id'] = '<' . bin2hex(random_bytes(16)) . '@' . $this->host . '>';
+            $host_name = parse_url($this->host, PHP_URL_HOST);
+            $headers['Message-Id'] = '<' . bin2hex(random_bytes(16)) . '@' . (isset($host_name) ? $host_name : $this->host) . '>';
         if (empty($headers['Date']))
             $headers['Date'] = date('r');
 
