@@ -22,7 +22,9 @@
 
 namespace SimpleID\Protocols\OAuth;
 
-use SimpleID\Util\Events\BaseStoppableEvent;
+use SimpleID\Util\Events\GenericEventTrait;
+use SimpleID\Util\Events\StoppableEventTrait;
+use Psr\EventDispatcher\StoppableEventInterface;
 
 /**
  * A generic event to process an OAuth message.
@@ -37,13 +39,23 @@ use SimpleID\Util\Events\BaseStoppableEvent;
  * Listeners can use {@link getRequest()} and {@link getResponse()}
  * methods to obtain and modify the request and response accordingly.
  */
-class OAuthEvent extends BaseStoppableEvent {
+class OAuthEvent implements \GenericEventInterface, StoppableEventInterface {
+    use GenericEventTrait;
+    use StoppableEventTrait;
+
     /** @var Request */
     protected $request;
 
     /** @var Response */
     protected $response;
 
+    /**
+     * Creates a new OAuth event.
+     * 
+     * @param Request $request the OAuth request
+     * @param Response $response the OAuth response
+     * @param string $eventName the name of the event
+     */
     public function __construct(Request $request, Response $response, $eventName = null) {
         $this->setEventName($eventName);
         $this->request = $request;
