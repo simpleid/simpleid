@@ -26,7 +26,7 @@ use Psr\Log\LogLevel;
 use SimpleID\Module;
 use SimpleID\ModuleManager;
 use SimpleID\Util\SecurityToken;
-use SimpleID\Util\Events\BaseStoppableEvent;
+use SimpleID\Util\Events\GenericStoppableEvent;
 use SimpleID\Util\Forms\FormState;
 use SimpleID\Util\Forms\FormBuildEvent;
 use SimpleID\Util\Forms\FormSubmitEvent;
@@ -204,7 +204,7 @@ class AuthModule extends Module {
     
         $this->auth->logout();
 
-        $event = new BaseStoppableEvent('post_logout');
+        $event = new GenericStoppableEvent('post_logout');
         \Events::instance()->dispatch($event);
 
         if (!$event->isPropagationStopped()) {

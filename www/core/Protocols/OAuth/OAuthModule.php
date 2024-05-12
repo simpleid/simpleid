@@ -32,7 +32,7 @@ use SimpleID\Protocols\ProtocolResult;
 use SimpleID\Protocols\ProtocolResultEvent;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\SecurityToken;
-use SimpleID\Util\Events\BaseStoppableEvent;
+use SimpleID\Util\Events\GenericStoppableEvent;
 use SimpleID\Util\Events\BaseDataCollectionEvent;
 use SimpleID\Util\Forms\FormState;
 use SimpleID\Util\Forms\FormBuildEvent;
@@ -77,7 +77,7 @@ class OAuthModule extends Module implements ProtocolResult {
      *
      * @return void
      */
-    public function onPostInit(BaseStoppableEvent $event) {
+    public function onPostInit(GenericStoppableEvent $event) {
         $event = new ScopeInfoCollectionEvent();
         \Events::instance()->dispatch($event);
         
