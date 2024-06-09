@@ -26,14 +26,14 @@ tests:
 
     - array:
         content: '{{ @form_content | raw }}'
-      push: forms
+      push: forms.default
 
     - template: auth_rememberme.html
       set: form_content
 
     - array:
         content: '{{ @form_content | raw }}'
-      push: forms
+      push: forms.default
 
     - template: page.html
       variables:
