@@ -3,7 +3,7 @@
         <input type="hidden" name="fs" value="{{ @@fs }}">
         <input type="hidden" name="tk" value="{{ @@tk }}">
 
-        <repeat group="{{ @forms }}" value="{{ @form }}">
+        <repeat group="{{ @forms.default }}" value="{{ @form }}">
             {{ @form.content | raw }}
         </repeat>
 
@@ -12,6 +12,10 @@
         <check if="{{ @@cancellable }}">
             <input type="submit" name="op" value="{{ @intl.common.cancel }}">
         </check>
+
+        <repeat group="{{ @forms.after_buttons }}" value="{{ @form }}">
+            {{ @form.content | raw }}
+        </repeat>
     </form>
 </div>
 
