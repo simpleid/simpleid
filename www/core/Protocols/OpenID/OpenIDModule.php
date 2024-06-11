@@ -849,7 +849,7 @@ class OpenIDModule extends Module implements ProtocolResult {
         $return_to = $response['return_to'];
         if ($return_to == null) $return_to = $request['openid.return_to'];
     
-        if ($this->f3->get('POST.op') == $this->f3->get('intl.common.cancel')) {
+        if ($this->f3->get('POST.op') == 'cancel') {
             $response = $this->createErrorResponse($request, false);
             if (!$return_to) $this->f3->set('message', $this->f3->get('intl.common.login_cancelled'));
         } else {

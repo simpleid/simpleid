@@ -4,7 +4,8 @@
     
     <p>{{ @intl.core.connect.logout_consent_label | raw }}</p>
     
-    <input type="submit" name="op" id="edit-submit" value="{{ @intl.common.logout }}" class="is-default" />
-    <input type="submit" name="op" id="edit-cancel" value="{{ @intl.common.cancel }}" />
+    {* value="submit" is not submitted in form data, whereas other values for the 'values' attribute would *}
+    <button type="submit" name="op" value="submit" id="edit-submit" class="is-default">{{ @intl.common.logout }}</button>
+    <button type="submit" name="op" value="cancel" id="edit-cancel">{{ @intl.common.cancel }}</button>
 </form>
 

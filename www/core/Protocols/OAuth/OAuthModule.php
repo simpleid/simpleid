@@ -724,7 +724,7 @@ class OAuthModule extends Module implements ProtocolResult {
             return;
         }
         
-        if ($this->f3->get('POST.op') == $this->f3->get('intl.common.deny')) {
+        if ($this->f3->get('POST.op') == 'deny') {
             $response->setError('access_denied')->renderRedirect();
             return;
         } else {
