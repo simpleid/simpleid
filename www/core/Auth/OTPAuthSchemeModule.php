@@ -67,7 +67,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             return;
         }
 
-        if ($this->f3->get('POST.op') == $this->f3->get('intl.common.disable')) {
+        if ($this->f3->get('POST.op') == 'disable') {
             if (($this->f3->exists('POST.tk') === false) || (!$token->verify($this->f3->get('POST.tk'), 'otp'))) {
                 $this->f3->set('message', $this->f3->get('intl.common.invalid_tk'));
                 $this->f3->mock('GET /my/dashboard');
@@ -81,7 +81,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             $this->f3->set('message', $this->f3->get('intl.core.auth_otp.disable_success'));
             $this->f3->mock('GET /my/dashboard');
             return;
-        } elseif ($this->f3->get('POST.op') == $this->f3->get('intl.common.verify')) {
+        } elseif ($this->f3->get('POST.op') == 'verify') {
             $params = $token->getPayload($this->f3->get('POST.otp_params'));
             $params['secret'] = base64_decode($params['secret']);
             $this->f3->set('otp_params', $this->f3->get('POST.otp_params'));
@@ -166,11 +166,11 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
         if (isset($user['otp'])) {
             $html .= '<p>' . $this->f3->get('intl.core.auth_otp.otp_enabled_block') . '</p>';
             $html .= '<form action="' . $base_path . 'auth/otp" method="post" enctype="application/x-www-form-urlencoded"><input type="hidden" name="tk" value="'. $tk . '"/>';
-            $html .= '<input type="submit" name="op" value="' . $this->f3->get('intl.common.disable') . '" /></form>';
+            $html .= '<button type="submit" name="op" value="disable">' . $this->f3->get('intl.common.disable') . '</button></form>';
         } else {
             $html .= '<p>' . $this->f3->get('intl.core.auth_otp.otp_disabled_block') . '</p>';
             $html .= '<form action="' . $base_path . 'auth/otp" method="post" enctype="application/x-www-form-urlencoded"><input type="hidden" name="tk" value="'. $tk . '"/>';
-            $html .= '<input type="submit" name="op" value="' . $this->f3->get('intl.common.enable') . '" /></form>';
+            $html .= '<button type="submit" name="op" value="enable">' . $this->f3->get('intl.common.enable') . '</button></form>';
         }
         
         $event->addBlock('otp', $html, 0, [

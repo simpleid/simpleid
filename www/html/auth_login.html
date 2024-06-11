@@ -8,9 +8,10 @@
         </repeat>
 
         {* @submit_button text may vary depending on auth module *}
-        <input type="submit" name="op" value="{{ @@submit_button }}" class="is-default" :disabled="isSubmitted">
+        {* value="submit" is not submitted in form data, whereas other values for the 'values' attribute would *}
+        <button type="submit" name="op" value="submit" class="is-default" :disabled="isSubmitted">{{ @@submit_button }}</button>
         <check if="{{ @@cancellable }}">
-            <input type="submit" name="op" value="{{ @intl.common.cancel }}">
+            <button type="submit" name="op" value="cancel">{{ @intl.common.cancel }}</button>
         </check>
 
         <repeat group="{{ @forms.after_buttons }}" value="{{ @form }}">

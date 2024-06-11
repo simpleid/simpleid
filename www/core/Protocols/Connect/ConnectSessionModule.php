@@ -82,7 +82,7 @@ class ConnectSessionModule extends Module {
                 return;
             }
 
-            if ($this->f3->get('POST.op') == $this->f3->get('intl.common.cancel')) {
+            if ($this->f3->get('POST.op') == 'cancel') {
                 if ($form_state['connect_logout']['post_logout_redirect_uri']) {
                     $response = new Response();
                     if (isset($form_state['connect_logout']['state'])) $response['state'] = $form_state['connect_logout']['state'];
