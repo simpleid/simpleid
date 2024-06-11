@@ -55,13 +55,17 @@ class LoginFormBuildEvent extends FormBuildEvent implements StoppableEventInterf
         return parent::addBlock($id, $content, $weight, $additional);
     }
 
-    public function addUIDBlock() {
+    /**
+     * 
+     */
+    public function addUIDBlock(): UIBuildEvent {
         // Check if user name block has already been added
         if (!$this->hasUIDBlock) {
-            $tpl = Template::instance();
-            $this->addBlock('auth_uid', $tpl->render('auth_uid.html', false), 0, [ 'region' => self::IDENTITY_REGION ]);
             $this->hasUIDBlock = true;
+            $tpl = Template::instance();
+            return $this->addBlock('auth_uid', $tpl->render('auth_uid.html', false), 0, [ 'region' => self::IDENTITY_REGION ]);
         }
+        return $this;
     }
 
     /**

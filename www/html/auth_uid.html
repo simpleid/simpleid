@@ -1,0 +1,12 @@
+<div class="form-item">
+    <label for="edit-uid">{{ @@intl.core.auth_password.name_label }}</label>
+    <check if="{{ @@uid }}">
+        <true>
+            <input type="hidden" name="uid" value="{{ @uid }}">
+            <div id="edit-uid">{{ @uid }}</div>
+        </true>
+        <false>
+            <input type="text" name="uid" id="edit-uid" value="{{ @@REQUEST.uid }}" autocomplete="username" autocapitalize="off" autocorrect="off" class="form-text required" data-focus-weight="0">
+        </false>
+    </check>
+</div>
