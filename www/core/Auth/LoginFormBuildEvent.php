@@ -22,9 +22,11 @@
 
 namespace SimpleID\Auth;
 
-use \InvalidArgumentException;
+use Psr\EventDispatcher\StoppableEventInterface;
+use SimpleID\Util\Events\StoppableEventTrait;
 use SimpleID\Util\Events\UIBuildEvent;
 use SimpleID\Util\Forms\FormBuildEvent;
+use SimpleID\Util\UI\Template;
 
 /**
  * An event used to build the login form.
@@ -32,10 +34,17 @@ use SimpleID\Util\Forms\FormBuildEvent;
  * This class is derived from `FormBuildEvent` with the additional
  * 
  */
-class LoginFormBuildEvent extends FormBuildEvent {
-    const A_REGION = 1;
+class LoginFormBuildEvent extends FormBuildEvent implements StoppableEventInterface {
+    use StoppableEventTrait;
+
+    const IDENTITY_REGION = 'identity';
     const DEFAULT_REGION = 'default';
+    const PASSWORD_REGION = 'password';  // JS popout
+    // identity, credentials, options
     const AFTER_BUTTONS_REGION = 'after_buttons';
+
+    /** @var bool */
+    protected $hasUIDBlock = false;
 
     /**
      * {@inheritdoc}
@@ -46,6 +55,14 @@ class LoginFormBuildEvent extends FormBuildEvent {
         return parent::addBlock($id, $content, $weight, $additional);
     }
 
+    public function addUIDBlock() {
+        // Check if user name block has already been added
+        if (!$this->hasUIDBlock) {
+            $tpl = Template::instance();
+            $this->addBlock('auth_uid', $tpl->render('auth_uid.html', false), 0, [ 'region' => self::IDENTITY_REGION ]);
+            $this->hasUIDBlock = true;
+        }
+    }
 
     /**
      * Retrieves the blocks grouped by region, ordered by the
