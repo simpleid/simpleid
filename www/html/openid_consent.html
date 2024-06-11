@@ -36,8 +36,9 @@ function confirmConsent(ev) {
                 <check if="{{ @form.weight >= 0 }}">{{ @form.content | raw }}</check>
             </repeat>
             
-            <input type="submit" name="op" id="edit-submit" value="{{ @intl.common.ok }}" class="is-default" />
-            <input type="submit" name="op" id="edit-cancel" value="{{ @intl.common.cancel }}" />
+            {* value="submit" is not submitted in form data, whereas other values for the 'values' attribute would *}
+            <button type="submit" name="op" value="submit" id="edit-submit" class="is-default">{{ @intl.common.ok }}</button>
+            <button type="submit" name="op" value="cancel" id="edit-cancel">{{ @intl.common.cancel }}</button>
         </true>
         <false>
             <div class="narrative">
@@ -48,7 +49,7 @@ function confirmConsent(ev) {
                 <p>{{ @intl.core.openid.switch_user_label, @switch_url | format, raw }}</p>
             </div>
             
-            <input type="submit" name="op" id="edit-cancel" value="{{ @intl.common.cancel }}" class="is-default">
+            <button type="submit" name="op" value="cancel" id="edit-cancel" class="is-default">{{ @intl.common.cancel }}</button>
         </false>
     </check>
 </form>

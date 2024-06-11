@@ -122,7 +122,7 @@ class AuthModule extends Module {
             return;
         }
 
-        if ($this->f3->exists('POST.op') && $this->f3->get('POST.op') == $this->f3->get('intl.common.cancel')) {
+        if ($this->f3->exists('POST.op') && $this->f3->get('POST.op') == 'cancel') {
             $cancel_event = new FormSubmitEvent($form_state, 'login_form_cancel');
 
             $dispatcher->dispatch($cancel_event);
