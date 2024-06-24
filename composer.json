@@ -17,7 +17,7 @@
         "kelvinmo/simplejwt": "^0.9",
         "bcosca/fatfree-core": "^3.8",
         "composer/semver": "^3.0",
-        "psr/log": "^1.0",
+        "psr/log": "^3.0",
         "wikimedia/composer-merge-plugin": "^2.0",
         "kelvinmo/f3-event-dispatcher": "^0.1",
         "robinvdvleuten/ulid": "^5.0",
