@@ -3,5 +3,5 @@ root = true
 [*]
 indent_style = space
 
-[*.{html,yml}]
+[*.{html,yml,css,scss}]
 indent_size = 2
