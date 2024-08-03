@@ -79,6 +79,21 @@ label.option { font-weight: normal; }
   @include util.form-button { flex-grow: 1; }
 }
 
+.form-divider {
+  display: flex;
+  align-items: center;
+  //text-transform: uppercase;
+  color: var(--grey-400);
+
+  &::before, &::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid var(--grey-800);
+  }
+  &::before { margin-right: util.size(2); }
+  &::after { margin-left: util.size(2); }
+}
+
 /* ----- Info panes ------------------------------------- */
 .info-pane {
   @include util.margin-y(util.size(4));
