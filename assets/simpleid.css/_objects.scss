@@ -74,6 +74,11 @@ label.option { font-weight: normal; }
   @include util.form-button { @include util.padding-y(util.size(2)); }
 }
 
+.form-button-group {
+  display: flex;
+  @include util.form-button { flex-grow: 1; }
+}
+
 /* ----- Info panes ------------------------------------- */
 .info-pane {
   @include util.margin-y(util.size(4));
