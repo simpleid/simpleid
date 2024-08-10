@@ -105,9 +105,13 @@ class OpaqueIdentifier {
             $rand = new Random();
 
             $opaque_token = $rand->bytes(16);
-            $store->setSetting('opaque-token', base64_encode($opaque_token));
+            $store->setSetting('opaque-token', SecureString::fromPlaintext($opaque_token));
         } else {
-            $opaque_token = base64_decode($opaque_token);
+            if ($opaque_token instanceof SecureString) {
+                $opaque_token = SecureString::getPlaintext($opaque_token);
+            } else {
+                $opaque_token = base64_decode($opaque_token);
+            }
         }
 
         return $opaque_token;

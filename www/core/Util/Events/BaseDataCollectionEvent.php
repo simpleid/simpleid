@@ -83,7 +83,6 @@ class BaseDataCollectionEvent extends BaseEvent implements \GenericEventInterfac
      * @return void
      */
     public function addResult($result) {
-        /** @phpstan-ignore-next-line */
         if (($result == null) || (is_array($result) && (count($result) == 0))) return;
 
         // If recursive, result must be an array
