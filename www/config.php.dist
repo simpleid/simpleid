@@ -79,6 +79,25 @@ return [
     'store_dir' => '@@STORE_DIR@@',
 
     /*
+     * Secret used to encrypt sensitive strings (such as token
+     * generation keys) that are stored locally. This should be a
+     * random string of at least 64 characters.
+     *
+     * The secret can be specified in the 'secure_secret' configuration here.
+     * Alternatively it can be set via the SIMPLEID_SECURE_SECRET environment
+     * variable (which will take precedence).
+     *
+     * Alternatively, instead of defining secure_secret, the secure_secret_file
+     * configuration (or the SIMPLEID_SECURE_SECRET_FILE environment variable)
+     * can be set to read the secret from the specified file.
+     *
+     * This secret is VERY IMPORTANT. If you lose it, data encrypted by it
+     * cannot be decrypted anymore.
+     */
+    'secure_secret' => '',
+    //'secure_secret_file' => '',
+
+    /*
      * JSON Web Key Set files.  These contain the public and private keys
      * used for JSON web tokens.  These are mandatory if you want to
      * use OpenID Connect.
