@@ -79,10 +79,24 @@ final class SecureString implements \Stringable {
     }
 
     /**
-     * @param SecureString|TaggedValue|string|Stringable $value
+     * Returns the plain text value.
+     * 
+     * The plaint text value is determined based on the following rules:
+     * 
+     * 1. If $value is a SecureString, then the value is decrypted
+     * 2. If $value is a YAML !secure_string tagged value, then a SecureString is
+     *    created from the YAML value and is decrypted
+     * 3. If $value is or can be converted to a string, then the string value
+     *    is returned
+     * 4. If $value is null, then null is returned
+     * 5. Otherwise an InvalidArugmentException is raised
+     * 
+     * @param SecureString|TaggedValue|string|Stringable|null $value the value to
+     * get the plain text value
+     * @return string the plain text value, or null if $value is null
      * @throws \InvalidArgumentException
      */
-    static public function getPlaintext($value): string {
+    static public function getPlaintext($value): ?string {
         if ($value instanceof SecureString) {
             return $value->toPlaintext();
         } elseif (($value instanceof TaggedValue) && ($value->getTag() == 'secure_string')) {
@@ -91,6 +105,8 @@ final class SecureString implements \Stringable {
             return $value;
         } elseif ($value instanceof Stringable) {
             return $value->__toString();
+        } elseif ($value == null) {
+            return null;
         }
         
         throw new \InvalidArgumentException();
