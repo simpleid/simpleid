@@ -21,6 +21,7 @@
 
 namespace SimpleID\Util;
 
+use \Stringable;
 use Branca\Branca;
 use Symfony\Component\Yaml\Tag\TaggedValue;
 
@@ -111,6 +112,7 @@ final class SecureString implements \Stringable {
 
     /**
      * {@inheritdoc}
+     * @param array<mixed> $data
      * @return void
      */
     public function __unserialize(array $data) {
