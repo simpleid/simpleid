@@ -180,13 +180,13 @@ class SecurityToken {
     static private function getSiteToken() {
         $store = StoreManager::instance();
 
-        $site_token = $store->getSetting('site-token');
+        $site_token = SecureString::getPlaintext($store->getSetting('site-token'));
 
         if ($site_token == NULL) {
             $rand = new Random();
 
             $site_token = strtr(base64_encode($rand->bytes(32)), '+/', '-_');
-            $store->setSetting('site-token', $site_token);
+            $store->setSetting('site-token', SecureString::fromPlaintext($site_token));
         }
 
         return $site_token;

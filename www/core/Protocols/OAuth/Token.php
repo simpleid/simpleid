@@ -24,6 +24,7 @@ namespace SimpleID\Protocols\OAuth;
 use Branca\Branca;
 use SimpleID\Crypt\Random;
 use SimpleID\Store\StoreManager;
+use SimpleID\Util\SecureString;
 
 /**
  * An OAuth access or refresh token.
@@ -408,13 +409,13 @@ class Token {
     static protected function getKey() {
         $store = StoreManager::instance();
 
-        $key = $store->getSetting('oauth-token');
+        $key = SecureString::getPlaintext($store->getSetting('oauth-token'));
 
         if ($key == NULL) {
             $rand = new Random();
 
             $key = strtr(base64_encode($rand->bytes(32)), '+/', '-_');
-            $store->setSetting('oauth-token', $key);
+            $store->setSetting('oauth-token', SecureString::fromPlaintext($key));
         }
 
         return $key;

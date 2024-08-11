@@ -80,6 +80,14 @@ if (!isset($config['canonical_base_path'])) {
         . ($port && $port != 80 && $port != 443 ? (':' . $port) : '') . $f3->get('BASE');
 }
 
+if (isset($config['secure_secret']) && ($config['secure_secret'] != '') && !isset($_ENV['SIMPLEID_SECURE_SECRET'])) {
+    $_ENV['SIMPLEID_SECURE_SECRET'] = $config['secure_secret'];
+    $f3->sync('ENV');
+} elseif (isset($config['secure_secret_file']) && ($config['secure_secret_file'] != '') && !isset($_ENV['SIMPLEID_SECURE_SECRET_FILE'])) {
+    $_ENV['SIMPLEID_SECURE_SECRET_FILE'] = $config['secure_secret_file'];
+    $f3->sync('ENV');
+}
+
 date_default_timezone_set(@date_default_timezone_get());
 
 $f3->mset([
@@ -142,6 +150,11 @@ if (isset($_GET['q'])) {
 if ((@ini_get('register_globals') === 1) || (@ini_get('register_globals') === '1') || (strtolower(@ini_get('register_globals')) == 'on')) {
     $f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'register_globals is enabled in PHP configuration.');
     $f3->error(500, $f3->get('intl.bootstrap.register_globals', 'http://simpleid.org/docs/2/system-requirements/'));
+}
+
+if (!isset($_ENV['SIMPLEID_SECURE_SECRET']) && !isset($_ENV['SIMPLEID_SECURE_SECRET_FILE'])) {
+    $f3->get('logger')->log(\Psr\Log\LogLevel::CRITICAL, 'secure_secret or secure_secret_file not set.');
+    $f3->error(500, $f3->get('intl.bootstrap.secure_secret'));
 }
 
 if (!\SimpleID\Crypt\BigNum::loaded()) {
