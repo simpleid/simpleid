@@ -128,6 +128,7 @@ class ModuleManager extends Prefab {
 
         $results = [];
 
+        /** @var string $class_file */
         $class_file = realpath($loader->findFile($class));
         $class_dir = strtr(dirname($class_file), '\\', '/');
 
