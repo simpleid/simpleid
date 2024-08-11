@@ -128,23 +128,24 @@ class ModuleManager extends Prefab {
 
         $results = [];
 
-        $class_file = $loader->findFile($class);
+        /** @var string $class_file */
+        $class_file = realpath($loader->findFile($class));
         $class_dir = strtr(dirname($class_file), '\\', '/');
 
         if (strncmp($root_dir, $class_dir, strlen($root_dir)) === 0) {
             $relative_dir = substr($class_dir, strlen($root_dir) + 1);
-            list ($base_dir, $module_dir, $dummy) = explode('/', $relative_dir, 3);
+            $segments = explode('/', $relative_dir, 3);
 
-            switch ($base_dir) {
+            switch ($segments[0]) {
                 case 'core':
                     break;
                 case 'upgrade':
-                    $results['asset_dir'] = $base_dir . '/';
-                    $results['asset_domain'] = $base_dir;
+                    $results['asset_dir'] = $segments[0] . '/';
+                    $results['asset_domain'] = $segments[0];
                     break;
                 case 'site':
-                    $results['asset_dir'] = $base_dir . '/' . $module_dir . '/';
-                    $results['asset_domain'] = $module_dir;
+                    $results['asset_dir'] = $segments[0] . '/' . $segments[1] . '/';
+                    $results['asset_domain'] = $segments[1];
                     break;
             }
         }

@@ -144,6 +144,8 @@ final class SecureString implements \Stringable {
                 $secret = $_ENV['SIMPLEID_SECURE_SECRET'];
             } elseif (isset($_ENV['SIMPLEID_SECURE_SECRET_FILE'])) {
                 $secret = file_get_contents($_ENV['SIMPLEID_SECURE_SECRET_FILE']);
+                if ($secret === false)
+                    throw new \RuntimeException('Error reading file File specified by SIMPLEID_SECURE_SECRET_FILE');
             } else {
                 throw new \RuntimeException('Key not found');
             }
