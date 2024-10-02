@@ -3,16 +3,21 @@
         <input type="hidden" name="fs" value="{{ @@fs }}">
         <input type="hidden" name="tk" value="{{ @@tk }}">
 
-        <repeat group="{{ @forms }}" value="{{ @form }}">
+        <repeat group="{{ @forms.default }}" value="{{ @form }}">
             {{ @form.content | raw }}
         </repeat>
 
         {* @submit_button text may vary depending on auth module *}
         {* value="submit" is not submitted in form data, whereas other values for the 'values' attribute would *}
+         {* TODO: onClick or onsubmit *}
         <button type="submit" name="op" value="submit" class="is-default" :disabled="isSubmitted">{{ @@submit_button }}</button>
         <check if="{{ @@cancellable }}">
             <button type="submit" name="op" value="cancel">{{ @intl.common.cancel }}</button>
         </check>
+
+        <repeat group="{{ @@forms.after_buttons }}" value="{{ @form }}">
+            {{ @form.content | raw }}
+        </repeat>
     </form>
 </div>
 
