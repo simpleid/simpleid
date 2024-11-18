@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - '**.php'
+      - 'composer.json'
       - 'phpstan.*'
       - 'phpunit.*'
   pull_request:
     paths:
       - '**.php'
+      - 'composer.json'
       - 'phpstan.*'
       - 'phpunit.*'
 
