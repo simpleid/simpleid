@@ -5,5 +5,6 @@ parameters:
     - www/core
   scanFiles:
     - www/bootstrap.inc.php
+  treatPhpDocTypesAsCertain: false
   ignoreErrors:
     - "#^Parameter \\#1 \\$callback of function call_user_func(_array)? expects callable\\(\\)\\: mixed, array\\{[^}]+\\} given\\.$#"
