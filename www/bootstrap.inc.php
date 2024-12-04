@@ -264,8 +264,10 @@ function parse_http_query($query) {
     $pairs = explode('&', $query);
     
     foreach ($pairs as $pair) {
-        list ($key, $value) = explode('=', $pair, 2);
-        $data[$key] = urldecode($value);
+        if (!empty($pair)) {
+            list ($key, $value) = explode('=', $pair, 2);
+            $data[$key] = urldecode($value);
+        }
     }
 
     return $data;
