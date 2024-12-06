@@ -4,7 +4,7 @@
     "homepage": "https://simpleid.org/",
     "type": "project",
     "require": {
-        "php": "^7.3 || ^8.0",
+        "php": "^7.4 || ^8.0",
         "ext-bcmath": "*",
         "ext-pcre": "*",
         "ext-session": "*",
