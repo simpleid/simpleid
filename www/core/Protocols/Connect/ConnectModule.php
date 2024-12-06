@@ -423,8 +423,8 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
                         break;
                     default:
                         $consent_scope = null;
+                        /** @var array<string, mixed> $settings */
                         foreach (array_keys($scope_info) as $scope => $settings) {
-                            /** @var array<string, mixed> $settings */
                             if (!isset($settings['claims'])) continue;
                             if (in_array($claim, $settings['claims'])) $consent_scope = $scope;
                         }

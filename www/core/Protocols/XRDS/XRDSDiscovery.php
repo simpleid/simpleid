@@ -275,7 +275,7 @@ class XRDSDiscovery extends Prefab {
         preg_match('|<link\s+rel=["\'](.*)'. $rel .'(.*)["\'](.*)/?>|iUs', $html, $matches);
         if (isset($matches[3])) {
             preg_match('|href=["\']([^"]+)["\']|iU', $matches[3], $href);
-            return trim($href[1]);
+            if (isset($href[1])) return trim($href[1]);
         }
         return FALSE;
     }

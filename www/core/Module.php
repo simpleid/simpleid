@@ -184,7 +184,7 @@ abstract class Module extends \Prefab {
 
                 if (!empty($aliases[$parts[1]])) {
                     $path = $aliases[$parts[1]];
-                    $path = $this->f3->build($path, isset($parts[2]) ? $this->f3->parse($parts[2]) : []);
+                    $path = $this->f3->build($path, $this->f3->parse($parts[2]));
                     $path = ltrim($path, '/');
                 }
             }
