@@ -242,11 +242,10 @@ class DiffieHellman {
             }
         
             $mxrand = new BigNum(256);
-            $mxrand = $mxrand->pow($nbytes);
 
             // If we get a number less than this, then it is in the
             // duplicated range.
-            $duplicate = $mxrand->mod($stop);
+            $duplicate = $mxrand->powmod(new BigNum($nbytes), $stop);
 
             if (count($duplicate_cache) > 10) {
                 $duplicate_cache = [];
