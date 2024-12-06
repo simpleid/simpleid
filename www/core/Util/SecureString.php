@@ -130,7 +130,7 @@ final class SecureString implements \Stringable {
     }
 
     static private function getKey(): string {
-        /** @var string */
+        /** @var ?string */
         static $key = null;
 
         if ($key == null) {

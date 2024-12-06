@@ -223,7 +223,7 @@ class SMTP extends F3SMTP {
 
             if (!preg_match('/^235\s.*/', $reply)) {
                 $this->dialog('QUIT', $log, $mock);
-                if (!$mock && ($socket !== false)) fclose($socket);
+                if (!$mock && ($socket !== false)) fclose($socket); // @phpstan-ignore notIdentical.alwaysTrue
                 return FALSE;
             }
         }
@@ -323,7 +323,7 @@ class SMTP extends F3SMTP {
         }
 
         $this->dialog('QUIT',$log,$mock);
-        if (!$mock && ($socket !== false)) fclose($socket);
+        if (!$mock && ($socket !== false)) fclose($socket); // @phpstan-ignore notIdentical.alwaysTrue
         return TRUE;
     }
 }
