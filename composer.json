@@ -14,7 +14,7 @@
         "ext-hash": "*",
         "ext-sodium": "*",
         "kelvinmo/simplexrd": "^3.0",
-        "kelvinmo/simplejwt": "^0.9",
+        "kelvinmo/simplejwt": "^1.0",
         "bcosca/fatfree-core": "^3.8",
         "composer/semver": "^3.0",
         "psr/log": "^1.0",
