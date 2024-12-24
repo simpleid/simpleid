@@ -4,7 +4,7 @@
     "homepage": "https://simpleid.org/",
     "type": "project",
     "require": {
-        "php": "^7.4 || ^8.0",
+        "php": "^8.0",
         "ext-bcmath": "*",
         "ext-pcre": "*",
         "ext-session": "*",
@@ -14,7 +14,7 @@
         "ext-hash": "*",
         "ext-sodium": "*",
         "kelvinmo/simplexrd": "^3.0",
-        "kelvinmo/simplejwt": "^0.9",
+        "kelvinmo/simplejwt": "^1.0",
         "bcosca/fatfree-core": "^3.8",
         "composer/semver": "^3.0",
         "psr/log": "^1.0",
@@ -22,7 +22,7 @@
         "kelvinmo/f3-event-dispatcher": "^0.1",
         "robinvdvleuten/ulid": "^5.0",
         "tuupola/branca": "^2.3",
-        "symfony/yaml": "^5.4 || ^6.0",
+        "symfony/yaml": "^6.0",
         "erusev/parsedown": "^1.0"
     },
     "suggest": {
