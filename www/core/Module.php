@@ -216,6 +216,24 @@ abstract class Module extends \Prefab {
     }
 
     /**
+     * Gets the origin of a URI
+     *
+     * @param string $uri the URI
+     * @return string the origin
+     * @link https://www.rfc-editor.org/rfc/rfc6454.txt
+     */
+    protected function getOrigin($uri) {
+        $parts = parse_url($uri);
+        if ($parts == false) return $uri;
+        
+        $origin = $parts['scheme'] . '://';
+        $origin .= $parts['host'];
+        if (isset($parts['port'])) $origin .= ':' . $parts['port'];
+        
+        return $origin;
+    }
+
+    /**
      * Displays a fatal error message and exits.
      *
      * @param string $error the message to set

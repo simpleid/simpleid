@@ -246,24 +246,6 @@ class ConnectSessionModule extends Module {
         $salt = $rand->secret(8);
         return hash_hmac('sha256', $client_id . ' ' . $origin . ' ' . $salt, $uals) . '.' . $salt;
     }
-
-    /**
-     * Gets the origin of a URI
-     *
-     * @param string $uri the URI
-     * @return string the origin
-     * @link https://www.rfc-editor.org/rfc/rfc6454.txt
-     */
-    private function getOrigin($uri) {
-        $parts = parse_url($uri);
-        if ($parts == false) return $uri;
-        
-        $origin = $parts['scheme'] . '://';
-        $origin .= $parts['host'];
-        if (isset($parts['port'])) $origin .= ':' . $parts['port'];
-        
-        return $origin;
-    }
 }
 
 
