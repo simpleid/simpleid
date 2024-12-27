@@ -82,13 +82,11 @@
                     <a href="#" class="get-app-details" x-html="app.display_html"></a>
                     <div class="app-details" x-show="app.details && app.openDetails">
                         <ul>
-                            <li><%= t.first_time_label %> <%= first_time %></li>
-                            <li><%= t.last_time_label %> <%= last_time %></li>
-                            <% if (consents.length > 0) { %>
-                            <li><%= t.consents_label %><ul>
-                            <% _.each(consents, function(consent) { %><%= consent.description %><% }); %>
+                            <li><span x-text="t.first_time_label"></span> <span x-text="app.first_time"></span></li>
+                            <li><span x-text="t.last_time_label"></span> <span x-text="app.last_time"></span></li>
+                            <li x-show="app.consents.length > 0"><span x-text="t.consents_label"></span><ul x-for="consent in app.consents">
+                            <span x-text="consent.description"></span>
                             </ul></li>
-                            <% } %>
                         </ul>
                     </div>
                 </td>
