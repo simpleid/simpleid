@@ -111,3 +111,10 @@ window.webAuthnGetPublicKeyCredential = async function (options) {
     };
     return result;    
 }
+
+document.isPublicKeyCredentialSupported = () => ('PublicKeyCredential' in window);
+
+document.hasLocalAuthenticator = async function () {
+    if (!document.isPublicKeyCredentialSupported()) return false;
+    return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+}
