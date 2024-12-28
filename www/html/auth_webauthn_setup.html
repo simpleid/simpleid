@@ -1,0 +1,78 @@
+<script src="{{ @base_path }}html/assets/webauthn.js" type="text/javascript"></script>
+<script type="text/javascript">
+    function createCredentialApp(url, tk, baseCreateOptions) {
+        return {
+            supported: document.isPublicKeyCredentialSupported(),
+            hasLocalAuthenticator: await document.hasLocalAuthenticator(),
+            challenge: '',
+            nonce: '',
+            result: '',
+            url: url,
+            tk: tk,
+            baseCreateOptions: baseCreateOptions,
+            isRequesting: false,
+
+            async createCredential(authenticatorAttachment) {
+                const challengeResponse = await fetch(this.url, { method: 'POST', headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-Request-Token': this.tk,
+                    'Accept': 'application/json'
+                 }});
+                if (!challengeResponse.ok) {
+
+                }
+
+                const challengeObject = await challengeResponse.json();
+                this.challenge = challengeObject.challenge;
+                this.nonce = challengeObject.nonce;
+
+                const options = JSON.parse(JSON.stringify(this.baseCreateOptions)); // deep clone
+                options.challenge = challengeObject.challenge;
+                if (authenticatorAttachment) options.authenticatorSelection.authenticatorAttachment = authenticatorAttachment;
+
+                this.isRequesting = true;
+                await this.$nextTick();
+
+                try {
+                    const response = await webAuthnCreatePublicKeyCredential(options);
+                    this.result = JSON.stringify(response);
+                    this.isRequesting = false;
+
+                    await this.$nextTick();
+                    this.$refs.createCredentialButton.form.requestSubmit();
+                } catch (e) {
+                    this.isRequesting = false;
+
+                    if (e.name == 'NotAllowedError') {
+                        // User cancels, etc
+                    }
+                    console.error(e);
+                }
+            }
+        };
+    }
+</script>
+<div class="narrative">
+    <p>{{ @intl.core.auth_webauthn.about_security_keys }}</p>
+
+    <p>{{ @intl.core.auth_webauthn.credential_warning, @otp_recovery_url | format, raw }}</p>
+
+    <p>{{ @intl.core.auth_webauthn.setup_credential | markdown }}</p>
+</div>
+
+<form action="{{ @base_path }}auth/webauthn" method="post" enctype="application/x-www-form-urlencoded" x-data="createCredentialApp({{ @challenge_url | js, raw }}, {{ @tk | js, raw }}, {{ @create_options | js, raw }})">
+    <input type="hidden" name="tk" value="{{ @tk }}"/>
+    <input type="hidden" name="challenge" x-model="challenge">
+    <input type="hidden" name="nonce" x-model="nonce">
+    <input type="hidden" name="result" x-model="result">
+
+    <template x-if="!supported"><p>{{ @intl.core.auth_webauthn.webauthn_not_supported }}</p></template>
+
+    <div x-show="supported">
+        <div class="form-item">
+            <label for="edit-otp">{{ @intl.core.auth_webauthn.credential_name_label }}</label>
+            <input type="text" name="name" value="" class="form-text" />
+        </div>
+        <button type="submit" name="op" value="add" id="edit-submit" class="is-default" :disabled="isRequesting" @click.prevent="createCredential('cross-platform')" x-ref="createCredentialButton">{{ @intl.common.continue }}</button>
+    </div>
+</form>

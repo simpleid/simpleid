@@ -1,0 +1,76 @@
+<script src="{{ @base_path }}html/assets/webauthn.js" type="text/javascript"></script>
+<script type="text/javascript">
+    function getCredentialApp(url, tk, baseRequestOptions) {
+        return {
+            supported: document.isPublicKeyCredentialSupported(),
+            challenge: '',
+            nonce: '',
+            result: '',
+            url: url,
+            tk: tk,
+            baseRequestOptions: baseRequestOptions,
+            isRequesting: false,
+
+            async getCredential (e) {
+                const challengeResponse = await fetch(this.url, { method: 'POST', headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-Request-Token': this.tk,
+                    'Accept': 'application/json'
+                }});
+                if (!challengeResponse.ok) {
+
+                }
+
+                const challengeObject = await challengeResponse.json();
+                this.challenge = challengeObject.challenge;
+                this.nonce = challengeObject.nonce;
+
+                const options = JSON.parse(JSON.stringify(this.baseRequestOptions)); // deep clone
+                options.publicKey.challenge = challengeObject.challenge;
+
+                this.isRequesting = true; console.debug(options);
+                await this.$nextTick();
+
+                try {
+                    const response = await webAuthnGetPublicKeyCredential(options);
+                    this.result = JSON.stringify(response);
+
+                    await this.$nextTick();
+                    this.$refs.getCredentialButton.form.requestSubmit();
+                } catch (e) {
+                    this.isRequesting = false;
+
+                    if (e.name == 'NotAllowedError') {
+                        // User cancels, etc
+                    }
+                    console.error(e.name);
+                }
+            }
+        }
+    }
+</script>
+
+<div class="narrative">
+    <p>{{ @intl.core.auth_webauthn.webauthn_instructions_label }}</p>
+
+    <p>{{ @intl.core.auth_webauthn.webauthn_recovery_label, @otp_recovery_url | format, raw }}</p>
+</div>
+
+<div class="form-item" x-data="getCredentialApp({{ @challenge_url | js, raw }}, {{ @challenge_tk | js, raw }}, {{ @request_options | js, raw }})">
+    <input type="hidden" name="webauthn[challenge]" x-model="challenge">
+    <input type="hidden" name="webauthn[nonce]" x-model="nonce">
+    <input type="hidden" name="webauthn[result]" x-model="result">
+
+    <template x-if="!supported"><p>{{ @intl.core.auth_webauthn.webauthn_not_supported }}</p></template>
+
+    <button class="is-default" :disabled="isRequesting" @click.prevent="getCredential" x-show="supported" x-ref="getCredentialButton">{{ @intl.common.continue }}</button>
+</div>
+
+<check if="{{ @@allow_remember }}">
+    <div class="form-item">
+        <label class="option">
+            <input type="checkbox" name="webauthn[remember]" value="1" <check if="{{ @@REQUEST.webauthn.remember }}">checked="checked"</check>>
+            {{ @intl.core.auth_webauthn.webauthn_remember_label }}
+        </label>
+    </div>
+</check>
