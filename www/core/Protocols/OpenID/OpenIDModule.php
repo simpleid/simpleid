@@ -792,7 +792,7 @@ class OpenIDModule extends Module implements ProtocolResult {
             if ($reason == self::CHECKID_RETURN_TO_SUSPECT) {
                 $this->f3->set('return_to_suspect', true);
                 $this->f3->set('suspect_url', 'http://simpleid.org/documentation/troubleshooting/returnto-discovery-failure');
-                $this->f3->set('js_data.intl', [ 'openid_suspect' => addslashes($this->f3->get('intl.core.openid.suspect_js_1')) . '\n\n' . addslashes($this->f3->get('intl.core.openid.suspect_js_2')) ]);
+                $this->f3->set('js_data.intl.openid_suspect', $this->f3->get('intl.core.openid.suspect_js_1') . "\n\n" $this->f3->get('intl.core.openid.suspect_js_2'));
             }
         }
         
