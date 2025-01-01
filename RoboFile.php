@@ -14,7 +14,7 @@ class RoboFile extends \Robo\Tasks {
         $current_year = date('Y');
 
         $finder = new Finder();
-        $finder->in(['tests', 'www/core', 'www/upgrade'])->name('*.php')->append(['COPYING.txt']);
+        $finder->in(['tests', 'www/core', 'www/upgrade', 'assets'])->name(['*.php', 'main.js'])->append(['COPYING.txt']);
 
         foreach($finder as $file) {
             $this->taskReplaceInFile($file)
