@@ -3,6 +3,7 @@ name: Update copyright
 on:
   schedule:
     - cron: "0 3 1 1 *"
+  workflow_dispatch:
 
 jobs:
   update-copyright:
@@ -10,14 +11,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '7.4'
+          php-version: '8.2'
           tools: composer
 
       - name: Get Composer cache directory
@@ -25,20 +26,20 @@ jobs:
         run: echo "::set-output name=dir::$(composer config cache-files-dir)"
 
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: "composer-${{ hashFiles('**/composer.json') }}"
           restore-keys: "composer-"
 
-      - name: Install dependencies
-        run: composer install
+      - name: Install dependencies without updating
+        run: rm composer.lock && composer install
 
       - name: Run composer update-copyright script
         run: composer update-copyright
 
       - name: Create pull request
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: Update copyright year
