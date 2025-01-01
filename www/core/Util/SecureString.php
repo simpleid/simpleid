@@ -59,14 +59,8 @@ final class SecureString implements \Stringable {
      * @throws \RuntimeException if an error occurs during the decryption process
      */
     public function toPlaintext(): string {
-        static $plaintext = null;
-
-        if ($plaintext == null) {
-            $branca = new Branca(self::getKey());
-            $plaintext = $branca->decode($this->ciphertext);
-        }
-
-        return $plaintext;
+        $branca = new Branca(self::getKey());
+        return $branca->decode($this->ciphertext);
     }
 
     /**
@@ -136,7 +130,7 @@ final class SecureString implements \Stringable {
     }
 
     static private function getKey(): string {
-        /** @var string */
+        /** @var ?string */
         static $key = null;
 
         if ($key == null) {

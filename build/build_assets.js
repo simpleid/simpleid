@@ -89,15 +89,16 @@ const entryPoints = fs.readdirSync('assets').filter((package) => {
 build(entryPoints);
 
 if (args['--serve']) {
-    const server = require("@compodoc/live-server");
+    const FiveServer = require('five-server').default;
+    const server = new FiveServer();
     params = {
         port: 4000,
         host: "0.0.0.0",
         root: "tests/frontend",
         open: false, // When false, it won't load your browser by default.
-        mount: [
-            ["/html", "./www/html"]
-        ],
+        mount: {
+            "/html": "./www/html"
+        },
         logLevel: 2, // 0 = errors only, 1 = some, 2 = lots
     };
     console.log(`Serving on http://${params.host}:${params.port}/`)

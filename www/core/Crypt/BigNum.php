@@ -286,8 +286,8 @@ class BigNum {
         if (BIGNUM_GMP) {
             return gmp_add($a, $b);
         } else {
-            /** @var string $a */
-            /** @var string $b */
+            /** @var numeric-string $a */
+            /** @var numeric-string $b */
             return bcadd($a, $b);
         }
     }
@@ -303,8 +303,8 @@ class BigNum {
         if (BIGNUM_GMP) {
             return gmp_mul($a, $b);
         } else {
-            /** @var string $a */
-            /** @var string $b */
+            /** @var numeric-string $a */
+            /** @var numeric-string $b */
             return bcmul($a, $b);
         }
     }
@@ -337,8 +337,10 @@ class BigNum {
         if (BIGNUM_GMP) {
             return gmp_pow($base, intval($exp));
         } else {
-            /** @var string $base */
-            return bcpow($base, strval($exp));
+            /** @var numeric-string $base */
+            /** @var numeric-string $exp */
+            $exp = strval($exp);
+            return bcpow($base, $exp);
         }
     }
 
@@ -402,8 +404,8 @@ class BigNum {
         if (BIGNUM_GMP) {
             return gmp_cmp($a, $b);
         } else {
-            /** @var string $a */
-            /** @var string $b */
+            /** @var numeric-string $a */
+            /** @var numeric-string $b */
             return bccomp($a, $b);
         }
     }
