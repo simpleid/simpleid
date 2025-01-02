@@ -61,6 +61,9 @@ use \ArrayIterator;
  * through arrays (with either string or numeric keys) and `->` to traverse
  * through object properties.  The entire expression in dot-notation is called
  * a *path*.
+ * 
+ * If a segment in the path contains a dot, this can be escaped using brackets.
+ * For example, the expression `a.[b.c].d` is split into `a`, `b.c` and `d`.
  *
  * Dot-notation can be used in {@link get()}, {@link exists()}, {@link set()},
  * and {@link ref()}.  Thus in the example above:
