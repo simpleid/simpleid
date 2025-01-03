@@ -99,6 +99,20 @@ class ArrayWrapperTest extends TestCase {
         $this->assertNull($wrapper['invalid']);
         $this->assertNull($wrapper['b.ba.invalid']);
     }
+
+    function testPropertySet() {
+        $wrapper = new ArrayWrapper($this->getTestData());
+
+        $wrapper->a = 'A';
+        $this->assertEquals('A', $wrapper->get('a'));
+    }
+
+    function testNonExistentPropertySet() {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $wrapper = new ArrayWrapper($this->getTestData());
+        $wrapper->nonExistentKey = 'A';
+    }
 }
 
 ?>

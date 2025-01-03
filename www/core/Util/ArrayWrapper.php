@@ -153,6 +153,33 @@ class ArrayWrapper implements ArrayAccess, Countable, IteratorAggregate {
     }
 
     /**
+     * Fallback function when attempt to write to non-existing properties.
+     * 
+     * A fallback function is required to to work around Fat-Free Framework's
+     * behaviour when escaping the contents in the hive for template rendering.
+     * The Fat-Free code causes a dynamic property to be set, which is
+     * deprecated in PHP 8.2.  Having an explicit __set() function allows
+     * PHP to call something rather than setting the property dynamically.
+     * 
+     * This function should not be called by anything other than the Fat-Free
+     * Framework.  As a result, the corresponding __get() and __exists() functions
+     * are not defined.
+     * 
+     * @link https://github.com/simpleid/simpleid/pull/132 Further details
+     * @link https://www.php.net/manual/en/language.oop5.overloading.php#object.set PHP documention on __set()
+     * @deprecated 2.0 This should not be used where possible
+     */
+    public function __set(string $name, mixed $value): void {
+        // Only allow keys already existing in $container to be set
+        if (array_key_exists($name, $this->container)) {
+            $this->container[$name] = $value;
+        } else {
+            throw new InvalidArgumentException('Attempt to set a non-existent key');
+        }
+    }
+
+
+    /**
      * Implementation of Countable
      */
     public function count(): int {
