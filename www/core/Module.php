@@ -178,13 +178,13 @@ abstract class Module extends \Prefab {
         $config = $this->f3->get('config');
         $canonical_base_path = $config['canonical_base_path'];
 
-        if (preg_match('/^(?:@(\w+)(?:(\(.+?)\))*|https?:\/\/)/', $path, $parts)) {
+        if (preg_match('/^(?:@(\w+)(?:(\(.+?)\))*|https?:\/\/)/', $path, $parts, PREG_UNMATCHED_AS_NULL)) {
             if (isset($parts[1])) {
                 $aliases = $this->f3->get('ALIASES');
 
                 if (!empty($aliases[$parts[1]])) {
                     $path = $aliases[$parts[1]];
-                    $path = $this->f3->build($path, $this->f3->parse($parts[2]));
+                    $path = $this->f3->build($path, isset($parts[2]) ? $this->f3->parse($parts[2]) : []);
                     $path = ltrim($path, '/');
                 }
             }
