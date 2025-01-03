@@ -33,7 +33,6 @@ use SimpleID\Store\Storable;
  * Different protocols may call clients different names.  For example,
  * clients are known as *relying parties* in OpenID 2.
  */
-#[\AllowDynamicProperties]
 class Client extends ArrayWrapper implements Storable {
     /** @var string */
     public $cid;
