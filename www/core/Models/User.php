@@ -34,6 +34,7 @@ use SimpleID\Base\UserModule;
 /**
  * Represents a SimpleID user
  */
+#[\AllowDynamicProperties]
 class User extends ArrayWrapper implements Serializable, Storable {
 
     const ACTIVITY_LOG_SIZE = 10;
