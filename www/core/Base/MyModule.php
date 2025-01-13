@@ -106,6 +106,11 @@ class MyModule extends Module {
         $tpl = Template::instance();
         $this->f3->set('tk', $token->generate('apps', SecurityToken::OPTION_BIND_SESSION));
         $this->f3->set('title', $this->f3->get('intl.core.my.apps_title'));
+        $this->f3->set('js_data.intl', [
+            'first_time_label' => $this->f3->get('intl.core.my.first_time_label'),
+            'last_time_label' => $this->f3->get('intl.core.my.last_time_label'),
+            'consents_label' => $this->f3->get('intl.core.my.consents_label')
+        ]);
         $this->f3->set('layout', 'my_apps.html');
         print $tpl->render('page.html');
     }
