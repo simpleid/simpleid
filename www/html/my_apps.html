@@ -60,18 +60,20 @@
         <template x-for="app in apps" :key="app.cid">
             <tr>
                 <td class="app-name">
-                    <a href="#" class="get-app-details" x-html="app.display_html" @click="app.openDetails = !app.openDetails"></a>
+                    <a href="#" class="get-app-details" x-html="app.display_html" @click.prevent="app.openDetails = !app.openDetails"></a>
                     <div class="app-details" x-show="app.openDetails">
                         <ul>
                             <li><span x-text="window.simpleid.intl.first_time_label"></span> <span x-text="app.first_time"></span></li>
                             <li><span x-text="window.simpleid.intl.last_time_label"></span> <span x-text="app.last_time"></span></li>
-                            <li x-show="app.consents.length > 0"><span x-text="window.simpleid.intl.consents_label"></span><ul x-for="consent in app.consents">
-                            <span x-text="consent.description"></span>
-                            </ul></li>
+                            <li x-show="app.consents.length > 0"><span x-text="window.simpleid.intl.consents_label"></span>
+                                <ul class="app-consents">
+                                <template x-for="consent in app.consents"><li x-text="consent.description"></li></template>
+                                </ul>
+                            </li>
                         </ul>
                     </div>
                 </td>
-                <td><a href="#" class="delete-app" @click="deleteApp(app.cid)">{{ @intl.common.delete }}</a></td>
+                <td><a href="#" class="delete-app" @click.prevent="deleteApp(app.cid)">{{ @intl.common.delete }}</a></td>
             </tr>
         </template>
     </table>
