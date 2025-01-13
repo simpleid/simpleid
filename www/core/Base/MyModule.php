@@ -106,6 +106,11 @@ class MyModule extends Module {
         $tpl = Template::instance();
         $this->f3->set('tk', $token->generate('apps', SecurityToken::OPTION_BIND_SESSION));
         $this->f3->set('title', $this->f3->get('intl.core.my.apps_title'));
+        $this->f3->set('js_data.intl', [
+            'first_time_label' => $this->f3->get('intl.core.my.first_time_label'),
+            'last_time_label' => $this->f3->get('intl.core.my.last_time_label'),
+            'consents_label' => $this->f3->get('intl.core.my.consents_label')
+        ]);
         $this->f3->set('layout', 'my_apps.html');
         print $tpl->render('page.html');
     }
@@ -136,81 +141,41 @@ class MyModule extends Module {
             return strcasecmp($a['display_name'], $b['display_name']);
         });
 
-        $results = [];
-        foreach ($prefs as $cid => $client_prefs) {
-            $results[] = array_merge([ 'cid' => $cid ], $client_prefs);
-        }
-        print json_encode($results);
-    }
-
-    /**
-     * @param \Base $f3
-     * @param array<string, mixed> $params
-     * @return void
-     */
-    public function get($f3, $params) {
-        $this->checkHttps('error', true);
-
-        header('Content-Type: application/json');
-
-        $token = new SecurityToken();
-        if (!$this->f3->exists('HEADERS.X-Request-Token') || !$token->verify($this->f3->get('HEADERS.X-Request-Token'), 'apps')) {
-            $this->f3->status(401);
-            print json_encode([
-                'error' => 'unauthorized',
-                'error_description' => $this->f3->get('intl.common.unauthorized')
-            ]);
-            return;
-        }
-
-        $auth = AuthManager::instance();
-        $user = $auth->getUser();
-        $clients = $user->clients;
-        if (!isset($clients[$params['cid']])) {
-            $this->f3->status(404);
-            print json_encode([
-                'error' => 'not_found',
-                'error_description' => $this->f3->get('intl.common.not_found')
-            ]);
-            return;
-        }
-        
-        $prefs = $clients[$params['cid']];
-        $results = [
-            'first_time' => $this->f3->format('{0,date} {0,time}', $prefs['first_time']),
-            'last_time' => $this->f3->format('{0,date} {0,time}', $prefs['last_time']),
-            't' => [
-                'first_time_label' => $this->f3->get('intl.core.my.first_time_label'),
-                'last_time_label' => $this->f3->get('intl.core.my.last_time_label'),
-                'consents_label' => $this->f3->get('intl.core.my.consents_label'),
-            ],
-        ];
-
         $event = new ScopeInfoCollectionEvent();
         \Events::instance()->dispatch($event);
         $scope_info = $event->getAllScopeInfo();
 
-        $consent_info = [];
-        foreach ($prefs['consents'] as $protocol => $consents) {
-            if (is_array($consents)) {
-                foreach ($consents as $consent) {
+        $results = [];
+        foreach ($prefs as $cid => $client_prefs) {
+            $consent_info = [];
+            foreach ($client_prefs['consents'] as $type => $consents) {
+                if (is_array($consents)) {
+                    foreach ($consents as $consent) {
+                        $consent_info[] = [
+                            'description' => isset($scope_info[$type][$consent]['description']) ? $scope_info[$type][$consent]['description'] : $type . ':' . $consent,
+                            'weight' => isset($scope_info[$type][$consent]['weight']) ? $scope_info[$type][$consent]['description'] : 0
+                        ];
+                    }
+                } elseif ($consents) {
                     $consent_info[] = [
-                        'description' => isset($scope_info[$protocol][$consent]['description']) ? $scope_info[$protocol][$consent]['description'] : $protocol . ':' . $consent,
-                        'weight' => isset($scope_info[$protocol][$consent]['weight']) ? $scope_info[$protocol][$consent]['description'] : 0
+                        'description' => isset($scope_info[$type]['description']) ? $scope_info[$type]['description'] : $type,
+                        'weight' => isset($scope_info[$type]['weight']) ? $scope_info[$type]['description'] : 0
                     ];
                 }
-            } elseif ($consents) {
-                $consent_info[] = [
-                    'description' => isset($scope_info[$protocol]['description']) ? $scope_info[$protocol]['description'] : $protocol,
-                    'weight' => isset($scope_info[$protocol]['weight']) ? $scope_info[$protocol]['description'] : 0
-                ];
             }
-        }
+            usort($consent_info, function ($a, $b) {
+                return $a['weight'] - $b['weight'];
+            });
 
-        usort($consent_info, function ($a, $b) {
-            return $a['weight'] - $b['weight'];
-        });
-        $results['consents'] = $consent_info;
+            $results[] = [
+                'cid' => $cid,
+                'display_name' => $client_prefs['display_name'],
+                'display_html' => $client_prefs['display_html'],
+                'first_time' => $this->f3->format('{0,date} {0,time}', $client_prefs['first_time']),
+                'last_time' => $this->f3->format('{0,date} {0,time}', $client_prefs['last_time']),
+                'consents' => $consent_info
+            ];
+        }
 
         print json_encode($results);
     }
