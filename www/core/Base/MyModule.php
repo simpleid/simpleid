@@ -171,8 +171,8 @@ class MyModule extends Module {
                 'cid' => $cid,
                 'display_name' => $client_prefs['display_name'],
                 'display_html' => $client_prefs['display_html'],
-                'first_time' => $this->f3->format('{0,date} {0,time}', $prefs['first_time']),
-                'last_time' => $this->f3->format('{0,date} {0,time}', $prefs['last_time']),
+                'first_time' => $this->f3->format('{0,date} {0,time}', $client_prefs['first_time']),
+                'last_time' => $this->f3->format('{0,date} {0,time}', $client_prefs['last_time']),
                 'consents' => $consent_info
             ];
         }
