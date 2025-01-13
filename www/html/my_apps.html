@@ -18,29 +18,10 @@
                 .then(response => {
                     this.apps = response;
                     this.apps.forEach((app) => {
-                        app.details = null,
                         app.openDetails = false
                     })
                     this.isLoading = false;
                 });
-            },
-
-            toggleDetails(cid) {
-                const currentApp = this.apps.find((app) => (app.cid == cid));
-
-                if (!currentApp.details) {
-                    fetch('apps/' + encodeURIComponent(cid), {
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'X-Request-Token': this.tk,
-                            'Accept': 'application/json'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(response => currentApp.details = response);
-                }
-
-                currentApp.openDetails = !currentApp.openDetails;
             },
 
             deleteApp(cid) {
@@ -79,8 +60,8 @@
         <template x-for="app in apps" :key="app.cid">
             <tr>
                 <td class="app-name">
-                    <a href="#" class="get-app-details" x-html="app.display_html"></a>
-                    <div class="app-details" x-show="app.details && app.openDetails">
+                    <a href="#" class="get-app-details" x-html="app.display_html" @click="app.openDetails = !app.openDetails"></a>
+                    <div class="app-details" x-show="app.openDetails">
                         <ul>
                             <li><span x-text="window.simpleid.intl.first_time_label"></span> <span x-text="app.first_time"></span></li>
                             <li><span x-text="window.simpleid.intl.last_time_label"></span> <span x-text="app.last_time"></span></li>
