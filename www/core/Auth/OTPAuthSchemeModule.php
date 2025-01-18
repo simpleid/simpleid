@@ -2,7 +2,7 @@
 /*
  * SimpleID
  *
- * Copyright (C) Kelvin Mo 2014-2024
+ * Copyright (C) Kelvin Mo 2014-2025
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -77,6 +77,9 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             if (isset($user['otp'])) {
                 unset($user['otp']);
                 $store->saveUser($user);
+
+                $event = new CredentialEvent($user, CredentialEvent::CREDENTIAL_DELETED_EVENT, self::class);
+                \Events::instance()->dispatch($event);
             }
             $this->f3->set('message', $this->f3->get('intl.core.auth_otp.disable_success'));
             $this->f3->mock('GET /my/dashboard');
@@ -97,6 +100,9 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             } else {
                 $user['otp'] = $params;
                 $store->saveUser($user);
+
+                $event = new CredentialEvent($user, CredentialEvent::CREDENTIAL_ADDED_EVENT, self::class);
+                \Events::instance()->dispatch($event);
 
                 $this->f3->set('message', $this->f3->get('intl.core.auth_otp.enable_success'));
                 $this->f3->mock('GET /my/dashboard');

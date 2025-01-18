@@ -2,7 +2,7 @@
 /*
  * SimpleID
  *
- * Copyright (C) Kelvin Mo 2014-2024
+ * Copyright (C) Kelvin Mo 2014-2025
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -178,13 +178,13 @@ abstract class Module extends \Prefab {
         $config = $this->f3->get('config');
         $canonical_base_path = $config['canonical_base_path'];
 
-        if (preg_match('/^(?:@(\w+)(?:(\(.+?)\))*|https?:\/\/)/', $path, $parts)) {
+        if (preg_match('/^(?:@(\w+)(?:(\(.+?)\))*|https?:\/\/)/', $path, $parts, PREG_UNMATCHED_AS_NULL)) {
             if (isset($parts[1])) {
                 $aliases = $this->f3->get('ALIASES');
 
                 if (!empty($aliases[$parts[1]])) {
                     $path = $aliases[$parts[1]];
-                    $path = $this->f3->build($path, $this->f3->parse($parts[2]));
+                    $path = $this->f3->build($path, isset($parts[2]) ? $this->f3->parse($parts[2]) : []);
                     $path = ltrim($path, '/');
                 }
             }
@@ -213,6 +213,24 @@ abstract class Module extends \Prefab {
         $url .= $path . (($query == '') ? '' : '?' . $query);
         
         return $url;
+    }
+
+    /**
+     * Gets the origin of a URI
+     *
+     * @param string $uri the URI
+     * @return string the origin
+     * @link https://www.rfc-editor.org/rfc/rfc6454.txt
+     */
+    protected function getOrigin($uri) {
+        $parts = parse_url($uri);
+        if ($parts == false) return $uri;
+        
+        $origin = $parts['scheme'] . '://';
+        $origin .= $parts['host'];
+        if (isset($parts['port'])) $origin .= ':' . $parts['port'];
+        
+        return $origin;
     }
 
     /**

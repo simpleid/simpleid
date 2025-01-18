@@ -1,0 +1,79 @@
+<script type="text/javascript">
+    function webAuthnCredentialsApp(url, tk) {
+        return {
+            credentials: [],
+            message: '',
+            isLoading: true,
+            url: url,
+            tk: tk,
+
+            loadCredentials() {
+                fetch(this.url + '/credentials', {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-Request-Token': this.tk,
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(response => {
+                    this.credentials = response;
+                    this.isLoading = false;
+                });
+            },
+
+            deleteCredential(id) {
+                if (!confirm(simpleid.intl.credential_confirm_delete)) return;
+                fetch(this.url + '/credentials/' + encodeURIComponent(id), {
+                    method: 'DELETE',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-Request-Token': this.tk,
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => {
+                    const body = response.json();
+                    if (response.ok) {
+                        this.message = body.result_description;
+                        this.credentials = this.credentials.filter((credential) => credential.id != id);
+                    } else {
+                        this.message = body.error_description;
+                    }
+                })
+            }
+        }
+    }
+</script>
+
+<div x-data="webAuthnCredentialsApp({{ @base_path . 'auth/webauthn' | js, raw }}, {{ @webauthn_tk | js, raw }})" x-init="loadCredentials">
+    <div class="message" x-cloak x-show="message"><p x-html="message"></p></div>
+
+    <p>{{ @intl.core.auth_webauthn.about_security_keys }}</p>
+
+    <table id="webauthn-credentials">
+        <tr class="loading" x-show="isLoading">
+            <td colspan="2" style="text-align: center"><div class="loading-spinner"></div></td>
+        </tr>
+        <tr x-cloak x-show="!isLoading && (credentials.length == 0)">
+            <td colspan="2" style="text-align: center">{{ @intl.core.auth_webauthn.credential_none }}</td>
+        </tr>
+        <template x-for="credential in credentials" :key="credential.id">
+            <tr>
+                <td class="app-name">
+                    <strong class="get-app-details" x-html="credential.display_name"></strong>
+                    <div class="app-details">
+                        {{ @intl.core.auth_webauthn.first_time_label }} <span x-text="(new Date(credential.activity.first_time * 1000)).toLocaleDateString()"></span> |
+                        {{ @intl.core.auth_webauthn.last_time_label }} <span x-text="(new Date(credential.activity.last_time * 1000)).toLocaleDateString()"></span>
+                    </div>
+                </td>
+                <td><a href="#" class="delete-app" @click.prevent="deleteCredential(credential.id)">{{ @intl.common.delete }}</a></td>
+            </tr>
+        </template>
+    </table>
+
+    <form action="{{ @base_path }}auth/webauthn" method="post">
+        <input type="hidden" name="tk" value="{{ @tk }}">
+        <button type="submit">{{ @intl.common.add }}</button>
+    </form>
+</div>

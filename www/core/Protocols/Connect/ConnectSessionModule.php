@@ -2,7 +2,7 @@
 /*
  * SimpleID
  *
- * Copyright (C) Kelvin Mo 2016-2024
+ * Copyright (C) Kelvin Mo 2016-2025
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -245,24 +245,6 @@ class ConnectSessionModule extends Module {
         $uals = $auth->assignUALoginState();
         $salt = $rand->secret(8);
         return hash_hmac('sha256', $client_id . ' ' . $origin . ' ' . $salt, $uals) . '.' . $salt;
-    }
-
-    /**
-     * Gets the origin of a URI
-     *
-     * @param string $uri the URI
-     * @return string the origin
-     * @link https://www.rfc-editor.org/rfc/rfc6454.txt
-     */
-    private function getOrigin($uri) {
-        $parts = parse_url($uri);
-        if ($parts == false) return $uri;
-        
-        $origin = $parts['scheme'] . '://';
-        $origin .= $parts['host'];
-        if (isset($parts['port'])) $origin .= ':' . $parts['port'];
-        
-        return $origin;
     }
 }
 

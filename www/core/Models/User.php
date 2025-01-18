@@ -2,7 +2,7 @@
 /*
  * SimpleID
  *
- * Copyright (C) Kelvin Mo 2014-2024
+ * Copyright (C) Kelvin Mo 2014-2025
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -44,7 +44,7 @@ class User extends ArrayWrapper implements Serializable, Storable {
     /** @var array<string, array<string, mixed>> the activity log */
     protected $activities = [];
 
-    /** @var array<string, array<string, mixed>> */
+    /** @var array<string, array<string, mixed>> client preferences */
     public $clients = [];
 
     /**
@@ -144,6 +144,21 @@ class User extends ArrayWrapper implements Serializable, Storable {
         return $this->activities;
     }
 
+    /**
+     * Overrides {@link ArrayWrapper::loadData()} to copy over the activity
+     * log and client preferences
+     *
+     * @param array<mixed>|ArrayWrapper $data the data
+     * @return void
+     */
+    public function loadData($data) {
+        parent::loadData($data);
+        if ($data instanceof User) {
+            $this->activities = $data->activities;
+            $this->clients = $data->clients;
+        }
+    }
+
     public function offsetSet($offset, $value): void {
         switch ($offset) {
             case 'uid':
@@ -171,14 +186,7 @@ class User extends ArrayWrapper implements Serializable, Storable {
         }
     }
 
-    /**
-     * Implementation of ArrayAccess
-     * 
-     * Ideally we should provide a mixed return type here, but for PHP7 compatibility,
-     * we add a ReturnTypeWillChange attribute instead.
-     */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($offset) {
+    public function offsetGet($offset): mixed {
         switch ($offset) {
             case 'uid':
                 return $this->uid;
