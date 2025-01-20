@@ -22,6 +22,7 @@
 namespace SimpleID\Util;
 
 use Branca\Branca;
+use JsonException;
 use SimpleID\Crypt\Random;
 use SimpleID\Store\StoreManager;
 
@@ -162,19 +163,24 @@ class SecurityToken {
             $this->data['s'] = session_id();
         }
 
-        $encoded = json_encode($this->data);
-        if ($encoded == false) return new \RuntimeException();
-        $compressed = gzcompress($encoded);
-        if ($compressed == false) return new \RuntimeException();
-        $token = $this->branca->encode($compressed);
+        try {
+            $encoded = json_encode($this->data, JSON_THROW_ON_ERROR);
 
-        if (($options & self::OPTION_NONCE) == self::OPTION_NONCE) {
-            $cache = \Cache::instance();
-            $cache_name = rawurlencode($this->data['i']) . '.token';
-            $cache->set($cache_name, $token, SIMPLEID_HUMAN_TOKEN_EXPIRES_IN);
+            $compressed = gzcompress($encoded);
+            if ($compressed == false) return new \RuntimeException();
+
+            $token = $this->branca->encode($compressed);
+
+            if (($options & self::OPTION_NONCE) == self::OPTION_NONCE) {
+                $cache = \Cache::instance();
+                $cache_name = rawurlencode($this->data['i']) . '.token';
+                $cache->set($cache_name, $token, SIMPLEID_HUMAN_TOKEN_EXPIRES_IN);
+            }
+
+            return $token;
+        } catch (\JsonException $e) {
+            return new \RuntimeException($e->getMessage(), 0, $e);
         }
-
-        return $token;
     }
 
     /**
