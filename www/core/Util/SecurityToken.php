@@ -28,14 +28,22 @@ use SimpleID\Store\StoreManager;
 /**
  * A security token generator based on the branca token specification.
  *
- * A security token is a string which contains signed and encrypted data
- * which only the generator can decode.  It is used for various
- * purposes, such as:
+ * A security token contains signed and encrypted data which only the
+ * generator can decode.  It is used for various purposes, such as:
  *
  * - encoding state data to be passed between HTTP requests
  * - generating CSRF tokens
  * 
- * @see https://branca.io/
+ * The payload of the token is a JSON object with the following
+ * keys defined:
+ * 
+ * - `i` - a random generated identifier for the token
+ * - `o` - token options, consisting of the sum of the OPTION_
+ *   constants defined by this class
+ * - `p` - the payload
+ * - `s` (optional) - the session ID
+ * 
+ * @see https://github.com/tuupola/branca-spec
  */
 class SecurityToken {
     /** @var string */
