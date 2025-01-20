@@ -773,12 +773,13 @@ class OpenIDModule extends Module implements ProtocolResult {
         $cancel = ($response['mode'] == 'cancel');
 
         $realm = $request->getRealm();
+        $state = ['rq' => $request->toArray()];
 
         $this->f3->set('realm', $realm);
 
         if ($cancel) {
             $this->f3->set('requested_identity', $request['openid.identity']);
-            $this->f3->set('switch_url', $this->getCanonicalURL('auth/logout/continue/' .  rawurlencode($token->generate($request->toArray())), '', 'detect'));
+            $this->f3->set('switch_url', $this->getCanonicalURL('auth/logout/continue/' .  rawurlencode($token->generate($state)), '', 'detect'));
         } else {
             $base_path = $this->f3->get('base_path');
             
@@ -801,7 +802,7 @@ class OpenIDModule extends Module implements ProtocolResult {
 
         $this->f3->set('cancel', $cancel);
 
-        $this->f3->set('logout_destination', '/continue/' . rawurlencode($token->generate($request->toArray())));
+        $this->f3->set('logout_destination', '/continue/' . rawurlencode($token->generate($state)));
         $this->f3->set('user_header', true);
         $this->f3->set('title', $this->f3->get('intl.core.openid.openid_title'));
         $this->f3->set('page_class', 'is-dialog-page');
