@@ -28,6 +28,7 @@ use SimpleID\Module;
 use SimpleID\ModuleManager;
 use SimpleID\Base\ScopeInfoCollectionEvent;
 use SimpleID\Base\ConsentEvent;
+use SimpleID\Base\RequestState;
 use SimpleID\Protocols\ProtocolResult;
 use SimpleID\Protocols\ProtocolResultEvent;
 use SimpleID\Store\StoreManager;
@@ -275,7 +276,8 @@ class OAuthModule extends Module implements ProtocolResult {
                     $response->setError('login_required', 'Login required')->renderRedirect();
                 } else {
                     $token = new SecurityToken();
-                    $state = [ 'rt' => '/oauth/auth', 'rq' => $request->toArray() ];
+                    $request_state = new RequestState();
+                    $request_state->setRoute('/oauth/auth')->setParams($request->toArray());
                     $form_state = new FormState([
                         'mode' => AuthManager::MODE_CREDENTIALS,
                         'auth_skip_activity' => true
@@ -291,7 +293,7 @@ class OAuthModule extends Module implements ProtocolResult {
                     /** @var \SimpleID\Auth\AuthModule $auth_module */
                     $auth_module = $this->mgr->getModule('SimpleID\Auth\AuthModule');
                     $auth_module->loginForm([
-                        'destination' => 'continue/' . rawurlencode($token->generate($state))
+                        'destination' => 'continue/' . rawurlencode($token->generate($request_state))
                     ], $form_state);
                     exit;
                 }
@@ -619,6 +621,9 @@ class OAuthModule extends Module implements ProtocolResult {
         $form_state = new FormState();
         $form_state->setRequest($request);
         $form_state->setResponse($response);
+
+        $request_state = new RequestState();
+        $request_state->setParams($request->toArray());
         
         $application_name = $client->getDisplayName();
         $application_type = (isset($client['oauth']['application_type'])) ? $client['oauth']['application_type'] : '';
@@ -676,7 +681,7 @@ class OAuthModule extends Module implements ProtocolResult {
         $this->f3->set('tk', $token->generate('oauth_consent', SecurityToken::OPTION_BIND_SESSION));
         $this->f3->set('fs', $token->generate($form_state->encode()));
 
-        $this->f3->set('logout_destination', '/continue/' . rawurlencode($token->generate($request->toArray())));
+        $this->f3->set('logout_destination', '/continue/' . rawurlencode($token->generate($request_state)));
         $this->f3->set('user_header', true);
         $this->f3->set('title', $this->f3->get('intl.core.oauth.oauth_title'));
         $this->f3->set('page_class', 'is-dialog-page');

@@ -24,6 +24,7 @@ namespace SimpleID\Protocols\Connect;
 
 use Psr\Log\LogLevel;
 use SimpleID\Auth\AuthManager;
+use SimpleID\Base\RequestState;
 use SimpleID\Crypt\Random;
 use SimpleID\Protocols\Connect\ConnectModule;
 use SimpleID\Protocols\OAuth\Response;
@@ -98,9 +99,10 @@ class ConnectSessionModule extends Module {
             } else {
                 if ($form_state['connect_logout']['post_logout_redirect_uri']) {
                     // set up continue param and redirect
-                    $state = [ 'rt' => 'connect/logout_complete/' . $token->generate($form_state['connect_logout']) ];
+                    $request_state = new RequestState();
+                    $request_state->setRoute('connect/logout_complete/' . $token->generate($form_state['connect_logout']));
 
-                    $destination = 'continue/' . rawurlencode($token->generate($state));
+                    $destination = 'continue/' . rawurlencode($token->generate($request_state));
                     $this->f3->reroute('@auth_logout(1=' . $destination . ')');
                 } else {
                     $this->f3->reroute('@auth_logout');
