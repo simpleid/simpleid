@@ -27,6 +27,7 @@ use SimpleID\Module;
 use SimpleID\ModuleManager;
 use SimpleID\Base\RouteContentNegotiationEvent;
 use SimpleID\Base\ScopeInfoCollectionEvent;
+use SimpleID\Base\RequestState;
 use SimpleID\Auth\AuthManager;
 use SimpleID\Crypt\Random;
 use SimpleID\Protocols\ProtocolResult;
@@ -123,8 +124,9 @@ class OpenIDModule extends Module implements ProtocolResult {
             case 'checkid_immediate':
             case 'checkid_setup':
                 $token = new SecurityToken();
-                $state = [ 'rq' => $request->toArray() ];
-                $this->checkHttps('redirect', true, $this->getCanonicalURL('continue/' . rawurlencode($token->generate($state)), '', 'https'));
+                $request_state = new RequestState();
+                $request_state->setParams($request->toArray());
+                $this->checkHttps('redirect', true, $this->getCanonicalURL('continue/' . rawurlencode($token->generate($request_state)), '', 'https'));
                 
                 $this->checkid($request);
                 break;
@@ -337,7 +339,8 @@ class OpenIDModule extends Module implements ProtocolResult {
                     $response->render($request['openid.return_to']);
                 } else {
                     $token = new SecurityToken();
-                    $state = [ 'rq' => $request->toArray() ];
+                    $request_state = new RequestState();
+                    $request_state->setParams($request->toArray());
                     $form_state = new FormState([
                         'cancel' => 'openid',
                         'mode' => AuthManager::MODE_CREDENTIALS,
@@ -354,7 +357,7 @@ class OpenIDModule extends Module implements ProtocolResult {
                     /** @var \SimpleID\Auth\AuthModule */
                     $auth_module = $this->mgr->getModule('SimpleID\Auth\AuthModule');
                     $auth_module->loginForm([
-                        'destination' => 'continue/' . rawurlencode($token->generate($state))
+                        'destination' => 'continue/' . rawurlencode($token->generate($request_state))
                     ], $form_state);
                     exit;
                 }
@@ -545,12 +548,13 @@ class OpenIDModule extends Module implements ProtocolResult {
             $response['mode'] = 'setup_needed';
         } else {
             $token = new SecurityToken();
-            $state = [ 'rq' => $request->toArray() ];
+            $request_state = new RequestState();
+            $request_state->setParams($request->toArray());
 
             $request['openid.mode'] = 'checkid_setup';
             $response->setArray([
                 'mode' => 'id_res',
-                'user_setup_url' => $this->getCanonicalURL('auth/login/continue/' . rawurlencode($token->generate($state)))
+                'user_setup_url' => $this->getCanonicalURL('auth/login/continue/' . rawurlencode($token->generate($request_state)))
             ]);
         }
         
@@ -578,12 +582,13 @@ class OpenIDModule extends Module implements ProtocolResult {
             $response['mode'] = 'setup_needed';
         } else {
             $token = new SecurityToken();
-            $state = [ 'rq' => $request->toArray() ];
+            $request_state = new RequestState();
+            $request_state->setParams($request->toArray());
             $query = ($result == self::CHECKID_REENTER_CREDENTIALS) ? 'mode=' . AuthManager::MODE_REENTER_CREDENTIALS : '';
 
             $response->setArray([
                 'mode' => 'id_res',
-                'user_setup_url' => $this->getCanonicalURL('auth/login/continue/' . rawurlencode($token->generate($state)), $query)
+                'user_setup_url' => $this->getCanonicalURL('auth/login/continue/' . rawurlencode($token->generate($request_state)), $query)
             ]);
         }
         
@@ -773,13 +778,14 @@ class OpenIDModule extends Module implements ProtocolResult {
         $cancel = ($response['mode'] == 'cancel');
 
         $realm = $request->getRealm();
-        $state = ['rq' => $request->toArray()];
+        $request_state = new RequestState();
+        $request_state->setParams($request->toArray());
 
         $this->f3->set('realm', $realm);
 
         if ($cancel) {
             $this->f3->set('requested_identity', $request['openid.identity']);
-            $this->f3->set('switch_url', $this->getCanonicalURL('auth/logout/continue/' .  rawurlencode($token->generate($state)), '', 'detect'));
+            $this->f3->set('switch_url', $this->getCanonicalURL('auth/logout/continue/' .  rawurlencode($token->generate($request_state)), '', 'detect'));
         } else {
             $base_path = $this->f3->get('base_path');
             
@@ -802,7 +808,7 @@ class OpenIDModule extends Module implements ProtocolResult {
 
         $this->f3->set('cancel', $cancel);
 
-        $this->f3->set('logout_destination', '/continue/' . rawurlencode($token->generate($state)));
+        $this->f3->set('logout_destination', '/continue/' . rawurlencode($token->generate($request_state)));
         $this->f3->set('user_header', true);
         $this->f3->set('title', $this->f3->get('intl.core.openid.openid_title'));
         $this->f3->set('page_class', 'is-dialog-page');
