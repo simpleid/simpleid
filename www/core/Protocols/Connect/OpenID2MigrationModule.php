@@ -105,7 +105,7 @@ class OpenID2MigrationModule extends Module {
     public function onScopeInfoCollectionEvent(ScopeInfoCollectionEvent $event) {
         $event->addScopeInfo('oauth', [
             'openid2' => [
-                'description' => '',
+                'description' => $this->f3->get('intl.core.connect.scope.openid2'),
                 'weight' => -1
             ]
         ]);
