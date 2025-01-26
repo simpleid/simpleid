@@ -22,10 +22,11 @@
 namespace SimpleID\Protocols\OAuth;
 
 /**
- * An OAuth access token.
+ * An interface for OAuth access tokens.
  *
- * To create and encode a token, use the {@link create()} static function.
- * To parse an encoded token, use the {@link decode()} static function.
+ * The canonical implementation of this interface is the
+ * {@link AccessToken} class, which implements the `bearer` access
+ * token type.
  */
 interface AccessTokenInterface {
     /**
