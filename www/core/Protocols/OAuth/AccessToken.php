@@ -36,6 +36,15 @@ class AccessToken extends Token implements AccessTokenInterface {
     }
 
     /**
+     * {@inheritdoc}
+     * 
+     * @return string the token type
+     */
+    public function getType(): string {
+        return 'access_token';
+    }
+
+    /**
      * Decodes an encoded token and returns an instance of this class
      * containing the decoded data.
      *
