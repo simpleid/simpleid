@@ -37,7 +37,7 @@ use SimpleID\Util\SecureString;
  *
  * This class cannot be instantiated directly.  It can only be created by its subclasses.
  */
-class Token {
+abstract class Token {
     /** The separator between the token ID and the source reference */
     const GRANT_REF_SEPARATOR = '~';
 
@@ -45,6 +45,7 @@ class Token {
     const TTL_PERPETUAL = 0;
 
     const KEY_FQAID = 'a';
+    const KEY_TYPE = 't';
     const KEY_CACHE_HASH = 'h';
     const KEY_ID = 'i';
     const KEY_GRANTREF = 'r';
@@ -138,6 +139,14 @@ class Token {
     public function getID() {
         return $this->id;
     }
+
+    /**
+     * Returns the type of the token (e.g. `access_token`, `refresh_token`).
+     * Subclasses must implement this method
+     * 
+     * @return string the token type
+     */
+    abstract public function getType(): string;
 
     /**
      * Returns the authorisation that created this token.
@@ -270,6 +279,8 @@ class Token {
             $token_data = json_decode($message, true);
 
             $this->id = $token_data[self::KEY_ID];
+            if ($token_data[self::KEY_TYPE] != $this->getType()) return;
+
             list($auth_state, $aid) = explode('.', $token_data[self::KEY_FQAID]);
             $this->scope = $this->resolveScope($token_data[self::KEY_SCOPEREF]);
             if (isset($token_data[self::KEY_EXPIRE])) $this->expire = $token_data[self::KEY_EXPIRE];
@@ -306,12 +317,14 @@ class Token {
 
         $server_data = array_merge([
             'id' => $this->id,
+            'type' => $this->getType(),
             'fqaid' => $fqaid,
             'scope' => $this->scope,
             'additional' => $this->additional
         ], $server_data);
         $token_data = array_merge([
             self::KEY_ID => $server_data['id'],
+            self::KEY_TYPE => $this->getType(),
             self::KEY_FQAID => $server_data['fqaid'],
             self::KEY_SCOPEREF => $this->getScopeRef($this->scope),
         ], $token_data);

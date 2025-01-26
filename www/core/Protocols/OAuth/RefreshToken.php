@@ -39,6 +39,15 @@ class RefreshToken extends Token implements TokenGrantType {
     }
 
     /**
+     * {@inheritdoc}
+     * 
+     * @return string the token type
+     */
+    public function getType(): string {
+        return 'refresh_token';
+    }
+
+    /**
      * Decodes an encoded token and returns an instance of this class
      * containing the decoded data.
      *
