@@ -66,13 +66,14 @@ $default_config = [
 
 // Check if the configuration file has been defined
 if (file_exists('conf/config.php')) {
-    $config = include_once('conf/config.php');
+    $config_file = 'conf/config.php';
 } elseif (file_exists('config.php')) {
-    $config = include_once('config.php');
+    $config_file = 'config.php';
 } else {
     die('No configuration file found.  See <http://simpleid.org/docs/2/installing/> for instructions on how to set up a configuration file.');
 }
 
+$config = include_once($config_file);
 $config = array_replace_recursive($default_config, $config);
 if (!isset($config['canonical_base_path'])) {
     $port = $f3->get('PORT');
