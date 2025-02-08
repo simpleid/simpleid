@@ -216,6 +216,41 @@ abstract class Module extends \Prefab {
     }
 
     /**
+     * Obtains the SimpleID host URL.
+     *
+     * @param string $secure if $relative is false, either 'https' to force an HTTPS connection, 'http' to force
+     * an unencrypted HTTP connection, 'detect' to base on the current connection, or NULL to vary based on SIMPLEID_BASE_URL
+     * @return string the url
+     *
+     */
+    public function getCanonicalHost($secure = null) {
+        $config = $this->f3->get('config');
+        $canonical_base_path = $config['canonical_base_path'];
+
+        $parts = parse_url($canonical_base_path);
+        if ($parts == false) return $canonical_base_path;
+        
+        if ($secure == 'https') {
+            $scheme = 'https';
+        } elseif ($secure == 'http') {
+            $scheme = 'http';
+        } else {
+            $scheme = $parts['scheme'];
+        }
+        
+        $url = $scheme . '://';
+        if (isset($parts['user'])) {
+            $url .= $parts['user'];
+            if (isset($parts['pass'])) $url .= ':' . $parts['pass'];
+            $url .= '@';
+        }
+        if (isset($parts['host'])) $url .= $parts['host'];
+        if (isset($parts['port'])) $url .= ':' . $parts['port'];
+
+        return $url;
+    }
+
+    /**
      * Gets the origin of a URI
      *
      * @param string $uri the URI
