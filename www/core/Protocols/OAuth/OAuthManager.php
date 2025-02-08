@@ -167,6 +167,15 @@ class OAuthManager extends Prefab {
     }
 
     /**
+     * Returns a list of supported methods to authenticate an OAuth client
+     * 
+     * @return array<string> a list of supported methods
+     */
+    public function getSupportedClientAuthMethods(): array {
+        return [ 'client_secret_basic', 'client_secret_post' ];
+    }
+
+    /**
      * Authenticates the OAuth access token.
      *
      * This function detects whether an access token has been presented.

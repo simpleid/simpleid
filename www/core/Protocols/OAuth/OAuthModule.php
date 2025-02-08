@@ -786,8 +786,6 @@ class OAuthModule extends Module implements ProtocolResult {
         $dispatcher->dispatch($scope_info_event);
         $scopes = $scope_info_event->getScopeInfoForType('oauth');
 
-        $token_endpoint_auth_methods_supported = [ 'client_secret_basic', 'client_secret_post' ];
-
         $config = [
             'issuer' => $this->getCanonicalHost(),
             'authorization_endpoint' => $this->getCanonicalURL('@oauth_auth', '', 'https'),
@@ -796,7 +794,7 @@ class OAuthModule extends Module implements ProtocolResult {
             'response_types_supported' => [ 'code', 'token', 'id_token', 'id_token token', 'code token', 'code id_token', 'code id_token token' ],
             'response_modes_supported' => Response::getResponseModesSupported(),
             'grant_types_supported' => [ 'authorization_code', 'refresh_token' ],
-            'token_endpoint_auth_methods_supported' => $token_endpoint_auth_methods_supported,
+            'token_endpoint_auth_methods_supported' => $this->oauth->getSupportedClientAuthMethods(),
             'code_challenge_methods_supported' => [ 'plain', 'S256' ],
             'service_documentation' => 'https://simpleid.org/docs/'
         ];
