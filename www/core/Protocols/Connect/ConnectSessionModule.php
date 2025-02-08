@@ -219,7 +219,7 @@ class ConnectSessionModule extends Module {
     /**
      * @return void
      */
-    public function onConnectConfiguration(BaseDataCollectionEvent $event) {
+    public function onOauthMetadata(BaseDataCollectionEvent $event) {
         $event->addResult([
             'check_session_iframe' => $this->getCanonicalURL('@connect_check_session', '', 'https'),
             'end_session_endpoint' => $this->getCanonicalURL('@connect_logout', '', 'https')

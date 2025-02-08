@@ -244,7 +244,7 @@ class ConnectClientRegistrationModule extends OAuthProtectedResource {
     /**
      * @return void
      */
-    public function onConnectConfiguration(BaseDataCollectionEvent $event) {
+    public function onOauthMetadata(BaseDataCollectionEvent $event) {
         $event->addResult([ 'registration_endpoint' => $this->getCanonicalURL('@connect_client_register') ]);
     }
 

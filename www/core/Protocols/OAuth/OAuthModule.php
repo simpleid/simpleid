@@ -63,7 +63,8 @@ class OAuthModule extends Module implements ProtocolResult {
         $f3->route('GET @oauth_auth: /oauth/auth', 'SimpleID\Protocols\OAuth\OAuthModule->auth');
         $f3->route('POST @oauth_token: /oauth/token', 'SimpleID\Protocols\OAuth\OAuthModule->token');
         $f3->route('POST @oauth_consent: /oauth/consent', 'SimpleID\Protocols\OAuth\OAuthModule->consent');
-        $f3->route('POST /oauth/revoke', 'SimpleID\Protocols\OAuth\OAuthModule->revoke');
+        //$f3->route('POST /oauth/revoke', 'SimpleID\Protocols\OAuth\OAuthModule->revoke');
+        $f3->route('GET @oauth_metadata: /.well-known/oauth-authorization-server', 'SimpleID\Protocols\OAuth\OAuthModule->metadata');
     }
 
     public function __construct() {
@@ -767,6 +768,43 @@ class OAuthModule extends Module implements ProtocolResult {
         }
 
         $this->processAuthRequest($request, $response);
+    }
+
+    /**
+     * Displays the OAuth authorisation server metadata for this installation.
+     *
+     * @link https://datatracker.ietf.org/doc/html/rfc8414
+     * @return void
+     */
+    public function metadata() {
+        $dispatcher = \Events::instance();
+
+        header('Content-Type: application/json');
+        header('Content-Disposition: inline; filename=oauth-authorization-server');
+
+        $scope_info_event = new ScopeInfoCollectionEvent();
+        $dispatcher->dispatch($scope_info_event);
+        $scopes = $scope_info_event->getScopeInfoForType('oauth');
+
+        $token_endpoint_auth_methods_supported = [ 'client_secret_basic', 'client_secret_post' ];
+
+        $config = [
+            'issuer' => $this->getCanonicalHost(),
+            'authorization_endpoint' => $this->getCanonicalURL('@oauth_auth', '', 'https'),
+            'token_endpoint' => $this->getCanonicalURL('@oauth_token', '', 'https'),
+            'scopes_supported' => array_keys($scopes),
+            'response_types_supported' => [ 'code', 'token', 'id_token', 'id_token token', 'code token', 'code id_token', 'code id_token token' ],
+            'response_modes_supported' => Response::getResponseModesSupported(),
+            'grant_types_supported' => [ 'authorization_code', 'refresh_token' ],
+            'token_endpoint_auth_methods_supported' => $token_endpoint_auth_methods_supported,
+            'code_challenge_methods_supported' => [ 'plain', 'S256' ],
+            'service_documentation' => 'https://simpleid.org/docs/'
+        ];
+
+        $config_event = new BaseDataCollectionEvent('oauth_metadata', BaseDataCollectionEvent::MERGE_RECURSIVE);
+        $config_event->addResult($config);
+        $dispatcher->dispatch($config_event);
+        print json_encode($config_event->getResults());
     }
 
     /**
