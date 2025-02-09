@@ -814,6 +814,7 @@ class OAuthModule extends Module implements ProtocolResult {
 
         // It does not matter what we put here, as the client is supposed to ignore
         // the response body.
+        $this->logger->log(LogLevel::INFO, 'OAuth token revoked: ', $request['token']);
         $response['success'] = true;
         $response->renderJSON();
     }
@@ -830,7 +831,7 @@ class OAuthModule extends Module implements ProtocolResult {
         
         $this->checkHttps('error');
         
-        $this->logger->log(LogLevel::INFO, 'OAuth token revocation request: ', $request->toArray());
+        $this->logger->log(LogLevel::INFO, 'OAuth token introspection request: ', $request->toArray());
                 
         $this->oauth->initClient();
         $client = $this->oauth->getClient();
@@ -849,6 +850,7 @@ class OAuthModule extends Module implements ProtocolResult {
         }
 
         if (($token == null) || (!$token->isValid())) {
+            $this->logger->log(LogLevel::INFO, 'OAuth token introspection result: not active');
             $response['active'] = false;
             $response->renderJSON();
             return;
@@ -869,7 +871,8 @@ class OAuthModule extends Module implements ProtocolResult {
         $response['client_id'] = $client->getStoreID();
         $response['token_type'] = $token->getType();
         if ($expiry != null) $response['exp'] = $expiry;
-
+        
+        $this->logger->log(LogLevel::INFO, 'OAuth token introspection result: active');
         $response->renderJSON();
     }
 
