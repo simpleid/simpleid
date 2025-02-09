@@ -38,6 +38,8 @@ use Psr\EventDispatcher\StoppableEventInterface;
  * 
  * Listeners can use {@link getRequest()} and {@link getResponse()}
  * methods to obtain and modify the request and response accordingly.
+ * In particular, errors should be communicated by using {@link getResponse()}
+ * to set the appropriate error response.
  */
 class OAuthEvent implements \GenericEventInterface, StoppableEventInterface {
     use GenericEventTrait;
