@@ -63,7 +63,7 @@ class OAuthModule extends Module implements ProtocolResult {
         $f3->route('GET @oauth_auth: /oauth/auth', 'SimpleID\Protocols\OAuth\OAuthModule->auth');
         $f3->route('POST @oauth_token: /oauth/token', 'SimpleID\Protocols\OAuth\OAuthModule->token');
         $f3->route('POST @oauth_consent: /oauth/consent', 'SimpleID\Protocols\OAuth\OAuthModule->consent');
-        //$f3->route('POST /oauth/revoke', 'SimpleID\Protocols\OAuth\OAuthModule->revoke');
+        $f3->route('POST @oauth_revoke: /oauth/revoke', 'SimpleID\Protocols\OAuth\OAuthModule->revoke');
         $f3->route('GET @oauth_metadata: /.well-known/oauth-authorization-server', 'SimpleID\Protocols\OAuth\OAuthModule->metadata');
     }
 
@@ -585,7 +585,6 @@ class OAuthModule extends Module implements ProtocolResult {
         if ($authorization->getClient()->getStoreID() != $client->getStoreID()) {
             $this->logger->log(LogLevel::ERROR, 'Token request failed: this client (' . $client->getStoreID() . ') does not match the client stored in refresh token (' . $authorization->getClient()->getStoreID() . ')');
             $response->setError('invalid_grant', 'this client does not match the client stored in refresh token');
-            $response->renderJSON();
             return;
         }
         $authorization->revokeTokensFromGrant($refresh_token);
@@ -771,6 +770,76 @@ class OAuthModule extends Module implements ProtocolResult {
     }
 
     /**
+     * Endpoint for token revocation requests
+     * 
+     * @link https://datatracker.ietf.org/doc/html/rfc7009
+     * @return void
+     */
+    public function revoke() {
+        $request = new Request($this->f3->get('POST'));
+        $response = new Response($request);
+        
+        $this->checkHttps('error');
+        
+        $this->logger->log(LogLevel::INFO, 'OAuth token revocation request: ', $request->toArray());
+                
+        $this->oauth->initClient();
+        $client = $this->oauth->getClient();
+
+        if (!$this->oauth->isClientAuthenticated(true, isset($client['oauth']['token_endpoint_auth_method']) ? $client['oauth']['token_endpoint_auth_method'] : null)) {
+            $this->logger->log(LogLevel::ERROR, 'Client authentication failed');
+            $response->setError('invalid_client', 'client authentication failed');
+            $response->renderJSON();
+            return;
+        }
+
+        if (!isset($request['token']) || ($request['token'] == '')) {
+            $this->logger->log(LogLevel::ERROR, 'Token revocation request failed: token not set');
+            $response->setError('invalid_request', 'token not set');
+            $response->renderJSON();
+            return;
+        }
+
+        if (isset($request['token_type_hint'])) {
+            switch ($request['token_type_hint']) {
+                case 'access_token':
+                    $token = AccessToken::decode($request['token']);
+                    break;
+                case 'refresh_token':
+                    $token = RefreshToken::decode($request['token']);
+                    break;
+                default:
+                    $this->logger->log(LogLevel::ERROR, 'Token revocation request failed: unsupported token type');
+                    $response->setError('unsupported_token_type', 'unsupported token type');
+                    $response->renderJSON();
+                    return;
+            }
+        } else {
+            // No token_type_hint. Try access_token, then refresh_token
+            $token = AccessToken::decode($request['token']);
+            if (!$token->isValid()) $token = RefreshToken::decode($request['token']);
+            if (!$token->isValid()) $token = null;
+        }
+
+        if (($token != null) && $token->isValid()) {
+            $authorization = $token->getAuthorization();
+            if ($authorization->getClient()->getStoreID() != $client->getStoreID()) {
+                $this->logger->log(LogLevel::ERROR, 'Token revocation request failed: this client (' . $client->getStoreID() . ') does not match the client stored in token (' . $authorization->getClient()->getStoreID() . ')');
+                $response->setError('invalid_grant', 'this client does not match the client stored in token');
+                $response->renderJSON();
+                return;
+            }
+
+            $token->revoke();
+        }
+
+        // It does not matter what we put here, as the client is supposed to ignore
+        // the response body.
+        $response['success'] = true;
+        $response->renderJSON();
+    }
+
+    /**
      * Displays the OAuth authorisation server metadata for this installation.
      *
      * @link https://datatracker.ietf.org/doc/html/rfc8414
@@ -790,11 +859,13 @@ class OAuthModule extends Module implements ProtocolResult {
             'issuer' => $this->getCanonicalHost(),
             'authorization_endpoint' => $this->getCanonicalURL('@oauth_auth', '', 'https'),
             'token_endpoint' => $this->getCanonicalURL('@oauth_token', '', 'https'),
+            'revocation_endpoint' => $this->getCanonicalURL('@oauth_revoke', '', 'https'),
             'scopes_supported' => array_keys($scopes),
             'response_types_supported' => [ 'code', 'token', 'code token' ],
             'response_modes_supported' => Response::getResponseModesSupported(),
             'grant_types_supported' => [ 'authorization_code', 'refresh_token' ],
             'token_endpoint_auth_methods_supported' => $this->oauth->getSupportedClientAuthMethods(),
+            'revocation_endpoint_auth_methods_supported' => $this->oauth->getSupportedClientAuthMethods(),
             'code_challenge_methods_supported' => [ 'plain', 'S256' ],
             'service_documentation' => 'https://simpleid.org/docs/'
         ];
