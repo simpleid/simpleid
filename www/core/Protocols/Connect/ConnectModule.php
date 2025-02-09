@@ -559,6 +559,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
         }
 
         $config = [
+            'response_types_supported' => [ 'id_token', 'id_token token', 'code id_token', 'code id_token token' ],
             'userinfo_endpoint' => $this->getCanonicalURL('@connect_userinfo', '', 'https'),
             'jwks_uri' => $this->getCanonicalURL('@connect_jwks', '', 'https'),
             'acr_values_supported' => [],

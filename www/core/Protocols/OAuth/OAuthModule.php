@@ -791,7 +791,7 @@ class OAuthModule extends Module implements ProtocolResult {
             'authorization_endpoint' => $this->getCanonicalURL('@oauth_auth', '', 'https'),
             'token_endpoint' => $this->getCanonicalURL('@oauth_token', '', 'https'),
             'scopes_supported' => array_keys($scopes),
-            'response_types_supported' => [ 'code', 'token', 'id_token', 'id_token token', 'code token', 'code id_token', 'code id_token token' ],
+            'response_types_supported' => [ 'code', 'token', 'code token' ],
             'response_modes_supported' => Response::getResponseModesSupported(),
             'grant_types_supported' => [ 'authorization_code', 'refresh_token' ],
             'token_endpoint_auth_methods_supported' => $this->oauth->getSupportedClientAuthMethods(),
