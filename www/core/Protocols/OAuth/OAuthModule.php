@@ -794,7 +794,7 @@ class OAuthModule extends Module implements ProtocolResult {
         }
 
         if (!isset($request['token']) || ($request['token'] == '')) {
-            $this->logger->log(LogLevel::ERROR, 'Token recovation request failed: token not set');
+            $this->logger->log(LogLevel::ERROR, 'Token revocation request failed: token not set');
             $response->setError('invalid_request', 'token not set');
             $response->renderJSON();
             return;
@@ -809,7 +809,7 @@ class OAuthModule extends Module implements ProtocolResult {
                     $token = RefreshToken::decode($request['token']);
                     break;
                 default:
-                    $this->logger->log(LogLevel::ERROR, 'Token recovation request failed: unsupported token type');
+                    $this->logger->log(LogLevel::ERROR, 'Token revocation request failed: unsupported token type');
                     $response->setError('unsupported_token_type', 'unsupported token type');
                     $response->renderJSON();
                     return;
@@ -824,7 +824,7 @@ class OAuthModule extends Module implements ProtocolResult {
         if (($token != null) && $token->isValid()) {
             $authorization = $token->getAuthorization();
             if ($authorization->getClient()->getStoreID() != $client->getStoreID()) {
-                $this->logger->log(LogLevel::ERROR, 'Token recovation request failed: this client (' . $client->getStoreID() . ') does not match the client stored in token (' . $authorization->getClient()->getStoreID() . ')');
+                $this->logger->log(LogLevel::ERROR, 'Token revocation request failed: this client (' . $client->getStoreID() . ') does not match the client stored in token (' . $authorization->getClient()->getStoreID() . ')');
                 $response->setError('invalid_grant', 'this client does not match the client stored in token');
                 $response->renderJSON();
                 return;
