@@ -202,6 +202,16 @@ abstract class Token {
     }
 
     /**
+     * Returns the expiry time for this token, if any.
+     * 
+     * @return int|null the expiry time, or null if the token does not
+     * expire
+     */
+    public function getExpiry() {
+        return $this->expire;
+    }
+
+    /**
      * Returns the encoded token as a string.
      *
      * @return string the encoded token

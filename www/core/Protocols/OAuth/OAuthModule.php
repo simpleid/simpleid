@@ -64,6 +64,7 @@ class OAuthModule extends Module implements ProtocolResult {
         $f3->route('POST @oauth_token: /oauth/token', 'SimpleID\Protocols\OAuth\OAuthModule->token');
         $f3->route('POST @oauth_consent: /oauth/consent', 'SimpleID\Protocols\OAuth\OAuthModule->consent');
         $f3->route('POST @oauth_revoke: /oauth/revoke', 'SimpleID\Protocols\OAuth\OAuthModule->revoke');
+        $f3->route('POST @oauth_introspect: /oauth/introspect', 'SimpleID\Protocols\OAuth\OAuthModule->introspect');
         $f3->route('GET @oauth_metadata: /.well-known/oauth-authorization-server', 'SimpleID\Protocols\OAuth\OAuthModule->metadata');
     }
 
@@ -793,32 +794,10 @@ class OAuthModule extends Module implements ProtocolResult {
             return;
         }
 
-        if (!isset($request['token']) || ($request['token'] == '')) {
-            $this->logger->log(LogLevel::ERROR, 'Token revocation request failed: token not set');
-            $response->setError('invalid_request', 'token not set');
+        $token = $this->inferTokenFromRequestBody($request, $response);
+        if ($response->isError()) {
             $response->renderJSON();
             return;
-        }
-
-        if (isset($request['token_type_hint'])) {
-            switch ($request['token_type_hint']) {
-                case 'access_token':
-                    $token = AccessToken::decode($request['token']);
-                    break;
-                case 'refresh_token':
-                    $token = RefreshToken::decode($request['token']);
-                    break;
-                default:
-                    $this->logger->log(LogLevel::ERROR, 'Token revocation request failed: unsupported token type');
-                    $response->setError('unsupported_token_type', 'unsupported token type');
-                    $response->renderJSON();
-                    return;
-            }
-        } else {
-            // No token_type_hint. Try access_token, then refresh_token
-            $token = AccessToken::decode($request['token']);
-            if (!$token->isValid()) $token = RefreshToken::decode($request['token']);
-            if (!$token->isValid()) $token = null;
         }
 
         if (($token != null) && $token->isValid()) {
@@ -835,7 +814,65 @@ class OAuthModule extends Module implements ProtocolResult {
 
         // It does not matter what we put here, as the client is supposed to ignore
         // the response body.
+        $this->logger->log(LogLevel::INFO, 'OAuth token revoked: ', $request['token']);
         $response['success'] = true;
+        $response->renderJSON();
+    }
+
+    /**
+     * Endpoint for token revocation requests
+     * 
+     * @link https://datatracker.ietf.org/doc/html/rfc7009
+     * @return void
+     */
+    public function introspect() {
+        $request = new Request($this->f3->get('POST'));
+        $response = new Response($request);
+        
+        $this->checkHttps('error');
+        
+        $this->logger->log(LogLevel::INFO, 'OAuth token introspection request: ', $request->toArray());
+                
+        $this->oauth->initClient();
+        $client = $this->oauth->getClient();
+
+        if (!$this->oauth->isClientAuthenticated(true, isset($client['oauth']['token_endpoint_auth_method']) ? $client['oauth']['token_endpoint_auth_method'] : null)) {
+            $this->logger->log(LogLevel::ERROR, 'Client authentication failed');
+            $response->setError('invalid_client', 'client authentication failed');
+            $response->renderJSON();
+            return;
+        }
+
+        $token = $this->inferTokenFromRequestBody($request, $response);
+        if ($response->isError()) {
+            $response->renderJSON();
+            return;
+        }
+
+        if (($token == null) || (!$token->isValid())) {
+            $this->logger->log(LogLevel::INFO, 'OAuth token introspection result: not active');
+            $response['active'] = false;
+            $response->renderJSON();
+            return;
+        }
+
+        $authorization = $token->getAuthorization();
+        if ($authorization->getClient()->getStoreID() != $client->getStoreID()) {
+            $this->logger->log(LogLevel::ERROR, 'Token introspection request failed: this client (' . $client->getStoreID() . ') does not match the client stored in token (' . $authorization->getClient()->getStoreID() . ')');
+            $response->setError('invalid_grant', 'this client does not match the client stored in token');
+            $response->renderJSON();
+            return;
+        }
+
+        $expiry = $token->getExpiry();
+
+        $response['active'] = true;
+        $response['scope'] = implode(' ', $token->getScope());
+        $response['client_id'] = $client->getStoreID();
+        $response['token_type'] = $token->getType();
+        if ($expiry != null) $response['exp'] = $expiry;
+        
+        $this->logger->log(LogLevel::INFO, 'OAuth token introspection result: active');
         $response->renderJSON();
     }
 
@@ -860,12 +897,14 @@ class OAuthModule extends Module implements ProtocolResult {
             'authorization_endpoint' => $this->getCanonicalURL('@oauth_auth', '', 'https'),
             'token_endpoint' => $this->getCanonicalURL('@oauth_token', '', 'https'),
             'revocation_endpoint' => $this->getCanonicalURL('@oauth_revoke', '', 'https'),
+            'introspection_endpoint' => $this->getCanonicalURL('@oauth_introspect', '', 'https'),
             'scopes_supported' => array_keys($scopes),
             'response_types_supported' => [ 'code', 'token', 'code token' ],
             'response_modes_supported' => Response::getResponseModesSupported(),
             'grant_types_supported' => [ 'authorization_code', 'refresh_token' ],
             'token_endpoint_auth_methods_supported' => $this->oauth->getSupportedClientAuthMethods(),
             'revocation_endpoint_auth_methods_supported' => $this->oauth->getSupportedClientAuthMethods(),
+            'introspection_endpoint_auth_methods_supported' => $this->oauth->getSupportedClientAuthMethods(),
             'code_challenge_methods_supported' => [ 'plain', 'S256' ],
             'service_documentation' => 'https://simpleid.org/docs/'
         ];
@@ -919,7 +958,6 @@ class OAuthModule extends Module implements ProtocolResult {
         }
     }
 
-
     /**
      * Encodes a URL using RFC 3986.
      *
@@ -933,10 +971,55 @@ class OAuthModule extends Module implements ProtocolResult {
      * @param string $s the URL to encode
      * @return string the encoded URL
      */
-    private function rfc3986_urlencode($s) {
+    protected function rfc3986_urlencode($s) {
         return str_replace('%7E', '~', rawurlencode($s));
     }
 
+    /**
+     * Infers a token by parsing the `token` and `token_type_hint` parameters
+     * in the body of a request.  If `token_type_hint` exists, then the
+     * appropriate `Token` object is created from `token`.  If `token_type_hint`
+     * does not exist, it firstly attempts to create an access token, then
+     * it attempts to create a refresh token.
+     * 
+     * Note that the token returned may not be valid.
+     * 
+     * If an error occurs, then an appropriate error response is set using
+     * the supplied response object
+     * 
+     * @param Request $request the request
+     * @param Response $response the response
+     * @return ?Token the access or refresh token, or null if no token can be found
+     */
+    protected function inferTokenFromRequestBody(Request $request, Response $response): ?Token {
+        if (!isset($request['token']) || ($request['token'] == '')) {
+            $this->logger->log(LogLevel::ERROR, 'Token operation request failed: token not set');
+            $response->setError('invalid_request', 'token not set');
+            return null;
+        }
+
+        if (isset($request['token_type_hint'])) {
+            switch ($request['token_type_hint']) {
+                case 'access_token':
+                    $token = AccessToken::decode($request['token']);
+                    break;
+                case 'refresh_token':
+                    $token = RefreshToken::decode($request['token']);
+                    break;
+                default:
+                    $this->logger->log(LogLevel::ERROR, 'Token operation request failed: unsupported token type');
+                    $response->setError('unsupported_token_type', 'unsupported token type');
+                    return null;
+            }
+        } else {
+            // No token_type_hint. Try access_token, then refresh_token
+            $token = AccessToken::decode($request['token']);
+            if (!$token->isValid()) $token = RefreshToken::decode($request['token']);
+            if (!$token->isValid()) $token = null;
+        }
+
+        return $token;
+    }
 
     /**
      * A callback function for use by usort() to sort scopes to be displayed on
