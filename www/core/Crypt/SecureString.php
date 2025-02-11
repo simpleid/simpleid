@@ -19,7 +19,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-namespace SimpleID\Util;
+namespace SimpleID\Crypt;
 
 use \Stringable;
 use Branca\Branca;

@@ -19,11 +19,10 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-namespace SimpleID\Util;
+namespace SimpleID\Crypt;
 
 use Branca\Branca;
 use JsonException;
-use SimpleID\Crypt\Random;
 use SimpleID\Store\StoreManager;
 
 /**
