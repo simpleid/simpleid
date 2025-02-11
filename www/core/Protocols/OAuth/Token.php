@@ -81,7 +81,7 @@ abstract class Token {
 
     /** Creates a token */
     protected function __construct() {
-        $this->branca = new Branca(base64_decode(strtr(self::getKey(), '-_', '+/')));
+        $this->branca = new Branca((StoreManager::instance())->getKey('oauth-token', true));
     }
 
     /**
@@ -419,29 +419,6 @@ abstract class Token {
     static function getScopeRefMap() {
         $store = StoreManager::instance();
         return $store->getSetting('oauth_scope', []);
-    }
-
-    /**
-     * Gets the site-specific encryption and signing key.
-     *
-     * If the key does not exist, it is automatically generated.
-     *
-     * @return string the site-specific encryption and signing key
-     * as a base64url encoded string
-     */
-    static protected function getKey() {
-        $store = StoreManager::instance();
-
-        $key = SecureString::getPlaintext($store->getSetting('oauth-token'));
-
-        if ($key == NULL) {
-            $rand = new Random();
-
-            $key = strtr(base64_encode($rand->bytes(32)), '+/', '-_');
-            $store->setSetting('oauth-token', SecureString::fromPlaintext($key));
-        }
-
-        return $key;
     }
 }
 

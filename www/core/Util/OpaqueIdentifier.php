@@ -40,7 +40,7 @@ class OpaqueIdentifier {
     static private $opaque_token = null;
 
     function __construct() {
-        if (self::$opaque_token === null) self::$opaque_token = self::getOpaqueToken();
+        if (self::$opaque_token === null) self::$opaque_token = (StoreManager::instance())->getKey('opaque-token', true, 16);
     }
 
     /**
@@ -87,33 +87,5 @@ class OpaqueIdentifier {
         }
         
         return implode('; ', $output);
-    }
-
-    /**
-     * Gets the site-specific key for generating identifiers.
-     *
-     * If the key does not exist, it is automatically generated.
-     *
-     * @return string site-specific key as a binary string
-     */
-    static private function getOpaqueToken() {
-        $store = StoreManager::instance();
-
-        $opaque_token = $store->getSetting('opaque-token');
-
-        if ($opaque_token == NULL) {
-            $rand = new Random();
-
-            $opaque_token = $rand->bytes(16);
-            $store->setSetting('opaque-token', SecureString::fromPlaintext($opaque_token));
-        } else {
-            if ($opaque_token instanceof SecureString) {
-                $opaque_token = SecureString::getPlaintext($opaque_token);
-            } else {
-                $opaque_token = base64_decode($opaque_token);
-            }
-        }
-
-        return $opaque_token;
     }
 }
