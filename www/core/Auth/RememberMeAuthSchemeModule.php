@@ -25,8 +25,8 @@ namespace SimpleID\Auth;
 use Psr\Log\LogLevel;
 use SimpleID\Auth\NonInteractiveAuthEvent;
 use SimpleID\Crypt\Random;
+use SimpleID\Crypt\SecurityToken;
 use SimpleID\Store\StoreManager;
-use SimpleID\Util\SecurityToken;
 use SimpleID\Util\Forms\FormBuildEvent;
 use SimpleID\Util\UI\Template;
 

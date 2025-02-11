@@ -25,7 +25,7 @@ namespace SimpleID\Store;
 use \Base;
 use \Prefab;
 use SimpleID\Crypt\Random;
-use SimpleID\Util\SecureString;
+use SimpleID\Crypt\SecureString;
 use SimpleID\ModuleManager;
 use SimpleID\Models\User;
 
