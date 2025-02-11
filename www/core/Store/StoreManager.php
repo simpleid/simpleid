@@ -332,12 +332,12 @@ class StoreManager extends Prefab {
      * the specified number of bytes.
      *
      * @param string $name the name of the setting to return
+     * @param bool $binary true if the key is to be returned as a binary string
      * @param int<1, max> $num_bytes if the key does not exist, the number of random bytes
      * required
-     * @param bool $binary true if the key is to be returned as a binary string
      * @return string the key as a binary or base64url encoded string
      */
-    public function getKey($name, $num_bytes = 32, $binary = false) {
+    public function getKey($name, $binary = false, $num_bytes = 32) {
         $setting = $this->getSetting($name);
 
         if ($setting == null) {
