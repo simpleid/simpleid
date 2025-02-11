@@ -76,7 +76,7 @@ class SecurityToken {
      */
     function __construct($key = null) {
         if ($key == null) {
-            if (self::$site_token === null) self::$site_token = self::getSiteToken();
+            if (self::$site_token === null) self::$site_token = (StoreManager::instance())->getKey('site-token');
             $key = self::$site_token;
         }
 
@@ -181,29 +181,6 @@ class SecurityToken {
         } catch (\JsonException $e) {
             return new \RuntimeException($e->getMessage(), 0, $e);
         }
-    }
-
-    /**
-     * Gets the site-specific encryption and signing key.
-     *
-     * If the key does not exist, it is automatically generated.
-     *
-     * @return string the site-specific encryption and signing key
-     * as a base64url encoded string
-     */
-    static private function getSiteToken() {
-        $store = StoreManager::instance();
-
-        $site_token = SecureString::getPlaintext($store->getSetting('site-token'));
-
-        if ($site_token == NULL) {
-            $rand = new Random();
-
-            $site_token = strtr(base64_encode($rand->bytes(32)), '+/', '-_');
-            $store->setSetting('site-token', SecureString::fromPlaintext($site_token));
-        }
-
-        return $site_token;
     }
 }
 
