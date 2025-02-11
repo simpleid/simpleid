@@ -25,7 +25,7 @@ namespace SimpleID\Auth;
 use Psr\Log\LogLevel;
 use SimpleID\Module;
 use SimpleID\ModuleManager;
-use SimpleID\Util\SecurityToken;
+use SimpleID\Crypt\SecurityToken;
 use SimpleID\Util\Events\GenericStoppableEvent;
 use SimpleID\Util\Forms\FormState;
 use SimpleID\Util\Forms\FormBuildEvent;

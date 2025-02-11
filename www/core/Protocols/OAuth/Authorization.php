@@ -25,8 +25,8 @@ use \Cache;
 use SimpleID\Crypt\Random;
 use SimpleID\Store\Storable;
 use SimpleID\Store\StoreManager;
-use SimpleID\Util\SecurityToken;
-use SimpleID\Util\OpaqueIdentifier;
+use SimpleID\Crypt\SecurityToken;
+use SimpleID\Crypt\OpaqueIdentifier;
 
 
 /**

@@ -29,7 +29,7 @@ use Psr\Log\LogLevel;
 use SimpleID\ModuleManager;
 use SimpleID\Store\StoreManager;
 use SimpleID\Crypt\Random;
-use SimpleID\Util\OpaqueIdentifier;
+use SimpleID\Crypt\OpaqueIdentifier;
 use SimpleID\Util\Events\BaseDataCollectionEvent;
 use SimpleID\Util\Forms\FormState;
 

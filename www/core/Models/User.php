@@ -25,9 +25,9 @@ namespace SimpleID\Models;
 use \Base;
 use \Serializable;
 use SimpleID\ModuleManager;
+use SimpleID\Crypt\OpaqueIdentifier;
 use SimpleID\Store\Storable;
 use SimpleID\Util\ArrayWrapper;
-use SimpleID\Util\OpaqueIdentifier;
 use SimpleID\Util\Events\BaseDataCollectionEvent;
 use SimpleID\Base\UserModule;
 

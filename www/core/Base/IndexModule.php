@@ -23,10 +23,10 @@
 namespace SimpleID\Base;
 
 use Psr\Log\LogLevel;
-use SimpleID\Auth\AuthManager;
 use SimpleID\Module;
 use SimpleID\ModuleManager;
-use SimpleID\Util\SecurityToken;
+use SimpleID\Auth\AuthManager;
+use SimpleID\Crypt\SecurityToken;
 use SimpleID\Util\UI\Template;
 
 /**
