@@ -759,10 +759,6 @@ class OAuthModule extends Module implements ProtocolResult {
             $prefs['last_time'] = $now;
             $prefs['consents'] = array_merge($prefs['consents'], $consents);
 
-            if ($this->f3->exists('POST.prefs.oauth.prompt_none') && ($this->f3->get('POST.prefs.oauth.prompt_none') == 'true')) {
-                $prefs['oauth']['prompt_none'] = true;
-            }
-                
             $user->clients[$cid] = $prefs;
             $store->saveUser($user);
         }

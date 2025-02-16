@@ -40,14 +40,7 @@
         </div>
     </div>
     </check>
-    
-    <div class="form-item">
-        <label class="option">
-            <input class="{{ @@client_dynamic }}" type="checkbox" name="prefs[oauth][prompt_none]" value="true">
-            {{ @intl.common.consent.consent_label, @application_name | format, raw }}
-        </label>
-    </div>
-    
+        
     <button type="submit" name="op" value="allow" id="edit-allow" class="is-default">{{ @intl.common.allow }}</button>
     <button type="submit" name="op" value="deny" id="edit-deny" type="submit">{{ @intl.common.deny }}</button>
 </form>
