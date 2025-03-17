@@ -219,6 +219,21 @@ class AuthModule extends Module {
 
     /**
      * Displays a user login or a login verification form.
+     * 
+     * The following common additional variables are stored in the form state (`$form_state`):
+     * 
+     * - `auth_level` - if login is successful, the authentication level
+     * - `auth_skip_activity` - true if the login should not be recorded in the activity
+     *   log
+     * - `cancel` - if the login form is cancellable, a string to identify the module to
+     *   handle the cancellation event
+     * - `mode` - one of the AuthManager::MODE constants to determine the mode of the form
+     * - `modules` - if login is successful, an array of authentication modules
+     * - `uid` - the user ID entered by the user or requested for verification
+     * - `verify_forms` - if mode is AuthManager::MODE_VERIFY, an array of UI blocks containing
+     *   the verificationinterface
+     * 
+     * Authentication modules may define additional variables in the form state.
      *
      * @param array<string, mixed> $params the F3 parameters
      * @param FormState $form_state|null the form state
