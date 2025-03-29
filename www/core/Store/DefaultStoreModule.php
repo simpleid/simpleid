@@ -130,7 +130,8 @@ class DefaultStoreModule extends StoreModule {
         
         while (($file = readdir($dir)) !== false) {
             $filename = $this->config['identities_dir'] . '/' . $file;
-            
+
+            /** @var string $filename */
             if (is_link($filename) && readlink($filename)) $filename = readlink($filename);
             if ((filetype($filename) != "file") || (!preg_match('/^(.+)\.user\.yml$/', $file, $matches))) continue;
             
