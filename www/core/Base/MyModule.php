@@ -153,13 +153,13 @@ class MyModule extends Module {
                     foreach ($consents as $consent) {
                         $consent_info[] = [
                             'description' => isset($scope_info[$type][$consent]['description']) ? $scope_info[$type][$consent]['description'] : $type . ':' . $consent,
-                            'weight' => isset($scope_info[$type][$consent]['weight']) ? $scope_info[$type][$consent]['description'] : 0
+                            'weight' => isset($scope_info[$type][$consent]['weight']) ? $scope_info[$type][$consent]['weight'] : 0
                         ];
                     }
                 } elseif ($consents) {
                     $consent_info[] = [
                         'description' => isset($scope_info[$type]['description']) ? $scope_info[$type]['description'] : $type,
-                        'weight' => isset($scope_info[$type]['weight']) ? $scope_info[$type]['description'] : 0
+                        'weight' => isset($scope_info[$type]['weight']) ? $scope_info[$type]['weight'] : 0
                     ];
                 }
             }
