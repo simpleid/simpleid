@@ -128,7 +128,7 @@ class Request extends ArrayWrapper {
      * exists
      */
     public function getAuthorizationHeader($parse_credentials = false) {
-        if (!$this->hasHeader('Authorization')) return null;
+        if (!$this->hasHeader('Authorization') || $this->getHeader('Authorization') == '') return null;
 
         $results = [];
 
