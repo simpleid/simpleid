@@ -10,6 +10,9 @@ use SimpleID\Util\UI\Template;
  * @see http://robo.li/
  */
 class RoboFile extends \Robo\Tasks {
+    public function apigen($title = null) {
+    }
+
     public function update_copyright() {
         $current_year = date('Y');
 
