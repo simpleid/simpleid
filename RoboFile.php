@@ -1,5 +1,6 @@
 <?php
 
+use Robo\Symfony\ConsoleIO;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 use SimpleID\Util\UI\Template;
@@ -10,7 +11,49 @@ use SimpleID\Util\UI\Template;
  * @see http://robo.li/
  */
 class RoboFile extends \Robo\Tasks {
-    public function apigen($title = null) {
+    /**
+     * @option $apigen-url
+     */
+    public function apidocs(ConsoleIO $io, $title_template = 'SimpleID Documentation [%s]', $opts = [ 'apigen-path' => null ]) {
+        // 1. Get apigen
+        if (isset($opts['apigen-path'])) {
+            $apigen = $opts['apigen-path'];
+        } elseif (getenv('APIGEN_PATH') != null) {
+            $apigen = getenv('APIGEN_PATH');
+        } else {
+            $io->error("apigen-path option or APIGEN_PATH variable is not defined");
+            return 1;
+        }
+
+        if (!file_exists($apigen) && (filter_var($apigen, FILTER_VALIDATE_URL) !== false)) {
+            $io->say('Downloading apigen.phar');
+
+            $url = filter_var($apigen, FILTER_VALIDATE_URL);
+            $data = @file_get_contents($url, false, null);
+            if ($data == false) {
+                $io->error("Error downloading apigen.phar");
+                return 1;
+            } else {
+                $apigen = 'build/apigen.phar';
+                file_put_contents($apigen, $data);
+                chmod($apigen, 0755);
+            }
+        }
+
+        // 2. Get current branch name
+        //$branch_task = $this->taskExec('git rev-parse --abbrev-ref HEAD')->run();
+        $branch_task = $this->taskExec('git branch --show-current')->printOutput(false)->run();
+        if (!$branch_task->wasSuccessful()) {
+            return $branch_task;
+        }
+        $branch = trim($branch_task->getMessage());
+
+        // 3. Run apigen
+        $title = sprintf($title_template, $branch);
+        $this->taskExec('php')
+            ->arg($apigen)
+            ->option('title', $title)
+            ->run();
     }
 
     public function update_copyright() {
