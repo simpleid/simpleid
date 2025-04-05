@@ -60,6 +60,7 @@
     "scripts": {
         "test": [ "@composer install", "phpunit" ],
         "phpstan": [ "@composer install", "phpstan analyse" ],
+        "apidocs": [ "@composer install", "robo apidocs" ],
         "update-copyright": [ "@composer install", "robo update_copyright" ], 
         "make-frontend-tests": [ "@composer install", "robo make_frontend_tests" ],
         "watch-frontend": [ "@composer install", "robo watch_frontend" ]
