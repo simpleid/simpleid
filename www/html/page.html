@@ -70,7 +70,7 @@
             </check>
 
             <check if="{{ @@nav }}">
-              <aside class="header-nav--nav-menu" x-bind:class="{ 'is-open': showNavMenu }" x-on:click.away="showNavMenu = false">
+              <aside class="header-nav--nav-menu" x-bind:class="{ 'is-open': showNavMenu }" x-on:click.outside="showNavMenu = false">
                 <ul class="header-nav--links">
                   <repeat group="{{ @nav }}" value="{{ @item }}"><li><a href="{{ @base_path }}{{ @item.path }}">{{ @item.name }}</a></li></repeat>
                 </ul>
@@ -78,7 +78,7 @@
             </check>
 
             <check if="{{ @@user_header }}">
-              <aside class="header-nav--user-menu" x-cloak x-bind:class="{ 'is-open': showUserMenu }" x-on:click.away="showUserMenu = false">
+              <aside class="header-nav--user-menu" x-cloak x-bind:class="{ 'is-open': showUserMenu }" x-on:click.outside="showUserMenu = false">
                 <ul class="header-nav--links">
                   <check if="{{ @@logout_link || @@logout_destination }}"><li><a href="{{ @base_path }}auth/logout{{ @@logout_destination }}">{{ @intl.common.logout }}</a></li></check>
                 </ul>
