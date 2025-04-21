@@ -115,7 +115,7 @@ class WebFingerModule extends Module {
                 ],
                 [
                     'rel' => 'http://openid.net/specs/connect/1.0/issuer',
-                    'href' => rtrim($this->f3->get('config.canonical_base_path'), '/')
+                    'href' => $this->getCanonicalHost()
                 ]
             ]
         ];
