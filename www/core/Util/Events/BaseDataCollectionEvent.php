@@ -64,7 +64,8 @@ class BaseDataCollectionEvent extends BaseEvent implements \GenericEventInterfac
     /**
      * Creates a data collection event
      * 
-     * @param string $eventName the name of the event, or the name
+     * @param string $eventName the name of the event, or the null to use the
+     * name of this class
      * @param int $mergeStrategy whether the merge will be mergeStrategy
      */
     public function __construct($eventName = null, $mergeStrategy = self::MERGE_DEFAULT) {
@@ -83,7 +84,7 @@ class BaseDataCollectionEvent extends BaseEvent implements \GenericEventInterfac
      * @return void
      */
     public function addResult($result) {
-        if (($result == null) || (is_array($result) && (count($result) == 0))) return;
+        if ($this->isEmpty($result)) return;
 
         // If recursive, result must be an array
         if (($this->mergeStrategy == self::MERGE_RECURSIVE) && !is_array($result))
@@ -119,7 +120,6 @@ class BaseDataCollectionEvent extends BaseEvent implements \GenericEventInterfac
         return $this->results;
     }
 
-
     /**
      * Returns whether any data have been collected by the
      * event.
@@ -128,6 +128,18 @@ class BaseDataCollectionEvent extends BaseEvent implements \GenericEventInterfac
      */
     public function hasResults() {
         return (count($this->results) > 0);
+    }
+
+    /**
+     * Returns whether a variable is "empty".
+     * 
+     * A variable is empty if it is null or is a zero-length array.
+     * 
+     * @param mixed $x the variable
+     * @return bool true if the variable is empty
+     */
+    protected function isEmpty($x) {
+        return (($x == null) || (is_array($x) && (count($x) == 0)));
     }
 }
 
