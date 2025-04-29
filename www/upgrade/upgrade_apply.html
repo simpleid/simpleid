@@ -1,6 +1,6 @@
 <script type="text/javascript">
-    function upgradeApp(initStep) {
-        return {
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('upgradeApp', (initStep) => ({
             progress: '',
             error: '',
             step: initStep,
@@ -33,8 +33,8 @@
                 })
                 .catch(err => this.error = err.message);
             }
-        };
-    }
+        }));
+    });
 </script>
 
 <div x-data="upgradeApp('{{ @step }}')" class="narrative">

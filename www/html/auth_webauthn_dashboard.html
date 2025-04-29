@@ -1,6 +1,6 @@
 <script type="text/javascript">
-    function webAuthnCredentialsApp(url, tk) {
-        return {
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('webAuthnCredentialsApp', (url, tk) => ({
             credentials: [],
             message: '',
             isLoading: true,
@@ -42,8 +42,8 @@
                     }
                 })
             }
-        }
-    }
+        }));
+    });
 </script>
 
 <div x-data="webAuthnCredentialsApp({{ @base_path . 'auth/webauthn' | js, raw }}, {{ @webauthn_tk | js, raw }})">

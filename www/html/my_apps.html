@@ -1,6 +1,6 @@
 <script type="text/javascript">
-    function appsApp(tk) {
-        return {
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('appsApp', (tk) => ({
             apps: [],
             message: '',
             isLoading: true,
@@ -43,8 +43,8 @@
                     }
                 })
             }
-        }
-    }
+        }));
+    });
 </script>
 
 <div x-data="appsApp('{{ @tk }}')">
