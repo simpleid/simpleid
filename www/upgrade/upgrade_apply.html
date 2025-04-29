@@ -5,7 +5,7 @@
             error: '',
             step: initStep,
 
-            upgradeApply() {
+            init() {
                 const params = new URLSearchParams({ step: this.step });
                 fetch('step', {
                     method: 'POST',
@@ -37,7 +37,7 @@
     }
 </script>
 
-<div x-data="upgradeApp('{{ @step }}')" x-init="upgradeApply" class="narrative">
+<div x-data="upgradeApp('{{ @step }}')" class="narrative">
     <p>{{ @intl.upgrade.applying_upgrade }} <span x-html="progress"></span></p>
 
     <div class="upgrade--error" x-cloak x-show="error">

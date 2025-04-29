@@ -6,7 +6,7 @@
             isLoading: true,
             tk: tk,
 
-            loadApps() {
+            init() {
                 fetch('apps', {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
@@ -47,7 +47,7 @@
     }
 </script>
 
-<div x-data="appsApp('{{ @tk }}')" x-init="loadApps">
+<div x-data="appsApp('{{ @tk }}')">
     <div class="message" x-cloak x-show="message"><p x-html="message"></p></div>
 
     <table id="apps">

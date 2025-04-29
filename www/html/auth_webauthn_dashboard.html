@@ -7,7 +7,7 @@
             url: url,
             tk: tk,
 
-            loadCredentials() {
+            init() {
                 fetch(this.url + '/credentials', {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
@@ -46,7 +46,7 @@
     }
 </script>
 
-<div x-data="webAuthnCredentialsApp({{ @base_path . 'auth/webauthn' | js, raw }}, {{ @webauthn_tk | js, raw }})" x-init="loadCredentials">
+<div x-data="webAuthnCredentialsApp({{ @base_path . 'auth/webauthn' | js, raw }}, {{ @webauthn_tk | js, raw }})">
     <div class="message" x-cloak x-show="message"><p x-html="message"></p></div>
 
     <p>{{ @intl.core.auth_webauthn.about_security_keys }}</p>
