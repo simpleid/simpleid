@@ -1,7 +1,7 @@
 <script src="{{ @base_path }}html/assets/webauthn.js" type="text/javascript"></script>
 <script type="text/javascript">
-    function createCredentialApp(url, tk, baseCreateOptions) {
-        return {
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('createCredentialApp', (url, tk, baseCreateOptions) => ({
             supported: document.isPublicKeyCredentialSupported(),
             hasLocalAuthenticator: await document.hasLocalAuthenticator(),
             challenge: '',
@@ -49,8 +49,8 @@
                     console.error(e);
                 }
             }
-        };
-    }
+        }));
+    });
 </script>
 <div class="narrative">
     <p>{{ @intl.core.auth_webauthn.about_security_keys }}</p>

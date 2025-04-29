@@ -1,6 +1,6 @@
 <script>
-function openIdDiscoveryApp() {
-    return {
+document.addEventListener('alpine:init', () => {
+    Alpine.data('openIdDiscoveryApp', () => ({
         templates: {
             openid1: '&lt;link rel="openid.server" href="{{ rtrim(@config.canonical_base_path, '/') }}/"&gt;',
             openid2: '&lt;link rel="openid2.provider" href="{{ rtrim(@config.canonical_base_path, '/') }}/"&gt;',
@@ -27,11 +27,11 @@ function openIdDiscoveryApp() {
             
             return code;
         }
-    }
-}
+    }));
+});
 </script>
 
-<div x-data="openIdDiscoveryApp()">
+<div x-data="openIdDiscoveryApp">
     <h3>{{ @intl.core.openid.link_tags_label }}</h3>
             
     <div>
