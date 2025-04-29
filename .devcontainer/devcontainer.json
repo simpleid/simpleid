@@ -1,11 +1,12 @@
 {
     "name": "PHP + Node",
-    "image": "mcr.microsoft.com/devcontainers/php:8.1-bullseye",
+    // See https://hub.docker.com/r/microsoft/devcontainers for details
+    "image": "mcr.microsoft.com/devcontainers/php:8.2-bullseye",
 
     // Features to add to the dev container. More info: https://containers.dev/features.
     "features": {
         "ghcr.io/devcontainers/features/node:1": {
-          "version": "20"
+          "version": "22"
         }
     },
 
@@ -38,7 +39,7 @@
     },
 
     // Use 'postCreateCommand' to run commands after the container is created.
-    "postCreateCommand": "sudo curl -sSLf -o /usr/local/bin/install-php-extensions https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions && sudo chmod +x /usr/local/bin/install-php-extensions && sudo PHP_INI_DIR=/usr/local/etc/php install-php-extensions bcmath gmp xdebug && composer install && npm install"
+    "postCreateCommand": "sudo curl -sSLf -o /usr/local/bin/install-php-extensions https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions && sudo chmod +x /usr/local/bin/install-php-extensions && sudo PHP_INI_DIR=/usr/local/etc/php install-php-extensions bcmath gmp xdebug intl && composer install && npm install"
 
     // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
     // "remoteUser": "root"

@@ -33,7 +33,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
-          extensions: openssl, hash, gmp, xml
+          extensions: openssl, hash, gmp, xml, intl
           tools: composer
 
       - name: Get Composer cache directory
