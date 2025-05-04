@@ -25,6 +25,7 @@
             },
 
             deleteApp(cid) {
+                if (!confirm(simpleid.intl.app_confirm_delete)) return;
                 fetch('apps/' + encodeURIComponent(cid), {
                     method: 'DELETE',
                     headers: {

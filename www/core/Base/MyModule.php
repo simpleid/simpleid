@@ -109,7 +109,8 @@ class MyModule extends Module {
         $this->f3->set('js_data.intl', [
             'first_time_label' => $this->f3->get('intl.core.my.first_time_label'),
             'last_time_label' => $this->f3->get('intl.core.my.last_time_label'),
-            'consents_label' => $this->f3->get('intl.core.my.consents_label')
+            'consents_label' => $this->f3->get('intl.core.my.consents_label'),
+            'app_confirm_delete' => $this->f3->get('intl.core.my.app_confirm_delete')
         ]);
         $this->f3->set('layout', 'my_apps.html');
         print $tpl->render('page.html');
