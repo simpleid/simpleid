@@ -51,23 +51,23 @@
 
     <p>{{ @intl.core.auth_webauthn.about_security_keys }}</p>
 
-    <table id="webauthn-credentials">
-        <tr class="loading" x-show="isLoading">
+    <table id="webauthn-credentials" class="table-list">
+        <tr class="table-list--loading" x-show="isLoading">
             <td colspan="2" style="text-align: center"><div class="loading-spinner"></div></td>
         </tr>
-        <tr x-cloak x-show="!isLoading && (credentials.length == 0)">
+        <tr class="table-list--none" x-cloak x-show="!isLoading && (credentials.length == 0)">
             <td colspan="2" style="text-align: center">{{ @intl.core.auth_webauthn.credential_none }}</td>
         </tr>
-        <template x-for="credential in credentials" :key="credential.id">
-            <tr>
-                <td class="app-name">
-                    <strong class="get-app-details" x-html="credential.display_name"></strong>
-                    <div class="app-details">
+        <template x-for="(credential, idx) in credentials" :key="credential.id">
+            <tr class="table-list-item" :class="(idx == 0) ? 'u-first' : ''">
+                <td class="table-list-item--main">
+                    <div class="table-list-item--heading"><strong x-html="credential.display_name"></strong></div>
+                    <div class="table-list-item--body table-list-item--description">
                         {{ @intl.core.auth_webauthn.first_time_label }} <span x-text="(new Date(credential.activity.first_time * 1000)).toLocaleDateString()"></span> |
                         {{ @intl.core.auth_webauthn.last_time_label }} <span x-text="(new Date(credential.activity.last_time * 1000)).toLocaleDateString()"></span>
                     </div>
                 </td>
-                <td><a href="#" class="delete-app" @click.prevent="deleteCredential(credential.id)">{{ @intl.common.delete }}</a></td>
+                <td class="table-list-item--actions"><button class="is-subtle is-danger" @click.prevent="deleteCredential(credential.id)">{{ @intl.common.delete }}</button></td>
             </tr>
         </template>
     </table>
