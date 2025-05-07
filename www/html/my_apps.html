@@ -51,30 +51,34 @@
 <div x-data="appsApp('{{ @tk }}')">
     <div class="message" x-cloak x-show="message"><p x-html="message"></p></div>
 
-    <table id="apps">
-        <tr class="loading" x-show="isLoading">
+    <table id="apps" class="table-list apps-list">
+        <tr class="table-list--loading" x-show="isLoading">
             <td colspan="2" style="text-align: center"><div class="loading-spinner"></div></td>
         </tr>
-        <tr x-cloak x-show="!isLoading && (apps.length == 0)">
+        <tr class="table-list--none" x-cloak x-show="!isLoading && (apps.length == 0)">
             <td colspan="2" style="text-align: center">{{ @intl.core.my.app_none }}</td>
         </tr>
-        <template x-for="app in apps" :key="app.cid">
-            <tr>
-                <td class="app-name">
-                    <a href="#" class="get-app-details" x-html="app.display_html" @click.prevent="app.openDetails = !app.openDetails"></a>
-                    <div class="app-details" x-show="app.openDetails">
+        <template x-for="(app, idx) in apps" :key="app.cid">
+            <tr class="table-list-item" :class="(idx == 0) ? 'u-first' : ''">
+                <td class="table-list-item--main">
+                    <div class="table-list-item--heading"><strong x-html="app.display_html"></strong></div>
+                    <div class="table-list-item--body table-list-item--description">
+                        <span x-text="window.simpleid.intl.first_time_label"></span> <span x-text="app.first_time"></span> |
+                        <span x-text="window.simpleid.intl.last_time_label"></span> <span x-text="app.last_time"></span> 
+                        <span x-show="app.consents.length > 0"> | <button class="is-badge" @click.prevent="app.openDetails = !app.openDetails">...</button></span>
+                    </div>
+                    {*<a href="#" class="get-app-details" @click.prevent="app.openDetails = !app.openDetails"></a>*}
+                    <div class="table-list-item--body table-list-item--details" x-show="app.openDetails">
                         <ul>
-                            <li><span x-text="window.simpleid.intl.first_time_label"></span> <span x-text="app.first_time"></span></li>
-                            <li><span x-text="window.simpleid.intl.last_time_label"></span> <span x-text="app.last_time"></span></li>
                             <li x-show="app.consents.length > 0"><span x-text="window.simpleid.intl.consents_label"></span>
-                                <ul class="app-consents">
+                                <ul class="apps-list--consents">
                                 <template x-for="consent in app.consents"><li x-text="consent.description"></li></template>
                                 </ul>
                             </li>
                         </ul>
                     </div>
                 </td>
-                <td><a href="#" class="delete-app" @click.prevent="deleteApp(app.cid)">{{ @intl.common.delete }}</a></td>
+                <td class="table-list-item--actions"><button class="is-subtle is-danger" @click.prevent="deleteApp(app.cid)">{{ @intl.common.delete }}</button></td>
             </tr>
         </template>
     </table>

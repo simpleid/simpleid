@@ -94,6 +94,35 @@ label.option { font-weight: normal; }
   &::after { margin-left: util.size(2); }
 }
 
+/* ----- Badges ----------------------------------------- */
+.badge {
+  @include util.padding-x(util.size(2.5));
+  @include util.padding-y(util.size(0.5));
+  border-width: 1px;
+  border-stype: solid;
+  border-radius: 4px;
+  font-size: util.font-size(xs);
+  margin-inline-end: util.size(2);
+}
+
+/* ----- Table lists ------------------------------------ */
+.table-list {
+  tr.table-list-item { 
+    border-bottom: 1px solid var(--grey-900); 
+    &.u-first { border-top: 1px solid var(--grey-900); }
+  }
+  td { border-bottom: 0px; }
+  td.table-list-item--actions {
+    text-align: right;
+    vertical-align: middle;
+  }
+  .table-list-item--description { color: var(--grey-400); }
+  .table-list-item--details {
+    margin-top: util.size(2);
+    color: var(--grey-400);
+  }
+}
+
 /* ----- Info panes ------------------------------------- */
 .info-pane {
   @include util.margin-y(util.size(4));
