@@ -1,3 +1,4 @@
+@use 'sass:list';
 @use 'sass:map';
 @use 'sass:meta';
 @use 'sass:math';
@@ -27,7 +28,7 @@ $font-size-presets: (
 
 @function font-size($value) {
   @if map.has-key($font-size-presets, $value) {
-    @return nth(map.get($font-size-presets, $value), 1);
+    @return list.nth(map.get($font-size-presets, $value), 1);
   } @else {
     @return $value;
   }
@@ -35,7 +36,7 @@ $font-size-presets: (
 
 @function line-height($value) {
   @if map.has-key($font-size-presets, $value) {
-    @return nth(map.get($font-size-presets, $value), 2);
+    @return list.nth(map.get($font-size-presets, $value), 2);
   } @else {
     @return $value;
   }
@@ -43,8 +44,8 @@ $font-size-presets: (
 
 @mixin text-size($preset) {
   $values: map.get($font-size-presets, $preset);
-  font-size: nth($values, 1);
-  line-height: nth($values, 2);
+  font-size: list.nth($values, 1);
+  line-height: list.nth($values, 2);
 }
 
 // Font weight

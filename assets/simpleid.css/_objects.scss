@@ -99,7 +99,7 @@ label.option { font-weight: normal; }
   @include util.padding-x(util.size(2.5));
   @include util.padding-y(util.size(0.5));
   border-width: 1px;
-  border-stype: solid;
+  border-style: solid;
   border-radius: 4px;
   font-size: util.font-size(xs);
   margin-inline-end: util.size(2);
