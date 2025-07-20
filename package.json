@@ -14,13 +14,13 @@
     "autoprefixer": "^10.4.14",
     "esbuild": "^0.25.0",
     "esbuild-sass-plugin": "^3.3.1",
+    "five-server": "^0.4.4",
     "postcss": "^8.4.31",
     "postcss-merge-rules": "^6.0.1"
   },
   "dependencies": {
     "@alpinejs/collapse": "^3.12.2",
     "alpinejs": "^3.12.1",
-    "five-server": "^0.3.3",
     "modern-normalize": "^2.0.0",
     "qrcode-svg": "^1.1.0"
   }
