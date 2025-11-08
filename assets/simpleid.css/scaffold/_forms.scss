@@ -207,6 +207,12 @@ $valid-color: var(--green) !default;
       font-size: util.font-size(sm);
       @include util.padding-x(util.size(2));
     }
+
+    span {
+      flex: 0;
+      border: 0;
+      padding: 0;
+    }
   }
 
   span {
