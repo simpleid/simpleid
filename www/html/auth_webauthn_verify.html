@@ -10,6 +10,7 @@
             tk: tk,
             baseRequestOptions: baseRequestOptions,
             isRequesting: false,
+            error_message: null,
 
             async getCredential (e) {
                 const challengeResponse = await fetch(this.url, { method: 'POST', headers: {
@@ -18,7 +19,8 @@
                     'Accept': 'application/json'
                 }});
                 if (!challengeResponse.ok) {
-
+                    this.error_message = simpleid.intl.challenge_error;
+                    return;
                 }
 
                 const challengeObject = await challengeResponse.json();
@@ -28,7 +30,8 @@
                 const options = JSON.parse(JSON.stringify(this.baseRequestOptions)); // deep clone
                 options.publicKey.challenge = challengeObject.challenge;
 
-                this.isRequesting = true; console.debug(options);
+                this.isRequesting = true;
+                this.error_message = null;
                 await this.$nextTick();
 
                 try {
@@ -41,7 +44,7 @@
                     this.isRequesting = false;
 
                     if (e.name == 'NotAllowedError') {
-                        // User cancels, etc
+                        this.error_message = simpleid.intl.browser_error;
                     }
                     console.error(e.name);
                 }
@@ -62,6 +65,8 @@
     <input type="hidden" name="webauthn[result]" x-model="result">
 
     <template x-if="!supported"><p>{{ @intl.core.auth_webauthn.webauthn_not_supported }}</p></template>
+
+    <template x-if="error_message"><div class="message" x-text="error_message"></div></template>
 
     <button class="is-default" :disabled="isRequesting" @click.prevent="getCredential" x-show="supported" x-ref="getCredentialButton">{{ @intl.common.continue }}</button>
 </div>

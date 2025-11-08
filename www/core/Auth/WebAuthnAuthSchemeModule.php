@@ -244,6 +244,9 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
         $this->f3->set('create_options', $options);
 
         $this->f3->set('otp_recovery_url', 'http://simpleid.org/docs/2/common-problems/#otp');
+
+        $this->f3->set('js_data.intl.challenge_error',  $this->f3->get('intl.core.auth_webauthn.challenge_error'));
+        $this->f3->set('js_data.intl.browser_error',  $this->f3->get('intl.core.auth_webauthn.browser_error'));
         
         $this->f3->set('tk', $token->generate('webauthn', SecurityToken::OPTION_BIND_SESSION));
 
@@ -320,6 +323,9 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
             $this->f3->set('otp_recovery_url', 'http://simpleid.org/docs/2/common_problems/#otp');
 
             $this->f3->set('hide_submit_button', true);  // Remove the submit button
+
+            $this->f3->set('js_data.intl.challenge_error',  $this->f3->get('intl.core.auth_webauthn.challenge_error'));
+            $this->f3->set('js_data.intl.browser_error',  $this->f3->get('intl.core.auth_webauthn.browser_error'));
 
             $event->addBlock('auth_webauthn', $tpl->render('auth_webauthn.html', false), 0);
         }

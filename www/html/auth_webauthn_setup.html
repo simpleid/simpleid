@@ -11,6 +11,7 @@
             tk: tk,
             baseCreateOptions: baseCreateOptions,
             isRequesting: false,
+            error_message: null,
 
             async createCredential(authenticatorAttachment) {
                 const challengeResponse = await fetch(this.url, { method: 'POST', headers: {
@@ -19,7 +20,8 @@
                     'Accept': 'application/json'
                  }});
                 if (!challengeResponse.ok) {
-
+                    this.error_message = simpleid.intl.challenge_error;
+                    return;
                 }
 
                 const challengeObject = await challengeResponse.json();
@@ -31,6 +33,7 @@
                 if (authenticatorAttachment) options.authenticatorSelection.authenticatorAttachment = authenticatorAttachment;
 
                 this.isRequesting = true;
+                this.error_message = null;
                 await this.$nextTick();
 
                 try {
@@ -44,7 +47,7 @@
                     this.isRequesting = false;
 
                     if (e.name == 'NotAllowedError') {
-                        // User cancels, etc
+                        this.error_message = simpleid.intl.browser_error;
                     }
                     console.error(e);
                 }
@@ -67,6 +70,8 @@
     <input type="hidden" name="result" x-model="result">
 
     <template x-if="!supported"><p>{{ @intl.core.auth_webauthn.webauthn_not_supported }}</p></template>
+
+    <template x-if="error_message"><div class="message" x-text="error_message"></div></template>
 
     <div x-show="supported">
         <div class="form-item">
