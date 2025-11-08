@@ -206,6 +206,8 @@ $valid-color: var(--green) !default;
       color: initial;
       font-size: util.font-size(sm);
       @include util.padding-x(util.size(2));
+      svg { stroke: $placeholder-color; }
+      svg:hover { stroke: $hover-color; }
     }
 
     span {
