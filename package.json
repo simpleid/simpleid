@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@alpinejs/collapse": "^3.12.2",
+    "@ryangjchandler/alpine-clipboard": "^2.3.0",
     "alpinejs": "^3.12.1",
     "modern-normalize": "^2.0.0",
     "qrcode-svg": "^1.1.0"
