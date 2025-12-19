@@ -349,7 +349,7 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
             $result = $this->verifyCredential($this->f3->get('POST.webauthn.challenge'), $this->f3->get('POST.webauthn.nonce'), $test_credentials, $this->f3->get('POST.webauthn.result'));
             
             if ($result === false) {
-                $this->f3->set('message', $this->f3->get('intl.core.auth_webauthn.credential_verify_error'));
+                $event->addMessage($this->f3->get('intl.core.auth_webauthn.credential_verify_error'));
                 $event->setInvalid();
                 return;
             }
