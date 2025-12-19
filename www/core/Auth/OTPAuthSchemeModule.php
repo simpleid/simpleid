@@ -244,7 +244,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             $params = $test_user['otp'];
             
             if ($this->verifyOTP($params, $this->f3->get('POST.otp.otp'), 10) === false) {
-                $this->f3->set('message', $this->f3->get('intl.core.auth_otp.invalid_otp'));
+                $event->addMessage($this->f3->get('intl.core.auth_otp.invalid_otp'));
                 $event->setInvalid();
                 return;
             }
