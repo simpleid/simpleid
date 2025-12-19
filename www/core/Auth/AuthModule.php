@@ -162,6 +162,7 @@ class AuthModule extends Module {
             $form_state['auth_level'] = $submit_event->getAuthLevel();
             $form_state['modules'] = $submit_event->getAuthModuleNames();
         } else {
+            $this->f3->set('message', $submit_event->getMessages());
             $this->loginForm($params, $form_state);
             return;
         }
