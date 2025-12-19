@@ -798,7 +798,7 @@ class OpenIDModule extends Module implements ProtocolResult {
             
             if ($reason == self::CHECKID_RETURN_TO_SUSPECT) {
                 $this->f3->set('return_to_suspect', true);
-                $this->f3->set('suspect_url', 'http://simpleid.org/documentation/troubleshooting/returnto-discovery-failure');
+                $this->f3->set('suspect_url', 'https://simpleid.org/documentation/troubleshooting/returnto-discovery-failure');
                 $this->f3->set('js_data.intl.openid_suspect', $this->f3->get('intl.core.openid.suspect_js_1') . "\n\n" . $this->f3->get('intl.core.openid.suspect_js_2'));
             }
         }
@@ -1091,7 +1091,7 @@ class OpenIDModule extends Module implements ProtocolResult {
         
         $event->addBlock('discovery', $tpl->render('openid_profile.html', false, $hive), 1, [
             'title' => $this->f3->get('intl.core.openid.discovery_title'),
-            'links' => [ [ 'href' => 'http://simpleid.org/documentation/getting-started/setting-identity/claim-your-identifier', 'name' => $this->f3->get('intl.common.more_info') ] ],
+            'links' => [ [ 'href' => 'https://simpleid.org/documentation/getting-started/setting-identity/claim-your-identifier', 'name' => $this->f3->get('intl.common.more_info') ] ],
         ]);
     }
 }

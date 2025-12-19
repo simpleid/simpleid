@@ -243,7 +243,7 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
 
         $this->f3->set('create_options', $options);
 
-        $this->f3->set('otp_recovery_url', 'http://simpleid.org/docs/2/common-problems/#otp');
+        $this->f3->set('otp_recovery_url', 'https://simpleid.org/docs/2/common-problems/#otp');
 
         $this->f3->set('js_data.intl.challenge_error',  $this->f3->get('intl.core.auth_webauthn.challenge_error'));
         $this->f3->set('js_data.intl.browser_error',  $this->f3->get('intl.core.auth_webauthn.browser_error'));
@@ -320,7 +320,7 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
             $this->f3->set('request_options', $options);
 
             // Note this is called from user_login(), so $_POST is always filled
-            $this->f3->set('otp_recovery_url', 'http://simpleid.org/docs/2/common_problems/#otp');
+            $this->f3->set('otp_recovery_url', 'https://simpleid.org/docs/2/common_problems/#otp');
 
             $this->f3->set('hide_submit_button', true);  // Remove the submit button
 
