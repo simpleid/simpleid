@@ -77,12 +77,12 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
 
         if (!is_readable($config['public_jwks_file'])) {
             $this->logger->log(LogLevel::CRITICAL, 'Public JSON web key file not found.');
-            $this->f3->error(500, $this->f3->get('intl.core.connect.missing_public_jwk', 'http://simpleid.org/docs/2/installing/#keys'));
+            $this->f3->error(500, $this->f3->get('intl.core.connect.missing_public_jwk', 'https://simpleid.org/docs/2/installing/#keys'));
         }
 
         if (!is_readable($config['private_jwks_file'])) {
             $this->logger->log(LogLevel::CRITICAL, 'Private JSON web key file not found.');
-            $this->f3->error(500, $this->f3->get('intl.core.connect.missing_private_jwk', 'http://simpleid.org/docs/2/installing/#keys'));
+            $this->f3->error(500, $this->f3->get('intl.core.connect.missing_private_jwk', 'https://simpleid.org/docs/2/installing/#keys'));
         }
     }
 

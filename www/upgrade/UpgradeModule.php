@@ -69,7 +69,7 @@ class UpgradeModule extends Module {
     function info() {
         $tpl = Template::instance();
         
-        $this->f3->set('upgrade_url', 'http://simpleid.org/documentation/getting-started/upgrading');
+        $this->f3->set('upgrade_url', 'https://simpleid.org/documentation/getting-started/upgrading');
 
         $token = new SecurityToken();
         $this->f3->set('tk', $token->generate('upgrade_info', SecurityToken::OPTION_BIND_SESSION));
