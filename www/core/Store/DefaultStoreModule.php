@@ -45,12 +45,12 @@ class DefaultStoreModule extends StoreModule {
     protected function checkConfig() {
         if (!is_dir($this->config['identities_dir'])) {
             $this->logger->log(\Psr\Log\LogLevel::CRITICAL, 'Identities directory not found.');
-            $this->f3->error(500, $this->f3->get('intl.store.identity_not_found', 'http://simpleid.org/docs/2/installing/'));
+            $this->f3->error(500, $this->f3->get('intl.store.identity_not_found', 'https://simpleid.org/docs/2/installing/'));
         }
 
         if (!is_dir($this->config['store_dir']) || !is_writeable($this->config['store_dir'])) {
             $this->logger->log(\Psr\Log\LogLevel::CRITICAL, 'Store directory not found or not writeable.');
-            $this->f3->error(500, $this->f3->get('intl.store.store_not_found', 'http://simpleid.org/docs/2/installing/'));
+            $this->f3->error(500, $this->f3->get('intl.store.store_not_found', 'https://simpleid.org/docs/2/installing/'));
         }
     }
 
