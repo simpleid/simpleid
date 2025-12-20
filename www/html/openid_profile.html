@@ -39,15 +39,21 @@ document.addEventListener('alpine:init', () => {
         <label><input type="checkbox" class="discovery-checkbox" x-model="openid2">{{ @intl.core.openid.openid2_label }}</label>
         <label><input type="checkbox" class="discovery-checkbox" x-model="local_id"> {{ @intl.core.openid.localid_label }} </label>
     </div>
-    <pre x-html="discoveryCode">
-    </pre>
+    <div class="form-combo" style="width: 100%">
+        <pre x-html="discoveryCode" style="flex: 2">
+        </pre>
+        <button class="is-subtle" :disabled="!openid1 && !openid2" @click="$clipboard(discoveryCode.replaceAll('<br>', '\n').replaceAll('&amp;lt;', '<').replaceAll('&amp;gt;', '>'))">{{ @intl.common.copy }}</button>
+    </div>
 
     <h3>{{ @intl.core.openid.yadis_label }}</h3>
     <ol>
         <li>{{ @intl.core.openid.yadis_doc_label, @xrds_url | format, raw }}</li>
         <li>
             <div>{{ @intl.core.openid.yadis_add_label }}</div>
-            <pre>&lt;meta http-equiv=&quot;X-XRDS-Location&quot; content=&quot;{{ @xrds_url }}&quot;&gt;</pre>
+            <div class="form-combo" x-data="{ text: '&lt;meta http-equiv=&quot;X-XRDS-Location&quot; content=&quot;{{ @xrds_url }}&quot;&gt;'}" style="width: 100%">
+            <pre x-text="text" style="flex: 2"></pre>
+            <button class="is-subtle" x-clipboard="text">{{ @intl.common.copy }}</button>
+            </div>
         </li>
     </ol>
 </div>

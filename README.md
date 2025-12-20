@@ -63,6 +63,10 @@ SimpleID uses the [Alpine.js library](http://alpinejs.dev),
 by Caleb Porzio and other contributors.
 Licensing information for this library can be found at <https://github.com/alpinejs/alpine/blob/main/LICENSE.md>.
 
+SimpleID uses the [Alpine Clipboard library](https://github.com/ryangjchandler/alpine-clipboard),
+by Ryan Chandler and other contributors.
+Licensing information for this library can be found at <https://github.com/ryangjchandler/alpine-clipboard/blob/main/LICENSE.md>.
+
 SimpleID uses the [qrcode-svg library](https://github.com/papnkukn/qrcode-svg),
 by papnkukn.
 Licensing information for this library can be found at

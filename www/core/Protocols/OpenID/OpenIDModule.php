@@ -1091,7 +1091,7 @@ class OpenIDModule extends Module implements ProtocolResult {
         
         $event->addBlock('discovery', $tpl->render('openid_profile.html', false, $hive), 1, [
             'title' => $this->f3->get('intl.core.openid.discovery_title'),
-            'links' => [ [ 'href' => 'https://simpleid.org/documentation/getting-started/setting-identity/claim-your-identifier', 'name' => $this->f3->get('intl.common.more_info') ] ],
+            'links' => [ [ 'href' => 'https://simpleid.org/docs/2/openid/#claiming', 'name' => $this->f3->get('intl.common.more_info') ] ],
         ]);
     }
 }
