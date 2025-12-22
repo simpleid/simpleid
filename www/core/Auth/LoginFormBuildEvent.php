@@ -40,11 +40,14 @@ class LoginFormBuildEvent extends FormBuildEvent implements StoppableEventInterf
     const IDENTITY_REGION = 'identity';
     const DEFAULT_REGION = 'default';
     const PASSWORD_REGION = 'password';  // JS popout
-    // identity, credentials, options
+    const CREDENTIALS_REGION = 'credentials'; // identity, credentials, options
     const AFTER_BUTTONS_REGION = 'after_buttons';
 
     /** @var bool */
     protected $hasUIDBlock = false;
+
+    /** @var array<string> */
+    protected $UIDAutocompleteValues = [];
 
     /**
      * {@inheritdoc}
@@ -56,16 +59,33 @@ class LoginFormBuildEvent extends FormBuildEvent implements StoppableEventInterf
     }
 
     /**
-     * 
+     * @param array<string> $uid_autocomplete additional values to the autocomplete
+     * attribute to be inserted into the login form
+     * @return UIBuildEvent
      */
-    public function addUIDBlock(): UIBuildEvent {
+    public function addUIDBlock($uid_autocomplete = []): UIBuildEvent {
         // Check if user name block has already been added
         if (!$this->hasUIDBlock) {
             $this->hasUIDBlock = true;
             $tpl = Template::instance();
             return $this->addBlock('auth_uid', $tpl->render('auth_uid.html', false), 0, [ 'region' => self::IDENTITY_REGION ]);
         }
+        $this->addUIDAutocomplete($uid_autocomplete);
         return $this;
+    }
+
+    /**
+     * Add values to the autocomplete attribute to be inserted into the user ID
+     * field in the login form.
+     * 
+     * Note that this does not insert the user ID block.  To do that, call the
+     * {@link addUIDBlock} function.
+     * 
+     * @param array<string> $uid_autocomplete additional values
+     * @return void
+     */
+    public function addUIDAutocompleteValues($uid_autocomplete = []) {
+        if (count($uid_autocomplete) > 0) $this->UIDAutocompleteValues = array_merge($this->UIDAutocompleteValues, $uid_autocomplete);
     }
 
     /**
@@ -88,6 +108,13 @@ class LoginFormBuildEvent extends FormBuildEvent implements StoppableEventInterf
             }
         }
         return $result;
+    }
+
+    /**
+     * @return array<string>
+     */
+    public function getUIDAutocompleteValues(): array {
+        return $this->UIDAutocompleteValues;
     }
 }
 

@@ -257,6 +257,9 @@ class AuthModule extends Module {
             \Events::instance()->dispatch($event);
             $forms = $event->getBlocksGroupedByRegion();
             $tpl->mergeAttachments($event);
+
+            $uid_autocomplete = $event->getUIDAutocompleteValues();
+            if (count($uid_autocomplete) > 0) $this->f3->set('uid_autocomplete', $uid_autocomplete);
         }
         $this->f3->set('forms', $forms);
 
