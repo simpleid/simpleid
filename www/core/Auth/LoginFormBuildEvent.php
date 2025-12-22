@@ -70,7 +70,7 @@ class LoginFormBuildEvent extends FormBuildEvent implements StoppableEventInterf
             $tpl = Template::instance();
             return $this->addBlock('auth_uid', $tpl->render('auth_uid.html', false), 0, [ 'region' => self::IDENTITY_REGION ]);
         }
-        $this->addUIDAutocomplete($uid_autocomplete);
+        $this->addUIDAutocompleteValues($uid_autocomplete);
         return $this;
     }
 
