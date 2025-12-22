@@ -144,6 +144,27 @@ $valid-color: var(--green) !default;
 
     &:hover, &:focus { background-color: $default-button-border-color; }
   }
+
+  &.is-danger { 
+    color: $error-color; 
+    &:hover, &:focus { color: white; background-color: $error-color; border-color: $error-color; }
+  }
+
+  &.is-subtle {
+    @include util.padding-x(util.size(2));
+    border-radius: 3px;
+    font-weight: util.font-weight(normal);
+    font-size: util.font-size(sm);
+  }
+
+  &.is-badge {
+    @include util.padding-x(util.size(2));
+    @include util.padding-y(util.size(0));
+    margin-bottom: 0;
+    border-radius: 3px;
+    font-weight: util.font-weight(normal);
+    font-size: util.font-size(sm);
+  }
 }
 
 /* Textbox-button-label combinations */
@@ -185,6 +206,14 @@ $valid-color: var(--green) !default;
       color: initial;
       font-size: util.font-size(sm);
       @include util.padding-x(util.size(2));
+      svg { stroke: $placeholder-color; }
+      svg:hover { stroke: $hover-color; }
+    }
+
+    span {
+      flex: 0;
+      border: 0;
+      padding: 0;
     }
   }
 

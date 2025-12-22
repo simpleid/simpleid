@@ -19,23 +19,31 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-namespace SimpleID\Util;
+namespace SimpleID\Crypt;
 
 use Branca\Branca;
-use SimpleID\Crypt\Random;
+use JsonException;
 use SimpleID\Store\StoreManager;
 
 /**
  * A security token generator based on the branca token specification.
  *
- * A security token is a string which contains signed and encrypted data
- * which only the generator can decode.  It is used for various
- * purposes, such as:
+ * A security token contains signed and encrypted data which only the
+ * generator can decode.  It is used for various purposes, such as:
  *
  * - encoding state data to be passed between HTTP requests
  * - generating CSRF tokens
  * 
- * @see https://branca.io/
+ * The payload of the token is a JSON object with the following
+ * keys defined:
+ * 
+ * - `i` - a random generated identifier for the token
+ * - `o` - token options, consisting of the sum of the OPTION_
+ *   constants defined by this class
+ * - `p` - the payload
+ * - `s` (optional) - the session ID
+ * 
+ * @see https://github.com/tuupola/branca-spec
  */
 class SecurityToken {
     /** @var string */
@@ -67,7 +75,7 @@ class SecurityToken {
      */
     function __construct($key = null) {
         if ($key == null) {
-            if (self::$site_token === null) self::$site_token = self::getSiteToken();
+            if (self::$site_token === null) self::$site_token = (StoreManager::instance())->getKey('site-token');
             $key = self::$site_token;
         }
 
@@ -154,42 +162,24 @@ class SecurityToken {
             $this->data['s'] = session_id();
         }
 
-        $encoded = json_encode($this->data);
-        if ($encoded == false) return new \RuntimeException();
-        $compressed = gzcompress($encoded);
-        if ($compressed == false) return new \RuntimeException();
-        $token = $this->branca->encode($compressed);
+        try {
+            $encoded = json_encode($this->data, JSON_THROW_ON_ERROR);
 
-        if (($options & self::OPTION_NONCE) == self::OPTION_NONCE) {
-            $cache = \Cache::instance();
-            $cache_name = rawurlencode($this->data['i']) . '.token';
-            $cache->set($cache_name, $token, SIMPLEID_HUMAN_TOKEN_EXPIRES_IN);
+            $compressed = gzcompress($encoded);
+            if ($compressed == false) return new \RuntimeException();
+
+            $token = $this->branca->encode($compressed);
+
+            if (($options & self::OPTION_NONCE) == self::OPTION_NONCE) {
+                $cache = \Cache::instance();
+                $cache_name = rawurlencode($this->data['i']) . '.token';
+                $cache->set($cache_name, $token, SIMPLEID_HUMAN_TOKEN_EXPIRES_IN);
+            }
+
+            return $token;
+        } catch (\JsonException $e) {
+            return new \RuntimeException($e->getMessage(), 0, $e);
         }
-
-        return $token;
-    }
-
-    /**
-     * Gets the site-specific encryption and signing key.
-     *
-     * If the key does not exist, it is automatically generated.
-     *
-     * @return string the site-specific encryption and signing key
-     * as a base64url encoded string
-     */
-    static private function getSiteToken() {
-        $store = StoreManager::instance();
-
-        $site_token = SecureString::getPlaintext($store->getSetting('site-token'));
-
-        if ($site_token == NULL) {
-            $rand = new Random();
-
-            $site_token = strtr(base64_encode($rand->bytes(32)), '+/', '-_');
-            $store->setSetting('site-token', SecureString::fromPlaintext($site_token));
-        }
-
-        return $site_token;
     }
 }
 

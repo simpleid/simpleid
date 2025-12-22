@@ -162,7 +162,7 @@ connect: {} # Remove empty braces if you wish to fill in this section
     #
     # OPTIONAL - The JWS signature algorithms required for ID tokens.
     #
-    #id_token_signed_response_alg": HS256
+    #id_token_signed_response_alg: HS256
 
     #
     # OPTIONAL - The JWE key encryption algorithm required for ID tokens.

@@ -25,8 +25,8 @@ use \Cache;
 use SimpleID\Crypt\Random;
 use SimpleID\Store\Storable;
 use SimpleID\Store\StoreManager;
-use SimpleID\Util\SecurityToken;
-use SimpleID\Util\OpaqueIdentifier;
+use SimpleID\Crypt\SecurityToken;
+use SimpleID\Crypt\OpaqueIdentifier;
 
 
 /**
@@ -314,7 +314,7 @@ class Authorization implements Storable {
         $token = AccessToken::create($this, $scope, $expires_in, $grant, $additional);
 
         $results['access_token'] = $token->getEncoded();
-        $results['token_type'] = $token->getTokenType();
+        $results['token_type'] = $token->getAccessTokenType();
         if ($expires_in != Token::TTL_PERPETUAL) $results['expires_in'] = strval($expires_in);
 
         return $results;

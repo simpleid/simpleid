@@ -167,7 +167,7 @@ abstract class Module extends \Prefab {
      *
      * @param string $path the FatFree path or alias
      * @param string $query a properly encoded query string
-     * @param string $secure if $relative is false, either 'https' to force an HTTPS connection, 'http' to force
+     * @param string $secure one of 'https' to force an HTTPS connection, 'http' to force
      * an unencrypted HTTP connection, 'detect' to base on the current connection, or NULL to vary based on the
      * `canonical_base_path` configuration
      * @return string the url
@@ -212,6 +212,46 @@ abstract class Module extends \Prefab {
         
         $url .= $path . (($query == '') ? '' : '?' . $query);
         
+        return $url;
+    }
+
+    /**
+     * Obtains the SimpleID host URL.
+     *
+     * This function returns the scheme, host name, port, user name and password (if specified) from
+     * the `canonical_base_path` configuration variable.  It is used, among other things, as the
+     * issuer identifier for JWTs issued by this installation.
+     *
+     * @param string $secure one of 'https' to force an HTTPS connection, 'http' to force
+     * an unencrypted HTTP connection, 'detect' to base on the current connection, or NULL to vary based on the
+     * `canonical_base_path` configuration
+     * @return string the url
+     *
+     */
+    public function getCanonicalHost($secure = null) {
+        $config = $this->f3->get('config');
+        $canonical_base_path = $config['canonical_base_path'];
+
+        $parts = parse_url($canonical_base_path);
+        if ($parts == false) return $canonical_base_path;
+        
+        if ($secure == 'https') {
+            $scheme = 'https';
+        } elseif ($secure == 'http') {
+            $scheme = 'http';
+        } else {
+            $scheme = $parts['scheme'];
+        }
+        
+        $url = $scheme . '://';
+        if (isset($parts['user'])) {
+            $url .= $parts['user'];
+            if (isset($parts['pass'])) $url .= ':' . $parts['pass'];
+            $url .= '@';
+        }
+        if (isset($parts['host'])) $url .= $parts['host'];
+        if (isset($parts['port'])) $url .= ':' . $parts['port'];
+
         return $url;
     }
 

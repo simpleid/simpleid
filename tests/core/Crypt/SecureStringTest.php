@@ -1,6 +1,6 @@
 <?php
 
-namespace SimpleID\Util;
+namespace SimpleID\Crypt;
 
 use PHPUnit\Framework\TestCase;
 

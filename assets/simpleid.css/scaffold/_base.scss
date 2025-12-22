@@ -1,6 +1,6 @@
 // Scaffold base module
 @use 'util';
-@import '~modern-normalize';
+@use '~modern-normalize' as normalize;
 
 // Whether to include additional styles
 $webapp: false !default;

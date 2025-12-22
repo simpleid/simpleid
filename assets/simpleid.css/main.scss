@@ -39,7 +39,8 @@
   $placeholder-color: var(--grey),
   $button-border-color: var(--grey-700),
   $default-button-color: var(--brand-color),
-  $default-button-border-color: var(--brand-color-dark)
+  $default-button-border-color: var(--brand-color-dark),
+  $error-color: var(--red-500)
 );
 
 @use 'base';

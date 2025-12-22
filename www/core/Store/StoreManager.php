@@ -24,6 +24,8 @@ namespace SimpleID\Store;
 
 use \Base;
 use \Prefab;
+use SimpleID\Crypt\Random;
+use SimpleID\Crypt\SecureString;
 use SimpleID\ModuleManager;
 use SimpleID\Models\User;
 
@@ -315,6 +317,45 @@ class StoreManager extends Prefab {
         $store = $this->getStore('keyvalue:write');
         if (isset($this->cache[$cache_name])) unset($this->cache[$cache_name]);
         $store->delete('setting', $name);
+    }
+
+    /**
+     * Loads or generates a random string to be used as an encryption
+     * and/or key.
+     * 
+     * This function is a wrapper for {@link getSetting()} to load
+     * a key.  If the value is a {@link SecureString}, then it is
+     * decoded automatically.  If the value is not a SecureString, then
+     * this function will migrate the value to a SecureString.
+     * 
+     * If the key does not exist, it is automatically generated using
+     * the specified number of bytes.
+     *
+     * @param string $name the name of the setting to return
+     * @param bool $binary true if the key is to be returned as a binary string
+     * @param int<1, max> $num_bytes if the key does not exist, the number of random bytes
+     * required
+     * @return string the key as a binary or base64url encoded string
+     */
+    public function getKey($name, $binary = false, $num_bytes = 32) {
+        $setting = $this->getSetting($name);
+
+        if ($setting == null) {
+            $rand = new Random();
+            $encoded_plaintext = trim(strtr(base64_encode($rand->bytes($num_bytes)), '+/', '-_'), '=');
+
+            $this->setSetting($name, SecureString::fromPlaintext($encoded_plaintext));
+        } elseif (is_string($setting)) {
+            // A base64 or base64url encoded string - convert to SecureString
+            $encoded_plaintext = trim(strtr($setting, '+/', '-_'), '=');
+            $this->setSetting($name, SecureString::fromPlaintext($encoded_plaintext));
+        } elseif ($setting instanceof SecureString) {
+            $encoded_plaintext = SecureString::getPlaintext($setting);
+        } else {
+            throw new \UnexpectedValueException('Unexpected type for setting');
+        }
+
+        return ($binary) ? base64_decode(strtr($encoded_plaintext, '-_', '+/')) : $encoded_plaintext;
     }
 
     /**

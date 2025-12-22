@@ -2,7 +2,7 @@
 /*
  * SimpleID
  *
- * Copyright (C) Kelvin Mo 2007-14
+ * Copyright (C) Kelvin Mo 2007-2025
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -32,7 +32,7 @@ use \XMLReader;
  *
  * The result is a {@link XRDSServices} object.
  *
- * @link http://xrds-simple.net/
+ * @see https://docs.oasis-open.org/xri/2.0/specs/xri-resolution-V2.0.html
  */
 class XRDSParser {
 

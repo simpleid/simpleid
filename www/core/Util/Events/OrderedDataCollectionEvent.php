@@ -23,41 +23,39 @@
 namespace SimpleID\Util\Events;
 
 /**
- * A generic event used to collect data in an ordered way.
+ * A generic event used to collect data with a specified order.
+ * 
+ * Unlike the {@link BaseDataCollectionEvent}, results are always
+ * appended to the results array and never merged.
  *
  */
-class OrderedDataCollectionEvent extends BaseEvent implements \GenericEventInterface {
-    use GenericEventTrait;
-
-    /** @var array<array<mixed>> */
-    protected $results = [];
-
+class OrderedDataCollectionEvent extends BaseDataCollectionEvent {
     /**
-     * Creates a data collection event
+     * Creates an ordered data collection event
      * 
-     * @param string $eventName the name of the event, or the name
+     * @param string $eventName the name of the event, or null to use
+     * the name of this class
      */
     public function __construct($eventName = null) {
-        $this->setEventName($eventName);
+        parent::__construct($eventName, self::MERGE_APPEND);
     }
 
     /**
-     * Adds data to the event.
-     * 
-     * Unlike the {@link BaseDataCollectionEvent}, results are always
-     * appended to the results array and never merged
+     * Adds data to the event with a specified weight.  The weight
+     * is used to order the results, to be retrieved by
+     * {@link OrderedDataCollectionEvent::getResults()}.
      * 
      * @param array<mixed> $result the data to add
      * @param int $weight the weight
      * @return void
      */
     public function addResult($result, $weight = 0) {
-        if ($result == null) return;
+        if ($this->isEmpty($result)) return;
                 
-        $this->results[] = [
+        parent::addResult([
             '#data' => $result,
             '#weight' => $weight
-        ];
+        ]);
     }
 
     /**

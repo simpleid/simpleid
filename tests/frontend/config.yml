@@ -77,7 +77,7 @@ tests:
         qr: otpauth://totp/SimpleID?secret=AAAABBBBCCCCDDDD&digits=6&period=30
         tk: foo
         otp_params: foo
-        otp_recovery_url: http://simpleid.org/docs/2/common-problems/#otp
+        otp_recovery_url: https://simpleid.org/docs/2/common-problems/#otp
 
   oauth_consent.html:
     - template: page.html
@@ -128,7 +128,7 @@ tests:
         cancel: false
         realm: https://example.com/
         return_to_suspect: true
-        suspect_url: http://simpleid.org/documentation/troubleshooting/returnto-discovery-failure
+        suspect_url: https://simpleid.org/documentation/troubleshooting/returnto-discovery-failure
         js_data.intl.openid_suspect: |
           This web site has not confirmed its identity and might be fraudulent.
           Are you sure you wish to automatically send your information to this site for any future requests?

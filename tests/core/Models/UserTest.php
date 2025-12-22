@@ -21,7 +21,6 @@ class UserTest extends TestCase {
 
         // Set up $user_cfg->clients
         $user_cfg->clients['test_cid'] = [
-            'oauth' => [ 'prompt_none' => true ],
             'store_id' => 'test_cid',
             'consents' => [ 'oauth' => ['openid'] ]
         ];
@@ -45,7 +44,7 @@ class UserTest extends TestCase {
 
         $user->loadData($user_cfg);
 
-        $this->assertTrue($user->clients['test_cid']['oauth']['prompt_none']);
+        $this->assertContains('openid', $user->clients['test_cid']['consents']['oauth']);
 
         $activities = $user->getActivities();
         $this->assertEquals('app', $activities['test_cid']['type']);

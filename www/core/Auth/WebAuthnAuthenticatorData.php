@@ -2,7 +2,7 @@
 /*
  * SimpleID
  *
- * Copyright (C) Kelvin Mo 2014-2025
+ * Copyright (C) Kelvin Mo 2024-2025
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,7 +26,10 @@ use \InvalidArgumentException;
 use SimpleJWT\Util\Util as SimpleJWTUtil;
 
 /**
- * 
+ * Class that parses and represents the authenticator data structure
+ * in WebAuthn.
+ *
+ * @link https://developer.mozilla.org/en-US/docs/Web/API/Web_Authentication_API/Authenticator_data
  */
 class WebAuthnAuthenticatorData {
     /**

@@ -28,10 +28,8 @@ use SimpleID\Auth\AuthManager;
 use SimpleID\Base\ScopeInfoCollectionEvent;
 use SimpleID\Protocols\HTTPResponse;
 use SimpleID\Protocols\ProtocolResult;
-use SimpleID\Protocols\OAuth\OAuthModule;
 use SimpleID\Protocols\OAuth\OAuthEvent;
 use SimpleID\Protocols\OAuth\OAuthProtectedResource;
-use SimpleID\Protocols\OAuth\OAuthDynamicClient;
 use SimpleID\Protocols\OAuth\OAuthAuthRequestEvent;
 use SimpleID\Protocols\OAuth\OAuthAuthGrantEvent;
 use SimpleID\Protocols\OAuth\OAuthTokenGrantEvent;
@@ -56,7 +54,7 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
     protected $oauth_include_request_body = true;
 
     static function init($f3) {
-        $f3->route('GET /.well-known/openid-configuration', 'SimpleID\Protocols\Connect\ConnectModule->openid_configuration');
+        $f3->redirect('GET /.well-known/openid-configuration', '@oauth_metadata');
         $f3->route('GET|POST @connect_userinfo: /connect/userinfo', 'SimpleID\Protocols\Connect\ConnectModule->userinfo');
         $f3->route('GET @connect_jwks: /connect/jwks', 'SimpleID\Protocols\Connect\ConnectModule->jwks');
     }
@@ -79,12 +77,12 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
 
         if (!is_readable($config['public_jwks_file'])) {
             $this->logger->log(LogLevel::CRITICAL, 'Public JSON web key file not found.');
-            $this->f3->error(500, $this->f3->get('intl.core.connect.missing_public_jwk', 'http://simpleid.org/docs/2/installing/#keys'));
+            $this->f3->error(500, $this->f3->get('intl.core.connect.missing_public_jwk', 'https://simpleid.org/docs/2/installing/#keys'));
         }
 
         if (!is_readable($config['private_jwks_file'])) {
             $this->logger->log(LogLevel::CRITICAL, 'Private JSON web key file not found.');
-            $this->f3->error(500, $this->f3->get('intl.core.connect.missing_private_jwk', 'http://simpleid.org/docs/2/installing/#keys'));
+            $this->f3->error(500, $this->f3->get('intl.core.connect.missing_private_jwk', 'https://simpleid.org/docs/2/installing/#keys'));
         }
     }
 
@@ -538,16 +536,12 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
 
 
     /**
-     * Displays the OpenID Connect configuration file for this installation.
+     * Add the OpenID Connect configuration data to the OAuth metadata endpoint.
      *
      * @return void
      */
-    public function openid_configuration() {
-        $mgr = ModuleManager::instance();
+    public function onOauthMetadata(BaseDataCollectionEvent $event) {
         $dispatcher = \Events::instance();
-
-        header('Content-Type: application/json');
-        header('Content-Disposition: inline; filename=openid-configuration');
 
         $scope_info_event = new ScopeInfoCollectionEvent();
         $dispatcher->dispatch($scope_info_event);
@@ -560,22 +554,14 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
         $claims_supported = [ 'sub', 'iss', 'auth_time', 'acr' ];
         foreach ($scopes as $scope => $settings) {
             if (isset($settings['claims'])) {
-                $claims_supporteds = array_merge($claims_supported, $settings['claims']);
+                $claims_supported = array_merge($claims_supported, $settings['claims']);
             }
         }
 
-        $token_endpoint_auth_methods_supported = [ 'client_secret_basic', 'client_secret_post' ];
-        
         $config = [
-            'issuer' => $this->getCanonicalHost(),
-            'authorization_endpoint' => $this->getCanonicalURL('@oauth_auth', '', 'https'),
-            'token_endpoint' => $this->getCanonicalURL('@oauth_token', '', 'https'),
+            'response_types_supported' => [ 'id_token', 'id_token token', 'code id_token', 'code id_token token' ],
             'userinfo_endpoint' => $this->getCanonicalURL('@connect_userinfo', '', 'https'),
             'jwks_uri' => $this->getCanonicalURL('@connect_jwks', '', 'https'),
-            'scopes_supported' => array_keys($scopes),
-            'response_types_supported' => [ 'code', 'token', 'id_token', 'id_token token', 'code token', 'code id_token', 'code id_token token' ],
-            'response_modes_supported' => Response::getResponseModesSupported(),
-            'grant_types_supported' => [ 'authorization_code', 'refresh_token' ],
             'acr_values_supported' => [],
             'subject_types_supported' => [ 'public', 'pairwise' ],
             'userinfo_signing_alg_values_supported' => $jwt_signing_algs,
@@ -587,20 +573,15 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
             'request_object_signing_alg_values_supported' => array_merge($jwt_signing_algs, [ 'none' ]),
             'request_object_encryption_alg_values_supported' => $jwt_encryption_algs,
             'request_object_encryption_enc_alg_values_supported' => $jwt_encryption_enc_algs,
-            'token_endpoint_auth_methods_supported' => $token_endpoint_auth_methods_supported,
             'claim_types_supported' => [ 'normal' ],
             'claims_supported' => $claims_supported,
             'claims_parameter_supported' => true,
             'request_parameter_supported' => true,
             'request_uri_parameter_supported' => true,
             'require_request_uri_registration' => false,
-            'service_documentation' => 'https://simpleid.org/docs/'
         ];
 
-        $config_event = new BaseDataCollectionEvent('connect_configuration');
-        $config_event->addResult($config);
-        $dispatcher->dispatch($config_event);
-        print json_encode($config_event->getResults());
+        $event->addResult($config);
     }
 
 
@@ -627,41 +608,6 @@ class ConnectModule extends OAuthProtectedResource implements ProtocolResult {
         header('Content-Type: application/jwk-set+json');
         header('Content-Disposition: inline; filename=jwks.json');
         print $set->toJWKS();
-    }
-
-    /**
-     * Obtains the SimpleID host URL.
-     *
-     * @param string $secure if $relative is false, either 'https' to force an HTTPS connection, 'http' to force
-     * an unencrypted HTTP connection, 'detect' to base on the current connection, or NULL to vary based on SIMPLEID_BASE_URL
-     * @return string the url
-     *
-     */
-    public function getCanonicalHost($secure = null) {
-        $config = $this->f3->get('config');
-        $canonical_base_path = $config['canonical_base_path'];
-
-        $parts = parse_url($canonical_base_path);
-        if ($parts == false) return $canonical_base_path;
-        
-        if ($secure == 'https') {
-            $scheme = 'https';
-        } elseif ($secure == 'http') {
-            $scheme = 'http';
-        } else {
-            $scheme = $parts['scheme'];
-        }
-        
-        $url = $scheme . '://';
-        if (isset($parts['user'])) {
-            $url .= $parts['user'];
-            if (isset($parts['pass'])) $url .= ':' . $parts['pass'];
-            $url .= '@';
-        }
-        if (isset($parts['host'])) $url .= $parts['host'];
-        if (isset($parts['port'])) $url .= ':' . $parts['port'];
-
-        return $url;
     }
 }
 ?>

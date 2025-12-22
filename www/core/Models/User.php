@@ -25,9 +25,9 @@ namespace SimpleID\Models;
 use \Base;
 use \Serializable;
 use SimpleID\ModuleManager;
+use SimpleID\Crypt\OpaqueIdentifier;
 use SimpleID\Store\Storable;
 use SimpleID\Util\ArrayWrapper;
-use SimpleID\Util\OpaqueIdentifier;
 use SimpleID\Util\Events\BaseDataCollectionEvent;
 use SimpleID\Base\UserModule;
 
@@ -202,10 +202,11 @@ class User extends ArrayWrapper implements Serializable, Storable {
     }
 
     /**
-     * @param string|null $hidden_value
+     * @param string|false|null $secret_paths_mask if a string, the string
+     * to mask secret paths, or if false, remove secret paths completely
      * @return array<string, mixed>
      */
-    private function toSecureArray($hidden_value = null) {
+    private function toSecureArray($secret_paths_mask = false) {
         $event = new BaseDataCollectionEvent('user_secret_data_paths');
         $copy = new ArrayWrapper($this->container);
         \Events::instance()->dispatch($event);
@@ -213,13 +214,13 @@ class User extends ArrayWrapper implements Serializable, Storable {
         if ($secret_paths == null) $secret_paths = [];
         $secret_paths[] = 'uid';
         foreach ($secret_paths as $path) {
-            if ($hidden_value) {
-                $copy->set($path, $hidden_value);
-            } else {
+            if (is_string($secret_paths_mask)) {
+                $copy->set($path, $secret_paths_mask);
+            } elseif ($secret_paths_mask === false) {
                 $copy->unset($path);
             }
         }
-        return $copy->toArray();        
+        return $copy->toArray();
     }
 
     /**
@@ -240,7 +241,7 @@ class User extends ArrayWrapper implements Serializable, Storable {
         $result = [];
         foreach (get_object_vars($this) as $var => $value) {
             if ($var == 'container') {
-                $result['container'] = $this->toSecureArray();
+                $result['container'] = $this->toSecureArray(null);
             } else {
                 $result[$var] = $value;
             }

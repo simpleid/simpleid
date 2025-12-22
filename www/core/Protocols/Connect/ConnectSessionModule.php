@@ -24,12 +24,13 @@ namespace SimpleID\Protocols\Connect;
 
 use Psr\Log\LogLevel;
 use SimpleID\Auth\AuthManager;
+use SimpleID\Base\RequestState;
 use SimpleID\Crypt\Random;
+use SimpleID\Crypt\SecurityToken;
 use SimpleID\Protocols\Connect\ConnectModule;
 use SimpleID\Protocols\OAuth\Response;
 use SimpleID\Protocols\OAuth\OAuthAuthGrantEvent;
 use SimpleID\Store\StoreManager;
-use SimpleID\Util\SecurityToken;
 use SimpleID\Util\Events\BaseDataCollectionEvent;
 use SimpleID\Util\Forms\FormState;
 use SimpleID\Util\UI\Template;
@@ -98,9 +99,10 @@ class ConnectSessionModule extends Module {
             } else {
                 if ($form_state['connect_logout']['post_logout_redirect_uri']) {
                     // set up continue param and redirect
-                    $state = [ 'rt' => 'connect/logout_complete/' . $token->generate($form_state['connect_logout']) ];
+                    $request_state = new RequestState();
+                    $request_state->setRoute('connect/logout_complete/' . $token->generate($form_state['connect_logout']));
 
-                    $destination = 'continue/' . rawurlencode($token->generate($state));
+                    $destination = 'continue/' . rawurlencode($token->generate($request_state));
                     $this->f3->reroute('@auth_logout(1=' . $destination . ')');
                 } else {
                     $this->f3->reroute('@auth_logout');
@@ -217,7 +219,7 @@ class ConnectSessionModule extends Module {
     /**
      * @return void
      */
-    public function onConnectConfiguration(BaseDataCollectionEvent $event) {
+    public function onOauthMetadata(BaseDataCollectionEvent $event) {
         $event->addResult([
             'check_session_iframe' => $this->getCanonicalURL('@connect_check_session', '', 'https'),
             'end_session_endpoint' => $this->getCanonicalURL('@connect_logout', '', 'https')

@@ -305,6 +305,9 @@ body.is-dialog-page { background: var(--grey-950); }
   }
 }
 
+/* App consent list --------------------------------------------------------- */
+.apps-list ul.apps-list--consents { list-style: disc; list-style-position: inside; }
+
 /* OTP key ------------------------------------------------------------------ */
 .otp-key {
   @include util.text-size('2xl');

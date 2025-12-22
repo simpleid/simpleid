@@ -27,12 +27,21 @@ namespace SimpleID\Protocols\OAuth;
  * To create and encode a token, use the {@link create()} static function.
  * To parse an encoded token, use the {@link decode()} static function.
  */
-class AccessToken extends Token {
+class AccessToken extends Token implements AccessTokenInterface {
     /** @var string */
     private $token_type = 'bearer';
 
     protected function __construct() {
         parent::__construct();
+    }
+
+    /**
+     * {@inheritdoc}
+     * 
+     * @return string the token type
+     */
+    public function getType(): string {
+        return 'access_token';
     }
 
     /**
@@ -77,14 +86,14 @@ class AccessToken extends Token {
     }
 
     /**
-     * Returns the token type for this token.
+     * {@inheritdoc}
      *
      * This class will always return `bearer`.  Subclasses implementing other token
      * types may return a different value.
      *
      * @return string the token type
      */
-    public function getTokenType() {
+    public function getAccessTokenType(): string {
         return $this->token_type;
     }
 }

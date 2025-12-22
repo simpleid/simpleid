@@ -29,11 +29,13 @@ use \Psr\Log\LoggerTrait;
 /**
  * The default SimpleID logger.
  *
- * This logger extends the logger included in the PSR-3 framework
+ * This logger extends the logger included in the Fat-Free framework
  * by implementing the PSR-3 specification.  In addition, it retains the
  * same log file format as per SimpleID 1.
  *
  * You can replace this logger with any PSR-3 compliant logger.
+ *
+ * @see https://fatfreeframework.com/3.8/log
  * 
  */
 class DefaultLogger extends Log implements LoggerInterface {

@@ -25,7 +25,7 @@ namespace SimpleID\Auth;
 use Psr\Log\LogLevel;
 use SimpleID\Module;
 use SimpleID\ModuleManager;
-use SimpleID\Util\SecurityToken;
+use SimpleID\Crypt\SecurityToken;
 use SimpleID\Util\Events\GenericStoppableEvent;
 use SimpleID\Util\Forms\FormState;
 use SimpleID\Util\Forms\FormBuildEvent;
@@ -162,6 +162,7 @@ class AuthModule extends Module {
             $form_state['auth_level'] = $submit_event->getAuthLevel();
             $form_state['modules'] = $submit_event->getAuthModuleNames();
         } else {
+            $this->f3->set('message', $submit_event->getMessages());
             $this->loginForm($params, $form_state);
             return;
         }
@@ -219,6 +220,21 @@ class AuthModule extends Module {
 
     /**
      * Displays a user login or a login verification form.
+     * 
+     * The following common additional variables are stored in the form state (`$form_state`):
+     * 
+     * - `auth_level` - if login is successful, the authentication level
+     * - `auth_skip_activity` - true if the login should not be recorded in the activity
+     *   log
+     * - `cancel` - if the login form is cancellable, a string to identify the module to
+     *   handle the cancellation event
+     * - `mode` - one of the AuthManager::MODE constants to determine the mode of the form
+     * - `modules` - if login is successful, an array of authentication modules
+     * - `uid` - the user ID entered by the user or requested for verification
+     * - `verify_forms` - if mode is AuthManager::MODE_VERIFY, an array of UI blocks containing
+     *   the verificationinterface
+     * 
+     * Authentication modules may define additional variables in the form state.
      *
      * @param array<string, mixed> $params the F3 parameters
      * @param FormState $form_state|null the form state

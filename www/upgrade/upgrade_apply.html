@@ -1,11 +1,11 @@
 <script type="text/javascript">
-    function upgradeApp(initStep) {
-        return {
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('upgradeApp', (initStep) => ({
             progress: '',
             error: '',
             step: initStep,
 
-            upgradeApply() {
+            init() {
                 const params = new URLSearchParams({ step: this.step });
                 fetch('step', {
                     method: 'POST',
@@ -33,11 +33,11 @@
                 })
                 .catch(err => this.error = err.message);
             }
-        };
-    }
+        }));
+    });
 </script>
 
-<div x-data="upgradeApp('{{ @step }}')" x-init="upgradeApply" class="narrative">
+<div x-data="upgradeApp('{{ @step }}')" class="narrative">
     <p>{{ @intl.upgrade.applying_upgrade }} <span x-html="progress"></span></p>
 
     <div class="upgrade--error" x-cloak x-show="error">

@@ -48,6 +48,17 @@ class ScopeInfoCollectionEvent extends BaseEvent {
 
     /**
      * Add scope information.
+     *
+     * The scope information is arranged as an array, with the key being the
+     * protocol specific name of the scope, and the value being an array of
+     * protocol specific settings.  Commonly used settings include:
+     *
+     * - `description` - a description of the scope presented to the user in
+     *   the consent page
+     * - `weight` - used for sorting multiple scopes when presented to the
+     *   user
+     * - `claims` - in OpenID Connect, the claims available in the `userinfo`
+     *   endpoint if granted
      * 
      * @param string $type the type of the scope information
      * @param array<string, array<string, mixed>> $scopes the scope information

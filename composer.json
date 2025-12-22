@@ -13,13 +13,14 @@
         "ext-openssl": "*",
         "ext-hash": "*",
         "ext-sodium": "*",
+        "ext-intl": "*",
         "kelvinmo/simplexrd": "^3.0",
         "kelvinmo/simplejwt": "^1.0",
         "bcosca/fatfree-core": "^3.8",
         "composer/semver": "^3.0",
         "psr/log": "^1.0",
         "wikimedia/composer-merge-plugin": "^2.0",
-        "kelvinmo/f3-event-dispatcher": "^0.1",
+        "kelvinmo/f3-event-dispatcher": "^1.0",
         "robinvdvleuten/ulid": "^5.0",
         "tuupola/branca": "^2.3",
         "symfony/yaml": "^6.0",
@@ -60,6 +61,7 @@
     "scripts": {
         "test": [ "@composer install", "phpunit" ],
         "phpstan": [ "@composer install", "phpstan analyse" ],
+        "apidocs": [ "@composer install", "robo apidocs" ],
         "update-copyright": [ "@composer install", "robo update_copyright" ], 
         "make-frontend-tests": [ "@composer install", "robo make_frontend_tests" ],
         "watch-frontend": [ "@composer install", "robo watch_frontend" ]

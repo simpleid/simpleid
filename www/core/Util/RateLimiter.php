@@ -188,7 +188,11 @@ class RateLimiter {
     }
     
     /**
-     * Returns the IP address as the default source for the rate limiter.
+     * Returns the IP address using the default source for the rate limiter.
+     *
+     * The default source is the {@link https://fatfreeframework.com/3.8/quick-reference#IP IP}
+     * hive variable from the FatFree Framework, which resolves reverse proxies
+     * using the `Client-IP` and the `X-Forwarded-For` headers.
      *
      * @return string the IP address
      */

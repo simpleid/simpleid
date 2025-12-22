@@ -29,7 +29,7 @@ use Psr\Log\LogLevel;
 use SimpleID\ModuleManager;
 use SimpleID\Store\StoreManager;
 use SimpleID\Crypt\Random;
-use SimpleID\Util\OpaqueIdentifier;
+use SimpleID\Crypt\OpaqueIdentifier;
 use SimpleID\Util\Events\BaseDataCollectionEvent;
 use SimpleID\Util\Forms\FormState;
 
@@ -382,10 +382,12 @@ class AuthManager extends Prefab {
     public function assignUAID($reset = false) {
         $name = 'COOKIE.' . $this->getCookieName('uaid');
 
-        if (($this->f3->exists($name) === true) && !$reset) return $this->f3->get($name);
-
-        $rand = new Random();
-        $uaid = $rand->id();
+        if (($this->f3->exists($name) === true) && !$reset) {
+            $uaid = $this->f3->get($name);
+        } else {
+            $rand = new Random();
+            $uaid = $rand->id();
+        }
 
         $this->f3->set($name, $uaid, SIMPLEID_ETERNAL_TOKEN_EXPIRES_IN);
 

@@ -19,14 +19,19 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-namespace SimpleID\Util;
+namespace SimpleID\Crypt;
 
 use \Stringable;
 use Branca\Branca;
 use Symfony\Component\Yaml\Tag\TaggedValue;
 
 /**
- * A secure string
+ * A secure string that is encrypted at rest.
+ *
+ * The string is encrypted as a {@link Branca\Branca} token when stored.
+ * The key is obtained from the `SIMPLEID_SECURE_SECRET` environment
+ * variable (as a binary string), or a file specified by the
+ * `SIMPLEID_SECURE_SECRET_FILE` environment variable.
  */
 final class SecureString implements \Stringable {
     /** @var string */

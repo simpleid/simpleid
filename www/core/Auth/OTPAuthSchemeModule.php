@@ -22,12 +22,11 @@
 
 namespace SimpleID\Auth;
 
-use Psr\Log\LogLevel;
 use SimpleID\Auth\AuthManager;
 use SimpleID\Crypt\BigNum;
 use SimpleID\Crypt\Random;
+use SimpleID\Crypt\SecurityToken;
 use SimpleID\Store\StoreManager;
-use SimpleID\Util\SecurityToken;
 use SimpleID\Util\Events\BaseDataCollectionEvent;
 use SimpleID\Util\Events\UIBuildEvent;
 use SimpleID\Util\Forms\FormBuildEvent;
@@ -138,7 +137,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
         $url = 'otpauth://totp/SimpleID:' . rawurlencode($user['uid']) . '?issuer=SimpleID&secret=' . $code . '&digits=' . $params['digits'] . '&period=' . $params['period'];
         $this->f3->set('qr', addslashes($url));
 
-        $this->f3->set('otp_recovery_url', 'http://simpleid.org/docs/2/common-problems/#otp');
+        $this->f3->set('otp_recovery_url', 'https://simpleid.org/docs/2/common-problems/#otp');
         
         $this->f3->set('tk', $token->generate('otp', SecurityToken::OPTION_BIND_SESSION));
 
@@ -198,7 +197,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             /** @var \SimpleID\Models\User $test_user */
             $test_user = $store->loadUser($form_state['uid']);
             if (!isset($test_user['otp'])) return;
-            if ($test_user['otp']['type'] == 'recovery') return;
+            if ($test_user->exists('otp.recovery') && $test_user->get('otp.recovery')) return;
 
             $uaid = $auth->assignUAID();
             if (in_array($uaid, $test_user['otp']['remember'])) return;
@@ -206,7 +205,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             $tpl = Template::instance();
 
             // Note this is called from user_login(), so $_POST is always filled
-            $this->f3->set('otp_recovery_url', 'http://simpleid.org/docs/2/common_problems/#otp');
+            $this->f3->set('otp_recovery_url', 'https://simpleid.org/docs/2/common_problems/#otp');
 
             $this->f3->set('submit_button', $this->f3->get('intl.common.verify'));
 
@@ -223,7 +222,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
 
         if ($form_state['mode'] == AuthManager::MODE_VERIFY) {
             if ($this->f3->exists('POST.otp.otp') === false) {
-                $this->f3->set('message', $this->f3->get('intl.core.auth_otp.missing_otp'));
+                $event->addMessage($this->f3->get('intl.core.auth_otp.missing_otp'));
                 $event->setInvalid();
             }
         }
@@ -245,7 +244,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             $params = $test_user['otp'];
             
             if ($this->verifyOTP($params, $this->f3->get('POST.otp.otp'), 10) === false) {
-                $this->f3->set('message', $this->f3->get('intl.core.auth_otp.invalid_otp'));
+                $event->addMessage($this->f3->get('intl.core.auth_otp.invalid_otp'));
                 $event->setInvalid();
                 return;
             }

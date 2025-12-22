@@ -63,28 +63,44 @@ class Random {
 
     /**
      * Generates a random string that can be used as a password.
-     * 
+     *
      * The function calls the {@link bytes()} function with the specified
      * number of characters, then converts to a string containing only alphanumeric
-     * characters (case sensitive).  The conversion method is a form of Base58
-     * encoding, which strips out confusing characters such as I, l, O and 0.
+     * characters (case sensitive).
+     * 
+     * By default, the conversion method is a form of Base58 encoding, which strips
+     * out confusing characters such as I, l, O and 0.  A custom encoding can be
+     * specified in the `$chars` parameter.
      *
      * @param int<1, max> $num_chars the number of characters in the password
+     * @param int<0, max> $group_size if greater than 0, the characters
+     * are grouped into groups of this size, separated by hyphens
+     * @param string $chars the set of characters to use for the password
      * @return string the random password
      */
-    function password($num_chars = 18) {
+    function password($num_chars = 18, $group_size = 0, $chars = self::BASE58_CHARS) {
         // determine mask for valid characters
-        $mask = 256 - (256 % strlen(self::BASE58_CHARS));
+        $mask = 256 - (256 % strlen($chars));
 
         $result = '';
         do {
             $rand = self::bytes($num_chars);
             for ($i = 0; $i < $num_chars; $i++) {
                 if (ord($rand[$i]) >= $mask) continue;
-                $result .= self::BASE58_CHARS[ord($rand[$i]) % strlen(self::BASE58_CHARS)];
+                $result .= $chars[ord($rand[$i]) % strlen($chars)];
             }
         } while (strlen($result) < $num_chars);
-        return substr($result, 0, $num_chars);
+        $result = substr($result, 0, $num_chars);
+
+        if ($group_size > 0) {
+            $grouped_result = [];
+            for ($i = 0; $i < strlen($result); $i += $group_size) {
+                $grouped_result[] = substr($result, $i, $group_size);
+            }
+            return implode('-', $grouped_result);
+        } else {
+            return $result;
+        }
     }
 
     /**

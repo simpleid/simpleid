@@ -23,10 +23,10 @@
 namespace SimpleID\Base;
 
 use Psr\Log\LogLevel;
-use SimpleID\Auth\AuthManager;
 use SimpleID\Module;
 use SimpleID\ModuleManager;
-use SimpleID\Util\SecurityToken;
+use SimpleID\Auth\AuthManager;
+use SimpleID\Crypt\SecurityToken;
 use SimpleID\Util\UI\Template;
 
 /**
@@ -80,13 +80,9 @@ class IndexModule extends Module {
     /**
      * Continues a previously saved request.
      *
-     * The request is saved as a <code>SecurityToken</code> which is passed through
-     * the <code>token</code> path parameter.  The underlying payload
-     * can contain the following keys
-     *
-     * - mt the HTTP method (e.g. GET, POST)
-     * - rt the FatFree routing path
-     * - rq an array containing the request parameters
+     * The request is saved as a {@link RequestState}, encoded
+     * in a {@link SecurityToken}, which is passed through
+     * the <code>token</code> path parameter.
      * 
      * @param \Base $f3
      * @param array<string, mixed> $params
@@ -100,12 +96,9 @@ class IndexModule extends Module {
             $this->fatalError($this->f3->get('intl.common.invalid_request'), 400);
             return;
         }
-        
-        if (!isset($payload['mt'])) $payload['mt'] = 'GET';
-        if (!isset($payload['rt'])) $payload['rt'] = '/';
-        if (!isset($payload['rq'])) $payload['rq'] = [];
-        
-        $this->f3->mock($payload['mt'] . ' ' . $payload['rt'], $payload['rq']);
+
+        $request_state = new RequestState($payload);
+        $this->f3->mock($request_state->toF3RoutePattern(), $request_state->getParams());
     }
 
 }

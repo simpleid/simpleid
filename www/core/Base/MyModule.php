@@ -26,9 +26,9 @@ use SimpleID\Auth\AuthManager;
 use SimpleID\Module;
 use SimpleID\ModuleManager;
 use SimpleID\Base\ConsentEvent;
+use SimpleID\Crypt\SecurityToken;
 use SimpleID\Protocols\ProtocolResultEvent;
 use SimpleID\Store\StoreManager;
-use SimpleID\Util\SecurityToken;
 use SimpleID\Util\Events\OrderedDataCollectionEvent;
 use SimpleID\Util\Events\UIBuildEvent;
 use SimpleID\Util\UI\Template;
@@ -109,7 +109,8 @@ class MyModule extends Module {
         $this->f3->set('js_data.intl', [
             'first_time_label' => $this->f3->get('intl.core.my.first_time_label'),
             'last_time_label' => $this->f3->get('intl.core.my.last_time_label'),
-            'consents_label' => $this->f3->get('intl.core.my.consents_label')
+            'consents_label' => $this->f3->get('intl.core.my.consents_label'),
+            'app_confirm_delete' => $this->f3->get('intl.core.my.app_confirm_delete')
         ]);
         $this->f3->set('layout', 'my_apps.html');
         print $tpl->render('page.html');
@@ -153,13 +154,13 @@ class MyModule extends Module {
                     foreach ($consents as $consent) {
                         $consent_info[] = [
                             'description' => isset($scope_info[$type][$consent]['description']) ? $scope_info[$type][$consent]['description'] : $type . ':' . $consent,
-                            'weight' => isset($scope_info[$type][$consent]['weight']) ? $scope_info[$type][$consent]['description'] : 0
+                            'weight' => isset($scope_info[$type][$consent]['weight']) ? $scope_info[$type][$consent]['weight'] : 0
                         ];
                     }
                 } elseif ($consents) {
                     $consent_info[] = [
                         'description' => isset($scope_info[$type]['description']) ? $scope_info[$type]['description'] : $type,
-                        'weight' => isset($scope_info[$type]['weight']) ? $scope_info[$type]['description'] : 0
+                        'weight' => isset($scope_info[$type]['weight']) ? $scope_info[$type]['weight'] : 0
                     ];
                 }
             }

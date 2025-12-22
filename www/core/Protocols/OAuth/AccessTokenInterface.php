@@ -1,7 +1,8 @@
-/**
+<?php
+/*
  * SimpleID
  *
- * Copyright (C) Kelvin Mo 2023-2025
+ * Copyright (C) Kelvin Mo 2025
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -16,17 +17,25 @@
  * You should have received a copy of the GNU General Public
  * License along with this program; if not, write to the Free
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- * 
  */
 
-import Alpine from 'alpinejs';
-import collapse from '@alpinejs/collapse';
-import Clipboard from '@ryangjchandler/alpine-clipboard';
+namespace SimpleID\Protocols\OAuth;
 
-Alpine.plugin(collapse);
-Alpine.plugin(Clipboard);
+/**
+ * An interface for OAuth access tokens.
+ *
+ * The canonical implementation of this interface is the
+ * {@link AccessToken} class, which implements the `bearer` access
+ * token type.
+ */
+interface AccessTokenInterface {
+    /**
+     * Returns the access token type for this token.
+     *
+     * @see https://datatracker.ietf.org/doc/html/rfc6749#section-7.1
+     * @return string the token type
+     */
+    public function getAccessTokenType(): string;
+}
 
-window.Alpine = Alpine;
-queueMicrotask(() => {
-    Alpine.start();
-})
+?>

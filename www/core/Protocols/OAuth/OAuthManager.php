@@ -26,9 +26,8 @@ use \Base;
 use \Prefab;
 use Psr\Log\LogLevel;
 use SimpleID\ModuleManager;
-use SimpleID\Crypt\Random;
 use SimpleID\Store\StoreManager;
-use SimpleID\Util\SecurityToken;
+use SimpleID\Util\Events\BaseDataCollectionEvent;
 
 /**
  * The manager handling OAuth based authentication
@@ -164,6 +163,21 @@ class OAuthManager extends Prefab {
      */
     public function getClientAuthMethod() {
         return $this->client_auth_method;
+    }
+
+    /**
+     * Returns a list of supported methods to authenticate an OAuth client
+     * 
+     * @return array<string> a list of supported methods
+     */
+    public function getSupportedClientAuthMethods(): array {
+        $dispatcher = \Events::instance();
+        $event = new BaseDataCollectionEvent('oauth_supported_client_auth_methods');
+        $event->addResult('client_secret_basic');
+        $event->addResult('client_secret_post');
+        $dispatcher->dispatch($event);
+
+        return $event->getResults();
     }
 
     /**

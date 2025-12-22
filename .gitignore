@@ -4,6 +4,8 @@ composer.lock
 
 node_modules/
 
+api/
+build/apigen.phar
 log/
 tests/frontend/*.html
 tests/frontend/*.txt

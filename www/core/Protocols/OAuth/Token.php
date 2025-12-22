@@ -37,7 +37,7 @@ use SimpleID\Util\SecureString;
  *
  * This class cannot be instantiated directly.  It can only be created by its subclasses.
  */
-class Token {
+abstract class Token {
     /** The separator between the token ID and the source reference */
     const GRANT_REF_SEPARATOR = '~';
 
@@ -45,6 +45,7 @@ class Token {
     const TTL_PERPETUAL = 0;
 
     const KEY_FQAID = 'a';
+    const KEY_TYPE = 't';
     const KEY_CACHE_HASH = 'h';
     const KEY_ID = 'i';
     const KEY_GRANTREF = 'r';
@@ -80,7 +81,7 @@ class Token {
 
     /** Creates a token */
     protected function __construct() {
-        $this->branca = new Branca(base64_decode(strtr(self::getKey(), '-_', '+/')));
+        $this->branca = new Branca((StoreManager::instance())->getKey('oauth-token', true));
     }
 
     /**
@@ -140,6 +141,14 @@ class Token {
     }
 
     /**
+     * Returns the type of the token (e.g. `access_token`, `refresh_token`).
+     * Subclasses must implement this method
+     * 
+     * @return string the token type
+     */
+    abstract public function getType(): string;
+
+    /**
      * Returns the authorisation that created this token.
      *
      * @return Authorization the authorisation object
@@ -190,6 +199,16 @@ class Token {
     public function hasExpired() {
         if ($this->expire == null) return false;
         return (time() >= $this->expire);
+    }
+
+    /**
+     * Returns the expiry time for this token, if any.
+     * 
+     * @return int|null the expiry time, or null if the token does not
+     * expire
+     */
+    public function getExpiry() {
+        return $this->expire;
     }
 
     /**
@@ -270,6 +289,8 @@ class Token {
             $token_data = json_decode($message, true);
 
             $this->id = $token_data[self::KEY_ID];
+            if ($token_data[self::KEY_TYPE] != $this->getType()) return;
+
             list($auth_state, $aid) = explode('.', $token_data[self::KEY_FQAID]);
             $this->scope = $this->resolveScope($token_data[self::KEY_SCOPEREF]);
             if (isset($token_data[self::KEY_EXPIRE])) $this->expire = $token_data[self::KEY_EXPIRE];
@@ -306,12 +327,14 @@ class Token {
 
         $server_data = array_merge([
             'id' => $this->id,
+            'type' => $this->getType(),
             'fqaid' => $fqaid,
             'scope' => $this->scope,
             'additional' => $this->additional
         ], $server_data);
         $token_data = array_merge([
             self::KEY_ID => $server_data['id'],
+            self::KEY_TYPE => $this->getType(),
             self::KEY_FQAID => $server_data['fqaid'],
             self::KEY_SCOPEREF => $this->getScopeRef($this->scope),
         ], $token_data);
@@ -396,29 +419,6 @@ class Token {
     static function getScopeRefMap() {
         $store = StoreManager::instance();
         return $store->getSetting('oauth_scope', []);
-    }
-
-    /**
-     * Gets the site-specific encryption and signing key.
-     *
-     * If the key does not exist, it is automatically generated.
-     *
-     * @return string the site-specific encryption and signing key
-     * as a base64url encoded string
-     */
-    static protected function getKey() {
-        $store = StoreManager::instance();
-
-        $key = SecureString::getPlaintext($store->getSetting('oauth-token'));
-
-        if ($key == NULL) {
-            $rand = new Random();
-
-            $key = strtr(base64_encode($rand->bytes(32)), '+/', '-_');
-            $store->setSetting('oauth-token', SecureString::fromPlaintext($key));
-        }
-
-        return $key;
     }
 }
 
