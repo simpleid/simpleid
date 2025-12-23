@@ -39,12 +39,15 @@ class LoginFormBuildEvent extends FormBuildEvent implements StoppableEventInterf
 
     const IDENTITY_REGION = 'identity';
     const DEFAULT_REGION = 'default';
-    const PASSWORD_REGION = 'password';  // JS popout
+    const PASSWORD_REGION = 'password';
     const CREDENTIALS_REGION = 'credentials'; // identity, credentials, options
     const AFTER_BUTTONS_REGION = 'after_buttons';
 
     /** @var bool */
     protected $hasUIDBlock = false;
+
+    /** @var bool */
+    protected $UIDBlockRendered = false;
 
     /** @var array<string> */
     protected $UIDAutocompleteValues = [];
@@ -59,33 +62,34 @@ class LoginFormBuildEvent extends FormBuildEvent implements StoppableEventInterf
     }
 
     /**
+     * Show the user ID block when presenting the login form, and optionally
+     * add values to the `autocomplete` attribute in the user ID field.
+     * 
      * @param array<string> $uid_autocomplete additional values to the autocomplete
      * attribute to be inserted into the login form
      * @return UIBuildEvent
      */
-    public function addUIDBlock($uid_autocomplete = []): UIBuildEvent {
-        // Check if user name block has already been added
-        if (!$this->hasUIDBlock) {
-            $this->hasUIDBlock = true;
-            $tpl = Template::instance();
-            return $this->addBlock('auth_uid', $tpl->render('auth_uid.html', false), 0, [ 'region' => self::IDENTITY_REGION ]);
-        }
-        $this->addUIDAutocompleteValues($uid_autocomplete);
+    public function showUIDBlock($uid_autocomplete = []): UIBuildEvent {
+        $this->hasUIDBlock = true;
+
+        if (count($uid_autocomplete) > 0) $this->UIDAutocompleteValues = array_merge($this->UIDAutocompleteValues, $uid_autocomplete);
         return $this;
     }
 
     /**
-     * Add values to the autocomplete attribute to be inserted into the user ID
-     * field in the login form.
+     * {@inheritdoc}
      * 
-     * Note that this does not insert the user ID block.  To do that, call the
-     * {@link addUIDBlock} function.
-     * 
-     * @param array<string> $uid_autocomplete additional values
-     * @return void
+     * @return array<array<mixed>>
      */
-    public function addUIDAutocompleteValues($uid_autocomplete = []) {
-        if (count($uid_autocomplete) > 0) $this->UIDAutocompleteValues = array_merge($this->UIDAutocompleteValues, $uid_autocomplete);
+    public function getBlocks(): array {
+        // Check if user name block has already been added
+        if (!$this->UIDBlockRendered) {
+            $this->UIDBlockRendered = true;
+            $tpl = Template::instance();
+            $this->addBlock('auth_uid', $tpl->render('auth_uid.html', false), 0, [ 'region' => self::IDENTITY_REGION ]);
+        }
+
+        return parent::getBlocks();
     }
 
     /**
