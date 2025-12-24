@@ -281,7 +281,7 @@ class OAuthModule extends Module implements ProtocolResult {
                     $request_state = new RequestState();
                     $request_state->setRoute('/oauth/auth')->setParams($request->toArray());
                     $form_state = new FormState([
-                        'mode' => AuthManager::MODE_CREDENTIALS,
+                        'mode' => AuthManager::MODE_IDENTIFY_USER,
                         'auth_skip_activity' => true
                     ]);
                     $form_state->setRequest($request);

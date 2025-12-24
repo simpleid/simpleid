@@ -25,9 +25,9 @@ namespace SimpleID\Auth;
 use \Bcrypt;
 use Psr\Log\LogLevel;
 use SimpleID\Auth\AuthManager;
+use SimpleID\Auth\LoginFormBuildEvent;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\Events\BaseDataCollectionEvent;
-use SimpleID\Util\Forms\FormBuildEvent;
 use SimpleID\Util\Forms\FormSubmitEvent;
 use SimpleID\Util\UI\Template;
 
@@ -46,18 +46,24 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
      * Displays the login form, with input fields for the user name
      * and password
      *
-     * @param FormBuildEvent $event
+     * @param LoginFormBuildEvent $event
      * @return void
      */
-    public function onLoginFormBuild(FormBuildEvent $event) {
+    public function onLoginFormBuild(LoginFormBuildEvent $event) {
         $form_state = $event->getFormState();
+        $additional = [];
 
-        if ($form_state['mode'] == AuthManager::MODE_CREDENTIALS || $form_state['mode'] == AuthManager::MODE_REENTER_CREDENTIALS) {
+        if ($form_state['mode'] == AuthManager::MODE_IDENTIFY_USER) {
+            $event->showUIDBlock();
+            $additional['region'] = LoginFormBuildEvent::PASSWORD_REGION;
+        }
+
+        if (in_array($form_state['mode'], [ AuthManager::MODE_IDENTIFY_USER, AuthManager::MODE_CREDENTIALS, AuthManager::MODE_REENTER_CREDENTIALS ])) {
             $tpl = Template::instance();
 
             $this->f3->set('login_form_module', 'password');
 
-            $event->addBlock('auth_password', $tpl->render('auth_password.html', false), 0);
+            $event->addBlock('auth_password', $tpl->render('auth_password.html', false), 0, $additional);
         }
     }
 

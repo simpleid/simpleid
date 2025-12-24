@@ -46,6 +46,7 @@ class AuthModule extends Module {
     private $auth;
 
     static function init($f3) {
+        $f3->route('POST @auth_identify: /auth/identify [ajax]', 'SimpleID\Auth\AuthModule->identifyUser');
         $f3->route('GET|POST /auth/login', 'SimpleID\Auth\AuthModule->login');
         $f3->route('GET|POST @auth_login: /auth/login/*', 'SimpleID\Auth\AuthModule->login');
         $f3->route('GET /auth/logout', 'SimpleID\Auth\AuthModule->logout');
@@ -70,6 +71,73 @@ class AuthModule extends Module {
     }
 
     /**
+     * API endpoint to determine the authentication scheme for a specified user, and whether
+     * the 'password' region of the login form should be displayed.
+     * 
+     * @return void
+     */
+    public function identifyUser() {
+        $this->checkHttps('error', true);
+
+        $dispatcher = \Events::instance();
+
+        header('Content-Type: application/json');
+
+        $token = new SecurityToken();
+        if (($this->f3->exists('POST.tk') === false) || !$token->verify($this->f3->get('POST.tk'), 'login')) {
+            $this->f3->status(401);
+            print json_encode([
+                'error' => 'unauthorized',
+                'error_description' => $this->f3->get('intl.common.unauthorized')
+            ]);
+            return;
+        }
+
+        if (($this->f3->exists('POST.fs') === false)) {
+            $this->f3->status(400);
+            print json_encode([
+                'error' => 'invalid_request',
+                'error_description' => $this->f3->get('intl.core.auth.state_error')
+            ]);
+            return;
+        }
+
+        $form_state = FormState::decode($token->getPayload($this->f3->get('POST.fs')));
+
+        // We always reset mode to AuthManager::MODE_IDENTIFY_USER
+        $form_state['mode'] = AuthManager::MODE_IDENTIFY_USER;
+
+        $submit_event = new LoginFormSubmitEvent($form_state, 'login_form_submit');
+        $dispatcher->dispatch($submit_event);
+
+        // We set request_password as the default action, so that an attacker
+        // cannot guess what authentication is being used.
+        $action = 'request_password';
+        $form_state['mode'] = AuthManager::MODE_CREDENTIALS; 
+
+        if ($submit_event->isValid()) {
+            $auth_modules = $submit_event->getAuthModuleNames();
+            // If there are multiple authentication options, or if the single option
+            // is not PasswordAuthSchemeModule, then submit the form with op
+            // show_credentials_form to show the credentials form.
+            //
+            // Otherwise, expand the password region.
+            if ((count($auth_modules) > 1)
+                || ((count($auth_modules) == 1) && ($auth_modules[0] != PasswordAuthSchemeModule::class))
+            ) {
+                $action = 'show_credentials_form';
+            }
+        }
+
+        print json_encode([
+            'action' => $action,
+            'fs' => $token->generate($form_state->encode()),
+            'tk' => $token->generate('login', SecurityToken::OPTION_NONCE),
+            'mode' => $form_state['mode'],
+        ]);
+    }
+
+    /**
      * Attempts to log in a user, using the credentials specified in the
      * HTTP request.
      *
@@ -89,8 +157,8 @@ class AuthModule extends Module {
         $this->checkHttps('error', true);
 
         if (($this->f3->exists('POST.fs') === false)) {
-            $form_state = new FormState([ 'mode' => AuthManager::MODE_CREDENTIALS ]);
-            if (in_array($this->f3->get('GET.mode'), [ AuthManager::MODE_VERIFY, AuthManager::MODE_REENTER_CREDENTIALS ])) {
+            $form_state = new FormState([ 'mode' => AuthManager::MODE_IDENTIFY_USER ]);
+            if (in_array($this->f3->get('GET.mode'), [ AuthManager::MODE_CREDENTIALS, AuthManager::MODE_VERIFY, AuthManager::MODE_REENTER_CREDENTIALS ])) {
                 $form_state['mode'] = $this->f3->get('GET.mode');
             }
             $this->loginForm($params, $form_state);
@@ -98,9 +166,9 @@ class AuthModule extends Module {
         }
 
         $form_state = FormState::decode($token->getPayload($this->f3->get('POST.fs')));
-        if (count($form_state) == 0) $form_state['mode'] = AuthManager::MODE_CREDENTIALS;
+        if (count($form_state) == 0) $form_state['mode'] = AuthManager::MODE_IDENTIFY_USER;
         $mode = $form_state['mode'];
-        if (!in_array($mode, [ AuthManager::MODE_CREDENTIALS, AuthManager::MODE_REENTER_CREDENTIALS, AuthManager::MODE_VERIFY ])) {
+        if (!in_array($mode, [ AuthManager::MODE_IDENTIFY_USER, AuthManager::MODE_CREDENTIALS, AuthManager::MODE_REENTER_CREDENTIALS, AuthManager::MODE_VERIFY ])) {
             $this->f3->set('message', $this->f3->get('intl.core.auth.state_error'));
             $this->loginForm($params, $form_state);
             return;
@@ -122,20 +190,34 @@ class AuthModule extends Module {
             return;
         }
 
-        if ($this->f3->exists('POST.op') && $this->f3->get('POST.op') == 'cancel') {
-            $cancel_event = new FormSubmitEvent($form_state, 'login_form_cancel');
+        if ($this->f3->exists('POST.op')) {
+            switch ($this->f3->get('POST.op')) {
+                case 'cancel':
+                    $cancel_event = new FormSubmitEvent($form_state, 'login_form_cancel');
 
-            $dispatcher->dispatch($cancel_event);
+                    $dispatcher->dispatch($cancel_event);
 
-            // Listeners should call stopPropagation if it has processed successfully
-            if (!$cancel_event->isPropagationStopped()) {
-                $this->fatalError($this->f3->get('intl.core.auth.cancelled'), 400);
+                    // Listeners should call stopPropagation if it has processed successfully
+                    if (!$cancel_event->isPropagationStopped()) {
+                        $this->fatalError($this->f3->get('intl.core.auth.cancelled'), 400);
+                    }
+                    return;
+                case 'show_credentials_form':
+                    // uid, if required, would still be in POST.uid
+                    $form_state['mode'] = AuthManager::MODE_CREDENTIALS;
+                    $this->loginForm($params, $form_state);
+                    return;
+                case 'show_identity_form':
+                    $form_state['mode'] = AuthManager::MODE_IDENTIFY_USER;
+                    $this->loginForm($params, $form_state);
+                    return;
             }
-            return;
         }
 
         // If the user is already logged in, return
-        if (($mode == AuthManager::MODE_CREDENTIALS) && $this->auth->isLoggedIn()) $this->f3->reroute('/');
+        if (in_array($mode, [ AuthManager::MODE_IDENTIFY_USER, AuthManager::MODE_CREDENTIALS ])
+            && $this->auth->isLoggedIn())
+            $this->f3->reroute('/');
 
         $validate_event = new FormSubmitEvent($form_state, 'login_form_validate');
         $dispatcher->dispatch($validate_event);
@@ -175,10 +257,11 @@ class AuthModule extends Module {
 
         if ($mode == AuthManager::MODE_CREDENTIALS) {
             $form_state['mode'] = AuthManager::MODE_VERIFY;
-            $event = new FormBuildEvent($form_state, 'login_form_build');
+            $event = new LoginFormBuildEvent($form_state, 'login_form_build');
 
             $dispatcher->dispatch($event);
-            if (count($event->getBlocks()) > 0) {
+            $blocks = $event->getBlocksGroupedByRegion();
+            if (isset($blocks[LoginFormBuildEvent::DEFAULT_REGION]) && (count($blocks[LoginFormBuildEvent::DEFAULT_REGION]) > 0)) {
                 $this->loginForm($params, $form_state);
                 return;
             }
@@ -243,29 +326,38 @@ class AuthModule extends Module {
     public function loginForm($params = [ 'destination' => null ], $form_state = null) {
         $tpl = Template::instance();
         $config = $this->f3->get('config');
-        if ($form_state == null) $form_state = new FormState([ 'mode' => AuthManager::MODE_CREDENTIALS ]);
+        if ($form_state == null) $form_state = new FormState([ 'mode' => AuthManager::MODE_IDENTIFY_USER ]);
 
         // 1. Check for HTTPS
         $this->checkHttps('redirect', true);
 
         // 2. Build the forms
         if (($form_state['mode'] == AuthManager::MODE_VERIFY) && isset($form_state['verify_forms'])) {
-            $forms = $form_state['verify_forms'];
+            $forms = [ 'default' => $form_state['verify_forms'] ];
             unset($form_state['verify_forms']);
         } else {
-            $event = new FormBuildEvent($form_state, 'login_form_build');
+            $event = new LoginFormBuildEvent($form_state, 'login_form_build');
+
+            if ($form_state['mode'] != AuthManager::MODE_IDENTIFY_USER) {
+                $this->f3->set('uid', $form_state['uid']);
+                $this->f3->set('allow_change_uid', ($form_state['mode'] != AuthManager::MODE_REENTER_CREDENTIALS));
+                $event->showUIDBlock();
+            }
+
             \Events::instance()->dispatch($event);
-            $forms = $event->getBlocks();
+            $forms = $event->getBlocksGroupedByRegion();
             $tpl->mergeAttachments($event);
+
+            $uid_autocomplete = $event->getUIDAutocompleteValues();
+            if (count($uid_autocomplete) > 0) $this->f3->set('uid_autocomplete', $uid_autocomplete);
         }
         $this->f3->set('forms', $forms);
 
         // 3. Build the buttons and security messaging
         switch ($form_state['mode']) {
             case AuthManager::MODE_REENTER_CREDENTIALS:
-                // Follow through
-                $this->f3->set('uid', $form_state['uid']);
             case AuthManager::MODE_CREDENTIALS:
+            case AuthManager::MODE_IDENTIFY_USER:
                 $this->f3->set('submit_button', $this->f3->get('intl.common.login'));
                 $this->f3->set('title', $this->f3->get('intl.common.login'));
                 break;
@@ -286,6 +378,8 @@ class AuthModule extends Module {
         
         $this->f3->set('fs', $token->generate($form_state->encode()));
         if (isset($params['destination'])) $this->f3->set('destination', $params['destination']);
+        $this->f3->set('mode', $form_state['mode']);
+        $this->f3->set('identify_url', $this->getCanonicalURL('@auth_identify', '', 'https'));
         $this->f3->set('page_class', 'is-dialog-page');
         $this->f3->set('layout', 'auth_login.html');
 

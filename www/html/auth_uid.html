@@ -1,0 +1,15 @@
+<div class="form-item">
+    <check if="{{ @@uid }}">
+        <true>
+            <input type="hidden" name="uid" value="{{ @uid }}">
+            <div class="message status">
+                <span>{{ @intl.core.auth.logging_in_as, @uid | format, raw }}</span>
+                <check if="{{ @allow_change_uid }}"><span class="inline-actions"><a href="#" @click.prevent="submitFormWithOp('show_identity_form')">{{ @intl.core.auth.change_name }}</a></span></check>
+            </div>
+        </true>
+        <false>
+            <label for="edit-uid">{{ @@intl.core.auth.name_label }}</label>
+            <input type="text" name="uid" id="edit-uid" value="{{ @@REQUEST.uid }}" autocomplete="username {{ ' ', ((@@uid_autocomplete) ? @@uid_autocomplete : []) | implode }}" autocapitalize="off" autocorrect="off" class="form-text required" data-focus-weight="0" x-ref="uid">
+        </false>
+    </check>
+</div>

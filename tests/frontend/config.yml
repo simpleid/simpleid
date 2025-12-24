@@ -1,5 +1,12 @@
 # Configuration of make_frontend_tests
+# ------------------------------------
 
+#
+# The globals section sets up the FatFree hive using the $f3->mset
+# function.  Due to the way the FatFree hive variables work, it
+# is necessary to call mset() multiple times to set the variables
+# properly.
+#
 globals:
   # Framework variables (1st phase)
   - UI: www/html/,www/upgrade/
@@ -16,8 +23,32 @@ globals:
     base_path: /
     frontend_test: true
 
+#
+# The tests section sets up the script to produce the required test files.
+# Each test file is generated using a series of step.  Each step contains
+# one input command and one output command (unless it is the final step,
+# in which case the test file is written)
+#
+# Input commands:
+# - template: renders the specified template, with variables from
+#   variables (which also updates the hive) and local_variables
+# - array: creates an associative array
+# - resolve: resolves the specified string through the template
+#   engine
+#
+# Output commands:
+# - set - assigns the output to the specified hive variable
+# - push - pushes the output to the specified hive variable
+#
 tests:
   auth_login.html:
+    - template: auth_uid.html
+      set: form_content
+
+    - array:
+        content: '{{ @form_content | raw }}'
+      push: forms.identity
+
     - template: auth_password.html
       variables:
         login_form_module: password
@@ -26,20 +57,54 @@ tests:
 
     - array:
         content: '{{ @form_content | raw }}'
-      push: forms
+      push: forms.default
 
     - template: auth_rememberme.html
       set: form_content
 
     - array:
         content: '{{ @form_content | raw }}'
-      push: forms
+      push: forms.options
 
     - template: page.html
       variables:
         page_class: is-dialog-page
         layout: auth_login.html
+        fs: ''
+        tk: ''
+        mode: 3
+        identify_url: ''
         message: The user name or password is not correct.
+
+  auth_otp.html:
+    - template: auth_uid.html
+      variables:
+        uid: test_uid
+        allow_change_uid: true
+      set: form_content
+
+    - array:
+        content: '{{ @form_content | raw }}'
+      push: forms.identity
+
+    - template: auth_otp.html
+      variables:
+        otp_recovery_url: https://simpleid.org/docs/2/common-problems/#otp
+        submit_button: Verify
+      set: form_content
+
+    - array:
+        content: '{{ @form_content | raw }}'
+      push: forms.default
+
+    - template: page.html
+      variables:
+        page_class: is-dialog-page
+        layout: auth_login.html
+        fs: ''
+        tk: ''
+        mode: 5
+        identify_url: ''
 
   auth_otp_setup.html:
     - template: page.html
