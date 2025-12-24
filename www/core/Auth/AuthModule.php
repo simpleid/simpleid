@@ -118,15 +118,14 @@ class AuthModule extends Module {
         if ($submit_event->isValid()) {
             $auth_modules = $submit_event->getAuthModuleNames();
             // If there are multiple authentication options, or if the single option
-            // is not PasswordAuthSchemeModule, then submit the form with mode
-            // AuthManager::MODE_SHOW_CREDENTIALS_FORM to show the credentials form.
+            // is not PasswordAuthSchemeModule, then submit the form with op
+            // show_credentials_form to show the credentials form.
             //
             // Otherwise, expand the password region.
             if ((count($auth_modules) > 1)
                 || ((count($auth_modules) == 1) && ($auth_modules[0] != PasswordAuthSchemeModule::class))
             ) {
-                $action = 'submit_form';
-                $form_state['mode'] = AuthManager::MODE_SHOW_CREDENTIALS_FORM;
+                $action = 'show_credentials_form';
             }
         }
 
@@ -169,7 +168,7 @@ class AuthModule extends Module {
         $form_state = FormState::decode($token->getPayload($this->f3->get('POST.fs')));
         if (count($form_state) == 0) $form_state['mode'] = AuthManager::MODE_IDENTIFY_USER;
         $mode = $form_state['mode'];
-        if (!in_array($mode, [ AuthManager::MODE_IDENTIFY_USER, AuthManager::MODE_CREDENTIALS, AuthManager::MODE_REENTER_CREDENTIALS, AuthManager::MODE_VERIFY, AuthManager::MODE_SHOW_CREDENTIALS_FORM ])) {
+        if (!in_array($mode, [ AuthManager::MODE_IDENTIFY_USER, AuthManager::MODE_CREDENTIALS, AuthManager::MODE_REENTER_CREDENTIALS, AuthManager::MODE_VERIFY ])) {
             $this->f3->set('message', $this->f3->get('intl.core.auth.state_error'));
             $this->loginForm($params, $form_state);
             return;
@@ -191,30 +190,34 @@ class AuthModule extends Module {
             return;
         }
 
-        if ($this->f3->exists('POST.op') && $this->f3->get('POST.op') == 'cancel') {
-            $cancel_event = new FormSubmitEvent($form_state, 'login_form_cancel');
+        if ($this->f3->exists('POST.op')) {
+            switch ($this->f3->get('POST.op')) {
+                case 'cancel':
+                    $cancel_event = new FormSubmitEvent($form_state, 'login_form_cancel');
 
-            $dispatcher->dispatch($cancel_event);
+                    $dispatcher->dispatch($cancel_event);
 
-            // Listeners should call stopPropagation if it has processed successfully
-            if (!$cancel_event->isPropagationStopped()) {
-                $this->fatalError($this->f3->get('intl.core.auth.cancelled'), 400);
+                    // Listeners should call stopPropagation if it has processed successfully
+                    if (!$cancel_event->isPropagationStopped()) {
+                        $this->fatalError($this->f3->get('intl.core.auth.cancelled'), 400);
+                    }
+                    return;
+                case 'show_credentials_form':
+                    // uid, if required, would still be in POST.uid
+                    $form_state['mode'] = AuthManager::MODE_CREDENTIALS;
+                    $this->loginForm($params, $form_state);
+                    return;
+                case 'show_identity_form':
+                    $form_state['mode'] = AuthManager::MODE_IDENTIFY_USER;
+                    $this->loginForm($params, $form_state);
+                    return;
             }
-            return;
         }
 
         // If the user is already logged in, return
-        if (in_array($mode, [ AuthManager::MODE_IDENTIFY_USER, AuthManager::MODE_CREDENTIALS, AuthManager::MODE_SHOW_CREDENTIALS_FORM ])
+        if (in_array($mode, [ AuthManager::MODE_IDENTIFY_USER, AuthManager::MODE_CREDENTIALS ])
             && $this->auth->isLoggedIn())
             $this->f3->reroute('/');
-
-        // Show login form if mode is MODE_SHOW_CREDENTIALS_FORM
-        if ($mode == AuthManager::MODE_SHOW_CREDENTIALS_FORM) {
-            // uid, if required, would still be in POST.uid
-            $form_state['mode'] = AuthManager::MODE_CREDENTIALS;
-            $this->loginForm($params, $form_state);
-            return;
-        }
 
         $validate_event = new FormSubmitEvent($form_state, 'login_form_validate');
         $dispatcher->dispatch($validate_event);
@@ -337,6 +340,7 @@ class AuthModule extends Module {
 
             if ($form_state['mode'] != AuthManager::MODE_IDENTIFY_USER) {
                 $this->f3->set('uid', $form_state['uid']);
+                $this->f3->set('allow_change_uid', ($form_state['mode'] != AuthManager::MODE_REENTER_CREDENTIALS));
                 $event->showUIDBlock();
             }
 

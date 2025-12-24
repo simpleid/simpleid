@@ -126,14 +126,6 @@ class AuthManager extends Prefab {
      * factor
      */
     const MODE_VERIFY = self::AUTH_LEVEL_VERIFIED;
-    /**
-     * Constant denoting a reroute to show the login form with mode
-     * MODE_CREDENTIALS.
-     * 
-     * This is used internally by {@link AuthModule::login()} and is not
-     * passed to the authentication modules.
-     */
-    const MODE_SHOW_CREDENTIALS_FORM = 1;
 
     /** @var string|null */
     static private $cookie_prefix = null;

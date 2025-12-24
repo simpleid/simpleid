@@ -80,6 +80,7 @@ tests:
     - template: auth_uid.html
       variables:
         uid: test_uid
+        allow_change_uid: true
       set: form_content
 
     - array:

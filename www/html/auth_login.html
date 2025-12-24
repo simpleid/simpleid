@@ -20,6 +20,11 @@
                 focus[0].el.focus();
             },
 
+            submitFormWithOp(op) {
+                this.$refs.form.insertAdjacentHTML('beforeend', `<input type="hidden" name="op" value="${op}">`);
+                this.$refs.form.submit();
+            },
+
             promptForPassword() {
                 this.showPasswordRegion = true;
                 this.isSubmitted = false;
@@ -55,8 +60,8 @@
 
                     if (result.action == 'request_password') {
                         this.promptForPassword();
-                    } else if (request.action == 'submit_form') {
-                        this.$refs.form.submit(); 
+                    } else if (request.action == 'show_credentials_form') {
+                        this.$nextTick(() => this.submitFormWithOp('show_credentials_form')); 
                     }
                 }
             },
@@ -102,7 +107,7 @@
         {* @submit_button text may vary depending on auth module *}
         {* value="submit" is not submitted in form data, whereas other values for the 'values' attribute are *}
         <check if="{{ !@@hide_submit_button }}">
-            <button type="submit" name="op" value="submit" class="is-default" id="auth-login-submit-button" :disabled="isSubmitted">{{ @@submit_button }}</button>
+            <button type="submit" class="is-default" id="auth-login-submit-button" :disabled="isSubmitted">{{ @@submit_button }}</button>
         </check>         
         <check if="{{ @@cancellable }}">
             <button type="submit" name="op" value="cancel" id="auth-login-cancel-button">{{ @intl.common.cancel }}</button>
