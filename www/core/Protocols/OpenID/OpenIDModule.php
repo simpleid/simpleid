@@ -343,7 +343,7 @@ class OpenIDModule extends Module implements ProtocolResult {
                     $request_state->setParams($request->toArray());
                     $form_state = new FormState([
                         'cancel' => 'openid',
-                        'mode' => AuthManager::MODE_CREDENTIALS,
+                        'mode' => AuthManager::MODE_IDENTIFY_USER,
                         'auth_skip_activity' => true
                     ]);
                     $form_state->setRequest($request);
