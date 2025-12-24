@@ -31,15 +31,53 @@ use SimpleID\Util\UI\Template;
 /**
  * An event used to build the login form.
  * 
- * This class is derived from `FormBuildEvent` with the additional
+ * This class is derived from {@link SimpleID\Util\Forms\FormBuildEvent}, which
+ * uses {@link SimpleID\Util\UI\UIBuilder} to build the form.  This event uses
+ * a `region` key in the `$additional` array in the {@link addBlock()} method
+ * to associate each block with a *region*.  Blocks in each region are sorted
+ * and displayed independently of each other.
+ * 
+ * The regions defined by this class, and their function, can be found in the
+ * documentation of the constants below.
  * 
  */
 class LoginFormBuildEvent extends FormBuildEvent implements StoppableEventInterface {
     use StoppableEventTrait;
 
+    /**
+     * Constant denoting the `identity` region.  The identity region contains a single
+     * block to allow the user to specify an identifier (such as the user name), or
+     * show the identifier if is already given.
+     * 
+     * Authentication modules that require an identifer to be given should call
+     * the {@link showUIDBlock()} method.  Otherwise no blocks should be added
+     * to this region.
+     */
     const IDENTITY_REGION = 'identity';
+    /**
+     * Constant denoting the `password` region.  The password region is added by
+     * the {@link PasswordAuthSchemeModule} module, to be rendered in the DOM
+     * but hidden from the user unless it is required.  This allows browser
+     * password managers to automatically fill in the password in the background.
+     * 
+     * No other blocks should be added to this region.
+     */
     const PASSWORD_REGION = 'password';
+    /**
+     * Constant denoting the `default` region.  If a region is not specified when
+     * adding the block, the block will be added to this region.
+     * 
+     * Note that blocks in the default region are rendered in the DOM, but
+     * not always shown to the user. For example, if the user is able to choose
+     * between multiple authentication methods, only the block associated with
+     * selected method is shown to the user, while other blocks are hidden.
+     * To always show a block, add it to the `options` region.
+     */
     const DEFAULT_REGION = 'default';
+    /**
+     * Constant denoting the `options` region.  Blocks in this region are
+     * rendered below the `default` region but above the log in button.
+     */
     const OPTIONS_REGION = 'options';
     const CREDENTIALS_REGION = 'credentials'; // credentials [alternatives]
     const AFTER_BUTTONS_REGION = 'after_buttons'; // or credentials_secondary
