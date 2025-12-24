@@ -1,15 +1,106 @@
-<div class="login-security {{ @@security_class }}" x-data="{ isSubmitted: false }" x-init="$nextTick(() => formReady($el))">
-    <form action="{{ @base_path }}auth/login/{{ @@destination }}" method="post" enctype="application/x-www-form-urlencoded" @submit="isSubmitted = true">
-        <input type="hidden" name="fs" value="{{ @@fs }}">
-        <input type="hidden" name="tk" value="{{ @@tk }}">
+<script type="text/javascript">
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('createLoginApp', (fs, tk, mode, identifyUrl) => ({
+            fs: fs,
+            tk: tk,
+            isSubmitted: false,
+            showPasswordRegion: false,
+            mode: mode,
+            identifyUrl: identifyUrl,
 
-        <repeat group="{{ @forms.default }}" value="{{ @form }}">
-            {{ @form.content | raw }}
-        </repeat>
+            formReady($div) {
+                const focus = new Array();
+                $div.querySelectorAll('input[data-focus-weight]').forEach((el) => {
+                    if ((el.value == '') && el.hasAttribute('data-focus-weight')) {
+                        focus.push({ weight: el.getAttribute('data-focus-weight'), el: el });
+                    }
+                });
+                if (focus.length == 0) return;
+                focus.sort((a, b) => a.weight - b.weight);
+                focus[0].el.focus();
+            },
+
+            promptForPassword() {
+                this.showPasswordRegion = true;
+                this.isSubmitted = false;
+                this.$nextTick(() => (this.$el.querySelectorAll('input.credentials')[0].focus()));
+            },
+
+            async formSubmit() {
+                const evt = this.$event;
+                this.isSubmitted = true;
+                
+                if ((this.mode == 0) && ('uid' in this.$refs) && (this.$refs.uid.value.trim() != '')) {
+                    evt.preventDefault();
+                    const formData = new URLSearchParams(new FormData(this.$refs.form));
+
+                    const identifyResponse = await fetch(this.identifyUrl, { method: 'POST', headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-Request-Token': this.tk,
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Accept': 'application/json'
+                    }, body: formData});
+
+                    if (!identifyResponse.ok) {
+                        // Show the password region if error occurs
+                        this.promptForPassword();
+                        return;
+                    }
+
+                    const result = await identifyResponse.json();
+
+                    this.fs = result.fs;
+                    this.tk = result.tk;
+                    this.mode = result.mode;
+
+                    if (result.action == 'request_password') {
+                        this.promptForPassword();
+                    } else if (request.action == 'submit_form') {
+                        this.$refs.form.submit(); 
+                    }
+                }
+            },
+
+            init() {
+                this.$nextTick(() => this.formReady(this.$el));
+            }
+        }));
+    });
+</script>
+
+<div class="login-security {{ @@security_class }}" x-data="createLoginApp({{ @fs | js, raw }}, {{ @tk | js, raw }}, {{ @mode | js, raw }}, {{ @identify_url | js, raw }})">
+    <form action="{{ @base_path }}auth/login/{{ @@destination }}" method="post" enctype="application/x-www-form-urlencoded"  @submit="formSubmit()" x-ref="form">
+        <input type="hidden" name="fs" x-model="fs">
+        <input type="hidden" name="tk" x-model="tk">
+
+        <check if="{{ @@forms.identity }}">
+            <repeat group="{{ @forms.identity }}" value="{{ @form }}">
+                {{ @form.content | raw }}
+            </repeat>
+        </check>
+
+        <check if="{{ @@forms.password }}">
+            <div x-show="showPasswordRegion" x-transition>
+                <repeat group="{{ @forms.password }}" value="{{ @form }}">
+                    {{ @form.content | raw }}
+                </repeat>
+            </div>
+        </check>
+
+        <check if="{{ @@forms.default }}">
+            <repeat group="{{ @forms.default }}" value="{{ @form }}">
+                {{ @form.content | raw }}
+            </repeat>
+        </check>
+
+        <check if="{{ @@forms.options }}">
+            <repeat group="{{ @forms.options }}" value="{{ @form }}">
+                {{ @form.content | raw }}
+            </repeat>
+        </check>
 
         {* @submit_button text may vary depending on auth module *}
-        {* value="submit" is not submitted in form data, whereas other values for the 'values' attribute would *}
-         {* TODO: onClick or onsubmit *}
+        {* value="submit" is not submitted in form data, whereas other values for the 'values' attribute are *}
         <check if="{{ !@@hide_submit_button }}">
             <button type="submit" name="op" value="submit" class="is-default" id="auth-login-submit-button" :disabled="isSubmitted">{{ @@submit_button }}</button>
         </check>         
@@ -17,22 +108,12 @@
             <button type="submit" name="op" value="cancel" id="auth-login-cancel-button">{{ @intl.common.cancel }}</button>
         </check>
 
-        <repeat group="{{ @@forms.after_buttons }}" value="{{ @form }}">
-            {{ @form.content | raw }}
-        </repeat>
+        {* TODO: Or *}
+
+        <check if="{{ @@forms.after_buttons }}">
+            <repeat group="{{ @@forms.after_buttons }}" value="{{ @form }}">
+                {{ @form.content | raw }}
+            </repeat>
+        </check>
     </form>
 </div>
-
-<script type="text/javascript">
-    const formReady = function($div) {
-        const focus = new Array();
-        $div.querySelectorAll('input[data-focus-weight]').forEach((el) => {
-            if ((el.value == '') && el.hasAttribute('data-focus-weight')) {
-                focus.push({ weight: el.getAttribute('data-focus-weight'), el: el });
-            }
-        });
-        if (focus.length == 0) return;
-        focus.sort((a, b) => a.weight - b.weight);
-        focus[0].el.focus();
-    };
-</script>

@@ -24,11 +24,11 @@ namespace SimpleID\Auth;
 
 use Psr\Log\LogLevel;
 use SimpleID\Auth\CredentialEvent;
+use SimpleID\Auth\LoginFormBuildEvent;
 use SimpleID\Auth\NonInteractiveAuthEvent;
 use SimpleID\Crypt\Random;
 use SimpleID\Crypt\SecurityToken;
 use SimpleID\Store\StoreManager;
-use SimpleID\Util\Forms\FormBuildEvent;
 use SimpleID\Util\UI\Template;
 
 /**
@@ -101,15 +101,15 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
     /**
      * Displays the login form, with a remember-me checkbox.
      *
-     * @param FormBuildEvent $event
+     * @param LoginFormBuildEvent $event
      * @return void
      */
-    public function onLoginFormBuild(FormBuildEvent $event) {
+    public function onLoginFormBuild(LoginFormBuildEvent $event) {
         $form_state = $event->getFormState();
 
-        if ($form_state['mode'] == AuthManager::MODE_CREDENTIALS) {
+        if ($form_state['mode'] == AuthManager::MODE_IDENTIFY_USER) {
             $tpl = Template::instance();
-            $event->addBlock('auth_rememberme', $tpl->render('auth_rememberme.html', false), 10);
+            $event->addBlock('auth_rememberme', $tpl->render('auth_rememberme.html', false), 10, [ 'region' => LoginFormBuildEvent::OPTIONS_REGION ]);
         }
     }
 
@@ -123,9 +123,12 @@ class RememberMeAuthSchemeModule extends AuthSchemeModule {
     public function onLoginFormSubmit(LoginFormSubmitEvent $event) {
         $form_state = $event->getFormState();
 
-        if ($form_state['mode'] == AuthManager::MODE_CREDENTIALS) {
+        if (in_array($form_state['mode'], [ AuthManager::MODE_IDENTIFY_USER, AuthManager::MODE_CREDENTIALS ])) {
             if ($this->f3->exists('POST.rememberme') === true) {
                 $form_state['rememberme'] = $this->f3->get('POST.rememberme');
+            } elseif ($form_state->exists('rememberme')) {
+                if (!$this->f3->exists('POST.rememberme'))
+                    $form_state->unset('rememberme');
             }
         }
     }

@@ -38,10 +38,11 @@ class LoginFormBuildEvent extends FormBuildEvent implements StoppableEventInterf
     use StoppableEventTrait;
 
     const IDENTITY_REGION = 'identity';
-    const DEFAULT_REGION = 'default';
     const PASSWORD_REGION = 'password';
-    const CREDENTIALS_REGION = 'credentials'; // identity, credentials, options
-    const AFTER_BUTTONS_REGION = 'after_buttons';
+    const DEFAULT_REGION = 'default';
+    const OPTIONS_REGION = 'options';
+    const CREDENTIALS_REGION = 'credentials'; // credentials [alternatives]
+    const AFTER_BUTTONS_REGION = 'after_buttons'; // or credentials_secondary
 
     /** @var bool */
     protected $hasUIDBlock = false;

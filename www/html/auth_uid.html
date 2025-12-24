@@ -1,12 +1,13 @@
 <div class="form-item">
-    <label for="edit-uid">{{ @@intl.core.auth.name_label }}</label>
     <check if="{{ @@uid }}">
         <true>
             <input type="hidden" name="uid" value="{{ @uid }}">
-            <div id="edit-uid">{{ @uid }}</div>
+            <div id="edit-uid">Logging in as <strong>{{ @uid }}</strong> (Change)</div>
         </true>
         <false>
-            <input type="text" name="uid" id="edit-uid" value="{{ @@REQUEST.uid }}" autocomplete="username {{ ' ', ((@@uid_autocomplete) ? @@uid_autocomplete : []) | implode }}" autocapitalize="off" autocorrect="off" class="form-text required" data-focus-weight="0">
+            <label for="edit-uid">{{ @@intl.core.auth.name_label }}</label>
+            <!-- TODO - if box changes set mode = 0 -->
+            <input type="text" name="uid" id="edit-uid" value="{{ @@REQUEST.uid }}" autocomplete="username {{ ' ', ((@@uid_autocomplete) ? @@uid_autocomplete : []) | implode }}" autocapitalize="off" autocorrect="off" class="form-text required" data-focus-weight="0" x-ref="uid">
         </false>
     </check>
 </div>
