@@ -42,6 +42,13 @@ globals:
 #
 tests:
   auth_login.html:
+    - template: auth_uid.html
+      set: form_content
+
+    - array:
+        content: '{{ @form_content | raw }}'
+      push: forms.identity
+
     - template: auth_password.html
       variables:
         login_form_module: password
@@ -57,13 +64,46 @@ tests:
 
     - array:
         content: '{{ @form_content | raw }}'
+      push: forms.options
+
+    - template: page.html
+      variables:
+        page_class: is-dialog-page
+        layout: auth_login.html
+        fs: ''
+        tk: ''
+        mode: 3
+        identify_url: ''
+        message: The user name or password is not correct.
+
+  auth_otp.html:
+    - template: auth_uid.html
+      variables:
+        uid: test_uid
+      set: form_content
+
+    - array:
+        content: '{{ @form_content | raw }}'
+      push: forms.identity
+
+    - template: auth_otp.html
+      variables:
+        otp_recovery_url: https://simpleid.org/docs/2/common-problems/#otp
+        submit_button: Verify
+      set: form_content
+
+    - array:
+        content: '{{ @form_content | raw }}'
       push: forms.default
 
     - template: page.html
       variables:
         page_class: is-dialog-page
         layout: auth_login.html
-        message: The user name or password is not correct.
+        fs: ''
+        tk: ''
+        mode: 5
+        identify_url: ''
 
   auth_otp_setup.html:
     - template: page.html

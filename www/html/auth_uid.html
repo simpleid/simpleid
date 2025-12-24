@@ -2,11 +2,10 @@
     <check if="{{ @@uid }}">
         <true>
             <input type="hidden" name="uid" value="{{ @uid }}">
-            <div id="edit-uid">Logging in as <strong>{{ @uid }}</strong> (Change)</div>
+            <div class="message status">{{ @intl.core.auth.logging_in_as, @uid | format, raw }} <span class="inline-actions"><a href="#">{{ @intl.core.auth.change_name }}</a></span></div>
         </true>
         <false>
             <label for="edit-uid">{{ @@intl.core.auth.name_label }}</label>
-            <!-- TODO - if box changes set mode = 0 -->
             <input type="text" name="uid" id="edit-uid" value="{{ @@REQUEST.uid }}" autocomplete="username {{ ' ', ((@@uid_autocomplete) ? @@uid_autocomplete : []) | implode }}" autocapitalize="off" autocorrect="off" class="form-text required" data-focus-weight="0" x-ref="uid">
         </false>
     </check>
