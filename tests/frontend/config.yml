@@ -70,6 +70,7 @@ tests:
       variables:
         page_class: is-dialog-page
         layout: auth_login.html
+        show_divider: true
         fs: ''
         tk: ''
         mode: 3

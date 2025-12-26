@@ -113,7 +113,7 @@
             <button type="submit" name="op" value="cancel" id="auth-login-cancel-button">{{ @intl.common.cancel }}</button>
         </check>
 
-        {* TODO: Or *}
+        <check if="{{ @@show_divider }}"><div class="form-divider">{{ @intl.core.auth.divider_label }}</div></check>
 
         <check if="{{ @@forms.after_buttons }}">
             <repeat group="{{ @@forms.after_buttons }}" value="{{ @form }}">
