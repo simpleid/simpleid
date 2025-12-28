@@ -28,8 +28,19 @@ use \Template as F3Template;
 use SimpleID\Util\ArrayWrapper;
 
 /**
- * An extension to the Fat-Free Framework `Template` class to
- * support attachments.
+ * An extension to the Fat-Free Framework `Template` class.
+ * 
+ * This class implements a numbner of extensions:
+ * 
+ * - **Attachments.**  This class uses the {@link AttachmentManagerTrait}
+ *   to provide methods to allow templates to retrieve attachments.
+ * - **Return values.**  The `return` custom tag, along with the {@getReturnValue()}
+ *   function, allows templates to assign and return values back to the
+ *   calling PHP code.
+ * - **Custom tags.**  This class provides custom tags such as `capture`,
+ *   `mail_callout` and `mail_button`.
+ * - **Custom filters.**.  This class provides a number of additional custom
+ *   filters, including `attr`, `js`, `markdown` and `html_to_text`.
  *
  */
 class Template extends F3Template implements AttachmentManagerInterface {
