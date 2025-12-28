@@ -124,9 +124,9 @@
 
         <check if="{{ @@show_divider }}"><div class="form-divider">{{ @intl.core.auth.divider_label }}</div></check>
 
-        <check if="{{ @@forms.after_buttons }}">
+        <check if="{{ @@forms.secondary }}">
             <div class="login-block-region login-block-region--after-buttons">
-                <repeat group="{{ @@forms.after_buttons }}" value="{{ @form }}">
+                <repeat group="{{ @@forms.secondary }}" value="{{ @form }}">
                     <div class="login-block login-block--{{ @form.id }}" data-block-id="{{ @form.id }}">{{ @form.content | raw }}</div>
                 </repeat>
             </div>
