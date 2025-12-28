@@ -66,13 +66,13 @@ class SMTP extends F3SMTP {
      * 
      * If the value has non-ASCII characters, this function
      * assumes that the value is already UTF-8 encoded.  It then further
-     * encodes it in base64.
+     * encodes the entire string in base64.
      * 
      * @param string $val the value to encode
      * @return string the encoded value
      */
     protected function encodeHeaderValue(string $val): string {
-        if (preg_match('/[^\x00-\x7F]/', $val) === 1) return sprintf("=?utf-8?B?%s?= ", base64_encode($val));;
+        if (preg_match('/[^\x00-\x7F]/', $val) === 1) return sprintf("=?utf-8?B?%s?=", base64_encode($val));;
         return $val;
     }
 
