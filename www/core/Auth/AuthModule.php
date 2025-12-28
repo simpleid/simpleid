@@ -369,6 +369,11 @@ class AuthModule extends Module {
                 $block_additional_data[$block['id']] = $block['additional'];
             }
         }
+        if (!isset($forms['default']) || count($forms['default']) == 0) {
+            $active_block_id = null;
+        } else {
+            $active_block_id = $forms['default'][0]['id'];
+        }
 
         $this->f3->set('forms', $forms);
 
@@ -381,7 +386,7 @@ class AuthModule extends Module {
                 $this->f3->set('title', $this->f3->get('intl.common.login'));
                 break;
             case AuthManager::MODE_VERIFY:
-                if (count($forms) == 0) return; // Nothing to verify
+                if (count($forms['default']) == 0) return; // Nothing to verify
                 $this->f3->set('submit_button', $this->f3->get('intl.common.verify'));
                 $this->f3->set('title', $this->f3->get('intl.common.verify'));
         }
@@ -404,6 +409,7 @@ class AuthModule extends Module {
             'tk' => $tk,
             'mode' => $form_state['mode'],
             'identifyUrl' => $this->getCanonicalURL('@auth_identify', '', 'https'),
+            'activeBlock' => $active_block_id,
             'blocks' => $block_additional_data
         ]);
         $this->f3->set('page_class', 'is-dialog-page');

@@ -30,6 +30,7 @@
             promptForPassword() {
                 this.showPasswordRegion = true;
                 this.isSubmitted = false;
+                this.activeBlock = this.$el.querySelector('.login-block-region--password > .login-block')?.getAttribute('data-block-id');
                 this.$nextTick(() => (this.$el.querySelectorAll('input.credentials')[0].focus()));
             },
 
@@ -79,11 +80,12 @@
     <form action="{{ @base_path }}auth/login/{{ @@destination }}" method="post" enctype="application/x-www-form-urlencoded"  @submit="formSubmit()" x-ref="form">
         <input type="hidden" name="fs" x-model="fs">
         <input type="hidden" name="tk" x-model="tk">
+        <input type="hidden" name="active_block" x-model="activeBlock">
 
         <check if="{{ @@forms.identity }}">
             <div class="login-block-region login-block-region--identity">
                 <repeat group="{{ @forms.identity }}" value="{{ @form }}">
-                    <div class="login-block login-block--{{ @form.id }}">{{ @form.content | raw }}</div>
+                    <div class="login-block login-block--{{ @form.id }}" data-block-id="{{ @form.id }}">{{ @form.content | raw }}</div>
                 </repeat>
             </div>
         </check>
@@ -91,7 +93,7 @@
         <check if="{{ @@forms.password }}">
             <div class="login-block-region login-block-region--password" x-show="showPasswordRegion" x-transition>
                 <repeat group="{{ @forms.password }}" value="{{ @form }}">
-                    <div class="login-block login-block--{{ @form.id }}">{{ @form.content | raw }}</div>
+                    <div class="login-block login-block--{{ @form.id }}" data-block-id="{{ @form.id }}">{{ @form.content | raw }}</div>
                 </repeat>
             </div>
         </check>
@@ -99,7 +101,7 @@
         <check if="{{ @@forms.default }}">
             <div class="login-block-region login-block-region--default">
                 <repeat group="{{ @forms.default }}" value="{{ @form }}">
-                    <div class="login-block login-block--{{ @form.id }}">{{ @form.content | raw }}</div>
+                    <div class="login-block login-block--{{ @form.id }}" data-block-id="{{ @form.id }}">{{ @form.content | raw }}</div>
                 </repeat>
             </div>
         </check>
@@ -107,16 +109,15 @@
         <check if="{{ @@forms.options }}">
             <div class="login-block-region login-block-region--options">
                 <repeat group="{{ @forms.options }}" value="{{ @form }}">
-                    <div class="login-block login-block--{{ @form.id }}">{{ @form.content | raw }}</div>
+                    <div class="login-block login-block--{{ @form.id }}" data-block-id="{{ @form.id }}">{{ @form.content | raw }}</div>
                 </repeat>
             </div>
         </check>
 
         {* @submit_button text may vary depending on auth module *}
         {* value="submit" is not submitted in form data, whereas other values for the 'values' attribute are *}
-        <check if="{{ !@@hide_submit_button }}">
-            <button type="submit" class="is-default" id="auth-login-submit-button" :disabled="isSubmitted">{{ @@submit_button }}</button>
-        </check>         
+        <button type="submit" class="is-default" id="auth-login-submit-button" x-show="activeBlock != null && blocks[activeBlock].showSubmitButton !== undefined ? blocks[activeBlock].showSubmitButton : true" :disabled="isSubmitted">{{ @@submit_button }}</button>
+        
         <check if="{{ @@cancellable }}">
             <button type="submit" name="op" value="cancel" id="auth-login-cancel-button">{{ @intl.common.cancel }}</button>
         </check>
@@ -126,7 +127,7 @@
         <check if="{{ @@forms.after_buttons }}">
             <div class="login-block-region login-block-region--after-buttons">
                 <repeat group="{{ @@forms.after_buttons }}" value="{{ @form }}">
-                    <div class="login-block login-block--{{ @form.id }}">{{ @form.content | raw }}</div>
+                    <div class="login-block login-block--{{ @form.id }}" data-block-id="{{ @form.id }}">{{ @form.content | raw }}</div>
                 </repeat>
             </div>
         </check>
