@@ -91,7 +91,7 @@
         </check>
 
         <check if="{{ @@forms.password }}">
-            <div class="login-block-region login-block-region--password" x-show="showPasswordRegion" x-transition>
+            <div class="login-block-region login-block-region--password" x-show="showPasswordRegion" x-transition x-cloak>
                 <repeat group="{{ @forms.password }}" value="{{ @form }}">
                     <div class="login-block login-block--{{ @form.id }}" data-block-id="{{ @form.id }}">{{ @form.content | raw }}</div>
                 </repeat>
