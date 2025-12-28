@@ -44,7 +44,7 @@ class UIBuilder implements UIBuilderInterface {
      * {@inheritdoc}
      */
     public function addBlock(string $id, string $content, int $weight = 0, array $additional = []): UIBuilder {
-        $block = [ 'id' => $id, 'content' => $content, 'weight' => $weight ];
+        $block = [ 'id' => $id, 'content' => $content, 'weight' => $weight, 'additional' => $additional ];
         $block = array_merge($block, $additional);
 
         $this->blocks[] = [
