@@ -79,29 +79,35 @@
         <input type="hidden" name="tk" x-model="tk">
 
         <check if="{{ @@forms.identity }}">
-            <repeat group="{{ @forms.identity }}" value="{{ @form }}">
-                {{ @form.content | raw }}
-            </repeat>
+            <div class="login-block-region login-block-region--identity">
+                <repeat group="{{ @forms.identity }}" value="{{ @form }}">
+                    <div class="login-block login-block--{{ @form.id }}">{{ @form.content | raw }}</div>
+                </repeat>
+            </div>
         </check>
 
         <check if="{{ @@forms.password }}">
-            <div x-show="showPasswordRegion" x-transition>
+            <div class="login-block-region login-block-region--password" x-show="showPasswordRegion" x-transition>
                 <repeat group="{{ @forms.password }}" value="{{ @form }}">
-                    {{ @form.content | raw }}
+                    <div class="login-block login-block--{{ @form.id }}">{{ @form.content | raw }}</div>
                 </repeat>
             </div>
         </check>
 
         <check if="{{ @@forms.default }}">
-            <repeat group="{{ @forms.default }}" value="{{ @form }}">
-                {{ @form.content | raw }}
-            </repeat>
+            <div class="login-block-region login-block-region--default">
+                <repeat group="{{ @forms.default }}" value="{{ @form }}">
+                    <div class="login-block login-block--{{ @form.id }}">{{ @form.content | raw }}</div>
+                </repeat>
+            </div>
         </check>
 
         <check if="{{ @@forms.options }}">
-            <repeat group="{{ @forms.options }}" value="{{ @form }}">
-                {{ @form.content | raw }}
-            </repeat>
+            <div class="login-block-region login-block-region--options">
+                <repeat group="{{ @forms.options }}" value="{{ @form }}">
+                    <div class="login-block login-block--{{ @form.id }}">{{ @form.content | raw }}</div>
+                </repeat>
+            </div>
         </check>
 
         {* @submit_button text may vary depending on auth module *}
@@ -116,9 +122,11 @@
         <check if="{{ @@show_divider }}"><div class="form-divider">{{ @intl.core.auth.divider_label }}</div></check>
 
         <check if="{{ @@forms.after_buttons }}">
-            <repeat group="{{ @@forms.after_buttons }}" value="{{ @form }}">
-                {{ @form.content | raw }}
-            </repeat>
+            <div class="login-block-region login-block-region--after-buttons">
+                <repeat group="{{ @@forms.after_buttons }}" value="{{ @form }}">
+                    <div class="login-block login-block--{{ @form.id }}">{{ @form.content | raw }}</div>
+                </repeat>
+            </div>
         </check>
     </form>
 </div>
