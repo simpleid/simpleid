@@ -374,6 +374,9 @@ class AuthModule extends Module {
         } else {
             $active_block_id = $forms['default'][0]['id'];
         }
+        if ((isset($forms['secondary']) && (count($forms['secondary']) > 0))) {
+            $this->f3->set('show_divider', true);
+        }
 
         $this->f3->set('forms', $forms);
 
