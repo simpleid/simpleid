@@ -343,6 +343,7 @@ class AuthManager extends Prefab {
      */
     public function logout() {
         $user = $this->getUser();
+        if ($user == null) return;
 
         $event = new LogoutEvent($user);
         \Events::instance()->dispatch($event);

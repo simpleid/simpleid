@@ -285,7 +285,17 @@ class AuthModule extends Module {
 
         // Require HTTPS, redirect if necessary
         $this->checkHttps('redirect', true);
-    
+
+        // Check if user is logged in
+        $user = $this->auth->getUser();
+        if ($user == null) {
+            if ($params['destination']) {
+                $this->f3->reroute('/' . $params['destination']);
+            } else {
+                $this->loginForm($params);
+            }
+        }
+
         $this->auth->logout();
 
         $event = new GenericStoppableEvent('post_logout');
