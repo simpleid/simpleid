@@ -335,6 +335,7 @@ class AuthModule extends Module {
      */
     public function loginForm($params = [ 'destination' => null ], $form_state = null) {
         $tpl = Template::instance();
+        $matrix = \Matrix::instance();
         $config = $this->f3->get('config');
         if ($form_state == null) $form_state = new FormState([ 'mode' => AuthManager::MODE_IDENTIFY_USER ]);
 
@@ -361,6 +362,14 @@ class AuthModule extends Module {
             $uid_autocomplete = $event->getUIDAutocompleteValues();
             if (count($uid_autocomplete) > 0) $this->f3->set('uid_autocomplete', $uid_autocomplete);
         }
+
+        $block_additional_data = [];
+        foreach ($forms as $region => $blocks) {
+            foreach ($blocks as $block) {
+                $block_additional_data[$block['id']] = $block['additional'];
+            }
+        }
+
         $this->f3->set('forms', $forms);
 
         // 3. Build the buttons and security messaging
@@ -394,7 +403,8 @@ class AuthModule extends Module {
             'fs' => $fs,
             'tk' => $tk,
             'mode' => $form_state['mode'],
-            'identifyUrl' => $this->getCanonicalURL('@auth_identify', '', 'https')
+            'identifyUrl' => $this->getCanonicalURL('@auth_identify', '', 'https'),
+            'blocks' => $block_additional_data
         ]);
         $this->f3->set('page_class', 'is-dialog-page');
         $this->f3->set('layout', 'auth_login.html');
