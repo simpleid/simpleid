@@ -384,12 +384,18 @@ class AuthModule extends Module {
         // 4. We can't use SecurityToken::BIND_SESSION here because the PHP session is not
         // yet stable
         $token = new SecurityToken();
-        $this->f3->set('tk', $token->generate('login', SecurityToken::OPTION_NONCE));
+        $tk = $token->generate('login', SecurityToken::OPTION_NONCE);
+        $this->f3->set('tk', $tk);
         
-        $this->f3->set('fs', $token->generate($form_state->encode()));
+        $fs = $token->generate($form_state->encode());
+        $this->f3->set('fs', $fs);
         if (isset($params['destination'])) $this->f3->set('destination', $params['destination']);
-        $this->f3->set('mode', $form_state['mode']);
-        $this->f3->set('identify_url', $this->getCanonicalURL('@auth_identify', '', 'https'));
+        $this->f3->set('login_app_options', [
+            'fs' => $fs,
+            'tk' => $tk,
+            'mode' => $form_state['mode'],
+            'identifyUrl' => $this->getCanonicalURL('@auth_identify', '', 'https')
+        ]);
         $this->f3->set('page_class', 'is-dialog-page');
         $this->f3->set('layout', 'auth_login.html');
 

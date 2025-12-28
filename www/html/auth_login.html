@@ -1,12 +1,12 @@
 <script type="text/javascript">
     document.addEventListener('alpine:init', () => {
-        Alpine.data('createLoginApp', (fs, tk, mode, identifyUrl) => ({
-            fs: fs,
-            tk: tk,
+        Alpine.data('createLoginApp', (options) => ({
+            fs: options.fs,
+            tk: options.tk,
             isSubmitted: false,
             showPasswordRegion: false,
-            mode: mode,
-            identifyUrl: identifyUrl,
+            mode: options.mode,
+            identifyUrl: options.identifyUrl,
 
             formReady($div) {
                 const focus = new Array();
@@ -73,7 +73,7 @@
     });
 </script>
 
-<div class="login-security {{ @@security_class }}" x-data="createLoginApp({{ @fs | js, raw }}, {{ @tk | js, raw }}, {{ @mode | js, raw }}, {{ @identify_url | js, raw }})">
+<div class="login-security {{ @@security_class }}" x-data="createLoginApp({{ @login_app_options | js, raw }})">
     <form action="{{ @base_path }}auth/login/{{ @@destination }}" method="post" enctype="application/x-www-form-urlencoded"  @submit="formSubmit()" x-ref="form">
         <input type="hidden" name="fs" x-model="fs">
         <input type="hidden" name="tk" x-model="tk">
