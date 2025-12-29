@@ -73,7 +73,7 @@
     </table>
 
     <form action="{{ @base_path }}auth/webauthn" method="post">
-        <input type="hidden" name="tk" value="{{ @tk }}">
+        <input type="hidden" name="tk" value="{{ @webauthn_tk }}">
         <button type="submit">{{ @intl.common.add }}</button>
     </form>
 </div>
