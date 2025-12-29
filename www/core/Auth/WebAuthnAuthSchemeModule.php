@@ -327,7 +327,7 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
             $this->f3->set('js_data.intl.challenge_error',  $this->f3->get('intl.core.auth_webauthn.challenge_error'));
             $this->f3->set('js_data.intl.browser_error',  $this->f3->get('intl.core.auth_webauthn.browser_error'));
 
-            $event->addBlock('auth_webauthn', $tpl->render('auth_webauthn.html', false), 0);
+            $event->addBlock('auth_webauthn', $tpl->render('auth_webauthn_verify.html', false), 0);
         }
     }
 
