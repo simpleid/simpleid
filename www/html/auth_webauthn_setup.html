@@ -3,7 +3,7 @@
     document.addEventListener('alpine:init', () => {
         Alpine.data('createCredentialApp', (url, tk, baseCreateOptions) => ({
             supported: document.isPublicKeyCredentialSupported(),
-            hasLocalAuthenticator: await document.hasLocalAuthenticator(),
+            hasLocalAuthenticator: false,
             challenge: '',
             nonce: '',
             result: '',
@@ -51,6 +51,10 @@
                     }
                     console.error(e);
                 }
+            },
+
+            async init() {
+                this.hasLocalAuthenticator = await document.hasLocalAuthenticator();
             }
         }));
     });
