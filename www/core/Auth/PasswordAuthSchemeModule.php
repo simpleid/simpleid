@@ -51,7 +51,7 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
      */
     public function onLoginFormBuild(LoginFormBuildEvent $event) {
         $form_state = $event->getFormState();
-        $additional = [];
+        $additional = [ 'title' => $this->f3->get('intl.core.auth_password.login_block_title') ];
 
         if ($form_state['mode'] == AuthManager::MODE_IDENTIFY_USER) {
             $event->showUIDBlock();

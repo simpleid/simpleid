@@ -209,7 +209,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
 
             $this->f3->set('submit_button', $this->f3->get('intl.common.verify'));
 
-            $event->addBlock('auth_otp', $tpl->render('auth_otp.html', false), 0);
+            $event->addBlock('auth_otp', $tpl->render('auth_otp.html', false), 0, ['title' => $this->f3->get('intl.core.auth_otp.verify_block_title')]);
         }
     }
 

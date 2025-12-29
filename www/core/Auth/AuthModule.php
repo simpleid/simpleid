@@ -364,6 +364,7 @@ class AuthModule extends Module {
         }
 
         $block_additional_data = [];
+        $switchable = false;
         foreach ($forms as $region => $blocks) {
             foreach ($blocks as $block) {
                 $block_additional_data[$block['id']] = $block['additional'];
@@ -373,8 +374,10 @@ class AuthModule extends Module {
             $active_block_id = null;
         } else {
             $active_block_id = $forms['default'][0]['id'];
+            $switchable = (($form_state['mode'] != AuthManager::MODE_IDENTIFY_USER) && count($forms['default']) > 1);
         }
-        if ((isset($forms['secondary']) && (count($forms['secondary']) > 0))) {
+        $this->f3->set('switchable', $switchable);
+        if ((isset($forms['secondary']) && (count($forms['secondary']) > 0)) || $switchable) {
             $this->f3->set('show_divider', true);
         }
 

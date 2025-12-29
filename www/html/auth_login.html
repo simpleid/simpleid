@@ -101,7 +101,7 @@
         <check if="{{ @@forms.default }}">
             <div class="login-block-region login-block-region--default">
                 <repeat group="{{ @forms.default }}" value="{{ @form }}">
-                    <div class="login-block login-block--{{ @form.id }}" data-block-id="{{ @form.id }}">{{ @form.content | raw }}</div>
+                    <div class="login-block login-block--{{ @form.id }}" data-block-id="{{ @form.id }}" <check if="{{ @@switchable || false }}">x-show="activeBlock == {{ @form.id | js, raw }}" x-cloak</check>>{{ @form.content | raw }}</div>
                 </repeat>
             </div>
         </check>
@@ -122,7 +122,15 @@
             <button type="submit" name="op" value="cancel" id="auth-login-cancel-button">{{ @intl.common.cancel }}</button>
         </check>
 
-        <check if="{{ @@show_divider }}"><div class="form-divider">{{ @intl.core.auth.divider_label }}</div></check>
+        <check if="{{ @@show_divider }}"><div class="form-item form-divider">{{ @intl.core.auth.divider_label }}</div></check>
+
+        <check if="{{ @@forms.default && (@@switchable || false) }}">
+            <div class="login-block-region login-block-region--alternative">
+                <repeat group="{{ @forms.default }}" value="{{ @form }}">
+                    <div class="form-item login-block-alternative--{{ @form.id }}" data-block-id="{{ @form.id }}"><a href="#" class="action-link" @click.prevent="activeBlock = {{ @form.id | js, raw }}" x-show="activeBlock != {{ @form.id | js, raw }}" x-cloak>{{ @@form.additional.title }}</a></div>
+                </repeat>
+            </div>
+        </check>
 
         <check if="{{ @@forms.secondary }}">
             <div class="login-block-region login-block-region--after-buttons">
