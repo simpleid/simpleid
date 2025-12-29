@@ -392,6 +392,7 @@ class AuthModule extends Module {
                 if (count($forms['default']) == 0) return; // Nothing to verify
                 $this->f3->set('submit_button', $this->f3->get('intl.common.verify'));
                 $this->f3->set('title', $this->f3->get('intl.common.verify'));
+                // TODO - $user['auth_login_last_active_block'][AuthManager::MODE_VERIFY]
         }
 
         if (isset($form_state['cancel'])) {

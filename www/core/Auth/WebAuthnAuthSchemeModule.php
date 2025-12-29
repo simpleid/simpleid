@@ -336,7 +336,7 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
     public function onLoginFormSubmit(LoginFormSubmitEvent $event) {
         $form_state = $event->getFormState();
 
-        if ($form_state['mode'] == AuthManager::MODE_VERIFY) {
+        if (($form_state['mode'] == AuthManager::MODE_VERIFY) && $this->isBlockActive('auth_webauthn')) {
             $store = StoreManager::instance();
 
             $uid = $form_state['uid'];
@@ -378,11 +378,15 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
         $auth = AuthManager::instance();
         $store = StoreManager::instance();
 
-        if (($level >= AuthManager::AUTH_LEVEL_VERIFIED) && isset($form_state['webauthn_remember']) && ($form_state['webauthn_remember'] == 1)) {
-            $uaid = $auth->assignUAID();
-            $remember = $user['webauthn']['remember'];
-            $remember[] = $uaid;
-            $user->set('webauthn.remember', array_unique($remember));
+        if ($level >= AuthManager::AUTH_LEVEL_VERIFIED) {
+            $user->set('auth_login_last_active_block.' . AuthManager::MODE_VERIFY, 'auth_webauthn');
+
+            if (isset($form_state['webauthn_remember']) && ($form_state['webauthn_remember'] == 1)) {
+                $uaid = $auth->assignUAID();
+                $remember = $user['webauthn']['remember'];
+                $remember[] = $uaid;
+                $user->set('webauthn.remember', array_unique($remember));
+            }
 
             $store->saveUser($user);
         }

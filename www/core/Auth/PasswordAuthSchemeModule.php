@@ -76,7 +76,7 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
     public function onLoginFormValidate(FormSubmitEvent $event) {
         $form_state = $event->getFormState();
 
-        if ($form_state['mode'] == AuthManager::MODE_CREDENTIALS || $form_state['mode'] == AuthManager::MODE_REENTER_CREDENTIALS) {
+        if (($form_state['mode'] == AuthManager::MODE_CREDENTIALS || $form_state['mode'] == AuthManager::MODE_REENTER_CREDENTIALS) && $this->isBlockActive('auth_password')) {
             $uid = ($form_state['mode'] == AuthManager::MODE_CREDENTIALS) ? $this->f3->get('POST.uid') : $form_state['uid'];
             if (($uid === false) || ($uid === null)) $uid = '';
 
@@ -101,7 +101,7 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
         $store = StoreManager::instance();
         $form_state = $event->getFormState();
 
-        if ($form_state['mode'] == AuthManager::MODE_CREDENTIALS || $form_state['mode'] == AuthManager::MODE_REENTER_CREDENTIALS) {
+        if (($form_state['mode'] == AuthManager::MODE_CREDENTIALS || $form_state['mode'] == AuthManager::MODE_REENTER_CREDENTIALS) && $this->isBlockActive('auth_password')) {
             $uid = ($form_state['mode'] == AuthManager::MODE_CREDENTIALS) ? $this->f3->get('POST.uid') : $form_state['uid'];
             
             if ($this->verifyCredentials($uid, $this->f3->get('POST')) === false) {
@@ -115,6 +115,21 @@ class PasswordAuthSchemeModule extends AuthSchemeModule {
             $event->addAuthModuleName(self::class);
             $event->setUser($test_user);
             $event->setAuthLevel(($form_state['mode'] == AuthManager::MODE_CREDENTIALS) ? AuthManager::AUTH_LEVEL_CREDENTIALS : AuthManager::AUTH_LEVEL_REENTER_CREDENTIALS);
+        }
+    }
+
+    /**
+     * @see SimpleID\Auth\LoginEvent
+     * @return void
+     */
+    public function onLoginEvent(LoginEvent $event) {
+        $user = $event->getUser();
+        $level = $event->getAuthLevel();
+        $store = StoreManager::instance();
+
+        if ($level >= AuthManager::AUTH_LEVEL_CREDENTIALS) {
+            $user->set('auth_login_last_active_block.' . AuthManager::MODE_CREDENTIALS, 'auth_password');
+            $store->saveUser($user);
         }
     }
 
