@@ -72,6 +72,11 @@ by papnkukn.
 Licensing information for this library can be found at
 <https://github.com/papnkukn/qrcode-svg/blob/master/LICENSE>.
 
+SimpleID uses the [deepmerge library](https://github.com/TehShrike/deepmerge),
+by James Halliday, Josh Duff, and other contributors.
+Licensing information for this library can be found at
+<https://github.com/TehShrike/deepmerge/blob/master/license.txt>.
+
 SimpleID uses [modern-normalize style sheet](http://necolas.github.io/normalize.css/),
 by Nicolas Gallagher, Jonathan Neal and Sindre Sorhus.
 Licensing information for this library can be found at
