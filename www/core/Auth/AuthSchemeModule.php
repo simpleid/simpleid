@@ -46,5 +46,18 @@ abstract class AuthSchemeModule extends Module {
         $this->auth = AuthManager::instance();
         $this->mgr = ModuleManager::instance();
     }
+
+    /**
+     * Returns whether the specified block ID is the active form.
+     * 
+     * An authentication module may use this function to determine whether
+     * the form should be validated and processed by this module.
+     * 
+     * @param string $block_id the block ID
+     * @return bool
+     */
+    protected function isBlockActive(string $block_id): bool {
+        return (!$this->f3->exists('POST.op') && ($this->f3->get('POST.active_block') == $block_id));
+    }
 }
 ?>

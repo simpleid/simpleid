@@ -12,6 +12,12 @@
   }
 }
 
+/* ----- Action links ----------------------------------- */
+a.action-link {
+  border-bottom: 0;
+  &.is-subtle { font-weight: normal; }
+}
+
 /* ----- Forms ------------------------------------------ */
 .form-item { @include util.margin-y(util.size(4)); }
 

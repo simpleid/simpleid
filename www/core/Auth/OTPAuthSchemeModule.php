@@ -209,7 +209,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
 
             $this->f3->set('submit_button', $this->f3->get('intl.common.verify'));
 
-            $event->addBlock('auth_otp', $tpl->render('auth_otp.html', false), 0);
+            $event->addBlock('auth_otp', $tpl->render('auth_otp.html', false), 0, ['title' => $this->f3->get('intl.core.auth_otp.verify_block_title')]);
         }
     }
 
@@ -220,7 +220,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
     public function onLoginFormValidate(FormSubmitEvent $event) {
         $form_state = $event->getFormState();
 
-        if ($form_state['mode'] == AuthManager::MODE_VERIFY) {
+        if (($form_state['mode'] == AuthManager::MODE_VERIFY) && $this->isBlockActive('auth_otp')) {
             if ($this->f3->exists('POST.otp.otp') === false) {
                 $event->addMessage($this->f3->get('intl.core.auth_otp.missing_otp'));
                 $event->setInvalid();
@@ -235,7 +235,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
     public function onLoginFormSubmit(LoginFormSubmitEvent $event) {
         $form_state = $event->getFormState();
 
-        if ($form_state['mode'] == AuthManager::MODE_VERIFY) {
+        if (($form_state['mode'] == AuthManager::MODE_VERIFY) && $this->isBlockActive('auth_otp')) {
             $store = StoreManager::instance();
 
             $uid = $form_state['uid'];
@@ -272,11 +272,15 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
         $auth = AuthManager::instance();
         $store = StoreManager::instance();
 
-        if (($level >= AuthManager::AUTH_LEVEL_VERIFIED) && isset($form_state['otp_remember']) && ($form_state['otp_remember'] == 1)) {
-            $uaid = $auth->assignUAID();
-            $remember = $user['otp']['remember'];
-            $remember[] = $uaid;
-            $user->set('otp.remember', array_unique($remember));
+        if ($level >= AuthManager::AUTH_LEVEL_VERIFIED) {
+            $user->set('auth_login_last_active_block.' . AuthManager::MODE_VERIFY, 'auth_otp');
+
+            if (isset($form_state['otp_remember']) && ($form_state['otp_remember'] == 1)) {
+                $uaid = $auth->assignUAID();
+                $remember = $user['otp']['remember'];
+                $remember[] = $uaid;
+                $user->set('otp.remember', array_unique($remember));
+            }
 
             $store->saveUser($user);
         }

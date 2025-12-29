@@ -76,11 +76,17 @@ class LoginFormBuildEvent extends FormBuildEvent implements StoppableEventInterf
     const DEFAULT_REGION = 'default';
     /**
      * Constant denoting the `options` region.  Blocks in this region are
-     * rendered below the `default` region but above the log in button.
+     * rendered below the `default` region but above the submit button.
      */
     const OPTIONS_REGION = 'options';
-    const CREDENTIALS_REGION = 'credentials'; // credentials [alternatives]
-    const AFTER_BUTTONS_REGION = 'after_buttons'; // or credentials_secondary
+    /**
+     * Constant denoting the `secondary` region.  Blocks in this region
+     * are always rendered below the default submit button.
+     * 
+     * If a block is added to this region, then a divider will be shown
+     * in the login form.
+     */
+    const SECONDARY_REGION = 'secondary';
 
     /** @var bool */
     protected $hasUIDBlock = false;

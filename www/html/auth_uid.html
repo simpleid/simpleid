@@ -4,7 +4,7 @@
             <input type="hidden" name="uid" value="{{ @uid }}">
             <div class="message status">
                 <span>{{ @intl.core.auth.logging_in_as, @uid | format, raw }}</span>
-                <check if="{{ @allow_change_uid }}"><span class="inline-actions"><a href="#" @click.prevent="submitFormWithOp('show_identity_form')">{{ @intl.core.auth.change_name }}</a></span></check>
+                <check if="{{ @allow_change_uid }}"><span class="inline-actions"><a href="#" class="action-link" @click.prevent="submitFormWithOp('show_identity_form')">{{ @intl.core.auth.change_name }}</a></span></check>
             </div>
         </true>
         <false>

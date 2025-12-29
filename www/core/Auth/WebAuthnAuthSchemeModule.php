@@ -322,12 +322,10 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
             // Note this is called from user_login(), so $_POST is always filled
             $this->f3->set('otp_recovery_url', 'https://simpleid.org/docs/2/common_problems/#otp');
 
-            $this->f3->set('hide_submit_button', true);  // Remove the submit button
-
             $this->f3->set('js_data.intl.challenge_error',  $this->f3->get('intl.core.auth_webauthn.challenge_error'));
             $this->f3->set('js_data.intl.browser_error',  $this->f3->get('intl.core.auth_webauthn.browser_error'));
 
-            $event->addBlock('auth_webauthn', $tpl->render('auth_webauthn_verify.html', false), 0);
+            $event->addBlock('auth_webauthn', $tpl->render('auth_webauthn_verify.html', false), 0, [ 'showSubmitButton' => false, 'title' => $this->f3->get('intl.core.auth_webauthn.verify_block_title') ]);
         }
     }
 
@@ -338,7 +336,7 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
     public function onLoginFormSubmit(LoginFormSubmitEvent $event) {
         $form_state = $event->getFormState();
 
-        if ($form_state['mode'] == AuthManager::MODE_VERIFY) {
+        if (($form_state['mode'] == AuthManager::MODE_VERIFY) && $this->isBlockActive('auth_webauthn')) {
             $store = StoreManager::instance();
 
             $uid = $form_state['uid'];
@@ -380,11 +378,15 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
         $auth = AuthManager::instance();
         $store = StoreManager::instance();
 
-        if (($level >= AuthManager::AUTH_LEVEL_VERIFIED) && isset($form_state['webauthn_remember']) && ($form_state['webauthn_remember'] == 1)) {
-            $uaid = $auth->assignUAID();
-            $remember = $user['webauthn']['remember'];
-            $remember[] = $uaid;
-            $user->set('webauthn.remember', array_unique($remember));
+        if ($level >= AuthManager::AUTH_LEVEL_VERIFIED) {
+            $user->set('auth_login_last_active_block.' . AuthManager::MODE_VERIFY, 'auth_webauthn');
+
+            if (isset($form_state['webauthn_remember']) && ($form_state['webauthn_remember'] == 1)) {
+                $uaid = $auth->assignUAID();
+                $remember = $user['webauthn']['remember'];
+                $remember[] = $uaid;
+                $user->set('webauthn.remember', array_unique($remember));
+            }
 
             $store->saveUser($user);
         }

@@ -335,6 +335,7 @@ class AuthModule extends Module {
      */
     public function loginForm($params = [ 'destination' => null ], $form_state = null) {
         $tpl = Template::instance();
+        $matrix = \Matrix::instance();
         $config = $this->f3->get('config');
         if ($form_state == null) $form_state = new FormState([ 'mode' => AuthManager::MODE_IDENTIFY_USER ]);
 
@@ -361,6 +362,25 @@ class AuthModule extends Module {
             $uid_autocomplete = $event->getUIDAutocompleteValues();
             if (count($uid_autocomplete) > 0) $this->f3->set('uid_autocomplete', $uid_autocomplete);
         }
+
+        $block_additional_data = [];
+        $switchable = false;
+        foreach ($forms as $region => $blocks) {
+            foreach ($blocks as $block) {
+                $block_additional_data[$block['id']] = $block['additional'];
+            }
+        }
+        if (!isset($forms['default']) || count($forms['default']) == 0) {
+            $active_block_id = null;
+        } else {
+            $active_block_id = $forms['default'][0]['id'];
+            $switchable = (($form_state['mode'] != AuthManager::MODE_IDENTIFY_USER) && count($forms['default']) > 1);
+        }
+        $this->f3->set('switchable', $switchable);
+        if ((isset($forms['secondary']) && (count($forms['secondary']) > 0)) || $switchable) {
+            $this->f3->set('show_divider', true);
+        }
+
         $this->f3->set('forms', $forms);
 
         // 3. Build the buttons and security messaging
@@ -372,9 +392,10 @@ class AuthModule extends Module {
                 $this->f3->set('title', $this->f3->get('intl.common.login'));
                 break;
             case AuthManager::MODE_VERIFY:
-                if (count($forms) == 0) return; // Nothing to verify
+                if (count($forms['default']) == 0) return; // Nothing to verify
                 $this->f3->set('submit_button', $this->f3->get('intl.common.verify'));
                 $this->f3->set('title', $this->f3->get('intl.common.verify'));
+                // TODO - $user['auth_login_last_active_block'][AuthManager::MODE_VERIFY]
         }
 
         if (isset($form_state['cancel'])) {
@@ -394,7 +415,9 @@ class AuthModule extends Module {
             'fs' => $fs,
             'tk' => $tk,
             'mode' => $form_state['mode'],
-            'identifyUrl' => $this->getCanonicalURL('@auth_identify', '', 'https')
+            'identifyUrl' => $this->getCanonicalURL('@auth_identify', '', 'https'),
+            'activeBlock' => $active_block_id,
+            'blocks' => $block_additional_data
         ]);
         $this->f3->set('page_class', 'is-dialog-page');
         $this->f3->set('layout', 'auth_login.html');
