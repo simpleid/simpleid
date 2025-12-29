@@ -22,10 +22,12 @@
 import Alpine from 'alpinejs';
 import collapse from '@alpinejs/collapse';
 import Clipboard from '@ryangjchandler/alpine-clipboard';
+import deepmerge from 'deepmerge';
 
 Alpine.plugin(collapse);
 Alpine.plugin(Clipboard);
 
+window.deepmerge = deepmerge;
 window.Alpine = Alpine;
 queueMicrotask(() => {
     Alpine.start();
