@@ -141,7 +141,14 @@ class DefaultStoreModule extends StoreModule {
         
             if ($test_value !== null) {
                 if (is_array($test_value)) {
-                    foreach ($test_value as $test_element) {
+                    $test_elements = array_keys($test_value);
+                    if ($test_elements == range(0, count($test_value) - 1)) {
+                        // $test_value is a list (i.e. sequential integer keys),
+                        // so we test the values rather than the keys
+                        $test_elements = $test_value;
+                    }
+
+                    foreach ($test_elements as $test_element) {
                         if (trim($test_element) != '') $index[$test_element] = $uid;
                         if ($test_element == $value) $result = $uid;
                     }
