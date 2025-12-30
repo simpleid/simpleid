@@ -215,8 +215,6 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
             }
         }
 
-        $this->f3->set('challenge_url', $this->getCanonicalURL('@webauthn_challenge', '', 'https'));
-
         $rp_name = ($this->f3->exists('config.site_title')) ? $this->f3->get('config.site_title') : 'SimpleID';
         $options = [
             'rp' => [
@@ -230,7 +228,7 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
             ],
             'pubKeyCredParams' => array_map(function ($n) { return [ 'alg' => $n, 'type' => 'public-key' ]; }, array_keys(self::$cose_alg_map)),
             'hints' => [ 'security-key', 'client-device' ],
-            // For passkeys, authenticatorAttachment='platform'
+            // For passkeys, authenticatorAttachment='platform' and authenticator.residentKey='required'
             'authenticatorSelection' => [
                 'residentKey' => 'discouraged',
                 'userVerification' => 'preferred'
@@ -240,15 +238,20 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
         ];
         if (isset($user['webauthn']['credentials']))
             $options['excludeCredentials'] = $this->getSavedCredentials($user);
+        
+        $tk = $token->generate('webauthn', SecurityToken::OPTION_BIND_SESSION);
+        $this->f3->set('tk', $tk);
 
-        $this->f3->set('create_options', $options);
+        $this->f3->set('create_credential_app_options', [
+            'tk' => $tk,
+            'url' => $this->getCanonicalURL('@webauthn_challenge', '', 'https'),
+            'baseCreateOptions' => $options
+        ]);
 
         $this->f3->set('otp_recovery_url', 'https://simpleid.org/docs/2/common-problems/#otp');
 
         $this->f3->set('js_data.intl.challenge_error',  $this->f3->get('intl.core.auth_webauthn.challenge_error'));
         $this->f3->set('js_data.intl.browser_error',  $this->f3->get('intl.core.auth_webauthn.browser_error'));
-        
-        $this->f3->set('tk', $token->generate('webauthn', SecurityToken::OPTION_BIND_SESSION));
 
         $this->f3->set('page_class', 'is-dialog-page');
         $this->f3->set('title', $this->f3->get('intl.core.auth_webauthn.webauthn_title'));
@@ -305,8 +308,7 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
             $tpl = Template::instance();
             $token = new SecurityToken();
 
-            $this->f3->set('challenge_url', $this->getCanonicalURL('@webauthn_challenge', '', 'https'));
-            $this->f3->set('challenge_tk', $token->generate('webauthn', SecurityToken::OPTION_BIND_SESSION));
+            $tk = $token->generate('webauthn', SecurityToken::OPTION_BIND_SESSION);
 
             $options = [
                 'mediation' => 'required',
@@ -317,7 +319,11 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
                     'allowCredentials' => $this->getSavedCredentials($test_user)
                 ]
             ];
-            $this->f3->set('request_options', $options);
+            $this->f3->set('request_credential_app_options', [
+                'tk' => $tk,
+                'url' => $this->getCanonicalURL('@webauthn_challenge', '', 'https'),
+                'baseRequestOptions' => $options
+            ]);
 
             // Note this is called from user_login(), so $_POST is always filled
             $this->f3->set('otp_recovery_url', 'https://simpleid.org/docs/2/common_problems/#otp');

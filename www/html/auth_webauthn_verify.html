@@ -1,18 +1,18 @@
 <script src="{{ @base_path }}html/assets/webauthn.js" type="text/javascript"></script>
 <script type="text/javascript">
     document.addEventListener('alpine:init', () => {
-        Alpine.data('getCredentialApp', (url, tk, baseRequestOptions) => ({
+        Alpine.data('getCredentialApp', (options) => ({
             supported: document.isPublicKeyCredentialSupported(),
             challenge: '',
             nonce: '',
             result: '',
-            url: url,
-            tk: tk,
-            baseRequestOptions: baseRequestOptions,
+            url: options.url,
+            tk: options.tk,
+            baseRequestOptions: options.baseRequestOptions,
             isRequesting: false,
             error_message: null,
 
-            async getCredential (e) {
+            async getCredential() {
                 const challengeResponse = await fetch(this.url, { method: 'POST', headers: {
                     'X-Requested-With': 'XMLHttpRequest',
                     'X-Request-Token': this.tk,
@@ -59,7 +59,7 @@
     <p>{{ @intl.core.auth_webauthn.webauthn_recovery_label, @otp_recovery_url | format, raw }}</p>
 </div>
 
-<div class="form-item" x-data="getCredentialApp({{ @challenge_url | js, raw }}, {{ @challenge_tk | js, raw }}, {{ @request_options | js, raw }})">
+<div class="form-item" x-data="getCredentialApp({{ @request_credential_app_options | js, raw }})">
     <input type="hidden" name="webauthn[challenge]" x-model="challenge">
     <input type="hidden" name="webauthn[nonce]" x-model="nonce">
     <input type="hidden" name="webauthn[result]" x-model="result">
