@@ -38,11 +38,19 @@ use SimpleJWT\Keys\KeySet;
 use SimpleJWT\Util\Util as SimpleJWTUtil;
 
 /**
- * An authentication scheme module that uses security keys with WebAuthn.
+ * An authentication scheme module that uses Passkeys and security keys with WebAuthn.
  * 
- * Currently this scheme only supports two-factor authentication.
+ * **Passkeys** are used to identify users (under
+ * {@link AuthManager::MODE_IDENTIFY_USERS}).
+ * 
+ * **Security keys** may be used as a second factor for login verification (under
+ * {@link AuthManager::MODE_VERIFY}).  This
+ * module restricts security keys to cross-platform attachments only.
  */
 class WebAuthnAuthSchemeModule extends AuthSchemeModule {
+    const USE_PASSKEY = 'passkey';
+    const USE_VERIFY = 'verify';
+
     /** @var array<int, string> */
     static $cose_alg_map = [
         -257 => 'RS256',
@@ -198,7 +206,10 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
                 return;
             }
 
-            $credential = $this->processNewCredential($this->f3->get('POST.challenge'), $this->f3->get('POST.nonce'), $this->f3->get('POST.result'), $this->f3->get('POST.name'));
+            $use = $this->f3->get('POST.use');
+            if (!in_array($use, [ self::USE_PASSKEY, self::USE_VERIFY ])) $key = self::USE_VERIFY;
+
+            $credential = $this->processNewCredential($this->f3->get('POST.challenge'), $this->f3->get('POST.nonce'), $this->f3->get('POST.result'), $use, $this->f3->get('POST.name'));
 
             if ($credential == null) {
                 $this->f3->set('message', $this->f3->get('intl.core.auth_webauthn.credential_add_error'));
@@ -216,7 +227,7 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
         }
 
         $rp_name = ($this->f3->exists('config.site_title')) ? $this->f3->get('config.site_title') : 'SimpleID';
-        $options = [
+        $base_options = [
             'rp' => [
                 'id' => $this->getRpId(),
                 'name' => $rp_name
@@ -227,17 +238,31 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
                 'displayName' => $user->getDisplayName()
             ],
             'pubKeyCredParams' => array_map(function ($n) { return [ 'alg' => $n, 'type' => 'public-key' ]; }, array_keys(self::$cose_alg_map)),
-            'hints' => [ 'security-key', 'client-device' ],
-            // For passkeys, authenticatorAttachment='platform' and authenticator.residentKey='required'
             'authenticatorSelection' => [
-                'residentKey' => 'discouraged',
                 'userVerification' => 'preferred'
             ],
             'timeout' => SIMPLEID_HUMAN_TOKEN_EXPIRES_IN,
             'attestation' => 'none',
         ];
         if (isset($user['webauthn']['credentials']))
-            $options['excludeCredentials'] = $this->getSavedCredentials($user);
+            $base_options['excludeCredentials'] = $this->getSavedCredentials($user);
+
+        $use_options = [
+            self::USE_PASSKEY => [
+                'hints' => [ 'client-device', 'hybrid' ],
+                'authenticatorSelection' => [
+                    'authenticatorAttachment' => 'platform',
+                    'residentKey' => 'required',
+                ],
+            ],
+            self::USE_VERIFY => [
+                'hints' => [ 'security-key', 'client-device' ],
+                'authenticatorSelection' => [
+                    'authenticatorAttachment' => 'cross-platform',
+                    'residentKey' => 'discouraged',
+                ],
+            ]
+        ];
         
         $tk = $token->generate('webauthn', SecurityToken::OPTION_BIND_SESSION);
         $this->f3->set('tk', $tk);
@@ -245,7 +270,8 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
         $this->f3->set('create_credential_app_options', [
             'tk' => $tk,
             'url' => $this->getCanonicalURL('@webauthn_challenge', '', 'https'),
-            'baseCreateOptions' => $options
+            'baseCreateOptions' => $base_options,
+            'useCreateOptions' => $use_options
         ]);
 
         $this->f3->set('otp_recovery_url', 'https://simpleid.org/docs/2/common-problems/#otp');
@@ -426,7 +452,7 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
      * to be used in the user's profile, or null if the credential creation response
      * is not valid
      */
-    protected function processNewCredential(string $challenge, string $nonce, string $new_credential_json, string $display_name = null): ?array {
+    protected function processNewCredential(string $challenge, string $nonce, string $new_credential_json, string $use, string $display_name = null): ?array {
         // 1. Check that nonce = challenge
         $token = new SecurityToken();
         if (!$token->verify($nonce, $challenge)) {
@@ -459,8 +485,21 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
         $aaguid = $authenticator->getAAGUID();
 
         if ($aaguid != null) {
-            // Get authenticator info.
-            // Note that without additional browser permission, the aaugid will be empty
+            // These are the most common authenticators
+            // https://passkeydeveloper.github.io/passkey-authenticator-aaguids/explorer/
+            $authenticator_names = [
+                'ea9b8d66-4d01-1d21-3ce4-b6b48cb575d4' => 'Google Password Manager',
+                '08987058-cadc-4b81-b6e1-30de50dcbe96' => 'Windows Hello',
+                'dd4ec289-e01d-41c9-bb89-70fa845d4bf2' => 'iCloud Keychain'
+            ];
+            
+            if (isset($authenticator_names[$aaguid])) {
+                $authenticator_name = $authenticator_names[$aaguid];
+            } else {
+                $authenticator_name = null;
+            }
+        } else {
+            $authenticator_name = null;
         }
 
         // 5. Convert public key from base64url encoded DER to JWK
@@ -470,7 +509,13 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
 
         // 6. Display name
         $time = new \DateTimeImmutable();
-        if ($display_name == null) $display_name = $time->format(\DateTimeImmutable::ISO8601);
+        if ($display_name == null) {
+            if ($authenticator_name != null) {
+                $display_name = $authenticator_name . ' - ' . $time->format(\DateTimeImmutable::ISO8601);
+            } else {
+                $display_name = $time->format(\DateTimeImmutable::ISO8601);
+            }
+        }
 
         // 7. Return result
         $result = [
@@ -478,7 +523,7 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
             'type' => $new_credential['type'],
 
             'display_name' => $display_name,
-            'use' => 'verify',
+            'use' => $use,
             'authenticator' => [
                 'aaguid' => $aaguid,
                 'user_verified' => $authenticator->isUserVerified(),

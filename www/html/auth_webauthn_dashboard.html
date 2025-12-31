@@ -49,7 +49,9 @@
 <div x-data="webAuthnCredentialsApp({{ @base_path . 'auth/webauthn' | js, raw }}, {{ @webauthn_tk | js, raw }})">
     <div class="message" x-cloak x-show="message"><p x-html="message"></p></div>
 
-    <p>{{ @intl.core.auth_webauthn.about_security_keys }}</p>
+    <p>{{ @intl.core.auth_webauthn.about_passkeys | markdown }}</p>
+
+    <p>{{ @intl.core.auth_webauthn.about_security_keys | markdown }}</p>
 
     <table id="webauthn-credentials" class="table-list">
         <tr class="table-list--loading" x-show="isLoading">

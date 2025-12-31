@@ -7,13 +7,15 @@
             challenge: '',
             nonce: '',
             result: '',
+            useType: '',
             url: options.url,
             tk: options.tk,
             baseCreateOptions: options.baseCreateOptions,
+            useCreateOptions: options.useCreateOptions,
             isRequesting: false,
             error_message: null,
 
-            async createCredential(authenticatorAttachment) {
+            async createCredential(useType) {
                 const challengeResponse = await fetch(this.url, { method: 'POST', headers: {
                     'X-Requested-With': 'XMLHttpRequest',
                     'X-Request-Token': this.tk,
@@ -28,9 +30,8 @@
                 this.challenge = challengeObject.challenge;
                 this.nonce = challengeObject.nonce;
 
-                const options = JSON.parse(JSON.stringify(this.baseCreateOptions)); // deep clone
+                const options = deepmerge(this.baseCreateOptions, this.useCreateOptions[useType]);
                 options.challenge = challengeObject.challenge;
-                if (authenticatorAttachment) options.authenticatorSelection.authenticatorAttachment = authenticatorAttachment;
 
                 this.isRequesting = true;
                 this.error_message = null;
@@ -39,6 +40,7 @@
                 try {
                     const response = await webAuthnCreatePublicKeyCredential(options);
                     this.result = JSON.stringify(response);
+                    this.useType = useType;
                     this.isRequesting = false;
 
                     await this.$nextTick();
@@ -60,7 +62,9 @@
     });
 </script>
 <div class="narrative">
-    <p>{{ @intl.core.auth_webauthn.about_security_keys }}</p>
+    <p>{{ @intl.core.auth_webauthn.about_passkeys | markdown }}</p>
+
+    <p>{{ @intl.core.auth_webauthn.about_security_keys | markdown }}</p>
 
     <p>{{ @intl.core.auth_webauthn.credential_warning, @otp_recovery_url | format, raw }}</p>
 
@@ -78,10 +82,12 @@
     <template x-if="error_message"><div class="message" x-text="error_message"></div></template>
 
     <div x-show="supported">
+        <input type="hidden" name="use" x-model="useType">
         <div class="form-item">
             <label for="edit-passkey-name">{{ @intl.core.auth_webauthn.credential_name_label }}</label>
             <input type="text" id="edit-passkey-name" name="name" value="" class="form-text" />
         </div>
-        <button type="submit" name="op" value="add" id="edit-submit" class="is-default" :disabled="isRequesting" @click.prevent="createCredential('cross-platform')" x-ref="createCredentialButton">{{ @intl.common.continue }}</button>
+        <button type="submit" name="op" value="add" id="edit-submit-passkey" class="is-default" :disabled="isRequesting" @click.prevent="createCredential('passkey')" x-ref="createCredentialButton">{{ @intl.core.auth_webauthn.add_passkey_button }}</button>
+        <button type="submit" name="op" value="add" id="edit-submit-verify" :disabled="isRequesting" @click.prevent="createCredential('verify')" x-ref="createCredentialButton">{{ @intl.core.auth_webauthn.add_security_key_button }}</button>
     </div>
 </form>
