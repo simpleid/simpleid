@@ -61,7 +61,7 @@
         <template x-for="(credential, idx) in credentials" :key="credential.id">
             <tr class="table-list-item" :class="(idx == 0) ? 'u-first' : ''">
                 <td class="table-list-item--main">
-                    <div class="table-list-item--heading"><strong x-html="credential.display_name"></strong></div>
+                    <div class="table-list-item--heading"><strong x-html="credential.display_name"></strong><span class="badge" :class="'badge--webauthn-' + credential.use" x-html="(credential.use == 'passkey') ? {{ @intl.core.auth_webauthn.dashboard_passkey_label | js, raw }} : {{ @intl.core.auth_webauthn.dashboard_verify_label | js, raw }}"></span></div>
                     <div class="table-list-item--body table-list-item--description">
                         {{ @intl.core.auth_webauthn.first_time_label }} <span x-text="(new Date(credential.activity.first_time * 1000)).toLocaleDateString()"></span> |
                         {{ @intl.core.auth_webauthn.last_time_label }} <span x-text="(new Date(credential.activity.last_time * 1000)).toLocaleDateString()"></span>

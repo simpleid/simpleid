@@ -331,6 +331,14 @@ body.is-dialog-page { background: var(--grey-950); }
   span { padding: 0 util.size(1); }  
 }
 
+/* Passkeys and security keys ----------------------------------------------- */
+.badge--webauthn-passkey {
+  background-color: var(--brand-color-700); border-color: var(--brand-color-700); color: white;
+}
+.badge--webauthn-verify {
+  background-color: var(--green); border-color: var(--green); color: white;
+}
+
 /* Loading pages ----------------------------------------------------------- */
 .is-dialog-page.is-loading .content--main .wrapper { text-align: center; }
 
