@@ -321,14 +321,13 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
 
         if (($form_state['mode'] == AuthManager::MODE_IDENTIFY_USER) || ($form_state['mode'] == AuthManager::MODE_VERIFY)) {
             $additional = [];
+            $allow_credentials = [];
             $tpl = Template::instance();
 
             $token = new SecurityToken();
             $tk = $token->generate('webauthn', SecurityToken::OPTION_BIND_SESSION);
 
             if ($form_state['mode'] == AuthManager::MODE_IDENTIFY_USER) {
-                $allow_credentials = [];
-
                 $additional = [ 'region' => LoginFormBuildEvent::SECONDARY_REGION, 'title' => $this->f3->get('intl.core.auth_webauthn.login_block_title') ];
 
                 $this->f3->set('webauthn_use', self::USE_PASSKEY);
@@ -386,6 +385,7 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
 
         if (($form_state['mode'] == AuthManager::MODE_IDENTIFY_USER) && $this->f3->exists('POST.op') && ($this->f3->exists('POST.op') == 'auth_webauthn')) {
             $credential = json_decode($this->f3->get('POST.webauthn.result'), true);
+            /** @var User|null $test_user */
             $test_user = $store->findUser('webauthn.credentials', $credential['id']);
 
             if ($test_user == null) {
