@@ -24,12 +24,12 @@ namespace SimpleID\Auth;
 
 use Psr\Log\LogLevel;
 use SimpleID\Auth\AuthManager;
+use SimpleID\Auth\LoginFormBuildEvent;
 use SimpleID\Crypt\Random;
 use SimpleID\Crypt\SecurityToken;
 use SimpleID\Models\User;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\Events\UIBuildEvent;
-use SimpleID\Util\Forms\FormBuildEvent;
 use SimpleID\Util\Forms\FormSubmitEvent;
 use SimpleID\Util\UI\Template;
 use SimpleJWT\Crypt\AlgorithmFactory;
@@ -313,28 +313,45 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
     }
 
     /**
-     * @param FormBuildEvent $event
+     * @param LoginFormBuildEvent $event
      * @return void
      */
-    public function onLoginFormBuild(FormBuildEvent $event) {
+    public function onLoginFormBuild(LoginFormBuildEvent $event) {
         $form_state = $event->getFormState();
 
-        if ($form_state['mode'] == AuthManager::MODE_VERIFY) {
-            $auth = AuthManager::instance();
-            $store = StoreManager::instance();
-
-            /** @var \SimpleID\Models\User $test_user */
-            $test_user = $store->loadUser($form_state['uid']);
-            if (!isset($test_user['webauthn'])) return;
-            /*if ($test_user['otp']['type'] == 'recovery') return;*/
-
-            $uaid = $auth->assignUAID();
-            if ($test_user->exists('webauthn.remember') && in_array($uaid, $test_user->get('webauthn.remember'))) return;
-
+        if (($form_state['mode'] == AuthManager::MODE_IDENTIFY_USER) || ($form_state['mode'] == AuthManager::MODE_VERIFY)) {
+            $additional = [];
             $tpl = Template::instance();
-            $token = new SecurityToken();
 
+            $token = new SecurityToken();
             $tk = $token->generate('webauthn', SecurityToken::OPTION_BIND_SESSION);
+
+            if ($form_state['mode'] == AuthManager::MODE_IDENTIFY_USER) {
+                $allow_credentials = [];
+
+                $additional = [ 'region' => LoginFormBuildEvent::SECONDARY_REGION, 'title' => $this->f3->get('intl.core.auth_webauthn.login_block_title') ];
+
+                $this->f3->set('webauthn_use', self::USE_PASSKEY);
+            } elseif ($form_state['mode'] == AuthManager::MODE_VERIFY) {
+                $auth = AuthManager::instance();
+                $store = StoreManager::instance();
+
+                /** @var \SimpleID\Models\User $test_user */
+                $test_user = $store->loadUser($form_state['uid']);
+                if (!isset($test_user['webauthn'])) return;
+                /*if ($test_user['otp']['type'] == 'recovery') return;*/
+
+                $uaid = $auth->assignUAID();
+                if ($test_user->exists('webauthn.remember') && in_array($uaid, $test_user->get('webauthn.remember'))) return;
+
+                $allow_credentials = $this->getSavedCredentials($test_user);
+
+                $this->f3->set('otp_recovery_url', 'https://simpleid.org/docs/2/common_problems/#otp');
+
+                $additional = [ 'showSubmitButton' => false, 'title' => $this->f3->get('intl.core.auth_webauthn.verify_block_title') ];
+
+                $this->f3->set('webauthn_use', self::USE_VERIFY);
+            }
 
             $options = [
                 'mediation' => 'required',
@@ -342,7 +359,7 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
                     'userVerification' => 'required',
                     'timeout' => 30000,
                     'rpId' => $this->getRpId(),
-                    'allowCredentials' => $this->getSavedCredentials($test_user)
+                    'allowCredentials' => $allow_credentials
                 ]
             ];
             $this->f3->set('request_credential_app_options', [
@@ -351,13 +368,10 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
                 'baseRequestOptions' => $options
             ]);
 
-            // Note this is called from user_login(), so $_POST is always filled
-            $this->f3->set('otp_recovery_url', 'https://simpleid.org/docs/2/common_problems/#otp');
-
             $this->f3->set('js_data.intl.challenge_error',  $this->f3->get('intl.core.auth_webauthn.challenge_error'));
             $this->f3->set('js_data.intl.browser_error',  $this->f3->get('intl.core.auth_webauthn.browser_error'));
 
-            $event->addBlock('auth_webauthn', $tpl->render('auth_webauthn_verify.html', false), 0, [ 'showSubmitButton' => false, 'title' => $this->f3->get('intl.core.auth_webauthn.verify_block_title') ]);
+            $event->addBlock('auth_webauthn', $tpl->render('auth_webauthn_verify.html', false), 0, $additional);
         }
     }
 
@@ -366,12 +380,36 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
      * @return void
      */
     public function onLoginFormSubmit(LoginFormSubmitEvent $event) {
+        $store = StoreManager::instance();
         $form_state = $event->getFormState();
+        $process_submit = false;
 
-        if (($form_state['mode'] == AuthManager::MODE_VERIFY) && $this->isBlockActive('auth_webauthn')) {
-            $store = StoreManager::instance();
+        if (($form_state['mode'] == AuthManager::MODE_IDENTIFY_USER) && $this->f3->exists('POST.op') && ($this->f3->exists('POST.op') == 'auth_webauthn')) {
+            $credential = json_decode($this->f3->get('POST.webauthn.result'), true);
+            $test_user = $store->findUser('webauthn.credentials', $credential['id']);
 
-            $uid = $form_state['uid'];
+            if ($test_user == null) {
+                $event->addMessage($this->f3->get('intl.core.auth_webauthn.credential_match_error'));
+                $event->setInvalid();
+                return;
+            }
+
+            // Check that the credential's use is 'passkey'
+            $test_credentials = $test_user->get('webauthn.credentials');
+            $test_credential = $test_credentials[$credential['id']];
+            if ($test_credential['use'] != self::USE_PASSKEY) {
+                $event->addMessage($this->f3->get('intl.core.auth_webauthn.credential_use_error'));
+                $event->setInvalid();
+                return;
+            }
+
+            $form_state['uid'] = $test_user['uid'];
+            $process_submit = true;
+        } elseif (($form_state['mode'] == AuthManager::MODE_VERIFY) && $this->isBlockActive('auth_webauthn')) {
+            $process_submit = true;
+        }
+
+        if ($process_submit) {
             /** @var \SimpleID\Models\User $test_user */
             $test_user = $store->loadUser($form_state['uid']);
             $test_credentials = $test_user->get('webauthn.credentials');

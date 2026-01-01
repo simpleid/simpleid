@@ -1,7 +1,7 @@
 <script src="{{ @base_path }}html/assets/webauthn.js" type="text/javascript"></script>
 <script type="text/javascript">
     document.addEventListener('alpine:init', () => {
-        Alpine.data('getCredentialApp', (options) => ({
+        Alpine.data('getCredentialApp', (options, useType) => ({
             supported: document.isPublicKeyCredentialSupported(),
             challenge: '',
             nonce: '',
@@ -9,6 +9,7 @@
             url: options.url,
             tk: options.tk,
             baseRequestOptions: options.baseRequestOptions,
+            useType: useType,
             isRequesting: false,
             error_message: null,
 
@@ -39,7 +40,12 @@
                     this.result = JSON.stringify(response);
 
                     await this.$nextTick();
-                    this.$refs.getCredentialButton.form.requestSubmit();
+                    if (this.useType == 'passkey') {
+                        // submitFormWithOp is defined in the parent Alpine component (auth_login.html)
+                        this.submitFormWithOp('auth_passkey');
+                    } else if (this.useType == 'verify') {
+                        this.$refs.getCredentialButton.form.requestSubmit();
+                    }
                 } catch (e) {
                     this.isRequesting = false;
 
@@ -53,13 +59,15 @@
     });
 </script>
 
-<div class="narrative">
-    <p>{{ @intl.core.auth_webauthn.webauthn_instructions_label }}</p>
+<check if="{{ @webauthn_use == 'verify' }}">
+    <div class="narrative">
+        <p>{{ @intl.core.auth_webauthn.webauthn_instructions_label }}</p>
 
-    <p>{{ @intl.core.auth_webauthn.webauthn_recovery_label, @otp_recovery_url | format, raw }}</p>
-</div>
+        <p>{{ @intl.core.auth_webauthn.webauthn_recovery_label, @otp_recovery_url | format, raw }}</p>
+    </div>
+</check>
 
-<div class="form-item" x-data="getCredentialApp({{ @request_credential_app_options | js, raw }})">
+<div class="form-item" x-data="getCredentialApp({{ @request_credential_app_options | js, raw }}, {{ @webauthn_use | js, raw }})">
     <input type="hidden" name="webauthn[challenge]" x-model="challenge">
     <input type="hidden" name="webauthn[nonce]" x-model="nonce">
     <input type="hidden" name="webauthn[result]" x-model="result">
@@ -68,10 +76,14 @@
 
     <template x-if="error_message"><div class="message" x-text="error_message"></div></template>
 
-    <button class="is-default" :disabled="isRequesting" @click.prevent="getCredential" x-show="supported" x-ref="getCredentialButton">{{ @intl.common.continue }}</button>
+    <div <check if="{{ @webauthn_use == 'passkey' }}">class="form-button-group"</check>>
+        <button class="<check if="{{ @webauthn_use == 'verify' }}">is-default</check>" :disabled="isRequesting" @click.prevent="getCredential" x-show="supported" x-ref="getCredentialButton">
+            <check if="{{ @webauthn_use == 'passkey' }}"><true>{{ @intl.core.auth_webauthn.login_block_title }}</true><false>{{ @intl.common.continue }}</false></check>
+        </button>
+    </div>
 </div>
 
-<check if="{{ @@allow_remember }}">
+<check if="{{ (@webauthn_use == 'verify') && @@allow_remember }}">
     <div class="form-item">
         <label class="option">
             <input type="checkbox" name="webauthn[remember]" value="1" <check if="{{ @@REQUEST.webauthn.remember }}">checked="checked"</check>>
