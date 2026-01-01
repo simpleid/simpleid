@@ -321,7 +321,7 @@ class DefaultStoreModule extends StoreModule {
             
         closedir($dir);
 
-        $cache->set($type . '_' . rawurldecode($criteria) . '.storeindex', $index); dump($result);
+        $cache->set($type . '_' . rawurldecode($criteria) . '.storeindex', $index);
         
         return $result;
     }
