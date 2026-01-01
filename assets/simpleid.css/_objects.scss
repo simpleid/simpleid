@@ -106,9 +106,9 @@ label.option { font-weight: normal; }
   @include util.padding-y(util.size(0.5));
   border-width: 1px;
   border-style: solid;
-  border-radius: 4px;
+  border-radius: 8px;
   font-size: util.font-size(xs);
-  margin-inline-end: util.size(2);
+  margin-inline: util.size(2);
 }
 
 /* ----- Table lists ------------------------------------ */

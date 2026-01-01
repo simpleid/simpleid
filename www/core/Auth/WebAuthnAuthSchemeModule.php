@@ -24,12 +24,12 @@ namespace SimpleID\Auth;
 
 use Psr\Log\LogLevel;
 use SimpleID\Auth\AuthManager;
+use SimpleID\Auth\LoginFormBuildEvent;
 use SimpleID\Crypt\Random;
 use SimpleID\Crypt\SecurityToken;
 use SimpleID\Models\User;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\Events\UIBuildEvent;
-use SimpleID\Util\Forms\FormBuildEvent;
 use SimpleID\Util\Forms\FormSubmitEvent;
 use SimpleID\Util\UI\Template;
 use SimpleJWT\Crypt\AlgorithmFactory;
@@ -38,11 +38,19 @@ use SimpleJWT\Keys\KeySet;
 use SimpleJWT\Util\Util as SimpleJWTUtil;
 
 /**
- * An authentication scheme module that uses security keys with WebAuthn.
+ * An authentication scheme module that uses Passkeys and security keys with WebAuthn.
  * 
- * Currently this scheme only supports two-factor authentication.
+ * **Passkeys** are used to identify users (under
+ * {@link AuthManager::MODE_IDENTIFY_USERS}).
+ * 
+ * **Security keys** may be used as a second factor for login verification (under
+ * {@link AuthManager::MODE_VERIFY}).  This
+ * module restricts security keys to cross-platform attachments only.
  */
 class WebAuthnAuthSchemeModule extends AuthSchemeModule {
+    const USE_PASSKEY = 'passkey';
+    const USE_VERIFY = 'verify';
+
     /** @var array<int, string> */
     static $cose_alg_map = [
         -257 => 'RS256',
@@ -198,7 +206,10 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
                 return;
             }
 
-            $credential = $this->processNewCredential($this->f3->get('POST.challenge'), $this->f3->get('POST.nonce'), $this->f3->get('POST.result'), $this->f3->get('POST.name'));
+            $use = $this->f3->get('POST.use');
+            if (!in_array($use, [ self::USE_PASSKEY, self::USE_VERIFY ])) $key = self::USE_VERIFY;
+
+            $credential = $this->processNewCredential($this->f3->get('POST.challenge'), $this->f3->get('POST.nonce'), $this->f3->get('POST.result'), $use, $this->f3->get('POST.name'));
 
             if ($credential == null) {
                 $this->f3->set('message', $this->f3->get('intl.core.auth_webauthn.credential_add_error'));
@@ -215,10 +226,8 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
             }
         }
 
-        $this->f3->set('challenge_url', $this->getCanonicalURL('@webauthn_challenge', '', 'https'));
-
         $rp_name = ($this->f3->exists('config.site_title')) ? $this->f3->get('config.site_title') : 'SimpleID';
-        $options = [
+        $base_options = [
             'rp' => [
                 'id' => $this->getRpId(),
                 'name' => $rp_name
@@ -229,26 +238,46 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
                 'displayName' => $user->getDisplayName()
             ],
             'pubKeyCredParams' => array_map(function ($n) { return [ 'alg' => $n, 'type' => 'public-key' ]; }, array_keys(self::$cose_alg_map)),
-            'hints' => [ 'security-key', 'client-device' ],
-            // For passkeys, authenticatorAttachment='platform'
             'authenticatorSelection' => [
-                'residentKey' => 'discouraged',
                 'userVerification' => 'preferred'
             ],
             'timeout' => SIMPLEID_HUMAN_TOKEN_EXPIRES_IN,
             'attestation' => 'none',
         ];
         if (isset($user['webauthn']['credentials']))
-            $options['excludeCredentials'] = $this->getSavedCredentials($user);
+            $base_options['excludeCredentials'] = $this->getSavedCredentials($user);
 
-        $this->f3->set('create_options', $options);
+        $use_options = [
+            self::USE_PASSKEY => [
+                'hints' => [ 'client-device', 'hybrid' ],
+                'authenticatorSelection' => [
+                    'authenticatorAttachment' => 'platform',
+                    'residentKey' => 'required',
+                ],
+            ],
+            self::USE_VERIFY => [
+                'hints' => [ 'security-key', 'client-device' ],
+                'authenticatorSelection' => [
+                    'authenticatorAttachment' => 'cross-platform',
+                    'residentKey' => 'discouraged',
+                ],
+            ]
+        ];
+        
+        $tk = $token->generate('webauthn', SecurityToken::OPTION_BIND_SESSION);
+        $this->f3->set('tk', $tk);
+
+        $this->f3->set('create_credential_app_options', [
+            'tk' => $tk,
+            'url' => $this->getCanonicalURL('@webauthn_challenge', '', 'https'),
+            'baseCreateOptions' => $base_options,
+            'useCreateOptions' => $use_options
+        ]);
 
         $this->f3->set('otp_recovery_url', 'https://simpleid.org/docs/2/common-problems/#otp');
 
         $this->f3->set('js_data.intl.challenge_error',  $this->f3->get('intl.core.auth_webauthn.challenge_error'));
         $this->f3->set('js_data.intl.browser_error',  $this->f3->get('intl.core.auth_webauthn.browser_error'));
-        
-        $this->f3->set('tk', $token->generate('webauthn', SecurityToken::OPTION_BIND_SESSION));
 
         $this->f3->set('page_class', 'is-dialog-page');
         $this->f3->set('title', $this->f3->get('intl.core.auth_webauthn.webauthn_title'));
@@ -284,29 +313,44 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
     }
 
     /**
-     * @param FormBuildEvent $event
+     * @param LoginFormBuildEvent $event
      * @return void
      */
-    public function onLoginFormBuild(FormBuildEvent $event) {
+    public function onLoginFormBuild(LoginFormBuildEvent $event) {
         $form_state = $event->getFormState();
 
-        if ($form_state['mode'] == AuthManager::MODE_VERIFY) {
-            $auth = AuthManager::instance();
-            $store = StoreManager::instance();
-
-            /** @var \SimpleID\Models\User $test_user */
-            $test_user = $store->loadUser($form_state['uid']);
-            if (!isset($test_user['webauthn'])) return;
-            /*if ($test_user['otp']['type'] == 'recovery') return;*/
-
-            $uaid = $auth->assignUAID();
-            if ($test_user->exists('webauthn.remember') && in_array($uaid, $test_user->get('webauthn.remember'))) return;
-
+        if (($form_state['mode'] == AuthManager::MODE_IDENTIFY_USER) || ($form_state['mode'] == AuthManager::MODE_VERIFY)) {
+            $additional = [];
+            $allow_credentials = [];
             $tpl = Template::instance();
-            $token = new SecurityToken();
 
-            $this->f3->set('challenge_url', $this->getCanonicalURL('@webauthn_challenge', '', 'https'));
-            $this->f3->set('challenge_tk', $token->generate('webauthn', SecurityToken::OPTION_BIND_SESSION));
+            $token = new SecurityToken();
+            $tk = $token->generate('webauthn', SecurityToken::OPTION_BIND_SESSION);
+
+            if ($form_state['mode'] == AuthManager::MODE_IDENTIFY_USER) {
+                $additional = [ 'region' => LoginFormBuildEvent::SECONDARY_REGION, 'title' => $this->f3->get('intl.core.auth_webauthn.login_block_title') ];
+
+                $this->f3->set('webauthn_use', self::USE_PASSKEY);
+            } elseif ($form_state['mode'] == AuthManager::MODE_VERIFY) {
+                $auth = AuthManager::instance();
+                $store = StoreManager::instance();
+
+                /** @var \SimpleID\Models\User $test_user */
+                $test_user = $store->loadUser($form_state['uid']);
+                if (!isset($test_user['webauthn'])) return;
+                /*if ($test_user['otp']['type'] == 'recovery') return;*/
+
+                $uaid = $auth->assignUAID();
+                if ($test_user->exists('webauthn.remember') && in_array($uaid, $test_user->get('webauthn.remember'))) return;
+
+                $allow_credentials = $this->getSavedCredentials($test_user);
+
+                $this->f3->set('otp_recovery_url', 'https://simpleid.org/docs/2/common_problems/#otp');
+
+                $additional = [ 'showSubmitButton' => false, 'title' => $this->f3->get('intl.core.auth_webauthn.verify_block_title') ];
+
+                $this->f3->set('webauthn_use', self::USE_VERIFY);
+            }
 
             $options = [
                 'mediation' => 'required',
@@ -314,18 +358,19 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
                     'userVerification' => 'required',
                     'timeout' => 30000,
                     'rpId' => $this->getRpId(),
-                    'allowCredentials' => $this->getSavedCredentials($test_user)
+                    'allowCredentials' => $allow_credentials
                 ]
             ];
-            $this->f3->set('request_options', $options);
-
-            // Note this is called from user_login(), so $_POST is always filled
-            $this->f3->set('otp_recovery_url', 'https://simpleid.org/docs/2/common_problems/#otp');
+            $this->f3->set('request_credential_app_options', [
+                'tk' => $tk,
+                'url' => $this->getCanonicalURL('@webauthn_challenge', '', 'https'),
+                'baseRequestOptions' => $options
+            ]);
 
             $this->f3->set('js_data.intl.challenge_error',  $this->f3->get('intl.core.auth_webauthn.challenge_error'));
             $this->f3->set('js_data.intl.browser_error',  $this->f3->get('intl.core.auth_webauthn.browser_error'));
 
-            $event->addBlock('auth_webauthn', $tpl->render('auth_webauthn_verify.html', false), 0, [ 'showSubmitButton' => false, 'title' => $this->f3->get('intl.core.auth_webauthn.verify_block_title') ]);
+            $event->addBlock('auth_webauthn', $tpl->render('auth_webauthn_verify.html', false), 0, $additional);
         }
     }
 
@@ -334,12 +379,37 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
      * @return void
      */
     public function onLoginFormSubmit(LoginFormSubmitEvent $event) {
+        $store = StoreManager::instance();
         $form_state = $event->getFormState();
+        $process_submit = false;
 
-        if (($form_state['mode'] == AuthManager::MODE_VERIFY) && $this->isBlockActive('auth_webauthn')) {
-            $store = StoreManager::instance();
+        if (($form_state['mode'] == AuthManager::MODE_IDENTIFY_USER) && $this->f3->exists('POST.op') && ($this->f3->exists('POST.op') == 'auth_webauthn')) {
+            $credential = json_decode($this->f3->get('POST.webauthn.result'), true);
+            /** @var User|null $test_user */
+            $test_user = $store->findUser('webauthn.credentials', $credential['id']);
 
-            $uid = $form_state['uid'];
+            if ($test_user == null) {
+                $event->addMessage($this->f3->get('intl.core.auth_webauthn.credential_match_error'));
+                $event->setInvalid();
+                return;
+            }
+
+            // Check that the credential's use is 'passkey'
+            $test_credentials = $test_user->get('webauthn.credentials');
+            $test_credential = $test_credentials[$credential['id']];
+            if ($test_credential['use'] != self::USE_PASSKEY) {
+                $event->addMessage($this->f3->get('intl.core.auth_webauthn.credential_use_error'));
+                $event->setInvalid();
+                return;
+            }
+
+            $form_state['uid'] = $test_user['uid'];
+            $process_submit = true;
+        } elseif (($form_state['mode'] == AuthManager::MODE_VERIFY) && $this->isBlockActive('auth_webauthn')) {
+            $process_submit = true;
+        }
+
+        if ($process_submit) {
             /** @var \SimpleID\Models\User $test_user */
             $test_user = $store->loadUser($form_state['uid']);
             $test_credentials = $test_user->get('webauthn.credentials');
@@ -420,7 +490,7 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
      * to be used in the user's profile, or null if the credential creation response
      * is not valid
      */
-    protected function processNewCredential(string $challenge, string $nonce, string $new_credential_json, string $display_name = null): ?array {
+    protected function processNewCredential(string $challenge, string $nonce, string $new_credential_json, string $use, string $display_name = null): ?array {
         // 1. Check that nonce = challenge
         $token = new SecurityToken();
         if (!$token->verify($nonce, $challenge)) {
@@ -453,8 +523,21 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
         $aaguid = $authenticator->getAAGUID();
 
         if ($aaguid != null) {
-            // Get authenticator info.
-            // Note that without additional browser permission, the aaugid will be empty
+            // These are the most common authenticators
+            // https://passkeydeveloper.github.io/passkey-authenticator-aaguids/explorer/
+            $authenticator_names = [
+                'ea9b8d66-4d01-1d21-3ce4-b6b48cb575d4' => 'Google Password Manager',
+                '08987058-cadc-4b81-b6e1-30de50dcbe96' => 'Windows Hello',
+                'dd4ec289-e01d-41c9-bb89-70fa845d4bf2' => 'iCloud Keychain'
+            ];
+            
+            if (isset($authenticator_names[$aaguid])) {
+                $authenticator_name = $authenticator_names[$aaguid];
+            } else {
+                $authenticator_name = null;
+            }
+        } else {
+            $authenticator_name = null;
         }
 
         // 5. Convert public key from base64url encoded DER to JWK
@@ -464,7 +547,13 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
 
         // 6. Display name
         $time = new \DateTimeImmutable();
-        if ($display_name == null) $display_name = $time->format(\DateTimeImmutable::ISO8601);
+        if ($display_name == null) {
+            if ($authenticator_name != null) {
+                $display_name = $authenticator_name . ' - ' . $time->format(\DateTimeImmutable::ISO8601);
+            } else {
+                $display_name = $time->format(\DateTimeImmutable::ISO8601);
+            }
+        }
 
         // 7. Return result
         $result = [
@@ -472,7 +561,7 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
             'type' => $new_credential['type'],
 
             'display_name' => $display_name,
-            'use' => 'verify',
+            'use' => $use,
             'authenticator' => [
                 'aaguid' => $aaguid,
                 'user_verified' => $authenticator->isUserVerified(),
