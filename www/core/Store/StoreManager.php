@@ -88,7 +88,6 @@ use SimpleID\Models\User;
  * @method void saveAuth(Storable $item)
  * @method void deleteAuth(Storable $item)
  * @method void saveClient(Storable $item)
- * @method Storable|null findUser(string $criteria, string $value)
  */
 class StoreManager extends Prefab {
     /** @var array<string, StoreModule> a mapping between the identifier of a store and its store module */
@@ -242,6 +241,28 @@ class StoreManager extends Prefab {
         } else {
             $this->save('user_cfg', $user);
         }
+    }
+
+    /**
+     * Finds a user, including searching through the writeable
+     * attributes (such as saved preferences).
+     *
+     * @param string $criteria the criteria name
+     * @param string $value the criteria value
+     * @return Storable|null the user or null if no user is found
+     */
+    public function findUser($criteria, $value) {
+        // This function only searches through the identity files and not
+        // through the user_cfg files (if they exist)
+        $result = $this->find('user', $criteria, $value);
+
+        if (($result == null) && ($this->getStore('user:write', false) == null)) {
+            $store = $this->getStore('user_cfg:read');
+            $id = $store->find('user_cfg', $criteria, $value);
+            if ($id != null) $result = $this->load('user', $id);
+        }
+
+        return $result;
     }
 
     /**

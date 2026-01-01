@@ -98,6 +98,45 @@ abstract class StoreModule extends Module {
      * @return bool true if the item exists
      */
     abstract public function exists($type, $id);
+
+    /**
+     * Returns whether $haystack contains or equals to $needle.
+     * 
+     * If $haystack is a scalar, then this function returns whether $needle equals
+     * $haystack.
+     * 
+     * If $haystack is a list (i.e. an array of sequential integer keys), this
+     * function returns whether a value of $haystack contains $needle.
+     * 
+     * If $haystack is an associative array, this function contains whether a key
+     * of $haystack contains $needle.
+     * 
+     * @param mixed $needle the value to find
+     * @param mixed $haystack the item to search for the value
+     * @param ?string $id the id to save cache information in
+     * @param array<mixed, mixed> &$index cache
+     */
+    protected function equalsOrContainsValue($needle, $haystack, $id, &$index): bool {
+        if (is_array($haystack)) {
+            $elements = array_keys($haystack);
+            if ($elements == range(0, count($haystack) - 1)) {
+                // $haystack is a list (i.e. sequential integer keys),
+                // so we test the values rather than the keys
+                $elements = $haystack;
+            }
+
+            foreach ($elements as $element) {
+                if ((trim($element) != '') && ($id != null)) $index[$element] = $id;
+                if ($element == $needle) return true;
+            }
+        } else {
+            if (trim($haystack) != '') {
+                if ($id != null) $index[$haystack] = $id;
+                if ($haystack == $needle) return true;
+            }
+        }
+        return false;
+    }
 }
 
 ?>
