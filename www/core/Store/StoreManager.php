@@ -259,7 +259,7 @@ class StoreManager extends Prefab {
         if (($result == null) && ($this->getStore('user:write', false) == null)) {
             $store = $this->getStore('user_cfg:read');
             $id = $store->find('user_cfg', $criteria, $value);
-            if ($id != null) $result = $this->load('user', $id);
+            if ($id != null) $result = $this->loadUser($id);
         }
 
         return $result;
