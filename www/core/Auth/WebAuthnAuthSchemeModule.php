@@ -466,7 +466,10 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
      * @return void
      */
     public function onLogoutEvent(LogoutEvent $event) {
-        // If signed in using passwordless, call window.credentials.preventSilentAccess()
+        $tpl = Template::instance();
+        $tpl->addAttachment('js', [
+            'inline' => "document.addEventListener('DOMContentLoaded', () => { window.credentials.preventSilentAccess(); });"
+        ]);
     }
 
     /**
