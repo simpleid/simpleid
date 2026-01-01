@@ -25,6 +25,7 @@ namespace SimpleID\Store;
 use Symfony\Component\Yaml\Yaml;
 use SimpleID\Models\User;
 use SimpleID\Models\Client;
+use SimpleID\Util\ArrayWrapper;
 
 /**
  * A data store module that uses the file system for all of
@@ -60,10 +61,14 @@ class DefaultStoreModule extends StoreModule {
 
     public function find($type, $criteria, $value) {
         switch ($type) {
+            case 'client':
+                // Not implemented
+                return null;
             case 'user':
                 return $this->findUser($criteria, $value);
+            default:
+                return $this->findKeyValue($type, $criteria, $value);
         }
-        return null;
     }
 
     public function exists($type, $id) {
@@ -140,17 +145,8 @@ class DefaultStoreModule extends StoreModule {
             $test_value = $test_user->get($criteria);
         
             if ($test_value !== null) {
-                if (is_array($test_value)) {
-                    foreach ($test_value as $test_element) {
-                        if (trim($test_element) != '') $index[$test_element] = $uid;
-                        if ($test_element == $value) $result = $uid;
-                    }
-                } else {
-                    if (trim($test_value) != '') {
-                        $index[$test_value] = $uid;
-                        if ($test_value == $value) $result = $uid;
-                    }
-                }
+                if ($this->equalsOrContainsValue($value, $test_value, $uid, $index))
+                    $result = $uid;
             }
         }
             
@@ -279,6 +275,55 @@ class DefaultStoreModule extends StoreModule {
             fwrite($file, $f3->serialize($client));
             fclose($file);
         }, [ $this->f3, $store_file, $client ]);
+    }
+
+    /**
+     * Finds a key-value item based on its value
+     *
+     * @param string $type the item type
+     * @param string $criteria the criteria name
+     * @param string $value the criteria value
+     * @return string|null the item ID or null if no item is found
+     */
+    protected function findKeyValue($type, $criteria, $value) {
+        $cache = \Cache::instance();
+        $index = $cache->get($type . '_' . rawurldecode($criteria) . '.storeindex');
+        if ($index === false) $index = [];
+        //if (isset($index[$value])) return $index[$value];
+
+        $result = NULL;
+        
+        $dir = opendir($this->config['store_dir']);
+        if ($dir == false) return null;
+        
+        while (($file = readdir($dir)) !== false) {
+            $filename = $this->config['store_dir'] . '/' . $file;
+
+            if (is_link($filename) && readlink($filename)) $filename = readlink($filename);
+            if (($filename === false) || (filetype($filename) != "file") || (!preg_match('/^(.+)\.' . preg_quote($type, '/') . '$/', $file, $matches))) continue;
+            
+            $name = $matches[1];
+            $test = $this->readKeyValue($type, $name);
+
+            if ($test instanceof ArrayWrapper) {
+                $test_value = $test->get($criteria);
+            } elseif (is_array($test)) {
+                $test_value = (new ArrayWrapper())->get($criteria);
+            } else {
+                $test_value = $test;
+            }
+        
+            if ($test_value !== null) {
+                if ($this->equalsOrContainsValue($value, $test_value, $name, $index))
+                    $result = $name;
+            }
+        }
+            
+        closedir($dir);
+
+        $cache->set($type . '_' . rawurldecode($criteria) . '.storeindex', $index); dump($result);
+        
+        return $result;
     }
 
     /**
