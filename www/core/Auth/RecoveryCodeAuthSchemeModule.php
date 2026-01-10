@@ -265,7 +265,7 @@ class RecoveryCodeAuthSchemeModule extends AuthSchemeModule {
      * @param string $code the recovery code
      * @return string the encoded hash value
      */
-    protected function encodeRecoveryCode(#[SensitiveParameter] string $code): string {
+    protected function encodeRecoveryCode(#[\SensitiveParameter] string $code): string {
         $rand = new Random();
         $salt = $rand->bytes(32);
         $params = [ 'f' => self::PBKDF2_ALGORITHM, 'c' => self::PBKDF2_ITERATIONS ];
@@ -282,7 +282,7 @@ class RecoveryCodeAuthSchemeModule extends AuthSchemeModule {
      * @return bool whether the recovery code supplied matches the specified encoded
      * value
      */
-    protected function verifyRecoveryCode(#[SensitiveParameter] string $code, string $encoded): bool {
+    protected function verifyRecoveryCode(#[\SensitiveParameter] string $code, string $encoded): bool {
         list($dummy, $prefix, $content) = explode('$', $encoded, 3);
         if ($prefix != 'pbkdf2') return false;
 
