@@ -169,8 +169,6 @@ class RecoveryCodeAuthSchemeModule extends AuthSchemeModule {
 
             $tpl = Template::instance();
 
-            $this->f3->set('submit_button', $this->f3->get('intl.common.verify'));
-
             $event->addBlock('auth_recovery', $tpl->render('auth_recovery.html', false), 10, ['title' => $this->f3->get('intl.core.auth_recovery.verify_block_title')]);
         }
     }

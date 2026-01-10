@@ -215,8 +215,6 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             // Note this is called from user_login(), so $_POST is always filled
             $this->f3->set('otp_recovery_url', 'https://simpleid.org/docs/2/common_problems/#otp');
 
-            $this->f3->set('submit_button', $this->f3->get('intl.common.verify'));
-
             $event->addBlock('auth_otp', $tpl->render('auth_otp.html', false), 0, ['title' => $this->f3->get('intl.core.auth_otp.verify_block_title')]);
         }
     }
