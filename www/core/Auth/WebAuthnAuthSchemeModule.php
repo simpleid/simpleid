@@ -207,7 +207,7 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
             }
 
             $use = $this->f3->get('POST.use');
-            if (!in_array($use, [ self::USE_PASSKEY, self::USE_VERIFY ])) $key = self::USE_VERIFY;
+            if (!in_array($use, [ self::USE_PASSKEY, self::USE_VERIFY ])) $use = self::USE_VERIFY;
 
             $credential = $this->processNewCredential($this->f3->get('POST.challenge'), $this->f3->get('POST.nonce'), $this->f3->get('POST.result'), $use, $this->f3->get('POST.name'));
 
