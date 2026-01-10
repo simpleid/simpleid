@@ -290,7 +290,7 @@ class RecoveryCodeAuthSchemeModule extends AuthSchemeModule {
         list($param_string, $hash, $salt) = explode('$', $content, 3);
         parse_str($param_string, $params);
         if (!isset($params['f']) || ($params['f'] != self::PBKDF2_ALGORITHM)) return false;
-        // @phpstan-ignore argument.type, argument.type, argument.type
+        // @phpstan-ignore argument.type, argument.type
         return $this->secureCompare(hash_pbkdf2(strval($params['f']), $code, base64_decode($salt), intval($params['c']), 0, true),
             base64_decode($hash));
     }
