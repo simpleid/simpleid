@@ -1,0 +1,36 @@
+<div class="narrative">
+    <p>{{ @intl.core.auth_recovery.about_recovery }}</p>
+
+    <p>{{ @intl.core.auth_recovery.about_recovery2 }}</p>
+
+    <check if="{{ @@recovery_codes }}">
+        <true><p>{{ @intl.core.auth_recovery.recovery_warning | raw }}</p></true>
+        <false><p>{{ @intl.core.auth_recovery.recovery_codes_generated }}</p></false>
+    </check>
+</div>
+
+<form action="{{ @base_path }}auth/recovery" method="post" enctype="application/x-www-form-urlencoded">
+    <input type="hidden" name="tk" value="{{ @tk }}"/>
+    <!-- Differentiate submission from this form vs mock from other auth modules -->
+    <input type="hidden" name="active_block" value="auth_recovery" />
+    
+    <check if="{{ @@recovery_codes }}">
+        <true>
+            <div class="form-item" x-data="{ codes: {{ @@recovery_codes | js, raw }} }">
+                <div class="form-combo">
+                    <div class="form-input">
+                        <ol>
+                    <repeat group="{{ @@recovery_codes }}" value="{{ @code }}"><li><code>{{ @code }}</code></li></repeat>
+                </ol>
+                    </div>
+                    <button class="is-subtle" @click.prevent="$clipboard(codes.map((code, idx) => `${idx + 1}. ${code}`).join('\n'))">{{ @intl.common.copy }}</button>
+                </div>
+            </div>
+
+            <button type="submit" name="op" value="continue" id="edit-submit" class="is-default">{{ @intl.common.continue }}</button>
+        </true>
+        <false>
+            <button type="submit" name="op" value="reset" id="edit-submit" class="is-default">{{ @intl.common.reset }}</button>
+        </false>
+    </check>
+</form>
