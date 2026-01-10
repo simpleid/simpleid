@@ -22,6 +22,7 @@
 
 namespace SimpleID\Auth;
 
+use SimpleID\ModuleManager;
 use SimpleID\Auth\AuthManager;
 use SimpleID\Crypt\BigNum;
 use SimpleID\Crypt\Random;
@@ -41,6 +42,13 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
 
     static function init($f3) {
         $f3->route('GET|POST /auth/otp', 'SimpleID\Auth\OTPAuthSchemeModule->setup');
+    }
+
+    public function __construct() {
+        parent::__construct();
+        
+        $mgr = ModuleManager::instance();
+        $mgr->loadModule('SimpleID\Auth\RecoveryCodeAuthSchemeModule');
     }
 
     /**
@@ -104,7 +112,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
                 \Events::instance()->dispatch($event);
 
                 $this->f3->set('message', $this->f3->get('intl.core.auth_otp.enable_success'));
-                $this->f3->mock('GET /my/dashboard');
+                $this->f3->mock('POST /auth/recovery');
                 return;
             }
         } else {
