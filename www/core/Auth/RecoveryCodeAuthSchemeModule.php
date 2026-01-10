@@ -33,8 +33,8 @@ use SimpleID\Util\Forms\FormSubmitEvent;
 use SimpleID\Util\UI\Template;
 
 /**
- * An authentication scheme module that provides two-factor authentication
- * based on a RFC 6238 Time-Based One-Time Password (TOTP).
+ * An authentication scheme module that provides account recovery through
+ * recovery codes.
  */
 class RecoveryCodeAuthSchemeModule extends AuthSchemeModule {
 
@@ -50,8 +50,7 @@ class RecoveryCodeAuthSchemeModule extends AuthSchemeModule {
     }
 
     /**
-     * Displays the page used to set up login verification using one-time
-     * passwords.
+     * Displays the page used to generate recovery codes.
      * 
      * @return void
      */
