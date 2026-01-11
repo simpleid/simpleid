@@ -377,7 +377,7 @@ class AuthModule extends Module {
             $switchable = (($form_state['mode'] != AuthManager::MODE_IDENTIFY_USER) && count($forms['default']) > 1);
             if ($switchable && $this->f3->exists('POST.active_block')) {
                 $block_ids = $matrix->pick($forms['default'], 'id');
-                if (in_array($active_block_id, $block_ids)) $active_block_id = $this->f3->get('POST.active_block');
+                if (in_array($this->f3->get('POST.active_block'), $block_ids)) $active_block_id = $this->f3->get('POST.active_block');
             }
         }
         $this->f3->set('switchable', $switchable);
