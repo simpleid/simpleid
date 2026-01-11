@@ -22,6 +22,7 @@
 
 namespace SimpleID\Auth;
 
+use SimpleID\ModuleManager;
 use SimpleID\Auth\AuthManager;
 use SimpleID\Crypt\BigNum;
 use SimpleID\Crypt\Random;
@@ -41,6 +42,13 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
 
     static function init($f3) {
         $f3->route('GET|POST /auth/otp', 'SimpleID\Auth\OTPAuthSchemeModule->setup');
+    }
+
+    public function __construct() {
+        parent::__construct();
+        
+        $mgr = ModuleManager::instance();
+        $mgr->loadModule('SimpleID\Auth\RecoveryCodeAuthSchemeModule');
     }
 
     /**
@@ -104,7 +112,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
                 \Events::instance()->dispatch($event);
 
                 $this->f3->set('message', $this->f3->get('intl.core.auth_otp.enable_success'));
-                $this->f3->mock('GET /my/dashboard');
+                $this->f3->mock('POST /auth/recovery');
                 return;
             }
         } else {
@@ -205,9 +213,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
             $tpl = Template::instance();
 
             // Note this is called from user_login(), so $_POST is always filled
-            $this->f3->set('otp_recovery_url', 'https://simpleid.org/docs/2/common_problems/#otp');
-
-            $this->f3->set('submit_button', $this->f3->get('intl.common.verify'));
+            $this->f3->set('otp_recovery_url', 'https://simpleid.org/docs/2/common-problems/#otp');
 
             $event->addBlock('auth_otp', $tpl->render('auth_otp.html', false), 0, ['title' => $this->f3->get('intl.core.auth_otp.verify_block_title')]);
         }

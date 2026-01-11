@@ -22,6 +22,7 @@
 
 namespace SimpleID\Auth;
 
+use SimpleID\ModuleManager;
 use Psr\Log\LogLevel;
 use SimpleID\Auth\AuthManager;
 use SimpleID\Auth\LoginFormBuildEvent;
@@ -62,6 +63,13 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
         $f3->route('POST @webauthn_challenge: /auth/webauthn/challenge [ajax]', 'SimpleID\Auth\WebAuthnAuthSchemeModule->createChallenge');
         $f3->route('GET /auth/webauthn/credentials [ajax]', 'SimpleID\Auth\WebAuthnAuthSchemeModule->listCredentials');
         $f3->map('/auth/webauthn/credentials/@id', 'SimpleID\Auth\WebAuthnAuthSchemeModule');
+    }
+
+    public function __construct() {
+        parent::__construct();
+        
+        $mgr = ModuleManager::instance();
+        $mgr->loadModule('SimpleID\Auth\RecoveryCodeAuthSchemeModule');
     }
 
     /**
@@ -207,7 +215,7 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
             }
 
             $use = $this->f3->get('POST.use');
-            if (!in_array($use, [ self::USE_PASSKEY, self::USE_VERIFY ])) $key = self::USE_VERIFY;
+            if (!in_array($use, [ self::USE_PASSKEY, self::USE_VERIFY ])) $use = self::USE_VERIFY;
 
             $credential = $this->processNewCredential($this->f3->get('POST.challenge'), $this->f3->get('POST.nonce'), $this->f3->get('POST.result'), $use, $this->f3->get('POST.name'));
 
@@ -221,7 +229,11 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
                 \Events::instance()->dispatch($event);
 
                 $this->f3->set('message', $this->f3->get('intl.core.auth_webauthn.credential_add_success'));
-                $this->f3->mock('GET /my/dashboard');
+                if ($use == self::USE_VERIFY) {
+                    $this->f3->mock('POST /auth/recovery');
+                } else {
+                    $this->f3->mock('GET /my/dashboard');
+                }
                 return;
             }
         }
