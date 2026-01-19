@@ -122,7 +122,7 @@ function _simpleweb_invoke($route, $args = array()) {
         return call_user_func_array(array($class, $method), $args);
     } elseif(strpos($route, '->') !== false) {
         list($class, $method) = explode('->', $route, 2);
-        $object &= new $class;
+        $object = new $class;
         return call_user_func_array(array($object, $method), $args);
     } else {
         return call_user_func_array($route, $args);
