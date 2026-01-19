@@ -118,10 +118,10 @@ function simpleweb_run($routes, $request_path = NULL, $not_found_route = NULL) {
  */
 function _simpleweb_invoke($route, $args = array()) {
     if (strpos($route, '::') !== false) {
-        list($class, $method) = split($route, '::', 2);
+        list($class, $method) = explode('::', $route, 2);
         return call_user_func_array(array($class, $method), $args);
     } elseif(strpos($route, '->') !== false) {
-        list($class, $method) = split($route, '->', 2);
+        list($class, $method) = explode('->', $route, 2);
         $object &= new $class;
         return call_user_func_array(array($object, $method), $args);
     } else {
