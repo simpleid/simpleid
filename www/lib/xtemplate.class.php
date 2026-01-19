@@ -596,7 +596,7 @@ class XTemplate {
 						$copy = preg_replace("|" . $this->tag_start_delim . $v . $this->tag_end_delim . "|m", "$nul", $copy);
 					}
 				} else {
-
+					if ($var == null) $var = '';
 					//$var = trim($var);
 					switch (true) {
 						case preg_match('/^\n/', $var) && preg_match('/\n$/', $var):
