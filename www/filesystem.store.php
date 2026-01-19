@@ -329,6 +329,6 @@ function store_del($name) {
  *
  */
 function _store_is_valid_name($name) {
-    return preg_match('!\A[^/\\\\]*\z!', $name);
+    return preg_match('!\A[^/\\\\]+\z!', $name);
 }
 ?>
