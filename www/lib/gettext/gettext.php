@@ -35,20 +35,20 @@
  */
 class gettext_reader {
   //public:
-   var $error = 0; // public variable that holds error code (0 if no error)
+   public $error = 0; // public variable that holds error code (0 if no error)
 
    //private:
-  var $BYTEORDER = 0;        // 0: low endian, 1: big endian
-  var $STREAM = NULL;
-  var $short_circuit = false;
-  var $enable_cache = false;
-  var $originals = NULL;      // offset of original table
-  var $translations = NULL;    // offset of translation table
-  var $pluralheader = NULL;    // cache header field for plural forms
-  var $total = 0;          // total string count
-  var $table_originals = NULL;  // table for original strings (offsets)
-  var $table_translations = NULL;  // table for translated strings (offsets)
-  var $cache_translations = NULL;  // original -> translation mapping
+  private $BYTEORDER = 0;        // 0: low endian, 1: big endian
+  private $STREAM = NULL;
+  private $short_circuit = false;
+  private $enable_cache = false;
+  private $originals = NULL;      // offset of original table
+  private $translations = NULL;    // offset of translation table
+  private $pluralheader = NULL;    // cache header field for plural forms
+  private $total = 0;          // total string count
+  private $table_originals = NULL;  // table for original strings (offsets)
+  private $table_translations = NULL;  // table for translated strings (offsets)
+  private $cache_translations = NULL;  // original -> translation mapping
 
 
   /* Methods */
