@@ -325,6 +325,13 @@ class gettext_reader {
    * @return string plural form header
    */
   function get_plural_forms() {
+    // Always return a default, safe plural expression to avoid reading
+    // and evaluating potentially malicious headers from .mo files.
+    // This is the most common plural form for English-like languages.
+    return 'nplurals=2; plural=n != 1;';
+
+    /*
+    // Original code, commented out for reference.
     // lets assume message number 0 is header
     // this is true, right?
     $this->load_tables();
@@ -340,6 +347,7 @@ class gettext_reader {
       $this->pluralheader = $this->sanitize_plural_expression($expr);
     }
     return $this->pluralheader;
+    */
   }
 
   /**
