@@ -402,7 +402,7 @@ class DefaultStoreModule extends StoreModule {
      * @return boolean whether the name is valid for use with this store 
      */
     protected function isValidName($name) {
-        return (preg_match('!\A[^/\\\\]*\z!', $name) != false);
+        return (preg_match('!\A[^/\\\\]+\z!', $name) != false);
     }
 
     /**
