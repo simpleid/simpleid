@@ -199,7 +199,7 @@ function _log_write($message, $level = false) {
     }
 
     /* Build the string containing the complete log line. */
-    $line = sprintf('%1$s %2$s [%3$s] %4$s', strftime(SIMPLEID_DATE_TIME_FORMAT), session_id(), $levels[$level], $message) . "\n";
+    $line = sprintf('%1$s %2$s [%3$s] %4$s', (new DateTimeImmutable())->format(SIMPLEID_DATE_TIME_FORMAT), session_id(), $levels[$level], $message) . "\n";
 
     /* Write the log line to the log file. */
     $success = (fwrite($log, $line) !== false);

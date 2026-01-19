@@ -162,12 +162,12 @@ define('SIMPLEID_LOCALE', 'en');
 /**
  * Date and time format.
  *
- * The date and time format specified using the strftime() syntax.
+ * The date and time format specified using the PHP date_format() syntax.
  *
- * See http://www.php.net/strftime for details.
+ * See https://www.php.net/manual/en/datetime.format.php for details.
  * 
  */
-define('SIMPLEID_DATE_TIME_FORMAT', '%Y-%m-%d %H:%M:%S %Z');
+define('SIMPLEID_DATE_TIME_FORMAT', 'Y-m-d H:i:s T');
 
 /**
  * The number of seconds before associations expire.  This is an advanced
