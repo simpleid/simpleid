@@ -627,7 +627,7 @@ function openid_extension_alias($ns, $create = FALSE) {
  * @link http://openid.net/specs/openid-authentication-2_0.html#positive_assertions
  */
 function openid_nonce() {
-    return gmstrftime('%Y-%m-%dT%H:%M:%SZ') . bin2hex(random_bytes(4));
+    return gmdate('Y-m-d\TH:i:s\Z') . bin2hex(random_bytes(4));
 }
 
 /* ------- Diffie-Hellman Key Exchange functions ----------------------------- */

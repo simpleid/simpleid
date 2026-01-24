@@ -156,7 +156,7 @@ function page_sites() {
             $xtpl->assign('realm_name', preg_replace('@^https?://(www\.|\*\.)?@', '<span class="url-elide">$0</span>', htmlspecialchars($rp['realm'], ENT_QUOTES, 'UTF-8')));
             $xtpl->assign('realm', htmlspecialchars($rp['realm'], ENT_QUOTES, 'UTF-8'));
             $xtpl->assign('last_time', htmlspecialchars($rp['last_time'], ENT_QUOTES, 'UTF-8'));
-            $xtpl->assign('last_time_formatted', htmlspecialchars(strftime(SIMPLEID_DATE_TIME_FORMAT, $rp['last_time']), ENT_QUOTES, 'UTF-8'));
+            $xtpl->assign('last_time_formatted', htmlspecialchars((new DateTimeImmutable('@' . $rp['last_time']))->format(SIMPLEID_DATE_TIME_FORMAT), ENT_QUOTES, 'UTF-8'));
             $xtpl->assign('auto_release', (isset($rp['auto_release']) && $rp['auto_release']) ? 'checked="checked"' : '');
             
             if (SIMPLEID_VERIFY_RETURN_URL_USING_REALM) {

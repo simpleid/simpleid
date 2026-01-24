@@ -88,18 +88,18 @@ function get_list_of_locales($locale) {
       if ($modifier) {
         if ($country) {
           if ($charset)
-            array_push($locale_names, "${lang}_$country.$charset@$modifier");
-          array_push($locale_names, "${lang}_$country@$modifier");
+            array_push($locale_names, "{$lang}_$country.$charset@$modifier");
+          array_push($locale_names, "{$lang}_$country@$modifier");
         } elseif ($charset)
-            array_push($locale_names, "${lang}.$charset@$modifier");
+            array_push($locale_names, "{$lang}.$charset@$modifier");
         array_push($locale_names, "$lang@$modifier");
       }
       if ($country) {
         if ($charset)
-          array_push($locale_names, "${lang}_$country.$charset");
-        array_push($locale_names, "${lang}_$country");
+          array_push($locale_names, "{$lang}_$country.$charset");
+        array_push($locale_names, "{$lang}_$country");
       } elseif ($charset)
-          array_push($locale_names, "${lang}.$charset");
+          array_push($locale_names, "{$lang}.$charset");
       array_push($locale_names, $lang);
     }
 
@@ -167,7 +167,14 @@ function _check_locale_and_function($function=false) {
 function _get_codeset($domain=null) {
     global $text_domains, $default_domain, $LC_CATEGORIES;
     if (!isset($domain)) $domain = $default_domain;
-    return (isset($text_domains[$domain]->codeset))? $text_domains[$domain]->codeset : ini_get('mbstring.internal_encoding');
+
+    if (isset($text_domains[$domain]->codeset)) {
+        return $text_domains[$domain]->codeset;
+    } elseif (ini_get('mbstring.internal_encoding')) {
+        return ini_get('mbstring.internal_encoding');
+    } else {
+        return 'utf-8';
+    }
 }
 
 /**

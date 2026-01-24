@@ -393,48 +393,48 @@ class XRDSParser {
      * @var resource
      * @access private
      */
-    var $parser;
+    private $parser;
     
     /**
      * Discovered services
      * @var array
      * @access private
      */
-    var $services = array();
+    private $services = array();
     
     /**
      * State: are we parsing a service element?
      * @var bool
      * @access private
      */
-    var $in_service = FALSE;
+    private $in_service = FALSE;
     
     /**
      * CDATA buffer
      * @var string
      * @access private
      */
-    var $_buffer;
+    private $_buffer;
     /**
      * Attributes buffer
      * @var array
      * @access private
      */
-    var $_attribs = array();
+    private $_attribs = array();
     
     /**
      * priority attribute buffer
      * @var string
      * @access private
      */
-    var $priority = NULL;
+    private $priority = NULL;
     
     /**
      * Currently parsed service buffer
      * @var array
      * @access private
      */
-    var $service = array();
+    private $service = array();
     
     /**
      * Creates an instance of the XRDS parser.
