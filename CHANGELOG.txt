@@ -1,3 +1,11 @@
+SimpleID 1.0.7 - 2026-01-31
+---------------------------
+
+- Bug fixes:
+    * #177 Fixes issues regarding compatibility with PHP 8.x, including
+      composer.json.
+    * Security hardening of gettext libraries.
+
 SimpleID 1.0.6 - 2023-07-15
 ---------------------------
 
