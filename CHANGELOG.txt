@@ -1,13 +1,13 @@
-SimpleID 1.0.6
---------------
+SimpleID 1.0.6 - 2023-07-15
+---------------------------
 
 - Enhancements:
     * Update autocomplete setting for one time password fields
 - Bug fixes:
     * #86 Further fix to compatibility with PHP 8.2
 
-SimpleID 1.0.5
---------------
+SimpleID 1.0.5 - 2023-03-13
+---------------------------
 
 - Bug fixes:
     * #85 Fix compatibility with PHP 8.2
