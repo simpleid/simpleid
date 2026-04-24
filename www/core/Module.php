@@ -239,8 +239,10 @@ abstract class Module extends \Prefab {
             $scheme = 'https';
         } elseif ($secure == 'http') {
             $scheme = 'http';
-        } else {
+        } elseif (isset($parts['scheme'])) {
             $scheme = $parts['scheme'];
+        } else {
+            throw new \UnexpectedValueException('Configuration value canonical_base_path does not contain a scheme');
         }
         
         $url = $scheme . '://';
@@ -264,7 +266,8 @@ abstract class Module extends \Prefab {
      */
     protected function getOrigin($uri) {
         $parts = parse_url($uri);
-        if ($parts == false) return $uri;
+        if ($parts == false) throw new \UnexpectedValueException('Invalid URL');
+        if (!isset($parts['scheme']) || !isset($parts['host'])) throw new \UnexpectedValueException('Missing scheme or host name');
         
         $origin = $parts['scheme'] . '://';
         $origin .= $parts['host'];

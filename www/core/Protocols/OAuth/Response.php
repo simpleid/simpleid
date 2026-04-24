@@ -178,6 +178,11 @@ class Response extends ArrayWrapper {
         if ($this->response_mode == self::FORM_POST_RESPONSE_MODE) $this->renderFormPost($redirect_uri);
 
         $parts = parse_url($redirect_uri);
+        if (!isset($parts['scheme'])) {
+            $this->setError('server_error', 'redirect_uri must contain a scheme');
+            $this->renderJSON();
+            return;
+        }
 
         // 1. Firstly, get the query string
         $query = str_replace([ '+', '%7E' ], [ '%20', '~' ], http_build_query($this->container));

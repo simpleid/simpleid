@@ -131,8 +131,7 @@ class SMTP extends F3SMTP {
             unset($headers['Content-Transfer-Encoding']);
             return $out;
         }
-        user_error(self::E_Blank, E_USER_ERROR);
-        return '';
+        throw new \RuntimeException(self::E_Blank);
     }
 
     /**
@@ -146,7 +145,7 @@ class SMTP extends F3SMTP {
      */
     function attach($file, $type = 'application/octet-stream', $alias = NULL, $cid = NULL) {
         if (!is_file($file))
-            user_error(sprintf(self::E_Attach,$file),E_USER_ERROR);
+            throw new \RuntimeException(sprintf(self::E_Attach,$file));
         if ($alias)
             $file = [$alias, $file];
         $this->attachments[] = ['filename' => $file, 'cid' => $cid, 'type' => $type];
@@ -165,7 +164,7 @@ class SMTP extends F3SMTP {
         if (($this->scheme == 'ssl') && !extension_loaded('openssl')) return FALSE;
 
         // Message should not be blank
-        if (!$message) user_error(self::E_Blank, E_USER_ERROR);
+        if (!$message) throw new \RuntimeException(self::E_Blank);
 
         $fw = Base::instance();
 
@@ -238,7 +237,7 @@ class SMTP extends F3SMTP {
         $reqd = ['From', 'To', 'Subject'];
         foreach ($reqd as $id) {
             if (empty($headers[$id]))
-                user_error(sprintf(self::E_Header,$id),E_USER_ERROR);
+                throw new \RuntimeException(sprintf(self::E_Header,$id));
         }
         $eol = "\r\n";
 

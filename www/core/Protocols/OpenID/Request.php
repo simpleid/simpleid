@@ -106,6 +106,7 @@ class Request extends Message {
         $realm = parse_url($realm);
         if ($url == false) return false;
         if ($realm == false) return false;
+        if (!isset($url['scheme']) || !isset($realm['scheme'])) return false;
         
         foreach(['user', 'pass', 'fragment'] as $key) {
             if (array_key_exists($key, $url) || array_key_exists($key, $realm))
