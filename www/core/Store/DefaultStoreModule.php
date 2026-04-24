@@ -190,7 +190,7 @@ class DefaultStoreModule extends StoreModule {
             $data = Yaml::parseFile($identity_file);
         } catch (\Exception $e) {
             $this->logger->log(\Psr\Log\LogLevel::ERROR, 'Cannot read user file ' . $identity_file . ': ' . $e->getMessage());
-            trigger_error('Cannot read user file ' . $identity_file . ': ' . $e->getMessage(), E_USER_ERROR);
+            throw new \RuntimeException('Cannot read user file ' . $identity_file . ': ' . $e->getMessage());
         }
             
         return new User($data);
@@ -243,7 +243,7 @@ class DefaultStoreModule extends StoreModule {
                 $data = Yaml::parseFile($client_file);
             } catch (\Exception $e) {
                 $this->logger->log(\Psr\Log\LogLevel::ERROR, 'Cannot read client file ' . $client_file . ' :' . $e->getMessage());
-                trigger_error('Cannot read client file ' . $client_file . ' :' . $e->getMessage(), E_USER_ERROR);
+                throw new \RuntimeException('Cannot read client file ' . $client_file . ' :' . $e->getMessage());
             }
 
             if ($data != null) $client->loadData($data);
@@ -265,7 +265,7 @@ class DefaultStoreModule extends StoreModule {
      */
     protected function writeClient($cid, $client) {
         if (!$this->isValidName($cid)) {
-            trigger_error("Invalid client name for filesystem store", E_USER_ERROR);
+            throw new \UnexpectedValueException("Invalid client name for filesystem store");
         }
         
         $store_file = $this->config['store_dir'] . "/$cid.client";
@@ -367,7 +367,7 @@ class DefaultStoreModule extends StoreModule {
      */
     protected function writeKeyValue($type, $name, $value) {
         if (!$this->isValidName($name . '.' . $type)) {
-            trigger_error("Invalid name for filesystem store", E_USER_ERROR);
+            throw new \UnexpectedValueException("Invalid name for filesystem store");
         }
 
         $file = $this->getKeyValueFile($type, $name);
@@ -385,7 +385,7 @@ class DefaultStoreModule extends StoreModule {
      */
     protected function deleteKeyValue($type, $name) {
         if (!$this->isValidName($name . '.' . $type)) {
-            trigger_error("Invalid name for filesystem store", E_USER_ERROR);
+            throw new \UnexpectedValueException("Invalid name for filesystem store");
         }
 
         $file = $this->getKeyValueFile($type, $name);
