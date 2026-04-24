@@ -132,7 +132,6 @@ class SMTP extends F3SMTP {
             return $out;
         }
         throw new \RuntimeException(self::E_Blank);
-        return '';
     }
 
     /**

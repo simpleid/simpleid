@@ -197,6 +197,7 @@ class Response extends Message {
         //    reconstruct the URL.
         $parts = parse_url($url);
         if ($parts == false) return $url;
+        if (!isset($parts['scheme'])) return $url;
         
         $url = $parts['scheme'] . '://';
         if (isset($parts['user'])) {
