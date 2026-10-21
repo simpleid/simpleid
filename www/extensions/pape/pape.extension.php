@@ -111,7 +111,7 @@ function pape_response($assertion, $request) {
     $response['openid.ns.' . $alias] = OPENID_NS_PAPE;
     
     // We return the last time the user logged in using the login form
-    $response['openid.' . $alias . '.auth_time'] = gmstrftime('%Y-%m-%dT%H:%M:%SZ', $user['auth_time']);
+    $response['openid.' . $alias . '.auth_time'] = gmdate('Y-m-d\TH:i:s\Z', $user['auth_time']);
     
     // We don't comply with NIST_SP800-63
     $response['openid.' . $alias . '.auth_level.ns.nist'] = PAPE_LEVEL_NIST800_63;
