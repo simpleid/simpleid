@@ -403,7 +403,7 @@ function _user_login($login_user, $auth_active = false) {
         // Set user has been actively authenticated this and the next request only
         $login_user['auth_active'] = true;
         $_SESSION['user_auth_active'] = true;
-        log_info('Login successful: ' . $login_user['uid'] . '['. gmstrftime('%Y-%m-%dT%H:%M:%SZ', $login_user['auth_time']) . ']');
+        log_info('Login successful: ' . $login_user['uid'] . '['. gmdate('Y-m-d\TH:i:s\Z', $login_user['auth_time']) . ']');
 
     }
 
