@@ -1,3 +1,10 @@
+SimpleID 1.0.8 - 2026-10-26
+---------------------------
+
+- Bug fixes:
+    * #204 Fixes issues regarding compatibility with PHP 8.4
+
+
 SimpleID 1.0.7 - 2026-01-31
 ---------------------------
 
