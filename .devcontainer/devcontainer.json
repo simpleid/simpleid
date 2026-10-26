@@ -3,10 +3,18 @@
 {
 	"name": "PHP",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/php:7.4",
+	"image": "mcr.microsoft.com/devcontainers/php:8.4",
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
-	// "features": {},
+	"features": {
+		// Configure properties specific to VS Code.
+        "vscode": {
+            // Set *default* container specific settings.json values on container create.
+            "settings": { 
+                "php.validate.executablePath": "/usr/local/bin/php"
+            }
+		}
+	},
 
 	// Configure tool-specific properties.
 	// "customizations": {},
