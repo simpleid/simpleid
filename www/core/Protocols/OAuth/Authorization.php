@@ -283,7 +283,7 @@ class Authorization implements Storable {
      * generated
      * @param array<string, mixed> $additional additional data to be stored on the server for this
      * token
-     * @return array<string, string> an array of parameters that can be included in the OAuth token
+     * @return array<string, string|int> an array of parameters that can be included in the OAuth token
      * endpoint response
      */
     public function issueTokens($scope = [], $expires_in = Token::TTL_PERPETUAL, $grant = null, $additional = []) {
@@ -305,7 +305,7 @@ class Authorization implements Storable {
      * generated
      * @param array<string, mixed> $additional additional data to be stored on the server for this
      * token
-     * @return array<string, string> an array of parameters that can be included in the OAuth token
+     * @return array<string, string|int> an array of parameters that can be included in the OAuth token
      * endpoint response
      */
     public function issueAccessToken($scope = [], $expires_in = Token::TTL_PERPETUAL, $grant = null, $additional = []) {
@@ -315,7 +315,7 @@ class Authorization implements Storable {
 
         $results['access_token'] = $token->getEncoded();
         $results['token_type'] = $token->getAccessTokenType();
-        if ($expires_in != Token::TTL_PERPETUAL) $results['expires_in'] = strval($expires_in);
+        if ($expires_in != Token::TTL_PERPETUAL) $results['expires_in'] = intval($expires_in);
 
         return $results;
     }
