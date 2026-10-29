@@ -272,7 +272,7 @@ class AuthManager extends Prefab {
      * @param FormState $form_state the state of the login form
      * @return void
      */
-    public function login(AuthResultInterface $result, FormState $form_state = null) {
+    public function login(AuthResultInterface $result, ?FormState $form_state = null) {
         if ($form_state == null) $form_state = new FormState();
 
         $store = StoreManager::instance();

@@ -64,7 +64,7 @@ class CredentialEvent extends AuditEvent implements GenericEventInterface {
      * the credential
      * @param ?string $credential_id the module-specifc ID of the credential (if any)
      */
-    public function __construct(User $user, string $event_type, string $auth_module_name, string $credential_id = null) {
+    public function __construct(User $user, string $event_type, string $auth_module_name, ?string $credential_id = null) {
         parent::__construct($user);
         $this->setEventName($event_type);
         $this->authModuleName = $auth_module_name;
