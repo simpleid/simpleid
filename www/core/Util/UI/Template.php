@@ -211,7 +211,7 @@ class Template extends F3Template implements AttachmentManagerInterface {
      * @param string $name the name of the attribute
      * @return string
      */
-    public function attr(mixed $val = null, string $name = null): string {
+    public function attr(mixed $val = null, ?string $name = null): string {
         if (($val == null) || ($val == false)) return '';
         if ($val === true) return $this->esc($name);
         return $this->esc($name) . '="' . $this->esc($val) . '"';

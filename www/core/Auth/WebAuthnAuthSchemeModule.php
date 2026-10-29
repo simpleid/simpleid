@@ -505,7 +505,7 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
      * to be used in the user's profile, or null if the credential creation response
      * is not valid
      */
-    protected function processNewCredential(string $challenge, string $nonce, string $new_credential_json, string $use, string $display_name = null): ?array {
+    protected function processNewCredential(string $challenge, string $nonce, string $new_credential_json, string $use, ?string $display_name = null): ?array {
         // 1. Check that nonce = challenge
         $token = new SecurityToken();
         if (!$token->verify($nonce, $challenge)) {

@@ -75,7 +75,7 @@ class AuditEvent extends BaseEvent {
      * event
      * @param Storable $client the client affected by the event
      */
-    public function __construct(Storable $subject = null, Storable $client = null) {
+    public function __construct(?Storable $subject = null, ?Storable $client = null) {
         $f3 = Base::instance();
         $geo = Geo::instance();
 
