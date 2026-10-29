@@ -1,7 +1,7 @@
 {
     "name": "PHP + Node",
     // See https://hub.docker.com/r/microsoft/devcontainers for details
-    "image": "mcr.microsoft.com/devcontainers/php:8.2-bullseye",
+    "image": "mcr.microsoft.com/devcontainers/php:8-bookworm",
 
     // Features to add to the dev container. More info: https://containers.dev/features.
     "features": {
