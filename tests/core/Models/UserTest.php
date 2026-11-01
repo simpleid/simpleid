@@ -28,7 +28,7 @@ class UserTest extends TestCase {
         // Set up $user_cfg->activities
         $refl = new \ReflectionClass($user_cfg);
         $activities_property = $refl->getProperty('activities');
-        $activities_property->setAccessible(true);
+        //$activities_property->setAccessible(true);
         $activities_property->setValue($user_cfg, [
             'test_cid' => [
                 'type' => 'app'

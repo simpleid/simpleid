@@ -1,0 +1,22 @@
+diff --git a/src/Branca.php b/src/Branca.php.new
+index 4c7c098..bf839ff 100644
+--- a/src/Branca.php
++++ b/src/Branca.php
+@@ -80,7 +80,7 @@ class Branca
+     /**
+      * Create a token from payload and optional timestamp.
+      */
+-    public function encode(string $payload, int $timestamp = null): string
++    public function encode(string $payload, ?int $timestamp = null): string
+     {
+         if (null === $timestamp) {
+             $timestamp = time();
+@@ -110,7 +110,7 @@ class Branca
+     /**
+      * Extract the payload from a token.
+      */
+-    public function decode(string $token, int $ttl = null): string
++    public function decode(string $token, ?int $ttl = null): string
+     {
+         $token = (new Base62)->decode($token);
+         $header = substr(

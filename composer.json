@@ -4,7 +4,7 @@
     "homepage": "https://simpleid.org/",
     "type": "project",
     "require": {
-        "php": "^8.0",
+        "php": "^8.2",
         "ext-bcmath": "*",
         "ext-pcre": "*",
         "ext-session": "*",
@@ -24,7 +24,8 @@
         "robinvdvleuten/ulid": "^5.0",
         "tuupola/branca": "^2.3",
         "symfony/yaml": "^6.0",
-        "erusev/parsedown": "^1.0"
+        "erusev/parsedown": "^1.0",
+        "cweagans/composer-patches": "^2.0"
     },
     "suggest": {
         "ext-gmp": "Better performance",
@@ -55,7 +56,8 @@
         "vendor-dir": "www/vendor",
         "allow-plugins": {
             "wikimedia/composer-merge-plugin": true,
-            "simpleid/module-installer": true
+            "simpleid/module-installer": true,
+            "cweagans/composer-patches": true
         }
     },
     "scripts": {
@@ -74,6 +76,11 @@
             "include": [
                 "composer.site.json"
             ]
+        },
+        "patches": {
+            "tuupola/branca": {
+                "Fix static analysis types/errors": "vendor-patches/tuupola-branca.patch"
+            }
         }
     }
 }
