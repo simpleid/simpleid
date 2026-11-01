@@ -1,7 +1,7 @@
-diff --git a/www/vendor/tuupola/branca/src/Branca.php b/www/vendor/tuupola/branca/src/Branca.php.new
+diff --git a/src/Branca.php b/src/Branca.php.new
 index 4c7c098..bf839ff 100644
---- a/www/vendor/tuupola/branca/src/Branca.php
-+++ b/www/vendor/tuupola/branca/src/Branca.php.new
+--- a/src/Branca.php
++++ b/src/Branca.php
 @@ -80,7 +80,7 @@ class Branca
      /**
       * Create a token from payload and optional timestamp.
