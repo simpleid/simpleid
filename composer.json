@@ -79,7 +79,10 @@
         },
         "patches": {
             "tuupola/branca": {
-                "Fix static analysis types/errors": "vendor-patches/tuupola-branca.patch"
+                "Fix static analysis types/errors": "https://patch-diff.githubusercontent.com/raw/tuupola/branca-php/pull/26.diff"
+            },
+            "consolidation/robo": {
+                "Symfony Console 7.4 compatibility": "https://patch-diff.githubusercontent.com/raw/consolidation/robo/pull/1184.diff"
             }
         }
     }
