@@ -89,7 +89,7 @@ class DefaultLogger extends Log implements LoggerInterface {
      * @param string $message the message to log
      * @param array<string, mixed> $context the context
      */
-    function log($level, $message, array $context = []) {
+    function log($level, $message, array $context = []): void {
         $fw = \Base::instance();
         $config = $fw->get('config');
         $time = new \DateTimeImmutable();

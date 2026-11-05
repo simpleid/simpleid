@@ -1,0 +1,29 @@
+{
+    "_hash": "419eda334e10e6bb744a67e00c4032ab8e8d4087df620aee20fa5cfdf0febfa0",
+    "patches": {
+        "tuupola/branca": [
+            {
+                "package": "tuupola/branca",
+                "description": "Fix static analysis types/errors",
+                "url": "https://patch-diff.githubusercontent.com/raw/tuupola/branca-php/pull/26.diff",
+                "sha256": "e52862d87710c32a531bacd44e7a816912903df636a54635dbb9475f34efea57",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "consolidation/robo": [
+            {
+                "package": "consolidation/robo",
+                "description": "Symfony Console 7.4 compatibility",
+                "url": "https://patch-diff.githubusercontent.com/raw/consolidation/robo/pull/1184.diff",
+                "sha256": "87f453117e3a9fb922dcf56b2c683caa66dd6d7c9c23485cf3b7da03b8e7714d",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ]
+    }
+}
