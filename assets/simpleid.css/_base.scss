@@ -17,13 +17,13 @@ h1 {
 }
 
 a {
-  border-bottom: 1px solid var(--grey-900);
+  border-bottom: 1px solid light-dark(var(--grey-900), var(--grey-200));
   color: var(--brand-color);
   text-decoration: none !important;
   font-weight: util.font-weight(bold);
 
   &:visited {
-    border-color: var(--grey-900);
+    border-color: light-dark(var(--grey-900), var(--grey-200));
     color: var(--brand-color-dark);
   }
   &:focus, &:hover {
