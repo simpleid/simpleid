@@ -27,8 +27,8 @@ $valid-color: var(--green) !default;
   &.is-error { border-color: $error-color !important; }
   &.is-valid { border-color: $valid-color; }
 
-  &:focus { 
-    outline-width: 0;
+  &:focus {
+    outline: none;
     border-color: $focus-color; 
   }
 }
@@ -110,7 +110,7 @@ $valid-color: var(--green) !default;
   font-size: unset;
   line-height: inherit;
 
-  &:focus { outline: 1px solid ButtonText, 1px audo -webkit-focus-ring-color; }
+  &:focus { outline: 1px solid ButtonText, 1px auto -webkit-focus-ring-color; }
 }
 
 /* Buttons */

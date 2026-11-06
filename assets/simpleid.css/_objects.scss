@@ -64,6 +64,8 @@ label.option { font-weight: normal; }
 @include util.form-check-radio {
   @include util.margin-y(util.size(2));
   margin-inline-end: util.size(2);
+
+  accent-color: var(--brand-color);
   &:focus { outline: 1px auto var(--brand-color); }
 
   table & { margin: 0; }
