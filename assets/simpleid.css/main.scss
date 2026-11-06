@@ -8,6 +8,8 @@
       'shades': (
         '50': -95%,
         '100': -85%,
+        '150': -75%,
+        '175': -70%,
         '200': -65%,
         '300': #444444,
         '400': #666666,
@@ -17,7 +19,8 @@
         '800': #aaaaaa,
         '900': #cccccc,
         '925': #dddddd,
-        '950': #eeeeee
+        '950': #eeeeee,
+        '975': 85%
       )
     ),
     'brand-color': #1144aa,
@@ -32,12 +35,12 @@
   )
 );
 @use 'scaffold/forms' with (
-  $background-color: var(--grey-950),
-  $border-color: var(--grey-800),
-  $hover-color: var(--grey),
-  $disabled-color: var(--grey),
-  $placeholder-color: var(--grey),
-  $button-border-color: var(--grey-700),
+  $box-background-color: light-dark(white, var(--grey-100)),
+  $button-background-color: light-dark(var(--grey-950), var(--grey-150)),
+  $border-color: light-dark(var(--grey-800), var(--grey-300)),
+  $hover-color: light-dark(var(--grey), var(--grey-400)),
+  $disabled-color: light-dark(var(--grey), var(--grey-400)),
+  $placeholder-color: light-dark(var(--grey), var(--grey-400)),
   $default-button-color: var(--brand-color),
   $default-button-border-color: var(--brand-color-dark),
   $error-color: var(--red-500)
@@ -49,5 +52,6 @@
 @use 'utilities';
 
 :root {
+  color-scheme: light dark;
   @include colors.generate-color-scheme;
 }

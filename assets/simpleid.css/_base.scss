@@ -3,11 +3,17 @@
 /* Set global font size ---------------------------------------------------- */
 html { font-size: 14px; }
 
+/* Set global colors ------------------------------------------------------- */
+body { 
+  background-color: light-dark(white, var(--grey-100));
+  color: light-dark(black, var(--grey-950));
+}
+
 /* General elements -------------------------------------------------------- */
 h1 {
   font-weight: normal;
   font-size: util.font-size('2xl');
-  color: var(--grey-400);
+  color: light-dark(var(--grey-400), white);
 }
 
 a {
@@ -34,21 +40,21 @@ table {
 }
 
 td, th {
-  border-bottom: 1px solid var(--grey-900);
+  border-bottom: 1px solid light-dark(var(--grey-900), var(--grey-200));
   text-align: left;
   vertical-align: top;
   padding: util.size(1.5) util.size(2);
 }
 th {
   border-bottom: 0px;
-  background-color: var(--grey-400);
+  background-color: light-dark(var(--grey-400), var(--grey-200));
   color: #FFFFFF;
   white-space: nowrap;
   font-weight: bold;
 }
 
 pre {
-    border:1px solid var(--grey-900);
+    border:1px solid light-dark(var(--grey-900), var(--grey-200));
     padding: 5px;
     font-size: 0.9em;
     white-space: nowrap;

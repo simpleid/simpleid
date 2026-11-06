@@ -14,6 +14,7 @@
 
 /* Header ------------------------------------------------------------------ */
 $header-height: 16;
+$header-background-color-lightmode: var(--grey-400);
 
 .header {
   position: fixed;
@@ -22,8 +23,12 @@ $header-height: 16;
   height: util.size($header-height);
   top: 0;
   @include util.padding-y(util.size(4));
-  background-color: var(--grey-400);
+  background-color: light-dark($header-background-color-lightmode, black);
   color: var(--grey-900);
+
+  @include util.dark-mode {
+    border-bottom: 1px solid light-dark($header-background-color-lightmode, var(--grey-200));
+  }
 
   @include dialog { height: auto; }
 
@@ -193,14 +198,16 @@ $header-nav-menu-width: 64;
   @include util.padding-y(util.size(8));
 
   @include dialog {
-    background-color: white;
+    background-color: light-dark(white, var(--grey-100));
     @include util.padding-x(util.size(8));
 
     @include util.breakpoint('sm') {
       @include util.margin-y(util.size(8));
       @include util.container('sm');
-      border: 1px solid var(--grey-900);
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      border: 1px solid light-dark(var(--grey-900), var(--grey-200));
+      box-shadow:
+        0 4px 6px -1px light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.1)),
+        0 2px 4px -1px light-dark(rgba(0, 0, 0, 0.06), rgba(255, 255, 255, 0.06));
     }
 
     @include util.breakpoint('md') { @include util.margin-y(util.size(16)); }
@@ -230,7 +237,7 @@ $header-nav-menu-width: 64;
 }
 
 /* Dialog pages ------------------------------------------------- */
-body.is-dialog-page { background: var(--grey-950); }
+body.is-dialog-page { background: light-dark(var(--grey-950), black); }
 .is-dialog-page {
   @include util.form-all-boxes { width: 100%; }
 
@@ -246,21 +253,21 @@ body.is-dialog-page { background: var(--grey-950); }
 .message {
   padding: util.size(4) util.size(4);
   @include util.margin-y(util.size(4));
-  background-color: var(--grey-925);
-  border: 1px solid var(--grey-400);
+  background-color: light-dark(var(--grey-925), var(--grey-175));
+  border: 1px solid light-dark(var(--grey-400), var(--grey-700));
   border-radius: 4px;
 
   &.success {
-    background-color: var(--green-950);
+    background-color: light-dark(var(--green-950), var(--green-200));
     border-color: var(--green-400);
   }
   &.warning {
-    background-color: var(--red-950);
+    background-color: light-dark(var(--red-950), var(--red-200));
     border-color: var(--red-400);
   }
   &.status {
-    background-color: var(--grey-950);
-    border-color: var(--grey-900);
+    background-color: light-dark(var(--grey-950), var(--grey-200));
+    border-color: light-dark(var(--grey-900), var(--grey-400));
   }
 }
 .message p { line-height: util.leading(tight); }
