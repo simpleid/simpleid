@@ -47,6 +47,7 @@ tests:
 
     - array:
         content: '{{ @form_content | raw }}'
+        id: auth_uid
       push: forms.identity
 
     - template: auth_password.html
@@ -57,6 +58,7 @@ tests:
 
     - array:
         content: '{{ @form_content | raw }}'
+        id: auth_password
       push: forms.default
 
     - template: auth_rememberme.html
@@ -64,6 +66,7 @@ tests:
 
     - array:
         content: '{{ @form_content | raw }}'
+        id: auth_rememberme
       push: forms.options
 
     - template: page.html
@@ -71,10 +74,13 @@ tests:
         page_class: is-dialog-page
         layout: auth_login.html
         show_divider: true
-        fs: ''
-        tk: ''
-        mode: 3
-        identify_url: ''
+        login_app_options:
+          fs: ''
+          tk: ''
+          mode: 3
+          identifyUrl: ''
+          activeBlock: auth_uid
+          blocks: {}
         message: The user name or password is not correct.
 
   auth_otp.html:
@@ -86,6 +92,7 @@ tests:
 
     - array:
         content: '{{ @form_content | raw }}'
+        id: auth_uid
       push: forms.identity
 
     - template: auth_otp.html
@@ -96,16 +103,20 @@ tests:
 
     - array:
         content: '{{ @form_content | raw }}'
+        id: auth_otp
       push: forms.default
 
     - template: page.html
       variables:
         page_class: is-dialog-page
         layout: auth_login.html
-        fs: ''
-        tk: ''
-        mode: 5
-        identify_url: ''
+        login_app_options:
+          fs: ''
+          tk: ''
+          mode: 5
+          identifyUrl: ''
+          activeBlock: auth_otp
+          blocks: {}
 
   auth_otp_setup.html:
     - template: page.html

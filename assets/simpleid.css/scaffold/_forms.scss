@@ -2,13 +2,13 @@
 
 @use 'util';
 
-$background-color: #eee !default;
+$box-background-color: #ffffff !default;
+$button-background-color: #eee !default;
 $border-color: #ccc !default;
 $hover-color: #888 !default;
 $focus-color: var(--brand-color) !default;
 $disabled-color: #888 !default;
 $placeholder-color: #888 !default;
-$button-border-color: #ccc !default;
 $default-button-color: var(--brand-color) !default;
 $default-button-border-color: var(--brand-color) !default;
 $error-color: var(--red) !default;
@@ -17,7 +17,7 @@ $valid-color: var(--green) !default;
 /* Box-like widgets */
 @include util.form-all-boxes {
   appearance: none;
-  background-color: #ffffff;
+  background-color: $box-background-color;
   border: 1px solid $border-color;
   @include util.padding-x(util.size(2));
   @include util.padding-y(util.size(1));
@@ -27,8 +27,8 @@ $valid-color: var(--green) !default;
   &.is-error { border-color: $error-color !important; }
   &.is-valid { border-color: $valid-color; }
 
-  &:focus { 
-    outline-width: 0;
+  &:focus {
+    outline: none;
     border-color: $focus-color; 
   }
 }
@@ -110,7 +110,7 @@ $valid-color: var(--green) !default;
   font-size: unset;
   line-height: inherit;
 
-  &:focus { outline: 1px solid ButtonText, 1px audo -webkit-focus-ring-color; }
+  &:focus { outline: 1px solid ButtonText, 1px auto -webkit-focus-ring-color; }
 }
 
 /* Buttons */
@@ -120,7 +120,7 @@ $valid-color: var(--green) !default;
   margin-inline-end: util.size(2);
   margin-block-end: util.size(2);
 
-  background-color: $background-color;
+  background-color: $button-background-color;
   border: 1px solid $border-color;
   cursor: pointer;
   font-weight: util.font-weight(medium);
@@ -132,7 +132,7 @@ $valid-color: var(--green) !default;
   &:active { box-shadow: 0 0 0 1px rgba(0,0,0, 0.15) inset, 0 0 6px rgba(0,0,0, 0.20) inset; }
 
   &[disabled] {
-    background-color: $background-color !important;
+    background-color: $button-background-color !important;
     border-color: $border-color !important;
     color: $disabled-color !important;
   }
@@ -230,7 +230,7 @@ $valid-color: var(--green) !default;
   // .is-subtle
   .is-subtle {
     color: $placeholder-color;
-    background-color: $background-color;
+    background-color: $button-background-color;
     font-weight: util.font-weight(normal);
   }
 }

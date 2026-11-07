@@ -64,7 +64,9 @@ label.option { font-weight: normal; }
 @include util.form-check-radio {
   @include util.margin-y(util.size(2));
   margin-inline-end: util.size(2);
-  &:focus { outline: 1px auto var(--brand-color); }
+
+  accent-color: light-dark(var(--brand-color), var(--brand-color-dark-mode));
+  &:focus { outline: 1px auto light-dark(var(--brand-color), var(--brand-color-dark-mode)); }
 
   table & { margin: 0; }
 }
@@ -89,12 +91,12 @@ label.option { font-weight: normal; }
   display: flex;
   align-items: center;
   //text-transform: uppercase;
-  color: var(--grey-400);
+  color: light-dark(var(--grey-400), var(--grey-700));
 
   &::before, &::after {
     content: "";
     flex: 1;
-    border-bottom: 1px solid var(--grey-800);
+    border-bottom: 1px solid light-dark(var(--grey-800), var(--grey-300));
   }
   &::before { margin-right: util.size(2); }
   &::after { margin-left: util.size(2); }
@@ -114,18 +116,18 @@ label.option { font-weight: normal; }
 /* ----- Table lists ------------------------------------ */
 .table-list {
   tr.table-list-item { 
-    border-bottom: 1px solid var(--grey-900); 
-    &.u-first { border-top: 1px solid var(--grey-900); }
+    border-bottom: 1px solid light-dark(var(--grey-900), var(--grey-200)); 
+    &.u-first { border-top: 1px solid light-dark(var(--grey-900), var(--grey-200)); }
   }
   td { border-bottom: 0px; }
   td.table-list-item--actions {
     text-align: right;
     vertical-align: middle;
   }
-  .table-list-item--description { color: var(--grey-400); }
+  .table-list-item--description { color: light-dark(var(--grey-400), var(--grey-700)); }
   .table-list-item--details {
     margin-top: util.size(2);
-    color: var(--grey-400);
+    color: light-dark(var(--grey-400), var(--grey-700));
   }
 }
 
@@ -142,19 +144,19 @@ label.option { font-weight: normal; }
     background: transparent;
     font-weight: util.font-weight(medium);
     font-size: util.font-size('lg');
-    color: var(--grey-400);
+    color: light-dark(var(--grey-400), var(--grey-700));
     svg, span { vertical-align: middle; }
   }
 }
 
 /* ----- Client URLs ------------------------------------ */
-.url-elide { color: var(--grey-700); }
+.url-elide { color: light-dark(var(--grey-700), var(--grey-400)); }
 
 /* ----- Loading spinners ------------------------------- */
 .loading-spinner {
   margin: util.size(8) auto;
-  border: util.size(2) solid var(--grey-950);
-  border-top-color: var(--grey-700);
+  border: util.size(2) solid light-dark(var(--grey-950), var(--grey-150));
+  border-top-color: light-dark(var(--grey-700), var(--grey-400));
   border-radius: 50%;
   width: util.size(14);
   height: util.size(14);

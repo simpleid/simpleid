@@ -14,6 +14,8 @@
 
 /* Header ------------------------------------------------------------------ */
 $header-height: 16;
+$header-background-color-lightmode: var(--grey-400);
+$header-color: light-dark(var(--grey-900), var(--grey-600));
 
 .header {
   position: fixed;
@@ -22,8 +24,12 @@ $header-height: 16;
   height: util.size($header-height);
   top: 0;
   @include util.padding-y(util.size(4));
-  background-color: var(--grey-400);
-  color: var(--grey-900);
+  background-color: light-dark($header-background-color-lightmode, black);
+  color: $header-color;
+
+  @include util.dark-mode {
+    border-bottom: 1px solid light-dark($header-background-color-lightmode, var(--grey-200));
+  }
 
   @include dialog { height: auto; }
 
@@ -37,6 +43,7 @@ $header-height: 16;
 /* Navigation menu --------------------------------------------------------- */
 $header-nav-bp: lg;
 $header-nav-menu-width: 64;
+$header-nav-button-color: light-dark(white, var(--grey-700));
 
 .header-nav {
   display: flex;
@@ -49,7 +56,7 @@ $header-nav-menu-width: 64;
     margin-block-end: 0;
     background-color: transparent;
     border: 0;
-    color: white;
+    color: $header-nav-button-color;
 
     &:active { box-shadow: none; }
   }
@@ -80,7 +87,7 @@ $header-nav-menu-width: 64;
   padding: 0;
   font-weight: bold;
   font-size: util.font-size('lg');
-  color: var(--grey-900);
+  color: $header-color;
   letter-spacing: 0;
 
   a {
@@ -104,7 +111,7 @@ $header-nav-menu-width: 64;
   margin-left: util.size(4);
 
   svg, img {
-    border: 2px solid white;
+    border: 2px solid $header-nav-button-color;
     border-radius: 50%;
   }
 }
@@ -116,7 +123,7 @@ $header-nav-menu-width: 64;
   width: 0;
   overflow: hidden;
   height: 100%;
-  background-color: var(--grey-300);
+  background-color: light-dark(var(--grey-300), var(--grey-150));
   transition-property: all;
   transition-duration: 0.3s;
 
@@ -124,6 +131,10 @@ $header-nav-menu-width: 64;
     width: util.size($header-nav-menu-width);
     overflow: auto;
     transition-property: none;
+  }
+
+  @include util.dark-mode {
+    border-right: 1px solid light-dark(var(--grey-300), var(--grey-200));
   }
 
   &.is-open {
@@ -153,19 +164,25 @@ $header-nav-menu-width: 64;
   top: util.size($header-height);
   right: 0;
   width: util.size($header-nav-menu-width);
-  background-color: var(--grey-400);
+  background-color: light-dark(var(--grey-400), black);
 
   overflow: hidden;
   height: 0;
-  transition-property: all;
+  transition-property: height, overflow;
   transition-duration: 0.3s;
 
   &.is-open {
     height: auto;
     overflow: auto;
-    transition-property: all;
+    transition-property: height, overflow;
     transition-duration: 0.3s;
+
+    @include util.dark-mode {
+      border: 1px solid light-dark(var(--grey-400), var(--grey-200));
+    }
   }
+
+  .header-nav--links a:hover { background-color: light-dark(var(--grey), var(--grey-100)); }
 }
 
 .header-nav--links {
@@ -181,7 +198,7 @@ $header-nav-menu-width: 64;
     border-bottom: 0;
 
     &:hover {
-      background-color: var(--grey);
+      background-color: light-dark(var(--grey), var(--grey-200));
     }
   }
 }
@@ -193,14 +210,16 @@ $header-nav-menu-width: 64;
   @include util.padding-y(util.size(8));
 
   @include dialog {
-    background-color: white;
+    background-color: light-dark(white, var(--grey-100));
     @include util.padding-x(util.size(8));
 
     @include util.breakpoint('sm') {
       @include util.margin-y(util.size(8));
       @include util.container('sm');
-      border: 1px solid var(--grey-900);
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      border: 1px solid light-dark(var(--grey-900), var(--grey-200));
+      box-shadow:
+        0 4px 6px -1px light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.1)),
+        0 2px 4px -1px light-dark(rgba(0, 0, 0, 0.06), rgba(255, 255, 255, 0.06));
     }
 
     @include util.breakpoint('md') { @include util.margin-y(util.size(16)); }
@@ -217,20 +236,20 @@ $header-nav-menu-width: 64;
   margin-bottom: util.size(4);
   text-align: right;
   font-size: util.font-size('sm');
-  color: var(--grey);
+  color: light-dark(var(--grey), var(--grey-500));
 
   address { font-style: normal }
   a { 
-    color: var(--grey-700);
+    color: light-dark(var(--grey-700), var(--grey));
     &:hover { 
-      color: var(--grey-400);
-      border-bottom-color: var(--grey-400); 
+      color: light-dark(var(--grey-400), var(--grey-900));
+      border-bottom-color: light-dark(var(--grey-400), var(--grey-900)); 
     }
   }
 }
 
 /* Dialog pages ------------------------------------------------- */
-body.is-dialog-page { background: var(--grey-950); }
+body.is-dialog-page { background: light-dark(var(--grey-950), black); }
 .is-dialog-page {
   @include util.form-all-boxes { width: 100%; }
 
@@ -246,32 +265,32 @@ body.is-dialog-page { background: var(--grey-950); }
 .message {
   padding: util.size(4) util.size(4);
   @include util.margin-y(util.size(4));
-  background-color: var(--grey-925);
-  border: 1px solid var(--grey-400);
+  background-color: light-dark(var(--grey-925), var(--grey-175));
+  border: 1px solid light-dark(var(--grey-400), var(--grey-700));
   border-radius: 4px;
 
   &.success {
-    background-color: var(--green-950);
+    background-color: light-dark(var(--green-950), var(--green-200));
     border-color: var(--green-400);
   }
   &.warning {
-    background-color: var(--red-950);
+    background-color: light-dark(var(--red-950), var(--red-200));
     border-color: var(--red-400);
   }
   &.status {
-    background-color: var(--grey-950);
-    border-color: var(--grey-900);
+    background-color: light-dark(var(--grey-950), var(--grey-200));
+    border-color: light-dark(var(--grey-900), var(--grey-400));
   }
 }
 .message p { line-height: util.leading(tight); }
 
 /* Dashboard blocks --------------------------------------------- */
 .block {
-  background-color: var(--grey-950);
+  background-color: light-dark(var(--grey-950), var(--grey-150));
   @include util.margin-y(util.size(8));
 }
 .block--header {
-  background-color: var(--grey-400);
+  background-color: light-dark(var(--grey-400), var(--grey-300));
   padding: util.size(1) util.size(4);
 
   h2 {
@@ -348,8 +367,8 @@ body.is-dialog-page { background: var(--grey-950); }
   font-weight: util.font-weight(bold);
   font-size: util.font-size(xl);
 
-  &.is-original-version { color: var(--grey-400); }
-  &.is-this-version { color: var(--brand-color-light); }
+  &.is-original-version { color: light-dark(var(--grey-400), var(--grey-700)); }
+  &.is-this-version { color: light-dark(var(--brand-color-lt), var(--brand-color-dark-mode)); }
 }
 
 .upgrade--error {
@@ -361,6 +380,6 @@ body.is-dialog-page { background: var(--grey-950); }
 .upgrade--results {
   overflow: auto;
   height: 200px;
-  border: 1px solid var(--grey-400);
-  background-color: var(--grey-950);
+  border: 1px solid light-dark(var(--grey-400), var(--grey-200));
+  background-color: light-dark(var(--grey-950), var(--grey-150));
 }

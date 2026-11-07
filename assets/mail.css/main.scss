@@ -22,7 +22,7 @@ h2 {
     font-weight: bold;
 }
 
-h1, h2, h3 { color: string.unquote('{{ @lightmode.content_heading }}'); }
+h1, h2, h3 { color: string.unquote('{{ @lightmode.content_heading }}')/**/; }
 
 @media (prefers-color-scheme: dark) {
     .callout-td, .callout-div {
