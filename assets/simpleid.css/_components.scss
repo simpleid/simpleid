@@ -172,14 +172,14 @@ $header-nav-button-color: light-dark(white, var(--grey-700));
   transition-duration: 0.3s;
 
   &.is-open {
-    @include util.dark-mode {
-      border: 1px solid light-dark(var(--grey-400), var(--grey-200));
-    }
-
     height: auto;
     overflow: auto;
     transition-property: height, overflow;
     transition-duration: 0.3s;
+
+    @include util.dark-mode {
+      border: 1px solid light-dark(var(--grey-400), var(--grey-200));
+    }
   }
 
   .header-nav--links a:hover { background-color: light-dark(var(--grey), var(--grey-100)); }
@@ -368,7 +368,7 @@ body.is-dialog-page { background: light-dark(var(--grey-950), black); }
   font-size: util.font-size(xl);
 
   &.is-original-version { color: var(--grey-400); }
-  &.is-this-version { color: var(--brand-color-light); }
+  &.is-this-version { color: var(--brand-color-lt); }
 }
 
 .upgrade--error {

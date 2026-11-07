@@ -65,8 +65,8 @@ label.option { font-weight: normal; }
   @include util.margin-y(util.size(2));
   margin-inline-end: util.size(2);
 
-  accent-color: var(--brand-color);
-  &:focus { outline: 1px auto var(--brand-color); }
+  accent-color: light-dark(var(--brand-color), var(--brand-color-dark-mode));
+  &:focus { outline: 1px auto light-dark(var(--brand-color), var(--brand-color-dark-mode)); }
 
   table & { margin: 0; }
 }

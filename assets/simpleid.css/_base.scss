@@ -18,17 +18,18 @@ h1 {
 
 a {
   border-bottom: 1px solid light-dark(var(--grey-900), var(--grey-200));
-  color: var(--brand-color);
+  color: light-dark(var(--brand-color), var(--brand-color-dark-mode));
   text-decoration: none !important;
   font-weight: util.font-weight(bold);
 
   &:visited {
     border-color: light-dark(var(--grey-900), var(--grey-200));
-    color: var(--brand-color-dark);
+    color: light-dark(var(--brand-color-dk), var(--brand-color-dk-dark-mode));
   }
   &:focus, &:hover {
-    border-color: var(--brand-color-light);
-    color: var(--brand-color-light);
+    // In dark mode, we highlight the underline rather than changing the colour of the text.
+    border-color: light-dark(var(--brand-color-lt), var(--brand-color-dark-mode));
+    color: light-dark(var(--brand-color-lt), var(--brand-color-dark-mode));
   }
 }
 
