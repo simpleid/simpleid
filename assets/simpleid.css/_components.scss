@@ -367,8 +367,8 @@ body.is-dialog-page { background: light-dark(var(--grey-950), black); }
   font-weight: util.font-weight(bold);
   font-size: util.font-size(xl);
 
-  &.is-original-version { color: var(--grey-400); }
-  &.is-this-version { color: var(--brand-color-lt); }
+  &.is-original-version { color: light-dark(var(--grey-400), var(--grey-700)); }
+  &.is-this-version { color: light-dark(var(--brand-color-lt), var(--brand-color-dark-mode)); }
 }
 
 .upgrade--error {
@@ -380,6 +380,6 @@ body.is-dialog-page { background: light-dark(var(--grey-950), black); }
 .upgrade--results {
   overflow: auto;
   height: 200px;
-  border: 1px solid var(--grey-400);
-  background-color: var(--grey-950);
+  border: 1px solid light-dark(var(--grey-400), var(--grey-200));
+  background-color: light-dark(var(--grey-950), var(--grey-150));
 }
