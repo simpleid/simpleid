@@ -258,3 +258,12 @@ connect: {} # Remove empty braces if you wish to fill in this section
     # SimpleID
     #
     #post_logout_redirect_uri: https://sample.application.example.com/logout
+
+
+proxyforward:  {} # Remove empty braces if you wish to fill in this section
+    #
+    # List of origins (consisting of the URI scheme and the host name)
+    # for the proxy forwarded URLs that are permitted to be authorised by
+    # this client.
+    #
+    #allowed_origins: []
