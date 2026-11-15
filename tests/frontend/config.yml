@@ -207,6 +207,28 @@ tests:
           display_name: Test user
         logout_destination: /
 
+  dashboard_alert.html:
+    - array:
+        id: welcome
+        title: '{{ @intl.core.my.welcome_title | raw }}'
+        content: "{{ @intl.core.my.logged_in_as, 'test', 'test' | format, raw }}"
+      push: blocks
+
+    - template: page.html
+      variables:
+        alert: This is a sample alert with a very very very very very very very very very very long string.
+        layout: my_blocks.html
+        nav:
+          - name: Dashboard
+            path: ''
+          - name: My profile
+            path: ''
+        user_header: true
+        user:
+          uid: test
+          display_name: Test user
+        logout_destination: /
+
   post.html:
     - template: page.html
       variables:
