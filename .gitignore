@@ -1,5 +1,4 @@
 composer.site.json
-composer.lock
 .phpunit.result.cache
 
 node_modules/
