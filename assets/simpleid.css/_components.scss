@@ -5,11 +5,25 @@
 }
 
 /* Alert bar --------------------------------------------------------------- */
+$alert-height: 12;
+
+:root { --alert-height: 0rem; }
+
+body:has(> .alert) { --alert-height: #{util.size($alert-height)}; }
+
 .alert {
-  padding: util.size(6) util.size(2);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 11;
+  width: 100%;
+  height: util.size($alert-height);
+  display: flex;
+  align-items: center;
   background-color: var(--red-400);
   color: white;
   text-align: center;
+  overflow-x: scroll;
 }
 
 /* Header ------------------------------------------------------------------ */
@@ -22,7 +36,7 @@ $header-color: light-dark(var(--grey-900), var(--grey-600));
   z-index: 10;
   width: 100%;
   height: util.size($header-height);
-  top: 0;
+  top: var(--alert-height);
   @include util.padding-y(util.size(4));
   background-color: light-dark($header-background-color-lightmode, black);
   color: $header-color;
@@ -118,7 +132,7 @@ $header-nav-button-color: light-dark(white, var(--grey-700));
 
 .header-nav--nav-menu {
   position: fixed;
-  top: util.size($header-height);
+  top: calc(util.size($header-height) + var(--alert-height));
   left: 0;
   width: 0;
   overflow: hidden;
@@ -161,7 +175,7 @@ $header-nav-button-color: light-dark(white, var(--grey-700));
 
 .header-nav--user-menu {
   position: fixed;
-  top: util.size($header-height);
+  top: calc(util.size($header-height) + var(--alert-height));
   right: 0;
   width: util.size($header-nav-menu-width);
   background-color: light-dark(var(--grey-400), black);
@@ -204,7 +218,7 @@ $header-nav-button-color: light-dark(white, var(--grey-700));
 }
 
 /* Content ------------------------------------------------------ */
-.content { top: util.size($header-height); }
+.content { top: calc(util.size($header-height) + var(--alert-height)); }
 
 .content--main .wrapper {
   @include util.padding-y(util.size(8));
