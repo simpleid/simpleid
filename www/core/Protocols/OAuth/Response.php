@@ -178,7 +178,7 @@ class Response extends ArrayWrapper {
         if ($this->response_mode == self::FORM_POST_RESPONSE_MODE) $this->renderFormPost($redirect_uri);
 
         $parts = parse_url($redirect_uri);
-        if (!isset($parts['scheme'])) {
+        if (($parts === false) || !isset($parts['scheme'])) {
             $this->setError('server_error', 'redirect_uri must contain a scheme');
             $this->renderJSON();
             return;
@@ -194,9 +194,6 @@ class Response extends ArrayWrapper {
             // 3. The URL may already have a query and a fragment.  If this is so, we
             //    need to slot in the new query string properly.  We disassemble and
             //    reconstruct the URL.
-            if ($parts == false) {
-                $url = $redirect_uri;
-            } else {
                 $url = $parts['scheme'] . '://';
                 if (isset($parts['user'])) {
                     $url .= $parts['user'];
@@ -221,7 +218,7 @@ class Response extends ArrayWrapper {
                         $url .= '#' . $parts['fragment'] . '&' . $query;
                     }
                 }
-            }
+            
         }
         
         if (isset($parts['scheme']) && ((strtolower($parts['scheme']) == 'https') || (strtolower($parts['scheme']) == 'http'))) {
