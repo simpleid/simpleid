@@ -7,6 +7,9 @@
     "features": {
         "ghcr.io/devcontainers/features/node:1": {
           "version": "22"
+        },
+        "ghcr.io/opencodeco/devcontainers/install-php-extensions:0": {
+            "extensions": "bcmath, gmp, xdebug, intl"
         }
     },
 
@@ -21,7 +24,6 @@
             
             // Add the IDs of extensions you want installed when the container is created.
             "extensions": [
-                "xdebug.php-debug",
                 "bmewburn.vscode-intelephense-client",
                 "mrmlnc.vscode-apache",
                 "Kasik96.latte"
@@ -30,7 +32,7 @@
     },
 
     // Use 'forwardPorts' to make a list of ports inside the container available locally.
-    "forwardPorts": [4000],
+    "forwardPorts": [4000, 8080],
 
     "portsAttributes": {
         "4000": {
@@ -39,7 +41,7 @@
     },
 
     // Use 'postCreateCommand' to run commands after the container is created.
-    "postCreateCommand": "sudo curl -sSLf -o /usr/local/bin/install-php-extensions https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions && sudo chmod +x /usr/local/bin/install-php-extensions && sudo PHP_INI_DIR=/usr/local/etc/php install-php-extensions bcmath gmp xdebug intl && composer install && npm install"
+    "postCreateCommand": ".devcontainer/postcreate.sh"
 
     // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
     // "remoteUser": "root"
