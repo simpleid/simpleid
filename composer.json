@@ -23,7 +23,7 @@
         "kelvinmo/f3-event-dispatcher": "^1.0",
         "robinvdvleuten/ulid": "^5.0",
         "tuupola/branca": "^2.3",
-        "symfony/yaml": "^6.0",
+        "symfony/yaml": "^7.4 || ^8.1",
         "erusev/parsedown": "^1.0",
         "cweagans/composer-patches": "^2.0"
     },
