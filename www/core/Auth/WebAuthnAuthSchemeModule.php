@@ -102,7 +102,7 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
         print json_encode([
             'challenge' => $challenge,
             'nonce' => $nonce,
-            'expires_in' => SIMPLEID_HUMAN_TOKEN_EXPIRES_IN,
+            'expires_in' => SecurityToken::NONCE_EXPIRES_IN,
         ]);
     }
 
@@ -253,7 +253,7 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
             'authenticatorSelection' => [
                 'userVerification' => 'preferred'
             ],
-            'timeout' => SIMPLEID_HUMAN_TOKEN_EXPIRES_IN,
+            'timeout' => SIMPLEID_USER_PRESENT_EXPIRES_IN * 1000, // milliseconds
             'attestation' => 'none',
         ];
         if (isset($user['webauthn']['credentials']))
@@ -370,7 +370,7 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
                 'mediation' => 'required',
                 'publicKey' => [
                     'userVerification' => 'required',
-                    'timeout' => 30000,
+                    'timeout' => SIMPLEID_USER_PRESENT_EXPIRES_IN * 1000, // milliseconds
                     'rpId' => $this->getRpId(),
                     'allowCredentials' => $allow_credentials
                 ]

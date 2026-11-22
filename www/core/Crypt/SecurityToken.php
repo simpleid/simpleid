@@ -57,6 +57,9 @@ class SecurityToken {
     /** The security token can only be verified once */
     const OPTION_NONCE = 2;
 
+    /** The maximum time in which a security token with OPTION_NONCE can be consumed */
+    const NONCE_EXPIRES_IN = SIMPLEID_MEDIUM_TOKEN_EXPIRES_IN;
+
     /** @var Branca the branca token generator */
     private $branca;
 
@@ -173,7 +176,7 @@ class SecurityToken {
             if (($options & self::OPTION_NONCE) == self::OPTION_NONCE) {
                 $cache = \Cache::instance();
                 $cache_name = rawurlencode($this->data['i']) . '.token';
-                $cache->set($cache_name, $token, SIMPLEID_HUMAN_TOKEN_EXPIRES_IN);
+                $cache->set($cache_name, $token, self::NONCE_EXPIRES_IN);
             }
 
             return $token;

@@ -23,13 +23,31 @@ include_once 'version.inc.php';
 $class_loader = include_once('vendor/autoload.php');
 
 // 1. Constants
+/** Used for extremely short-lived machine-to-machine tokens, such as authorisation codes */
 const SIMPLEID_INSTANT_TOKEN_EXPIRES_IN = 60;
+
+/** 
+ * Used for user interactions where the user should be present at all times
+ * (e.g. passkeys, one time codes, confirmation emails).
+ */
+const SIMPLEID_USER_PRESENT_EXPIRES_IN = 600;
+
+/** Used for short-lived tokens, such as access tokens and OpenID associations */
 const SIMPLEID_SHORT_TOKEN_EXPIRES_IN = 3600;
-const SIMPLEID_HUMAN_TOKEN_EXPIRES_IN = 43200;
+
+/** Used for medium-lived tokens, such as timeouts for nonces */
+const SIMPLEID_MEDIUM_TOKEN_EXPIRES_IN = 43200;
+
+/** Used for long-lived tokens, such as remember-me cookies and ID tokens */
 const SIMPLEID_LONG_TOKEN_EXPIRES_IN = 1209600;
 const SIMPLEID_LONG_TOKEN_EXPIRES_BUFFER = 300;
-// SIMPLEID_ETERNAL_TOKEN_EXPIRES_IN is set to 400 days, which is the 
-// browser-imposed maximum limit for long life cookies
+
+/** 
+ * Used for tokens that theoretically should last forever, such as UAIDs.
+ *
+ * This is set to 400 days, which is the 
+ * browser-imposed maximum limit for long life cookies.
+ */
 const SIMPLEID_ETERNAL_TOKEN_EXPIRES_IN = 34560000;
 
 
