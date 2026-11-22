@@ -58,7 +58,7 @@ class SecurityToken {
     const OPTION_NONCE = 2;
 
     /** The maximum time in which a security token with OPTION_NONCE can be consumed */
-    const NONCE_EXPIRES_IN = SIMPLEID_HUMAN_TOKEN_EXPIRES_IN;
+    const NONCE_EXPIRES_IN = SIMPLEID_MEDIUM_TOKEN_EXPIRES_IN;
 
     /** @var Branca the branca token generator */
     private $branca;
