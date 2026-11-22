@@ -129,7 +129,7 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
 
         $auth = AuthManager::instance();
         $user = $auth->getUser();
-        $results = $this->getSavedCredentials($user, true);
+        $results = $this->getSavedCredentials($user, null, true);
 
         print json_encode($results);
     }
@@ -349,13 +349,15 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
 
                 /** @var \SimpleID\Models\User $test_user */
                 $test_user = $store->loadUser($form_state['uid']);
-                if (!isset($test_user['webauthn'])) return;
+                if (!$test_user->exists('webauthn.credentials')) return;
                 /*if ($test_user['otp']['type'] == 'recovery') return;*/
+
+                // Check whether at least one saved credential has a use of USE_VERIFY
+                $allow_credentials = $this->getSavedCredentials($test_user, self::USE_VERIFY);
+                if (count($allow_credentials) == 0) return;
 
                 $uaid = $auth->assignUAID();
                 if ($test_user->exists('webauthn.remember') && in_array($uaid, $test_user->get('webauthn.remember'))) return;
-
-                $allow_credentials = $this->getSavedCredentials($test_user);
 
                 $this->f3->set('otp_recovery_url', 'https://simpleid.org/docs/2/common-problems/#otp');
 
@@ -757,18 +759,31 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
     /**
      * Retrieves saved credentials for a specified user.
      * 
+     * The `$use` parameter can be set to return only credentials for a particular
+     * use (either `WebAuthnAuthSchemeModule::USE_PASSKEY` or 
+     * `WebAuthnAuthSchemeModule::USE_VERIFY`).
+     * 
      * The `$include_details` parameter can be set to determine whether
      * additional details (such as the display name and usage information) are
      * returned.  When using the Credentials browser API, `$include_details`
      * should be set to false.
      * 
      * @param User $user the user
+     * @param ?string $use filter for a particular use, or null to return all credentials
      * @param bool $include_details whether additional details are included in the result
      * @return array<array<string, mixed>> the credentials
      */
-    protected function getSavedCredentials(User $user, bool $include_details = false): array {
+    protected function getSavedCredentials(User $user, ?string $use = null, bool $include_details = false): array {
         if (!$user->exists('webauthn.credentials') || (count($user->get('webauthn.credentials')) == 0))
             return [];
+
+        if ($use == null) {
+            $credentials = array_values($user->get('webauthn.credentials'));
+        } else {
+            $credentials = array_filter(array_values($user->get('webauthn.credentials')), function ($credential) use ($use) {
+                return ($credential['use'] == $use);
+            });
+        }
 
         return array_map(function($credential) use ($include_details) {
             $result = [
@@ -782,7 +797,7 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
                 $result['activity'] = $credential['activity'];
             }
             return $result;
-        }, array_values($user->get('webauthn.credentials')));
+        }, array_values($credentials)); // array_values() is still needed because array_filter() may leave gaps
     }
 }
 ?>
