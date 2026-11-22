@@ -102,7 +102,7 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
         print json_encode([
             'challenge' => $challenge,
             'nonce' => $nonce,
-            'expires_in' => SIMPLEID_HUMAN_TOKEN_EXPIRES_IN,
+            'expires_in' => SecurityToken::NONCE_EXPIRES_IN,
         ]);
     }
 
