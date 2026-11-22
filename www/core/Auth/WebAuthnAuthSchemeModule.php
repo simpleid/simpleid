@@ -357,7 +357,7 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
 
                 $allow_credentials = $this->getSavedCredentials($test_user);
 
-                $this->f3->set('otp_recovery_url', 'https://simpleid.org/docs/2/common_problems/#otp');
+                $this->f3->set('otp_recovery_url', 'https://simpleid.org/docs/2/common-problems/#otp');
 
                 $additional = [ 'showSubmitButton' => false, 'title' => $this->f3->get('intl.core.auth_webauthn.verify_block_title') ];
 
