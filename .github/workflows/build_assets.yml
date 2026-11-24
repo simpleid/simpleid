@@ -6,6 +6,7 @@ on:
     paths:
       - 'assets/**'
       - 'build/build_assets.js'
+      - 'package.json'
 
 jobs:
   build:
