@@ -257,12 +257,19 @@ class MyModule extends Module {
         ]);
 
         if ($this->f3->get('config.debug')) {
-            $event->addBlock('auth', '<pre class="code">' . $this->f3->encode($auth->toString()) . '</pre>', 10, [
-                'title' => $this->f3->get('intl.core.my.debug_auth_title')
-            ]);
+            $debug_vars = [];
 
-            $event->addBlock('user', '<pre class="code">' . $this->f3->encode($user->toString()) . '</pre>', 10, [
-                'title' => $this->f3->get('intl.core.my.debug_user_title')
+            if (class_exists('Tracy\\Dumper')) {
+                $debug_vars['auth'] = \Tracy\Dumper::toHtml($auth->dump(), [\Tracy\Dumper::DEPTH => 5]);
+                $debug_vars['user'] = \Tracy\Dumper::toHtml($user->dump(), [\Tracy\Dumper::DEPTH => 5]);
+            } else {
+                $debug_vars['auth'] = '<pre class="code">' . $this->f3->encode(print_r($auth->dump(), true)) . '</pre>';
+                $debug_vars['user'] = '<pre class="code">' . $this->f3->encode(print_r($user->dump(), true)) . '</pre>';
+            }
+
+            $this->f3->set('debug_vars', $debug_vars);
+            $event->addBlock('debug', $tpl->render('my_debug.html', false), 90, [
+                'title' => $this->f3->get('intl.core.my.debug_title')
             ]);
         }
     }

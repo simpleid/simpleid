@@ -30,6 +30,7 @@ use SimpleID\ModuleManager;
 use SimpleID\Store\StoreManager;
 use SimpleID\Crypt\Random;
 use SimpleID\Crypt\OpaqueIdentifier;
+use SimpleID\Util\Dumpable;
 use SimpleID\Util\Events\BaseDataCollectionEvent;
 use SimpleID\Util\Forms\FormState;
 
@@ -446,10 +447,12 @@ class AuthManager extends Prefab {
     }
 
     /**
-     * @return string
+     * {@inheritdocs}
+     * 
+     * @return mixed
      */
-    public function toString() {
-        return print_r($this->auth_info, true);
+    public function dump(): mixed {
+        return $this->auth_info;
     }
 }
 
