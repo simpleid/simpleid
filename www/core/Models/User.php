@@ -28,6 +28,7 @@ use SimpleID\ModuleManager;
 use SimpleID\Crypt\OpaqueIdentifier;
 use SimpleID\Store\Storable;
 use SimpleID\Util\ArrayWrapper;
+use SimpleID\Util\Dumpable;
 use SimpleID\Util\Events\BaseDataCollectionEvent;
 use SimpleID\Base\UserModule;
 
@@ -291,9 +292,9 @@ class User extends ArrayWrapper implements Serializable, Storable {
      * Returns a string representation of the user, with sensitive
      * information removed.
      * 
-     * @return string
+     * @return mixed
      */
-    public function toString() {
+    public function dump(): mixed {
         $result = [];
         foreach (get_object_vars($this) as $var => $value) {
             if ($var == 'container') {
@@ -303,7 +304,7 @@ class User extends ArrayWrapper implements Serializable, Storable {
             }
         }
         
-        return print_r($result, true);
+        return $result;
     }
 }
 
