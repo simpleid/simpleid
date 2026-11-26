@@ -20,10 +20,12 @@
  */
 
 import Alpine from 'alpinejs';
+import anchor from '@alpinejs/anchor';
 import collapse from '@alpinejs/collapse';
 import Clipboard from '@ryangjchandler/alpine-clipboard';
 import deepmerge from 'deepmerge';
 
+Alpine.plugin(anchor);
 Alpine.plugin(collapse);
 Alpine.plugin(Clipboard);
 
