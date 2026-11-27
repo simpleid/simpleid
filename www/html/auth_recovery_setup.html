@@ -16,14 +16,17 @@
     
     <check if="{{ @@recovery_codes }}">
         <true>
-            <div class="form-item" x-data="{ codes: {{ @@recovery_codes | js, raw }} }">
+            <div class="form-item" x-data="{ codes: {{ @@recovery_codes | js, raw }}, copied: false }">
                 <div class="form-combo">
                     <div class="form-input">
                         <ol>
                     <repeat group="{{ @@recovery_codes }}" value="{{ @code }}"><li><code>{{ @code }}</code></li></repeat>
                 </ol>
                     </div>
-                    <button class="is-subtle" @click.prevent="$clipboard(codes.map((code, idx) => `${idx + 1}. ${code}`).join('\n'))">{{ @intl.common.copy }}</button>
+                    <button class="is-subtle" @click.prevent="$clipboard(codes.map((code, idx) => `${idx + 1}. ${code}`).join('\n')); copied = true; setTimeout(() => copied = false, 2000)">
+                        <span x-show="!copied"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-copy"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></span>
+                        <span x-show="copied"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                    </button>
                 </div>
             </div>
 
