@@ -25,6 +25,7 @@ namespace SimpleID\Auth;
 use SimpleID\ModuleManager;
 use Psr\Log\LogLevel;
 use SimpleID\Auth\AuthManager;
+use SimpleID\Auth\AuthSchemeInfoCollectionEvent;
 use SimpleID\Auth\LoginFormBuildEvent;
 use SimpleID\Crypt\Random;
 use SimpleID\Crypt\SecurityToken;
@@ -297,6 +298,17 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
 
         header('X-Frame-Options: DENY');
         print $tpl->render('page.html');
+    }
+
+    /**
+     * @param AuthSchemeInfoCollectionEvent $event
+     * @return void
+     */
+    public function onAuthSchemeInfoCollectionEvent(AuthSchemeInfoCollectionEvent $event) {
+        $event->addCreateCredentialTypeItem(self::class, $this->f3->get('intl.core.auth_webauthn.menu_title'), AuthManager::MODE_CREDENTIALS, [
+            'type' => AuthSchemeInfoCollectionEvent::ACTION_TYPE_FORM,
+            'url' => 'auth/webauthn'
+        ]);
     }
 
     /**

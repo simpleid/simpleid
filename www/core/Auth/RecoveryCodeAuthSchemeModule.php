@@ -23,6 +23,7 @@
 namespace SimpleID\Auth;
 
 use SimpleID\Auth\AuthManager;
+use SimpleID\Auth\AuthSchemeInfoCollectionEvent;
 use SimpleID\Crypt\Random;
 use SimpleID\Crypt\SecurityToken;
 use SimpleID\Store\StoreManager;
@@ -116,6 +117,23 @@ class RecoveryCodeAuthSchemeModule extends AuthSchemeModule {
 
         header('X-Frame-Options: DENY');
         print $tpl->render('page.html');
+    }
+
+    /**
+     * @param AuthSchemeInfoCollectionEvent $event
+     * @return void
+     */
+    public function onAuthSchemeInfoCollectionEvent(AuthSchemeInfoCollectionEvent $event) {
+        $auth = AuthManager::instance();
+        $user = $auth->getUser();
+
+        if (!isset($user['recovery'])) {
+            $event->addCreateCredentialTypeItem(self::class, $this->f3->get('intl.core.auth_recovery.menu_title'), AuthManager::MODE_VERIFY, [
+                'type' => AuthSchemeInfoCollectionEvent::ACTION_TYPE_FORM,
+                'url' => 'auth/recovery',
+                'params' => [ 'active_block' => 'auth_recovery', 'op' => 'reset' ]
+            ], 10);
+        }
     }
 
     /**

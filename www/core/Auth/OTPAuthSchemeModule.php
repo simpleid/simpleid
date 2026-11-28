@@ -24,6 +24,7 @@ namespace SimpleID\Auth;
 
 use SimpleID\ModuleManager;
 use SimpleID\Auth\AuthManager;
+use SimpleID\Auth\AuthSchemeInfoCollectionEvent;
 use SimpleID\Crypt\BigNum;
 use SimpleID\Crypt\Random;
 use SimpleID\Crypt\SecurityToken;
@@ -156,6 +157,23 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
 
         header('X-Frame-Options: DENY');
         print $tpl->render('page.html');
+    }
+
+    /**
+     * @param AuthSchemeInfoCollectionEvent $event
+     * @return void
+     */
+    public function onAuthSchemeInfoCollectionEvent(AuthSchemeInfoCollectionEvent $event) {
+        $auth = AuthManager::instance();
+        $user = $auth->getUser();
+
+        if (!isset($user['otp'])) {
+            $event->addCreateCredentialTypeItem(self::class, $this->f3->get('intl.core.auth_otp.menu_title'), AuthManager::MODE_VERIFY, [
+                'type' => AuthSchemeInfoCollectionEvent::ACTION_TYPE_FORM,
+                'url' => 'auth/otp',
+                'params' => [ 'op' => 'enable' ]
+            ]);
+        }
     }
 
     /**
