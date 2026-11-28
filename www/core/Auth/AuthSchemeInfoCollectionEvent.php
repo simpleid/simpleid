@@ -93,6 +93,9 @@ class AuthSchemeInfoCollectionEvent extends BaseEvent {
         return array_values(array_map(function($a) { return $a['#data']; }, $this->createCredentialTypes));
     }
 
+    /**
+     * @return array<array<mixed>>
+     */
     public function getUserCredentials(): array {
         uasort($this->userCredentials, [ $this, 'sortByTwoWeights' ]);
         return array_values(array_map(function($a) { return $a['#data']; }, $this->userCredentials));
