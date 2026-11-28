@@ -25,7 +25,8 @@ namespace SimpleID\Auth;
 use SimpleID\Util\Events\BaseEvent;
 
 /**
- * XX
+ * Event dispatched to collect information on the logged-in user's
+ * credentials, as well as options to add new credentials.
  * 
  * @phpstan-type _Action array{type: string, url: string, params?: array<string, mixed>, title?: string, confirm?: string, class?: string|array<string>}
  * @phpstan-type _UserCredential array{id: string, subtype?: string, title?: string, description?: string, first_time?: int, last_time?: int, actions?: array<_Action>}
@@ -43,7 +44,16 @@ class AuthSchemeInfoCollectionEvent extends BaseEvent {
     protected $userCredentials = [];
 
     /**
-     * @param _Action $action
+     * Adds a credential type of the list of credentials that can be
+     * created.
+     * 
+     * @param string $id an ID of the credential type - typically the name
+     * of the authentication scheme module
+     * @param string $title the title of the credential type to be presented
+     * to the user
+     * @param int $mode the mode constant from AuthModule where the credential is used, for sorting purposes
+     * @param _Action $action the action to create the credential
+     * @param int $weight the weight for sorting
      * @return void
      */
     public function addCreateCredentialTypeItem(string $id, string $title, int $mode, array $action, int $weight = 0) {
@@ -60,7 +70,18 @@ class AuthSchemeInfoCollectionEvent extends BaseEvent {
     }
 
     /**
-     * @param array<_UserCredential> $credentials
+     * Adds a list of credentials that are currently saved for the user.
+     * 
+     * @param string $id an ID of the credential type - typically the name
+     * of the authentication scheme module
+     * @param string $title the title of the credential type to be presented
+     * to the user
+     * @param int $mode the mode constant from AuthModule where the credential is used, for sorting purposes
+     * @param array<_UserCredential> $credentials a list of credentials for this
+     * credential type
+     * @param int $weight the weight for sorting
+     * @param bool $allowMultiple whether multiple credentials are allowed to
+     * be saved for this credential type
      * @return void
      */
     public function addUserCredentialList(string $id, string $title, int $mode, array $credentials, int $weight = 0, bool $allowMultiple = false) {
@@ -78,6 +99,8 @@ class AuthSchemeInfoCollectionEvent extends BaseEvent {
     }
 
     /**
+     * Returns a list of credentials that are able to be created.
+     * 
      * @return array<array<mixed>>
      */
     public function getCreateCredentialTypeList(): array {
@@ -94,6 +117,8 @@ class AuthSchemeInfoCollectionEvent extends BaseEvent {
     }
 
     /**
+     * Returns a list of credentials that are currently saved.
+     * 
      * @return array<array<mixed>>
      */
     public function getUserCredentials(): array {
@@ -102,6 +127,12 @@ class AuthSchemeInfoCollectionEvent extends BaseEvent {
     }
 
     /**
+     * Comparison function for where each item is an associative
+     * array with weights specified by keys named `#weight1` and `#weight2`.
+     * 
+     * This function sorts the items by `#weight1`, and then
+     * by weight two `#weight2`.
+     * 
      * @param mixed $a
      * @param mixed $b
      */
