@@ -86,6 +86,9 @@ class MyModule extends Module {
         $this->blocksPage($this->f3->get('intl.core.my.dashboard_title'), 'dashboard_blocks');
     }
 
+    /**
+     * @return void
+     */
     public function credentials() {
         $this->checkHttps('error', true);
 

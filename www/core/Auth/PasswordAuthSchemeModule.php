@@ -25,6 +25,7 @@ namespace SimpleID\Auth;
 use \Bcrypt;
 use Psr\Log\LogLevel;
 use SimpleID\Auth\AuthManager;
+use SimpleID\Auth\AuthSchemeInfoCollectionEvent;
 use SimpleID\Auth\LoginFormBuildEvent;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\Events\BaseDataCollectionEvent;
@@ -42,6 +43,23 @@ use SimpleID\Util\UI\Template;
  * supported.
  */
 class PasswordAuthSchemeModule extends AuthSchemeModule {
+    /**
+     * @param AuthSchemeInfoCollectionEvent $event
+     * @return void
+     */
+    public function onAuthSchemeInfoCollectionEvent(AuthSchemeInfoCollectionEvent $event) {
+        $auth = AuthManager::instance();
+        $user = $auth->getUser();
+
+        if (isset($user['password'])) {
+            $event->addUserCredentialList(self::class, $this->f3->get('intl.core.auth_password.credential_list_title'), AuthManager::MODE_CREDENTIALS, [
+                [
+                    'id' => 'password'
+                ]
+            ]);
+        }
+    }
+
     /**
      * Displays the login form, with input fields for the user name
      * and password

@@ -62,7 +62,6 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
     static function init($f3) {
         $f3->route('GET|POST /auth/webauthn', 'SimpleID\Auth\WebAuthnAuthSchemeModule->setup');
         $f3->route('POST @webauthn_challenge: /auth/webauthn/challenge [ajax]', 'SimpleID\Auth\WebAuthnAuthSchemeModule->createChallenge');
-        $f3->route('GET /auth/webauthn/credentials [ajax]', 'SimpleID\Auth\WebAuthnAuthSchemeModule->listCredentials');
         $f3->map('/auth/webauthn/credentials/@id', 'SimpleID\Auth\WebAuthnAuthSchemeModule');
     }
 
@@ -105,34 +104,6 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
             'nonce' => $nonce,
             'expires_in' => SecurityToken::NONCE_EXPIRES_IN,
         ]);
-    }
-
-    /**
-     * API endpoint to list the saved credentials for the current logged-in
-     * user.
-     * 
-     * @return void
-     */
-    public function listCredentials() {
-        $this->checkHttps('error', true);
-
-        header('Content-Type: application/json');
-
-        $token = new SecurityToken();
-        if (!$this->f3->exists('HEADERS.X-Request-Token') || !$token->verify($this->f3->get('HEADERS.X-Request-Token'), 'webauthn')) {
-            $this->f3->status(401);
-            print json_encode([
-                'error' => 'unauthorized',
-                'error_description' => $this->f3->get('intl.common.unauthorized')
-            ]);
-            return;
-        }
-
-        $auth = AuthManager::instance();
-        $user = $auth->getUser();
-        $results = $this->getSavedCredentials($user, null, true);
-
-        print json_encode($results);
     }
 
     /**
@@ -305,35 +276,39 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
      * @return void
      */
     public function onAuthSchemeInfoCollectionEvent(AuthSchemeInfoCollectionEvent $event) {
+        $auth = AuthManager::instance();
+        $user = $auth->getUser();
+
         $event->addCreateCredentialTypeItem(self::class, $this->f3->get('intl.core.auth_webauthn.menu_title'), AuthManager::MODE_CREDENTIALS, [
             'type' => AuthSchemeInfoCollectionEvent::ACTION_TYPE_FORM,
             'url' => 'auth/webauthn'
         ]);
-    }
 
-    /**
-     * Returns the dashboard block.
-     *
-     * @param UIBuildEvent $event the event to collect
-     * the dashboard block
-     * @return void
-     */
-    public function onDashboardBlocks(UIBuildEvent $event) {
-        $tpl = Template::instance();
+        $credentials = $this->getSavedCredentials($user, null, true);
+        if (count($credentials) > 0) {
+            $credentialList = [];
+            foreach ($credentials as $credential) {
+                $credentialList[] = [
+                    'id' => $credential['id'],
+                    'subtype' => ($credential['use'] == self::USE_PASSKEY) ? $this->f3->get('intl.core.auth_webauthn.dashboard_passkey_label') : $this->f3->get('intl.core.auth_webauthn.dashboard_verify_label'),
+                    'title' => $credential['display_name'],
+                    'first_time' => $credential['activity']['first_time'],
+                    'last_time' => $credential['activity']['last_time'],
+                    'actions' => [
+                        [
+                            'type' => AuthSchemeInfoCollectionEvent::ACTION_TYPE_AJAX,
+                            'title' => $this->f3->get('intl.common.delete'),
+                            'confirm' => $this->f3->get('intl.core.auth_webauthn.credential_confirm_delete'),
+                            'class' => 'is-danger',
+                            'url' => 'auth/webauthn/credentials/' . $credential['id'],
+                            'params' => [ 'method' => 'DELETE' ]
+                        ]
+                    ]
+                ];
+            }
 
-        $auth = AuthManager::instance();
-        $user = $auth->getUser();
-
-        $base_path = $this->f3->get('base_path');
-
-        $token = new SecurityToken();
-        $this->f3->set('webauthn_tk', $token->generate('webauthn', SecurityToken::OPTION_BIND_SESSION));
-
-        $this->f3->set('js_data.intl.credential_confirm_delete',  $this->f3->get('intl.core.auth_webauthn.credential_confirm_delete'));
-
-        $event->addBlock('webauthn', $tpl->render('auth_webauthn_dashboard.html', false), 0, [
-            'title' => $this->f3->get('intl.core.auth_webauthn.webauthn_title')
-        ]);
+            $event->addUserCredentialList(self::class, $this->f3->get('intl.core.auth_webauthn.credential_list_title'), AuthManager::MODE_CREDENTIALS, $credentialList, 0, true);
+        }
     }
 
     /**

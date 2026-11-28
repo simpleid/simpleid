@@ -167,46 +167,28 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
         $auth = AuthManager::instance();
         $user = $auth->getUser();
 
-        if (!isset($user['otp'])) {
+        if (isset($user['otp'])) {
+            $event->addUserCredentialList(self::class, $this->f3->get('intl.core.auth_otp.credential_list_title'), AuthManager::MODE_VERIFY, [
+                [
+                    'id' => 'otp',
+                    'actions' => [
+                        [
+                            'type' => AuthSchemeInfoCollectionEvent::ACTION_TYPE_FORM,
+                            'title' => $this->f3->get('intl.common.disable'),
+                            'class' => 'is-danger',
+                            'url' => 'auth/otp',
+                            'params' => [ 'op' => 'disable' ]
+                        ]
+                    ]
+                ]
+            ]);
+        } else {
             $event->addCreateCredentialTypeItem(self::class, $this->f3->get('intl.core.auth_otp.menu_title'), AuthManager::MODE_VERIFY, [
                 'type' => AuthSchemeInfoCollectionEvent::ACTION_TYPE_FORM,
                 'url' => 'auth/otp',
                 'params' => [ 'op' => 'enable' ]
             ]);
         }
-    }
-
-    /**
-     * Returns the dashboard OTP block.
-     *
-     * @param UIBuildEvent $event the event to collect
-     * the dashboard OTP block
-     * @return void
-     */
-    public function onDashboardBlocks(UIBuildEvent $event) {
-        $auth = AuthManager::instance();
-        $user = $auth->getUser();
-
-        $base_path = $this->f3->get('base_path');
-
-        $token = new SecurityToken();
-        $tk = $token->generate('otp', SecurityToken::OPTION_BIND_SESSION);
-
-        $html = '<p>' . $this->f3->get('intl.core.auth_otp.about_otp') . '</p>';
-
-        if (isset($user['otp'])) {
-            $html .= '<p>' . $this->f3->get('intl.core.auth_otp.otp_enabled_block') . '</p>';
-            $html .= '<form action="' . $base_path . 'auth/otp" method="post" enctype="application/x-www-form-urlencoded"><input type="hidden" name="tk" value="'. $tk . '"/>';
-            $html .= '<button type="submit" name="op" value="disable">' . $this->f3->get('intl.common.disable') . '</button></form>';
-        } else {
-            $html .= '<p>' . $this->f3->get('intl.core.auth_otp.otp_disabled_block') . '</p>';
-            $html .= '<form action="' . $base_path . 'auth/otp" method="post" enctype="application/x-www-form-urlencoded"><input type="hidden" name="tk" value="'. $tk . '"/>';
-            $html .= '<button type="submit" name="op" value="enable">' . $this->f3->get('intl.common.enable') . '</button></form>';
-        }
-        
-        $event->addBlock('otp', $html, 0, [
-            'title' => $this->f3->get('intl.core.auth_otp.otp_title')
-        ]);
     }
 
     /**

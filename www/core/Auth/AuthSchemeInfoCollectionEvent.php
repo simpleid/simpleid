@@ -27,8 +27,8 @@ use SimpleID\Util\Events\BaseEvent;
 /**
  * XX
  * 
- * @phpstan-type _Action array{type: string, url: string, params: array<string, mixed>, confirm?: string, class?: string|array<string>}
- * @phpstan-type _UserCredential array{id: string, title: string, description?: string, first_time?: int, last_time?: int, actions: array<_Action>}
+ * @phpstan-type _Action array{type: string, url: string, params?: array<string, mixed>, title?: string, confirm?: string, class?: string|array<string>}
+ * @phpstan-type _UserCredential array{id: string, subtype?: string, title?: string, description?: string, first_time?: int, last_time?: int, actions?: array<_Action>}
  */
 class AuthSchemeInfoCollectionEvent extends BaseEvent {
 
@@ -44,6 +44,7 @@ class AuthSchemeInfoCollectionEvent extends BaseEvent {
 
     /**
      * @param _Action $action
+     * @return void
      */
     public function addCreateCredentialTypeItem(string $id, string $title, int $mode, array $action, int $weight = 0) {
         $this->createCredentialTypes[] = [
@@ -60,14 +61,16 @@ class AuthSchemeInfoCollectionEvent extends BaseEvent {
 
     /**
      * @param array<_UserCredential> $credentials
+     * @return void
      */
-    public function addUserCredentialList(string $id, string $title, int $mode, array $credentials, int $weight = 0) {
+    public function addUserCredentialList(string $id, string $title, int $mode, array $credentials, int $weight = 0, bool $allowMultiple = false) {
         $this->userCredentials[] = [
             '#data' => [
                 'id' => $id,
                 'title' => $title,
                 'mode' => $mode,
-                'credentials' => $credentials
+                'credentials' => $credentials,
+                'allow_multiple' => $allowMultiple
             ],
             '#weight1' => $mode,
             '#weight2' => $weight
@@ -90,12 +93,16 @@ class AuthSchemeInfoCollectionEvent extends BaseEvent {
         return array_values(array_map(function($a) { return $a['#data']; }, $this->createCredentialTypes));
     }
 
-    public function getUserCredentials() {
+    public function getUserCredentials(): array {
         uasort($this->userCredentials, [ $this, 'sortByTwoWeights' ]);
-        return array_map(function($a) { return $a['#data']; }, $this->userCredentials);
+        return array_values(array_map(function($a) { return $a['#data']; }, $this->userCredentials));
     }
 
-    protected function sortByTwoWeights($a, $b) {
+    /**
+     * @param mixed $a
+     * @param mixed $b
+     */
+    protected function sortByTwoWeights($a, $b): int {
         if ($a['#weight1'] == $b['#weight1']) { 
             if ($a['#weight2'] == $b['#weight2']) return 0;
             return ($a['#weight2'] < $b['#weight2']) ? -1 : 1;
