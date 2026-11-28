@@ -8,9 +8,7 @@ updates:
     schedule:
       interval: weekly
     ignore:
-      - dependency-name: 'phpunit/phpunit'
-        update-types: ["version-update:semver-patch"]
-      - dependency-name: 'phpstan/phpstan'
+      - dependency-name: '*'
         update-types: ["version-update:semver-patch"]
 
   # NPM
