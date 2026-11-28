@@ -20,12 +20,26 @@
  */
 
 import Alpine from 'alpinejs';
+import anchor from '@alpinejs/anchor';
 import collapse from '@alpinejs/collapse';
 import Clipboard from '@ryangjchandler/alpine-clipboard';
 import deepmerge from 'deepmerge';
 
+Alpine.plugin(anchor);
 Alpine.plugin(collapse);
 Alpine.plugin(Clipboard);
+
+Alpine.magic('format', () => (template, data = {}) => {
+  if (!template) return '';
+  
+  return template.replace(/\{([\w.]+)\}/g, (match, path) => {
+    const value = path.split('.').reduce((obj, key) => obj?.[key], data);
+    return value !== undefined ? value : match;
+  });
+});
+
+window.Alpine = Alpine;
+Alpine.start();
 
 window.deepmerge = deepmerge;
 window.Alpine = Alpine;

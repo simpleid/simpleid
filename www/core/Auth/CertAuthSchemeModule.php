@@ -24,6 +24,7 @@ namespace SimpleID\Auth;
 
 use Psr\Log\LogLevel;
 use SimpleID\Auth\NonInteractiveAuthEvent;
+use SimpleID\Auth\AuthSchemeInfoCollectionEvent;
 use SimpleID\Store\StoreManager;
 use SimpleID\Util\Events\BaseDataCollectionEvent;
 
@@ -53,6 +54,29 @@ class CertAuthSchemeModule extends AuthSchemeModule {
             $event->setAuthLevel(AuthManager::AUTH_LEVEL_NON_INTERACTIVE);
         } else {
             $this->logger->log(LogLevel::DEBUG, 'Client SSL certificate presented, but no user with that certificate exists.');
+        }
+    }
+
+    /**
+     * @param AuthSchemeInfoCollectionEvent $event
+     * @return void
+     */
+    public function onAuthSchemeInfoCollectionEvent(AuthSchemeInfoCollectionEvent $event) {
+        $auth = AuthManager::instance();
+        $user = $auth->getUser();
+
+        if ($user->exists('cert.certs') && (count($user->get('cert.certs')) > 0)) {
+            $credentialList = [];
+
+            foreach ($user->get('cert.certs') as $cert) {
+                list($id, $dn) = explode(';', $cert, 2);
+                $credentialList[] = [
+                    'id' => $id,
+                    'title' => $dn
+                ];
+            }
+
+            $event->addUserCredentialList(self::class, $this->f3->get('intl.core.auth_cert.credential_list_title'), AuthManager::MODE_CREDENTIALS, $credentialList, 0, true);
         }
     }
 

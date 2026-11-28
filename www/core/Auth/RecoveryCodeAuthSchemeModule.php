@@ -23,6 +23,7 @@
 namespace SimpleID\Auth;
 
 use SimpleID\Auth\AuthManager;
+use SimpleID\Auth\AuthSchemeInfoCollectionEvent;
 use SimpleID\Crypt\Random;
 use SimpleID\Crypt\SecurityToken;
 use SimpleID\Store\StoreManager;
@@ -80,7 +81,7 @@ class RecoveryCodeAuthSchemeModule extends AuthSchemeModule {
         } elseif (($this->f3->exists('POST.active_block') && ($this->f3->get('POST.active_block') == 'auth_recovery') && $this->f3->get('POST.op') == 'reset')
             || !$user->exists('recovery.recovery_codes') || (count($user->get('recovery.recovery_codes')) == 0)) {
 
-            if ($this->isBlockActive('auth_recovery') && (($this->f3->exists('POST.tk') === false) || (!$token->verify($this->f3->get('POST.tk'), 'recovery')))) {
+            if ($this->isBlockActive('auth_recovery') && (($this->f3->exists('POST.tk') === false) || (!$token->verify($this->f3->get('POST.tk'), 'my_credentials')))) {
                 $this->f3->set('message', $this->f3->get('intl.common.invalid_tk'));
                 $this->f3->mock('GET /my/dashboard');
                 return;
@@ -119,36 +120,34 @@ class RecoveryCodeAuthSchemeModule extends AuthSchemeModule {
     }
 
     /**
-     * Returns the dashboard recovery code block.
-     *
-     * @param UIBuildEvent $event the event to collect
-     * the dashboard recovery code block
+     * @param AuthSchemeInfoCollectionEvent $event
      * @return void
      */
-    public function onDashboardBlocks(UIBuildEvent $event) {
+    public function onAuthSchemeInfoCollectionEvent(AuthSchemeInfoCollectionEvent $event) {
         $auth = AuthManager::instance();
         $user = $auth->getUser();
 
-        $base_path = $this->f3->get('base_path');
-
-        $token = new SecurityToken();
-        $tk = $token->generate('recovery', SecurityToken::OPTION_BIND_SESSION);
-
-        $html = '<p>' . $this->f3->get('intl.core.auth_recovery.about_recovery') . '</p>';
-
         if (isset($user['recovery'])) {
-            $html .= '<p>' . $this->f3->get('intl.core.auth_recovery.recovery_codes_generated') . '</p>';
-            $html .= '<form action="' . $base_path . 'auth/recovery" method="post" enctype="application/x-www-form-urlencoded"><input type="hidden" name="tk" value="'. $tk . '"/><input type="hidden" name="active_block" value="auth_recovery"/>';
-            $html .= '<button type="submit" name="op" value="reset">' . $this->f3->get('intl.common.reset') . '</button></form>';
+            $event->addUserCredentialList(self::class, $this->f3->get('intl.core.auth_recovery.credential_list_title'), AuthManager::MODE_VERIFY, [
+                [
+                    'id' => 'recovery',
+                    'actions' => [
+                        [
+                            'type' => AuthSchemeInfoCollectionEvent::ACTION_TYPE_FORM,
+                            'title' => $this->f3->get('intl.common.reset'),
+                            'url' => 'auth/recovery',
+                            'params' => [ 'active_block' => 'auth_recovery', 'op' => 'reset' ]
+                        ]
+                    ]
+                ]
+            ], 10);
         } else {
-            $html .= '<p>' . $this->f3->get('intl.core.auth_recovery.recovery_codes_not_generated') . '</p>';
-            $html .= '<form action="' . $base_path . 'auth/recovery" method="post" enctype="application/x-www-form-urlencoded"><input type="hidden" name="tk" value="'. $tk . '"/><input type="hidden" name="active_block" value="auth_recovery"/>';
-            $html .= '<button type="submit" name="op" value="reset">' . $this->f3->get('intl.core.auth_recovery.generate_recovery_code_button') . '</button></form>';
+            $event->addCreateCredentialTypeItem(self::class, $this->f3->get('intl.core.auth_recovery.menu_title'), AuthManager::MODE_VERIFY, [
+                'type' => AuthSchemeInfoCollectionEvent::ACTION_TYPE_FORM,
+                'url' => 'auth/recovery',
+                'params' => [ 'active_block' => 'auth_recovery', 'op' => 'reset' ]
+            ], 10);
         }
-        
-        $event->addBlock('recovery', $html, 10, [
-            'title' => $this->f3->get('intl.core.auth_recovery.recovery_title')
-        ]);
     }
 
     /**

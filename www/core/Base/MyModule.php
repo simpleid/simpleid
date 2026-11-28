@@ -22,9 +22,10 @@
 
 namespace SimpleID\Base;
 
-use SimpleID\Auth\AuthManager;
 use SimpleID\Module;
 use SimpleID\ModuleManager;
+use SimpleID\Auth\AuthManager;
+use SimpleID\Auth\AuthSchemeInfoCollectionEvent;
 use SimpleID\Base\ConsentEvent;
 use SimpleID\Crypt\SecurityToken;
 use SimpleID\Protocols\ProtocolResultEvent;
@@ -44,6 +45,8 @@ class MyModule extends Module {
         $f3->route('GET /my/apps [sync]', 'SimpleID\Base\MyModule->apps_sync');
         $f3->route('GET /my/profile', 'SimpleID\Base\MyModule->profile');
         /* AJAX handlers */
+        $f3->route('GET /my/credentials [ajax]', 'SimpleID\Base\MyModule->credentials');
+
         $f3->route('GET /my/apps [ajax]', 'SimpleID\Base\MyModule->apps_ajax');
         $f3->map('/my/apps/@cid', 'SimpleID\Base\MyModule');
     }
@@ -81,6 +84,34 @@ class MyModule extends Module {
      */
     public function dashboard() {
         $this->blocksPage($this->f3->get('intl.core.my.dashboard_title'), 'dashboard_blocks');
+    }
+
+    /**
+     * @return void
+     */
+    public function credentials() {
+        $this->checkHttps('error', true);
+
+        header('Content-Type: application/json');
+
+        $token = new SecurityToken();
+        if (!$this->f3->exists('HEADERS.X-Request-Token') || !$token->verify($this->f3->get('HEADERS.X-Request-Token'), 'my_credentials')) {
+            $this->f3->status(401);
+            print json_encode([
+                'error' => 'unauthorized',
+                'error_description' => $this->f3->get('intl.common.unauthorized')
+            ]);
+            return;
+        }
+
+        $event = new AuthSchemeInfoCollectionEvent();
+        \Events::instance()->dispatch($event);
+        $results = [
+            'addMenu' => $event->getCreateCredentialTypeList(),
+            'credentials' => $event->getUserCredentials()
+        ];
+
+        print json_encode($results);
     }
 
     /**
@@ -250,6 +281,12 @@ class MyModule extends Module {
 
         $event->addBlock('welcome', $this->f3->get('intl.core.my.logged_in_as', [ $user->getDisplayName(), $user['uid'] ]), -10, [
             'title' => $this->f3->get('intl.core.my.welcome_title')
+        ]);
+
+        $token = new SecurityToken();
+        $this->f3->set('my_credentials_tk', $token->generate('my_credentials', SecurityToken::OPTION_BIND_SESSION));
+        $event->addBlock('credentials', $tpl->render('my_credentials.html', false), -1, [
+            'title' => $this->f3->get('intl.core.my.credentials_title')
         ]);
 
         $event->addBlock('activity', $tpl->render('my_activity.html', false), 0, [

@@ -234,3 +234,18 @@ $valid-color: var(--green) !default;
     font-weight: util.font-weight(normal);
   }
 }
+
+/* Popup menus */
+.form-popup-menu {
+  z-index: 10;
+  background-color: $button-background-color;
+  border: 1px solid $border-color;
+  cursor: pointer;
+
+  a {
+    @include util.padding-x(util.size(6));
+    @include util.padding-y(util.size(2));
+    display: block;
+  }
+}
+

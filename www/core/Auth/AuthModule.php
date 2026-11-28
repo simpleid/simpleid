@@ -242,7 +242,12 @@ class AuthModule extends Module {
             if ($test_user != null) $form_state['uid'] = $test_user['uid'];
 
             $form_state['auth_level'] = $submit_event->getAuthLevel();
-            $form_state['modules'] = $submit_event->getAuthModuleNames();
+            if (!isset($form_state['modules'])) {
+                $form_state['modules'] = $submit_event->getAuthModuleNames();
+            } else {
+                $form_state['modules'] = array_merge($form_state['modules'], $submit_event->getAuthModuleNames());
+            }
+            
         } else {
             $this->f3->set('message', $submit_event->getMessages());
             $this->loginForm($params, $form_state);
