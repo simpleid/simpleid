@@ -365,10 +365,10 @@ body.is-dialog-page { background: light-dark(var(--grey-950), black); }
 }
 
 /* Passkeys and security keys ----------------------------------------------- */
-.badge--webauthn-passkey {
+.badge--credential-passkey {
   background-color: var(--brand-color-700); border-color: var(--brand-color-700); color: white;
 }
-.badge--webauthn-verify {
+.badge--credential-security-key {
   background-color: var(--green); border-color: var(--green); color: white;
 }
 

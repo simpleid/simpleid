@@ -136,10 +136,18 @@ label.option { font-weight: normal; }
     text-align: right;
     vertical-align: middle;
   }
-  .table-list-item--description { color: light-dark(var(--grey-400), var(--grey-700)); }
+  .table-list-item--description {
+    margin: util.size(1) 0;
+    color: light-dark(var(--grey-400), var(--grey-700)); 
+  }
   .table-list-item--details {
-    margin-top: util.size(2);
+    margin: util.size(1) 0;
     color: light-dark(var(--grey-400), var(--grey-700));
+  }
+
+  .table-list { 
+      margin: 0 0 0 util.size(8); 
+      tr.table-list-item.u-last { border-bottom-width: 0; }
   }
 }
 
