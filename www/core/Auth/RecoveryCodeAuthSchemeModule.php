@@ -81,7 +81,7 @@ class RecoveryCodeAuthSchemeModule extends AuthSchemeModule {
         } elseif (($this->f3->exists('POST.active_block') && ($this->f3->get('POST.active_block') == 'auth_recovery') && $this->f3->get('POST.op') == 'reset')
             || !$user->exists('recovery.recovery_codes') || (count($user->get('recovery.recovery_codes')) == 0)) {
 
-            if ($this->isBlockActive('auth_recovery') && (($this->f3->exists('POST.tk') === false) || (!$token->verify($this->f3->get('POST.tk'), 'recovery')))) {
+            if ($this->isBlockActive('auth_recovery') && (($this->f3->exists('POST.tk') === false) || (!$token->verify($this->f3->get('POST.tk'), 'my_credentials')))) {
                 $this->f3->set('message', $this->f3->get('intl.common.invalid_tk'));
                 $this->f3->mock('GET /my/dashboard');
                 return;

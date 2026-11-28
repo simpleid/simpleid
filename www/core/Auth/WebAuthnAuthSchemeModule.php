@@ -120,7 +120,7 @@ class WebAuthnAuthSchemeModule extends AuthSchemeModule {
         header('Content-Type: application/json');
 
         $token = new SecurityToken();
-        if (!$this->f3->exists('HEADERS.X-Request-Token') || !$token->verify($this->f3->get('HEADERS.X-Request-Token'), 'webauthn')) {
+        if (!$this->f3->exists('HEADERS.X-Request-Token') || !$token->verify($this->f3->get('HEADERS.X-Request-Token'), 'my_credentials')) {
             $this->f3->status(401);
             print json_encode([
                 'error' => 'unauthorized',

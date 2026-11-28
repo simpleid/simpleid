@@ -76,7 +76,7 @@ class OTPAuthSchemeModule extends AuthSchemeModule {
         }
 
         if ($this->f3->get('POST.op') == 'disable') {
-            if (($this->f3->exists('POST.tk') === false) || (!$token->verify($this->f3->get('POST.tk'), 'otp'))) {
+            if (($this->f3->exists('POST.tk') === false) || (!$token->verify($this->f3->get('POST.tk'), 'my_credentials'))) {
                 $this->f3->set('message', $this->f3->get('intl.common.invalid_tk'));
                 $this->f3->mock('GET /my/dashboard');
                 return;
